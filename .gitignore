@@ -1,0 +1,8 @@
+.gradle/
+!.idea/
+.idea/*
+!.idea/codeStyles/
+!.idea/copyright/
+!.idea/runConfigurations/
+build/
+out/

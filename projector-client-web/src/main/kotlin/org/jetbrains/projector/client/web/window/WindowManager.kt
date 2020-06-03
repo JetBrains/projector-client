@@ -1,0 +1,84 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019-2020 JetBrains s.r.o.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.jetbrains.projector.client.web.window
+
+import org.jetbrains.projector.client.web.state.ClientStateMachine
+import org.jetbrains.projector.client.web.state.LafListener
+import org.jetbrains.projector.common.protocol.toClient.WindowData
+import org.w3c.dom.HTMLCanvasElement
+
+class WindowManager(private val stateMachine: ClientStateMachine) : Iterable<Window>, LafListener {
+
+  companion object {
+    const val zIndexStride = 10
+  }
+
+  private val windows = mutableMapOf<Int, Window>()
+
+  fun getWindowCanvas(windowId: Int): HTMLCanvasElement? = windows[windowId]?.canvas
+
+  fun getWindowZIndex(windowId: Int): Int? = windows[windowId]?.zIndex
+
+  /** Returns topmost visible window, containing point. Contain check includes window header and borders.  */
+  fun getTopWindow(x: Int, y: Int): Window? = windows.filter { it.value.contains(x, y) }.maxBy { it.value.zIndex }?.value
+
+  fun getOrCreate(windowData: WindowData): Window {
+    val window = windows[windowData.id] ?: Window(windowData, stateMachine)
+    windows[windowData.id] = window
+    return window
+  }
+
+  fun cleanup(presentedWindowIds: Set<Int>) {
+    windows.keys.retainAll { id ->
+      if (id in presentedWindowIds) {
+        true
+      }
+      else {
+        windows.getValue(id).dispose()
+        false
+      }
+    }
+  }
+
+  override fun lookAndFeelChanged() {
+    windows.forEach { it.value.lookAndFeelChanged() }
+  }
+
+  operator fun get(windowId: Int): Window? = windows[windowId]
+
+  override fun iterator(): Iterator<Window> = windows.values.iterator()
+
+  fun bringToFront(window: Window) {
+    val topWindow = windows.maxBy { it.value.zIndex }?.value ?: return
+    if (topWindow == window) {
+      return
+    }
+
+    val currentZIndex = window.zIndex
+    val topZIndex = topWindow.zIndex
+
+    windows.filter { it.value.zIndex in currentZIndex..topZIndex }.forEach { it.value.zIndex -= zIndexStride }
+    window.zIndex = topZIndex
+  }
+}

@@ -1,0 +1,90 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019-2020 JetBrains s.r.o.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.jetbrains.projector.client.web
+
+import org.jetbrains.projector.client.common.misc.Logger
+import org.jetbrains.projector.client.common.misc.ParamsProvider
+import org.jetbrains.projector.client.web.state.ClientAction
+import org.jetbrains.projector.client.web.state.ClientStateMachine
+import kotlin.browser.window
+import kotlin.js.Json
+import kotlin.js.Promise
+import kotlin.js.json
+
+// todo: remove after https://youtrack.jetbrains.com/issue/KT-36037 is resolved
+external class Permissions {
+
+  fun query(permissionDescriptor: Json): Promise<PermissionStatus>
+}
+
+external class PermissionStatus
+
+class Application {
+
+  private val stateMachine = ClientStateMachine()
+  private val windowSizeController = WindowSizeController(stateMachine)
+
+  fun start() {
+    val url = when (ParamsProvider.ENABLE_WSS) {
+      false -> "ws://${ParamsProvider.HOST}:${ParamsProvider.PORT}"
+
+      true -> "wss://${ParamsProvider.HOST}:${ParamsProvider.PORT}"
+    }
+
+    try {
+      setClipboardPermissions()
+    }
+    catch (t: Throwable) {
+      logger.error(t) { "Can't set clipboard permissions, maybe they are unsupported on your browser..." }
+    }
+
+    stateMachine.fire(
+      ClientAction.Start(
+        stateMachine = stateMachine,
+        url = url,
+        windowSizeController = windowSizeController
+      )
+    )
+  }
+
+  private fun setClipboardPermissions() {
+    val permissions = window.navigator.asDynamic().permissions as Permissions
+
+    listOf(
+      "clipboard-read",
+      "clipboard-write"
+    )
+      .forEach { permissionName ->
+        permissions
+          .query(json("name" to permissionName))
+          .then { logger.debug { "got permission $permissionName" } }
+          .catch { logger.debug { "can't get permission $permissionName" } }
+      }
+  }
+
+  companion object {
+
+    private val logger = Logger(Application::class.simpleName!!)
+  }
+}
