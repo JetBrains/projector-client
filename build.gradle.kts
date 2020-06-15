@@ -56,3 +56,12 @@ subprojects {
     }
   }
 }
+
+if (System.getenv("CHROME_BIN") == null) {
+  gradle.taskGraph.beforeTask {
+    if (name in setOf("jsTest", "jsBrowserTest")) {
+      actions.clear()
+      System.err.println("Skipping task as no CHROME_BIN env is set")
+    }
+  }
+}
