@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 plugins {
   kotlin("multiplatform") apply false
+  `maven-publish`
 }
 
 val kotlinVersion: String by project

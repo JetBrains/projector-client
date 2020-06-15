@@ -23,6 +23,7 @@
  */
 plugins {
   kotlin("js")
+  `maven-publish`
 }
 
 val serializationVersion: String by project

@@ -23,6 +23,7 @@
  */
 plugins {
   kotlin("multiplatform")
+  `maven-publish`
 }
 
 val kotlinVersion: String by project

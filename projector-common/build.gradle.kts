@@ -24,6 +24,7 @@
 plugins {
   kotlin("multiplatform")
   kotlin("plugin.serialization")
+  `maven-publish`
 }
 
 val kotlinVersion: String by project
