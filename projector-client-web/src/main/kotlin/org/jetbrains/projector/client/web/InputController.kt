@@ -216,11 +216,11 @@ class InputController(private val openingTimeStamp: Int,
     val isKeystroke = KeyModifier.CTRL_KEY in message.modifiers  // like Ctrl+S
     val isBrowserKeyStroke = isKeystroke && (message.code != "KeyV")  // don't block paste keystroke
 
-    if (type == ClientKeyEvent.KeyEventType.DOWN && event.key == "F10") {  // todo: move to client state
+    if (type == ClientKeyEvent.KeyEventType.DOWN && event.key == "F10" && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
       ClientStats.printStats()
     }
 
-    if (type == ClientKeyEvent.KeyEventType.DOWN && event.key == "F11") {  // todo: move to client state
+    if (type == ClientKeyEvent.KeyEventType.DOWN && event.key == "F11" && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
       (ParamsProvider.REPAINT_AREA as? RepaintAreaSetting.Enabled)?.let {
         it.show = !it.show
       }
