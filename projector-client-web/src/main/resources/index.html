@@ -26,7 +26,8 @@
 <head>
   <title>Please wait...</title>
   <meta charset="UTF-8">
-
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <link href="pj.png" rel="shortcut icon" type="image/x-icon">
 
   <script src="https://cdn.jsdelivr.net/pako/1.0.3/pako.min.js"></script>
@@ -54,6 +55,11 @@
       }
     }
   </script>
+  <style>
+    body {
+      touch-action: none;
+    }
+  </style>
 </head>
 
 <body onload="onLoad()">
