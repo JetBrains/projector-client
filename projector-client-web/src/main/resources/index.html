@@ -32,13 +32,13 @@
 
   <script src="https://cdn.jsdelivr.net/pako/1.0.3/pako.min.js"></script>
   <script>
-    // Disable hashing for some scripts (described here: https://stackoverflow.com/questions/118884/how-to-force-the-browser-to-reload-cached-css-js-files):
+    // Disable caching for some scripts (described here: https://stackoverflow.com/questions/118884/how-to-force-the-browser-to-reload-cached-css-js-files):
     const timestamp = Math.floor(Date.now());
-    const notHashableScripts = [
+    const notCachableScripts = [
       "projector-client-web.js",
     ];
 
-    notHashableScripts.forEach((script) => document.write(
+    notCachableScripts.forEach((script) => document.write(
         '<script src="' +
         script +
         '?v=' +
