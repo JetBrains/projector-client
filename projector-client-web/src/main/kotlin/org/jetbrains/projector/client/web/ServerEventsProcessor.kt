@@ -31,6 +31,7 @@ import org.jetbrains.projector.client.web.misc.ImageCacher
 import org.jetbrains.projector.client.web.misc.PingStatistics
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.state.ProjectorUI
+import org.jetbrains.projector.client.web.window.OnScreenMessenger
 import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.toClient.*
@@ -75,7 +76,11 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           is ServerMarkdownEvent.ServerMarkdownBrowseUriEvent -> browseUri(command.link)
         }
 
-        is ServerWindowColorsEvent -> ProjectorUI.setColors(command.colors)
+        is ServerWindowColorsEvent -> {
+          ProjectorUI.setColors(command.colors)
+          // todo: should WindowManager.lookAndFeelChanged() be called here?
+          OnScreenMessenger.lookAndFeelChanged()
+        }
       }
     }
 
