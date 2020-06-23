@@ -32,7 +32,6 @@ import org.jetbrains.projector.client.common.canvas.Extensions.applyStrokeData
 import org.jetbrains.projector.client.common.canvas.Extensions.toContext2dRule
 import org.jetbrains.projector.client.common.canvas.Extensions.toFillRule
 import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
-import org.jetbrains.projector.client.common.canvas.Extensions.toRgbaColor
 import org.jetbrains.projector.client.common.canvas.PaintColor
 import org.jetbrains.projector.client.common.canvas.PaintColor.SolidColor
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
@@ -143,8 +142,8 @@ class Renderer(private val renderingSurface: RenderingSurface) {
         ctx.save()
 
         Do exhaustive when (this) {
-          is CommonRectangle -> SolidColor("#c00")
-          is CommonPath -> SolidColor("#00c")
+          is CommonRectangle -> SolidColor(0xFFCC0000)
+          is CommonPath -> SolidColor(0xFF0000CC)
         }.run(ctx::setStrokeStyle)
 
         ctx.stroke()
@@ -255,11 +254,11 @@ class Renderer(private val renderingSurface: RenderingSurface) {
     ensureAlpha()
   }
 
-  fun setColor(color: String) {
+  fun setColor(color: Int) {
     requestedState.paint = color.toColor()
   }
 
-  fun setGradientPaint(p1: Point, p2: Point, color1: String, color2: String) {
+  fun setGradientPaint(p1: Point, p2: Point, color1: Int, color2: Int) {
     val linearGradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y).apply {
       addColorStop(0.0, color1)
       addColorStop(1.0, color2)
@@ -567,18 +566,15 @@ class Renderer(private val renderingSurface: RenderingSurface) {
 
   companion object {
 
-    fun String.toColor(): PaintColor {
+    fun Int.toColor(): PaintColor {
       return SolidColor(this)
     }
 
     private val logger = Logger(Renderer::class.simpleName!!)
 
     private fun createNextRandomColor(): PaintColor {
-      val r = Random.nextInt(256)
-      val g = Random.nextInt(256)
-      val b = Random.nextInt(256)
-
-      return SolidColor("rgba($r,$g,$b,0.5)")
+      // Random argb color with 0.5 alpha
+      return SolidColor(0x7F_00_00_00 + Random.nextInt(0x01_00_00_00))
     }
 
     private data class CanvasRenderingState(
@@ -623,7 +619,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
       var font: String = "${Defaults.FONT_SIZE}px Arial",
       var rule: AlphaCompositeRule = AlphaCompositeRule.SRC_OVER,
       var alpha: Double = 1.0,
-      var paint: PaintColor? = SolidColor(Defaults.FOREGROUND_COLOR_ARGB.toRgbaColor())
+      var paint: PaintColor? = SolidColor(Defaults.FOREGROUND_COLOR_ARGB)
     )
   }
 }

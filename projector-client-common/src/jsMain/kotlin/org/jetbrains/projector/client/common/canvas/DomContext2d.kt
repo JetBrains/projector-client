@@ -25,6 +25,7 @@ package org.jetbrains.projector.client.common.canvas
 
 import org.jetbrains.projector.client.common.canvas.Canvas.ImageSource
 import org.jetbrains.projector.client.common.canvas.Context2d.*
+import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
 import org.jetbrains.projector.client.common.canvas.PaintColor.Gradient
 import org.jetbrains.projector.client.common.canvas.PaintColor.SolidColor
 import org.jetbrains.projector.common.misc.Do
@@ -304,13 +305,13 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
 
   @Suppress("IMPLICIT_CAST_TO_ANY")
   fun PaintColor.extract() = when (this) {
-    is SolidColor -> color
+    is SolidColor -> argb.argbIntToRgbaString()
     is Gradient -> (this as DOMGradient).canvasGradient
   }
 
   class DOMGradient(val canvasGradient: CanvasGradient) : Gradient() {
-    override fun addColorStop(offset: Double, color: String) {
-      canvasGradient.addColorStop(offset, color)
+    override fun addColorStop(offset: Double, argb: Int) {
+      canvasGradient.addColorStop(offset, argb.argbIntToRgbaString())
     }
   }
 
