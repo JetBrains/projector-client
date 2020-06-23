@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.misc
 
+import com.intellij.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.debug.DivPingShower
 import org.jetbrains.projector.client.web.debug.NoPingShower
@@ -51,7 +52,7 @@ class PingStatistics(
   }
 
   fun onPingReply(pingReply: ServerPingReplyEvent) {
-    val currentTimeStamp = currentTimeStamp.toInt() - openingTimeStamp
+    val currentTimeStamp = TimeStamp.current.toInt() - openingTimeStamp
 
     val ping = currentTimeStamp - pingReply.clientTimeStamp
 

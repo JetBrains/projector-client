@@ -28,6 +28,8 @@ expect object ParamsProvider {
   val CLIPPING_BORDERS: Boolean
   val SHOW_TEXT_WIDTH: Boolean
   val REPAINT_AREA: RepaintAreaSetting
+  val LOG_UNSUPPORTED_EVENTS: Boolean
+  val IMAGE_TTL: Double
 }
 
 sealed class RepaintAreaSetting {

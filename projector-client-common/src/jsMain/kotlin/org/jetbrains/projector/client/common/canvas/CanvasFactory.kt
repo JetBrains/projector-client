@@ -23,11 +23,37 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
+import org.w3c.dom.CanvasImageSource
+import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
+import org.w3c.dom.Image
 import kotlin.browser.document
 
 actual object CanvasFactory {
   actual fun create(): Canvas {
     return DomCanvas(document.createElement("canvas") as HTMLCanvasElement)
+  }
+
+  actual fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit) {
+    Image().apply {
+      src = "data:image/png;base64,${pngBase64}"
+      onload = { onLoad(DomCanvas.DomImageSource(this)) }
+    }
+  }
+
+  actual fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit) {
+    createEmptyImage()
+      .run(DomCanvas::DomImageSource)
+      .run(onLoad)
+  }
+
+  private fun createEmptyImage(): CanvasImageSource = (document.createElement("div") as HTMLCanvasElement).apply {
+    width = 20
+    height = 20
+
+    (getContext("2d") as CanvasRenderingContext2D).apply {
+      fillStyle = "pink"
+      fillRect(0.0, 0.0, 20.0, 20.0)
+    }
   }
 }

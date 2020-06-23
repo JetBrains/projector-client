@@ -51,11 +51,11 @@ actual object ParamsProvider {
   actual val CLIPPING_BORDERS: Boolean
   val HOST: String
   val PORT: String
-  val LOG_UNSUPPORTED_EVENTS: Boolean
+  actual val LOG_UNSUPPORTED_EVENTS: Boolean
   val DOUBLE_BUFFERING: Boolean
   val ENABLE_COMPRESSION: Boolean
   val TO_CLIENT_FORMAT: ToClientFormat
-  val IMAGE_TTL: Double
+  actual val IMAGE_TTL: Double
   val FLUSH_DELAY: Int?
   actual val SHOW_TEXT_WIDTH: Boolean
   val SHOW_SENT_RECEIVED: Boolean

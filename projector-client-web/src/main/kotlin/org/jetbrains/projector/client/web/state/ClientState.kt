@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.state
 
+import com.intellij.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.InputController
@@ -88,7 +89,7 @@ sealed class ClientState {
           binaryType = BinaryType.ARRAYBUFFER
 
           onopen = fun(_: Event) {
-            action.stateMachine.fire(ClientAction.WebSocket.Open(openingTimeStamp = currentTimeStamp.roundToInt()))
+            action.stateMachine.fire(ClientAction.WebSocket.Open(openingTimeStamp = TimeStamp.current.roundToInt()))
           }
 
           onclose = fun(event: Event) {
@@ -305,7 +306,7 @@ sealed class ClientState {
     private val pingStatistics = PingStatistics(
       openingTimeStamp = openingTimeStamp,
       requestPing = {
-        stateMachine.fire(ClientAction.AddEvent(ClientRequestPingEvent(clientTimeStamp = currentTimeStamp.toInt() - openingTimeStamp)))
+        stateMachine.fire(ClientAction.AddEvent(ClientRequestPingEvent(clientTimeStamp = TimeStamp.current.toInt() - openingTimeStamp)))
       }
     ).apply {
       onHandshakeFinished()
@@ -335,13 +336,13 @@ sealed class ClientState {
     @OptIn(ExperimentalStdlibApi::class)
     override fun consume(action: ClientAction) = when (action) {
       is ClientAction.WebSocket.Message -> {
-        val receiveTimeStamp = currentTimeStamp
+        val receiveTimeStamp = TimeStamp.current
         val decompressed = decompressor.decompress(action.message)
-        val decompressTimeStamp = currentTimeStamp
+        val decompressTimeStamp = TimeStamp.current
         val commands = decoder.decode(decompressed)
-        val decodeTimestamp = currentTimeStamp
+        val decodeTimestamp = TimeStamp.current
         serverEventsProcessor.process(commands, pingStatistics, typing, markdownPanelManager)
-        val drawTimestamp = currentTimeStamp
+        val drawTimestamp = TimeStamp.current
 
         ImageCacher.collectGarbage()
 
@@ -376,7 +377,7 @@ sealed class ClientState {
         ClientStats.drawingTimeMsAverage.add(drawingTimeMs)
         ClientStats.drawingTimeMsRate.add(drawingTimeMs)
 
-        val processTimestamp = currentTimeStamp
+        val processTimestamp = TimeStamp.current
 
         val otherProcessingTimeMs = processTimestamp - drawTimestamp
         val totalTimeMs = processTimestamp - receiveTimeStamp

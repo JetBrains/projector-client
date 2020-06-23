@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.misc
 
+import com.intellij.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.common.statistics.Average
 import org.jetbrains.projector.common.statistics.Rate
@@ -87,7 +88,7 @@ object ClientStats {
         .joinToString("\n") { it.generateString(SEPARATOR) }
 
       val rateStats = rateList
-        .map { it.reset(currentTimeStamp) }
+        .map { it.reset(TimeStamp.current) }
         .joinToString("\n") { it.generateString(SEPARATOR) }
 
       """
