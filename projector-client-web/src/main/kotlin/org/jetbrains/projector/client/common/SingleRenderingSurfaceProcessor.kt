@@ -26,8 +26,6 @@ package org.jetbrains.projector.client.web.canvas
 import org.jetbrains.projector.client.common.Renderer
 import org.jetbrains.projector.client.common.Renderer.Companion.RequestedRenderingState
 import org.jetbrains.projector.client.common.canvas.Canvas
-import org.jetbrains.projector.client.common.canvas.DomCanvas
-import org.jetbrains.projector.client.common.canvas.Extensions.toRgbaColor
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
@@ -131,7 +129,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
         )
 
         is ServerDrawImageEvent -> {
-          val image = ImageCacher.getImageData(imageId)?.let(DomCanvas::DomImageSource)
+          val image = ImageCacher.getImageData(imageId)
 
           if (image == null) {
             success = false

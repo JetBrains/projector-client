@@ -23,7 +23,9 @@
  */
 package org.jetbrains.projector.client.web.misc
 
-import org.jetbrains.projector.client.common.canvas.DomCanvas
+import com.intellij.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.common.canvas.Canvas
+import org.jetbrains.projector.client.common.canvas.CanvasFactory
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
@@ -33,11 +35,6 @@ import org.jetbrains.projector.common.protocol.data.ImageData
 import org.jetbrains.projector.common.protocol.data.ImageId
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientRequestImageDataEvent
-import org.w3c.dom.CanvasImageSource
-import org.w3c.dom.CanvasRenderingContext2D
-import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.Image
-import kotlin.browser.document
 
 object ImageCacher {
 
@@ -47,10 +44,10 @@ object ImageCacher {
     val width: Int,
     val height: Int,
     val singleRenderingSurfaceProcessor: SingleRenderingSurfaceProcessor,
-    val offscreenCanvas: CanvasImageSource
+    val offscreenCanvas: Canvas.ImageSource
   )
 
-  private val cache = mutableMapOf<ImageId, LivingEntity<CanvasImageSource>>()
+  private val cache = mutableMapOf<ImageId, LivingEntity<Canvas.ImageSource>>()
 
   private val requestedImages = mutableMapOf<ImageId, LivingEntity<Nothing?>>()
 
@@ -67,16 +64,16 @@ object ImageCacher {
     putImageAsync(imageId, imageData, repainter)
   }
 
-  fun getImageData(imageId: ImageId): CanvasImageSource? = when (imageId) {
+  fun getImageData(imageId: ImageId): Canvas.ImageSource? = when (imageId) {
     is ImageId.PVolatileImageId -> offscreenImages[imageId.id]?.offscreenCanvas
 
     is ImageId.BufferedImageId -> {
-      val imageData = cache[imageId]?.apply { lastUsageTimestamp = currentTimeStamp }?.data
+      val imageData = cache[imageId]?.apply { lastUsageTimestamp = TimeStamp.current }?.data
 
       if (imageData == null) {
         if (imageId !in requestedImages) {
           imagesToRequest.add(imageId)
-          requestedImages[imageId] = LivingEntity(currentTimeStamp, null)
+          requestedImages[imageId] = LivingEntity(TimeStamp.current, null)
         }
 
         null
@@ -97,11 +94,11 @@ object ImageCacher {
     val image = offscreenImages[offscreenTarget.pVolatileImageId]
 
     if (image == null || image.width != offscreenTarget.width || image.height != offscreenTarget.height) {
-      val offScreenCanvas = (document.createElement("canvas") as HTMLCanvasElement).apply {
+      val offScreenCanvas = CanvasFactory.create().apply {
         width = offscreenTarget.width
         height = offscreenTarget.height
       }
-      val offScreenRenderingSurface = UnbufferedRenderingSurface(DomCanvas(offScreenCanvas))
+      val offScreenRenderingSurface = UnbufferedRenderingSurface(offScreenCanvas)
 
       val offScreenCommandProcessor = SingleRenderingSurfaceProcessor(offScreenRenderingSurface)
 
@@ -109,7 +106,7 @@ object ImageCacher {
         width = offscreenTarget.width,
         height = offscreenTarget.height,
         singleRenderingSurfaceProcessor = offScreenCommandProcessor,
-        offscreenCanvas = offScreenCanvas
+        offscreenCanvas = offScreenCanvas.imageSource
       )
 
       return offScreenCommandProcessor
@@ -125,21 +122,17 @@ object ImageCacher {
   }
 
   private fun putImageAsync(imageId: ImageId, imageData: ImageData, repainter: () -> Unit) {
-    fun onLoad(image: CanvasImageSource) {
-      cache[imageId] = LivingEntity(currentTimeStamp, image)
+    fun onLoad(image: Canvas.ImageSource) {
+      cache[imageId] = LivingEntity(TimeStamp.current, image)
       repainter()
     }
 
     Do exhaustive when (imageData) {
-      is ImageData.PngBase64 -> Image().apply {
-        src = "data:image/png;base64,${imageData.pngBase64}"
-        onload = { onLoad(this) }
-      }
+      is ImageData.PngBase64 -> CanvasFactory.createImageSource(imageData.pngBase64, ::onLoad)
 
       is ImageData.Empty -> {
         logger.info { "Empty image received for $imageId" }
-
-        onLoad(createEmptyImage())
+        CanvasFactory.createEmptyImageSource(::onLoad)
       }
     }
   }
@@ -149,7 +142,7 @@ object ImageCacher {
   }
 
   private fun <KeyType, EntityType> filterDeadEntitiesOutOfMutableMap(map: MutableMap<KeyType, LivingEntity<EntityType>>) {
-    val timestamp = currentTimeStamp
+    val timestamp = TimeStamp.current
 
     val iterator = map.iterator()
 
@@ -159,16 +152,6 @@ object ImageCacher {
       if (!isAlive(next, timestamp)) {
         iterator.remove()
       }
-    }
-  }
-
-  private fun createEmptyImage(): CanvasImageSource = (document.createElement("div") as HTMLCanvasElement).apply {
-    width = 20
-    height = 20
-
-    (getContext("2d") as CanvasRenderingContext2D).apply {
-      fillStyle = "pink"
-      fillRect(0.0, 0.0, 20.0, 20.0)
     }
   }
 
