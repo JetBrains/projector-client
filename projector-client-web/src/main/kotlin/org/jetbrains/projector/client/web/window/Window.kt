@@ -80,6 +80,8 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   private val renderingSurface = createRenderingSurface(canvas)
 
   private var header: WindowHeader? = null
+  private var headerVerticalPosition: Double = 0.0
+  private var headerHeight: Double = 0.0
   private val border = WindowBorder(windowData.resizable)
 
   private val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface)
@@ -122,10 +124,28 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
         canvas.style.border = ProjectorUI.borderStyle
       }
       else {
+        // If the window has a header on the host, its sizes are included in the window bounds.
+        // The client header is drawn above the window, outside its bounds. At the same time,
+        // the coordinates of the contents of the window come taking into account the size
+        // of the header. As a result, on client an empty space is obtained between header
+        // and the contents of the window. To get rid of this, we transfer the height of the system
+        // window header and if it > 0, we draw the heading not over the window but inside
+        // the window's bounds, filling in the empty space.
+
         header = WindowHeader(windowData.title)
         header!!.undecorated = windowData.undecorated
         header!!.onMove = ::onMove
         header!!.onClose = ::onClose
+
+        headerVerticalPosition = when (windowData.headerHeight) {
+          0, null -> ProjectorUI.headerHeight
+          else -> 0.0
+        }
+
+        headerHeight = when (windowData.headerHeight) {
+          0, null -> ProjectorUI.headerHeight
+          else -> windowData.headerHeight!!.toDouble()
+        }
 
         canvas.style.borderBottom = ProjectorUI.borderStyle
         canvas.style.borderLeft = ProjectorUI.borderStyle
@@ -200,19 +220,17 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     if (header != null) {
       header!!.bounds = CommonRectangle(
         clientBounds.x,
-        (bounds.y - ProjectorUI.headerHeight) * userScalingRatio,
+        (bounds.y - headerVerticalPosition) * userScalingRatio,
         clientBounds.width,
-        ProjectorUI.headerHeight * userScalingRatio
+        headerHeight * userScalingRatio
       )
     }
 
-    val headerHeight = if (header != null) ProjectorUI.headerHeight else 0.0
-
     border.bounds = CommonRectangle(
       clientBounds.x,
-      (bounds.y - headerHeight) * userScalingRatio,
+      (bounds.y - headerVerticalPosition) * userScalingRatio,
       clientBounds.width,
-      clientBounds.height + headerHeight * userScalingRatio
+      clientBounds.height + headerVerticalPosition * userScalingRatio
     ).createExtended(ProjectorUI.borderThickness * userScalingRatio)
 
     canvas.style.apply {
