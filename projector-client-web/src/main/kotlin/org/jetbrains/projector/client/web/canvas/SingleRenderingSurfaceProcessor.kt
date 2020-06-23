@@ -69,13 +69,13 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
 
         is ServerSetPaintEvent -> it.paint.let { paintValue ->
           when (paintValue) {
-            is PaintValue.Color -> renderer.setColor(paintValue.argb.toRgbaColor())
+            is PaintValue.Color -> renderer.setColor(paintValue.argb)
 
             is PaintValue.Gradient -> renderer.setGradientPaint(
               p1 = paintValue.p1,
               p2 = paintValue.p2,
-              color1 = paintValue.argb1.toRgbaColor(),
-              color2 = paintValue.argb2.toRgbaColor()
+              color1 = paintValue.argb1,
+              color2 = paintValue.argb2
             )
 
             is PaintValue.Unknown -> logUnsupportedCommand(it)

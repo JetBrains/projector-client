@@ -179,7 +179,7 @@ class WindowHeader(var title: String? = null) : DragEventsInterceptor, LafListen
     val offset = ProjectorUI.crossOffset * headerRenderingSurface.scalingRatio
 
     // Fill header background.
-    context.setFillStyle(PaintColor.SolidColor(ProjectorUI.windowHeaderActiveBackground))
+    context.setFillStyle(PaintColor.SolidColor(ProjectorUI.windowHeaderActiveBackgroundArgb))
     context.fillRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
 
     if (!undecorated) {
@@ -193,7 +193,7 @@ class WindowHeader(var title: String? = null) : DragEventsInterceptor, LafListen
     }
 
     if (title != null) {
-      context.setFillStyle(PaintColor.SolidColor(ProjectorUI.windowHeaderActiveText))
+      context.setFillStyle(PaintColor.SolidColor(ProjectorUI.windowHeaderActiveTextArgb))
       context.setFont("bold ${0.5 * ProjectorUI.headerHeight * headerRenderingSurface.scalingRatio}px Arial")
       context.setTextAlign(Context2d.TextAlign.CENTER)
       context.setTextBaseline(Context2d.TextBaseline.MIDDLE)

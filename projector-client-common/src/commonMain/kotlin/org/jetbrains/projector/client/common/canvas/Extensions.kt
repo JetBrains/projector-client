@@ -119,7 +119,7 @@ object Extensions {
   fun Short.toFontFaceName(): String = "serverFont$this"
 
   /* Creates an rgba(...) string (JS-like) by an ARGB number (Java-like). */
-  fun Number.toRgbaColor(): String {
+  fun Number.argbIntToRgbaString(): String {
     val colorValue = this.toLong()
 
     val b = colorValue and 0xFF

@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.state
 
+import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
 import org.jetbrains.projector.common.protocol.data.PaintValue
 
 interface LafListener {
@@ -31,25 +32,25 @@ interface LafListener {
 
 // Name of this class was chosen based on JBUI class.
 object ProjectorUI {
-  var windowHeaderActiveBackground = "#E6E6E6"
+  var windowHeaderActiveBackgroundArgb = 0xFFE6E6E6
     private set
 
-  var windowHeaderInactiveBackground = "#EDEDED"
+  var windowHeaderInactiveBackgroundArgb = 0xFFEDEDED
     private set
 
-  var windowActiveBorder = "#D5D5D5"
+  var windowActiveBorderArgb = 0xFFD5D5D5
     private set
 
-  var windowInactiveBorder = "#AAAAAA"
+  var windowInactiveBorderArgb = 0xFFAAAAAA
     private set
 
-  var windowHeaderActiveText = "#1A1A1A"
+  var windowHeaderActiveTextArgb = 0xFF1A1A1A
     private set
 
-  var windowHeaderInactiveText = "#DDDDDD"
+  var windowHeaderInactiveTextArgb = 0xFFDDDDDD
     private set
 
-  var borderStyle = "1px solid $windowActiveBorder"
+  var borderStyle = "1px solid ${windowActiveBorderArgb.argbIntToRgbaString()}"
     private set
 
   const val crossOffset = 4.0
@@ -57,20 +58,18 @@ object ProjectorUI {
   const val borderRadius = 8
   const val borderThickness = 8.0
 
-  private fun rgbColorFromInt(color: Int) = "rgb(${color shr 16 and 0xFF}, ${color shr 8 and 0xFF}, ${color and 0xFF})"
-
   fun setColors(colors: Map<String, PaintValue.Color>) {
     colors.forEach {
       when (it.key) {
-        "windowHeaderActiveBackground" -> windowHeaderActiveBackground = rgbColorFromInt(it.value.argb)
-        "windowHeaderInactiveBackground" -> windowHeaderInactiveBackground = rgbColorFromInt(it.value.argb)
+        "windowHeaderActiveBackground" -> windowHeaderActiveBackgroundArgb = it.value.argb.toLong()
+        "windowHeaderInactiveBackground" -> windowHeaderInactiveBackgroundArgb = it.value.argb.toLong()
         "windowActiveBorder" -> {
-          windowActiveBorder = rgbColorFromInt(it.value.argb)
-          borderStyle = "1px solid $windowActiveBorder"
+          windowActiveBorderArgb = it.value.argb.toLong()
+          borderStyle = "1px solid ${windowActiveBorderArgb.argbIntToRgbaString()}"
         }
-        "windowInactiveBorder" -> windowInactiveBorder = rgbColorFromInt(it.value.argb)
-        "windowHeaderActiveText" -> windowHeaderActiveText = rgbColorFromInt(it.value.argb)
-        "windowHeaderInactiveText" -> windowHeaderInactiveText = rgbColorFromInt(it.value.argb)
+        "windowInactiveBorder" -> windowInactiveBorderArgb = it.value.argb.toLong()
+        "windowHeaderActiveText" -> windowHeaderActiveTextArgb = it.value.argb.toLong()
+        "windowHeaderInactiveText" -> windowHeaderInactiveTextArgb = it.value.argb.toLong()
       }
     }
   }
