@@ -21,15 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web.misc
+package org.jetbrains.projector.client.common.misc
 
-import com.intellij.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.CanvasFactory
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
-import org.jetbrains.projector.client.common.misc.Logger
-import org.jetbrains.projector.client.common.misc.ParamsProvider
-import org.jetbrains.projector.client.web.canvas.SingleRenderingSurfaceProcessor
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.ImageData
 import org.jetbrains.projector.common.protocol.data.ImageId

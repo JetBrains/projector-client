@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web.canvas
+package org.jetbrains.projector.client.common
 
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowPaintEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowStateEvent
