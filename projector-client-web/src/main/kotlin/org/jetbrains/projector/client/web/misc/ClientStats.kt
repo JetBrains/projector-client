@@ -23,7 +23,7 @@
  */
 package org.jetbrains.projector.client.web.misc
 
-import com.intellij.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.common.statistics.Average
 import org.jetbrains.projector.common.statistics.Rate

@@ -23,7 +23,7 @@
  */
 package org.jetbrains.projector.client.web.misc
 
-import com.intellij.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.debug.DivPingShower
 import org.jetbrains.projector.client.web.debug.NoPingShower

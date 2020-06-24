@@ -1,4 +1,4 @@
-package com.intellij.projector.client.common.misc
+package org.jetbrains.projector.client.common.misc
 
 import kotlin.browser.window
 

@@ -24,10 +24,10 @@
 package org.jetbrains.projector.client.web
 
 import org.jetbrains.projector.client.common.misc.Logger
-import org.jetbrains.projector.client.web.canvas.DrawEvent
-import org.jetbrains.projector.client.web.canvas.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
+import org.jetbrains.projector.client.common.DrawEvent
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
-import org.jetbrains.projector.client.web.misc.ImageCacher
+import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.web.misc.PingStatistics
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.state.ProjectorUI

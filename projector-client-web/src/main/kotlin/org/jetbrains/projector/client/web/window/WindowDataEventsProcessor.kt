@@ -24,8 +24,8 @@
 package org.jetbrains.projector.client.web.window
 
 import org.jetbrains.projector.client.common.misc.Logger
-import org.jetbrains.projector.client.web.canvas.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
-import org.jetbrains.projector.client.web.misc.ImageCacher
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
+import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.common.misc.firstNotNullOrNull
 import org.jetbrains.projector.common.protocol.data.ImageId
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowEvent

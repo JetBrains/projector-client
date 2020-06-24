@@ -21,15 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web.canvas
+package org.jetbrains.projector.client.common
 
-import org.jetbrains.projector.client.common.Renderer
 import org.jetbrains.projector.client.common.Renderer.Companion.RequestedRenderingState
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
-import org.jetbrains.projector.client.web.misc.ImageCacher
+import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.ImageEventInfo
 import org.jetbrains.projector.common.protocol.data.PaintValue

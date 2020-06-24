@@ -23,7 +23,8 @@
  */
 package org.jetbrains.projector.client.web.state
 
-import com.intellij.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.common.misc.ImageCacher
+import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.InputController

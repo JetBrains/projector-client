@@ -27,8 +27,8 @@ import org.jetbrains.projector.client.common.canvas.DomCanvas
 import org.jetbrains.projector.client.common.canvas.buffering.DoubleBufferedRenderingSurface
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
 import org.jetbrains.projector.client.common.misc.ParamsProvider
-import org.jetbrains.projector.client.web.canvas.DrawEvent
-import org.jetbrains.projector.client.web.canvas.SingleRenderingSurfaceProcessor
+import org.jetbrains.projector.client.common.DrawEvent
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.web.misc.toDisplayType
 import org.jetbrains.projector.client.web.misc.toJsCursorType
 import org.jetbrains.projector.client.web.state.ClientAction
