@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.window
 
+import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.misc.toDisplayType
@@ -106,12 +107,12 @@ object OnScreenMessenger : LafListener {
     header.lookAndFeelChanged()
 
     div.style.apply {
-      backgroundColor = ProjectorUI.windowHeaderInactiveBackground
+      backgroundColor = ProjectorUI.windowHeaderInactiveBackgroundArgb.argbIntToRgbaString()
       borderLeft = ProjectorUI.borderStyle
       borderRight = ProjectorUI.borderStyle
       borderBottom = ProjectorUI.borderStyle
       borderRadius = "0 0 ${ProjectorUI.borderRadius}px ${ProjectorUI.borderRadius}px"
-      color = ProjectorUI.windowHeaderActiveText
+      color = ProjectorUI.windowHeaderActiveTextArgb.argbIntToRgbaString()
     }
   }
 }
