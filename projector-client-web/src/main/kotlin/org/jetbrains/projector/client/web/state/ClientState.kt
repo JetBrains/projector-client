@@ -24,9 +24,9 @@
 package org.jetbrains.projector.client.web.state
 
 import org.jetbrains.projector.client.common.misc.ImageCacher
-import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
+import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.web.InputController
 import org.jetbrains.projector.client.web.ServerEventsProcessor
 import org.jetbrains.projector.client.web.WindowSizeController
@@ -74,6 +74,7 @@ sealed class ClientState {
         style.apply {
           backgroundColor = "#2A2"
           asDynamic().overscrollBehaviorY = "none"
+          asDynamic().touchAction = "none"
         }
 
         oncontextmenu = { false }
