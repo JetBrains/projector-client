@@ -152,9 +152,16 @@ class InputController(private val openingTimeStamp: Int,
   private fun fireKeyPressEvent(event: Event) {
     require(event is KeyboardEvent)
 
+    val key = if (specialKeysState.isShiftEnabled) {
+      event.key.toUpperCase()
+    }
+    else {
+      event.key
+    }
+
     val message = ClientKeyPressEvent(
       timeStamp = event.timeStamp.toInt() - openingTimeStamp,
-      key = event.key,
+      key = key,
       modifiers = event.modifiers
     )
 
