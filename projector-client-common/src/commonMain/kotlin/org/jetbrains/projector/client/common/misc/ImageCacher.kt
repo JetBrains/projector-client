@@ -44,7 +44,9 @@ object ImageCacher {
     val offscreenCanvas: Canvas.ImageSource
   )
 
-  private val cache = mutableMapOf<ImageId, LivingEntity<Canvas.ImageSource>>()
+  private val cache = mutableMapOf<ImageData, LivingEntity<Canvas.ImageSource>>()
+
+  private val imageDataByImageId = mutableMapOf<ImageId, ImageData>()
 
   private val requestedImages = mutableMapOf<ImageId, LivingEntity<Nothing?>>()
 
@@ -58,14 +60,23 @@ object ImageCacher {
   }
 
   fun putImageData(imageId: ImageId, imageData: ImageData, repainter: () -> Unit) {
-    putImageAsync(imageId, imageData, repainter)
+    requestedImages[imageId] = LivingEntity(TimeStamp.current, null) // Added new image to requested
+
+    if (imageData is ImageData.PngBase64) {
+      imageDataByImageId[imageId] = imageData
+    }
+
+    cache[imageData]?.apply { repainter() } ?: putImageAsync(imageId, imageData, repainter)
   }
 
   fun getImageData(imageId: ImageId): Canvas.ImageSource? = when (imageId) {
     is ImageId.PVolatileImageId -> offscreenImages[imageId.id]?.offscreenCanvas
 
     is ImageId.BufferedImageId -> {
-      val imageData = cache[imageId]?.apply { lastUsageTimestamp = TimeStamp.current }?.data
+      val imageData = imageDataByImageId[imageId]
+        ?.run(cache::get)
+        ?.apply { lastUsageTimestamp = TimeStamp.current }
+        ?.data
 
       if (imageData == null) {
         if (imageId !in requestedImages) {
@@ -120,7 +131,7 @@ object ImageCacher {
 
   private fun putImageAsync(imageId: ImageId, imageData: ImageData, repainter: () -> Unit) {
     fun onLoad(image: Canvas.ImageSource) {
-      cache[imageId] = LivingEntity(TimeStamp.current, image)
+      cache[imageData] = LivingEntity(TimeStamp.current, image)
       repainter()
     }
 
