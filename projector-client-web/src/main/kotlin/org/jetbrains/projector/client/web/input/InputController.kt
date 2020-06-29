@@ -239,11 +239,6 @@ class InputController(private val openingTimeStamp: Int,
       event.preventDefault()
     }
 
-    //if (!isBrowserSpecialKey && isBrowserKeyStroke) {
-    //  // browser won't generate PRESS event, let's generate ours
-    //  fireKeyPressEvent(event)
-    //}
-
     if (isKeystroke && message.code == "KeyV") {
       // let "paste" event go to server and only after it send the keystroke
       window.setTimeout(
