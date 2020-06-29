@@ -27,13 +27,15 @@ import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
-import org.jetbrains.projector.client.web.InputController
 import org.jetbrains.projector.client.web.ServerEventsProcessor
 import org.jetbrains.projector.client.web.WindowSizeController
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.debug.DivSentReceivedBadgeShower
 import org.jetbrains.projector.client.web.debug.NoSentReceivedBadgeShower
 import org.jetbrains.projector.client.web.debug.SentReceivedBadgeShower
+import org.jetbrains.projector.client.web.input.InputController
+import org.jetbrains.projector.client.web.input.MobileKeyboardHelperImpl
+import org.jetbrains.projector.client.web.input.NopMobileKeyboardHelper
 import org.jetbrains.projector.client.web.misc.*
 import org.jetbrains.projector.client.web.protocol.KotlinxJsonToClientHandshakeDecoder
 import org.jetbrains.projector.client.web.protocol.KotlinxJsonToServerHandshakeEncoder
@@ -331,6 +333,11 @@ sealed class ClientState {
       stateMachine.fire(ClientAction.AddEvent(ClientOpenLinkEvent(link)))
     }
 
+    private val mobileKeyboardHelper = when (ParamsProvider.MOBILE_MODE) {
+      false -> NopMobileKeyboardHelper
+      true -> MobileKeyboardHelperImpl(openingTimeStamp, inputController.specialKeysState) { stateMachine.fire(ClientAction.AddEvent(it)) }
+    }
+
     init {
       windowSizeController.addListener()
     }
@@ -451,6 +458,8 @@ sealed class ClientState {
         typing.dispose()
 
         markdownPanelManager.disposeAll()
+
+        mobileKeyboardHelper.dispose()
 
         showDisconnectedMessage(action.url, action.closeCode)
 

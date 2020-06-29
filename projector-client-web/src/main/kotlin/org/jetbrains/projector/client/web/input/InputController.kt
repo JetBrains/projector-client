@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web
+package org.jetbrains.projector.client.web.input
 
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.RepaintAreaSetting
@@ -44,6 +44,8 @@ import kotlin.math.roundToInt
 class InputController(private val openingTimeStamp: Int,
                       private val stateMachine: ClientStateMachine,
                       private val windowManager: WindowManager) {
+
+  val specialKeysState = SpecialKeysState()
 
   private val mouseButtonsDown = mutableSetOf<Short>()
 
@@ -247,50 +249,50 @@ class InputController(private val openingTimeStamp: Int,
     }
   }
 
+  private val MouseEvent.modifiers: Set<MouseModifier>
+    get() {
+      val modifiers = mutableSetOf<MouseModifier>()
+
+      if (shiftKey) {
+        modifiers.add(MouseModifier.SHIFT_KEY)
+      }
+      if (ctrlKey) {
+        modifiers.add(MouseModifier.CTRL_KEY)
+      }
+      if (altKey) {
+        modifiers.add(MouseModifier.ALT_KEY)
+      }
+      if (metaKey) {
+        modifiers.add(MouseModifier.META_KEY)
+      }
+
+      return modifiers.union(specialKeysState.mouseModifiers)
+    }
+
+  private val KeyboardEvent.modifiers: Set<KeyModifier>
+    get() {
+      val modifiers = mutableSetOf<KeyModifier>()
+
+      if (shiftKey) {
+        modifiers.add(KeyModifier.SHIFT_KEY)
+      }
+      if (ctrlKey) {
+        modifiers.add(KeyModifier.CTRL_KEY)
+      }
+      if (altKey) {
+        modifiers.add(KeyModifier.ALT_KEY)
+      }
+      if (metaKey) {
+        modifiers.add(KeyModifier.META_KEY)
+      }
+      if (repeat) {
+        modifiers.add(KeyModifier.REPEAT)
+      }
+
+      return modifiers.union(specialKeysState.keyModifiers)
+    }
+
   companion object {
-
-    private val MouseEvent.modifiers: Set<MouseModifier>
-      get() {
-        val modifiers = mutableSetOf<MouseModifier>()
-
-        if (shiftKey) {
-          modifiers.add(MouseModifier.SHIFT_KEY)
-        }
-        if (ctrlKey) {
-          modifiers.add(MouseModifier.CTRL_KEY)
-        }
-        if (altKey) {
-          modifiers.add(MouseModifier.ALT_KEY)
-        }
-        if (metaKey) {
-          modifiers.add(MouseModifier.META_KEY)
-        }
-
-        return modifiers
-      }
-
-    private val KeyboardEvent.modifiers: Set<KeyModifier>
-      get() {
-        val modifiers = mutableSetOf<KeyModifier>()
-
-        if (shiftKey) {
-          modifiers.add(KeyModifier.SHIFT_KEY)
-        }
-        if (ctrlKey) {
-          modifiers.add(KeyModifier.CTRL_KEY)
-        }
-        if (altKey) {
-          modifiers.add(KeyModifier.ALT_KEY)
-        }
-        if (metaKey) {
-          modifiers.add(KeyModifier.META_KEY)
-        }
-        if (repeat) {
-          modifiers.add(KeyModifier.REPEAT)
-        }
-
-        return modifiers
-      }
 
     private fun Int.toCommonKeyLocation() = when (this) {
       KeyboardEvent.DOM_KEY_LOCATION_STANDARD -> ClientKeyEvent.KeyLocation.STANDARD

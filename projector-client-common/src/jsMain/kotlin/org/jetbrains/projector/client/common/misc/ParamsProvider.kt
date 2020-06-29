@@ -68,6 +68,7 @@ actual object ParamsProvider {
   val SPECULATIVE_TYPING: Boolean
   val ENABLE_WSS: Boolean
   val HANDSHAKE_TOKEN: String?
+  val MOBILE_MODE: Boolean
   val SCALING_RATIO: Double
     get() = SYSTEM_SCALING_RATIO * USER_SCALING_RATIO
 
@@ -104,6 +105,7 @@ actual object ParamsProvider {
       SPECULATIVE_TYPING = searchParams.has("speculativeTyping")
       ENABLE_WSS = searchParams.has("wss") || window.location.protocol == "https:"
       HANDSHAKE_TOKEN = searchParams.get("token")
+      MOBILE_MODE = searchParams.has("mobile")
     }
   }
 
