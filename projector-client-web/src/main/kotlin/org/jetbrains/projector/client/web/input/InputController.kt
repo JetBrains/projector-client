@@ -124,18 +124,26 @@ class InputController(private val openingTimeStamp: Int,
     stateMachine.fire(ClientAction.AddEvent(ClientClipboardEvent(stringContent)))
   }
 
-  private val documentActionListeners = mapOf<String, (Event) -> Unit>(
-    "paste" to ::handleClipboardChange,
-    "mousemove" to ::handleMouseMoveEvent,
-    "mousedown" to ::handleMouseDownEvent,
-    "mouseup" to ::handleMouseUpEvent,
-    "click" to ::handleClickEvent,
-    "mouseout" to ::handleMouseOutEvent,
-    "wheel" to ::fireWheelEvent,
-    "keydown" to ::handleKeyDownEvent,
-    "keyup" to ::handleKeyUpEvent,
-    "keypress" to ::fireKeyPressEvent
-  )
+  @OptIn(ExperimentalStdlibApi::class)
+  private val documentActionListeners = buildMap<String, (Event) -> Unit> {
+    putAll(mapOf(
+      "paste" to ::handleClipboardChange,
+      "mousemove" to ::handleMouseMoveEvent,
+      "mousedown" to ::handleMouseDownEvent,
+      "mouseup" to ::handleMouseUpEvent,
+      "click" to ::handleClickEvent,
+      "mouseout" to ::handleMouseOutEvent,
+      "wheel" to ::fireWheelEvent
+    ))
+
+    if (ParamsProvider.MOBILE_SETTING != ParamsProvider.MobileSetting.ALL) {
+      putAll(mapOf(
+        "keydown" to ::handleKeyDownEvent,
+        "keyup" to ::handleKeyUpEvent,
+        "keypress" to ::fireKeyPressEvent
+      ))
+    }
+  }
 
   fun addListeners() {
     documentActionListeners.forEach { (type, handler) ->

@@ -23,15 +23,22 @@
  */
 package org.jetbrains.projector.client.web.input
 
+import org.jetbrains.projector.client.common.misc.Logger
+import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.DOWN
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.UP
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.LEFT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.STANDARD
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
+import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.Node
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.browser.window
@@ -50,7 +57,7 @@ object NopMobileKeyboardHelper : MobileKeyboardHelper {
 class MobileKeyboardHelperImpl(
   private val openingTimeStamp: Int,
   private val specialKeysState: SpecialKeysState,
-  private val keyEventConsumer: (ClientKeyEvent) -> Unit
+  private val clientEventConsumer: (ClientEvent) -> Unit
 ) : MobileKeyboardHelper {
 
   private val panel = (document.createElement("div") as HTMLDivElement).apply {
@@ -65,20 +72,107 @@ class MobileKeyboardHelperImpl(
     document.body!!.appendChild(this)
   }
 
+  private val virtualKeyboardInput = (document.createElement("textarea") as HTMLTextAreaElement).apply {
+    style.apply {
+      position = "fixed"
+      bottom = "-30%"
+    }
+
+    oninput = fun(event: InputEvent) {
+      resetVirtualKeyboardInput()
+
+      when (val inputType = event.asDynamic().inputType) {
+        "insertText" -> event.data.forEach { char ->
+          val key = char.toString()
+          val code = "Key${char.toUpperCase()}"
+
+          fireKeyEvent(key = key, code = code, location = STANDARD, keyEventType = DOWN)
+          fireKeyPressEvent(key = key)
+          fireKeyEvent(key = key, code = code, location = STANDARD, keyEventType = UP)
+        }
+
+        "deleteContentBackward" -> {
+          fireKeyEvent(key = "Backspace", code = "Backspace", location = STANDARD, keyEventType = DOWN)
+          fireKeyEvent(key = "Backspace", code = "Backspace", location = STANDARD, keyEventType = UP)
+        }
+
+        "deleteContentForward" -> {
+          fireKeyEvent(key = "Delete", code = "Delete", location = STANDARD, keyEventType = DOWN)
+          fireKeyEvent(key = "Delete", code = "Delete", location = STANDARD, keyEventType = UP)
+        }
+
+        "insertLineBreak" -> {
+          fireKeyEvent(key = "Enter", code = "Enter", location = STANDARD, keyEventType = DOWN)
+          fireKeyEvent(key = "Enter", code = "Enter", location = STANDARD, keyEventType = UP)
+        }
+
+        else -> {
+          logger.info { "Unknown inputType=$inputType" }
+          @Suppress("UnsafeCastFromDynamic")  // TODO: Remove suppress after KT-39975 is implemented
+          console.log(event)
+        }
+      }
+    }
+
+    document.body!!.appendChild(this)
+  }
+
+  init {
+    resetVirtualKeyboardInput()
+  }
+
+  private fun resetVirtualKeyboardInput() {
+    virtualKeyboardInput.value = TEXTAREA_VALUE
+    virtualKeyboardInput.selectionStart = TEXTAREA_VALUE.length / 2
+    virtualKeyboardInput.selectionEnd = TEXTAREA_VALUE.length / 2
+  }
+
+  private fun handleVirtualKeyboardSelection(unused: Event) {
+    fun sendArrow(direction: String) {
+      fireKeyEvent(key = "Arrow$direction", code = "Arrow$direction", location = STANDARD, keyEventType = DOWN)
+      fireKeyEvent(key = "Arrow$direction", code = "Arrow$direction", location = STANDARD, keyEventType = UP)
+    }
+
+    if (
+      document.activeElement == virtualKeyboardInput &&
+      virtualKeyboardInput.value == TEXTAREA_VALUE
+    ) {
+      when (virtualKeyboardInput.selectionStart) {
+        0 -> sendArrow("Up")
+        1 -> sendArrow("Left")
+        3 -> sendArrow("Right")
+        4 -> sendArrow("Down")
+        else -> Unit
+      }
+
+      resetVirtualKeyboardInput()
+    }
+  }
+
   private fun fireKeyEvent(
     key: String,
     code: String,
     location: ClientKeyEvent.KeyLocation,
     keyEventType: ClientKeyEvent.KeyEventType
   ) {
-    keyEventConsumer(
+    clientEventConsumer(
       ClientKeyEvent(
         timeStamp = TimeStamp.current.roundToInt() - openingTimeStamp,
-        key = key,
+        key = if (key.length == 1 && specialKeysState.isShiftEnabled) key.toUpperCase() else key,
         code = code,
         location = location,
         modifiers = specialKeysState.keyModifiers,
         keyEventType = keyEventType
+      )
+    )
+  }
+
+  private fun fireKeyPressEvent(key: String) {
+    clientEventConsumer(
+      ClientKeyPressEvent(
+        timeStamp = TimeStamp.current.roundToInt() - openingTimeStamp,
+        key = if (key.length == 1 && specialKeysState.isShiftEnabled) key.toUpperCase() else key,
+        modifiers = specialKeysState.keyModifiers
       )
     )
   }
@@ -137,10 +231,28 @@ class MobileKeyboardHelperImpl(
         }
       }
     )
+
+    if (ParamsProvider.MOBILE_SETTING == ParamsProvider.MobileSetting.ALL) {
+      SimpleButton(
+        text = "⌨",  // Keyboard symbol
+        parent = panel,
+        onClick = {
+          virtualKeyboardInput.focus()
+          virtualKeyboardInput.click()
+        }
+      )
+
+      document.addEventListener("selectionchange", this::handleVirtualKeyboardSelection)
+    }
   }
 
   override fun dispose() {
     panel.remove()
+    virtualKeyboardInput.remove()
+
+    if (ParamsProvider.MOBILE_SETTING == ParamsProvider.MobileSetting.ALL) {
+      document.removeEventListener("selectionchange", this::handleVirtualKeyboardSelection)
+    }
   }
 
   private class ToggleButton(
@@ -227,5 +339,9 @@ class MobileKeyboardHelperImpl(
 
     private const val DISABLED_COLOR = "#ACA"
     private const val ENABLED_COLOR = "#8F8"
+
+    private const val TEXTAREA_VALUE = "\n--\n"
+
+    private val logger = Logger(MobileKeyboardHelperImpl::class.simpleName!!)
   }
 }

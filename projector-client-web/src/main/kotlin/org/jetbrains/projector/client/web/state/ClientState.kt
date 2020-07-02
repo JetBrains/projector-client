@@ -333,9 +333,9 @@ sealed class ClientState {
       stateMachine.fire(ClientAction.AddEvent(ClientOpenLinkEvent(link)))
     }
 
-    private val mobileKeyboardHelper = when (ParamsProvider.MOBILE_MODE) {
-      false -> NopMobileKeyboardHelper
-      true -> MobileKeyboardHelperImpl(openingTimeStamp, inputController.specialKeysState) { stateMachine.fire(ClientAction.AddEvent(it)) }
+    private val mobileKeyboardHelper = when (ParamsProvider.MOBILE_SETTING) {
+      ParamsProvider.MobileSetting.DISABLED -> NopMobileKeyboardHelper
+      else -> MobileKeyboardHelperImpl(openingTimeStamp, inputController.specialKeysState) { stateMachine.fire(ClientAction.AddEvent(it)) }
     }
 
     init {
