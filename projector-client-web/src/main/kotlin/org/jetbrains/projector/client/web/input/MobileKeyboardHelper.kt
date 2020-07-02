@@ -304,6 +304,7 @@ class MobileKeyboardHelperImpl(
         padding = "5px"
         margin = "5px"
         cursor = "pointer"
+        borderRadius = "3px"
         asDynamic().userSelect = "none"
       }
 
@@ -344,6 +345,7 @@ class MobileKeyboardHelperImpl(
         padding = "5px"
         margin = "5px"
         cursor = "pointer"
+        borderRadius = "3px"
         asDynamic().userSelect = "none"
       }
 
