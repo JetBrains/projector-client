@@ -105,6 +105,14 @@ class MobileKeyboardHelperImpl(
       bottom = "-30%"
     }
 
+    onkeydown = { // TODO: this Tab handling doesn't work in mobile because no keydown events are generated there
+      if (it.code == "Tab") {
+        it.preventDefault()
+        fireKeyEvent(key = "Tab", code = "Tab", location = STANDARD, keyEventType = DOWN)
+        fireKeyEvent(key = "Tab", code = "Tab", location = STANDARD, keyEventType = UP)
+      }
+    }
+
     oninput = fun(event: InputEvent) {
       resetVirtualKeyboardInput()
 
