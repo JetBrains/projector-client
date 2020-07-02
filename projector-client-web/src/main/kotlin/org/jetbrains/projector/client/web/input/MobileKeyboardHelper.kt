@@ -26,6 +26,7 @@ package org.jetbrains.projector.client.web.input
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.web.misc.toDisplayType
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.DOWN
@@ -70,6 +71,32 @@ class MobileKeyboardHelperImpl(
     }
 
     document.body!!.appendChild(this)
+  }
+
+  private val functionalButtonsPanel = (document.createElement("div") as HTMLDivElement).apply {
+    style.apply {
+      display = "none"
+    }
+
+    (1..12).forEach {
+      SimpleButton(
+        text = "F$it",
+        parent = this,
+        onClick = {
+          fireKeyEvent(key = "F$it", code = "F$it", location = STANDARD, keyEventType = DOWN)
+          fireKeyEvent(key = "F$it", code = "F$it", location = STANDARD, keyEventType = UP)
+        }
+      )
+
+      if (it % 4 == 0) {
+        val separator = (document.createElement("div") as HTMLDivElement).apply {
+          style.height = "15px"
+        }
+        this.appendChild(separator)
+      }
+    }
+
+    panel.appendChild(this)
   }
 
   private val virtualKeyboardInput = (document.createElement("textarea") as HTMLTextAreaElement).apply {
@@ -229,6 +256,14 @@ class MobileKeyboardHelperImpl(
         else {
           fireKeyEvent(key = "Shift", code = "ShiftLeft", location = LEFT, keyEventType = UP)
         }
+      }
+    )
+
+    ToggleButton(
+      text = "F*",
+      parent = panel,
+      onStateChange = { newState ->
+        functionalButtonsPanel.style.display = newState.toDisplayType()
       }
     )
 
