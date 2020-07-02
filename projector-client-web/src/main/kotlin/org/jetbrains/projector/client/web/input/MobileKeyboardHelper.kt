@@ -25,10 +25,16 @@ package org.jetbrains.projector.client.web.input
 
 import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.DOWN
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.UP
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.LEFT
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.STANDARD
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.Node
+import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
+import kotlin.browser.window
 import kotlin.math.roundToInt
 
 interface MobileKeyboardHelper {
@@ -62,6 +68,7 @@ class MobileKeyboardHelperImpl(
   private fun fireKeyEvent(
     key: String,
     code: String,
+    location: ClientKeyEvent.KeyLocation,
     keyEventType: ClientKeyEvent.KeyEventType
   ) {
     keyEventConsumer(
@@ -69,7 +76,7 @@ class MobileKeyboardHelperImpl(
         timeStamp = TimeStamp.current.roundToInt() - openingTimeStamp,
         key = key,
         code = code,
-        location = ClientKeyEvent.KeyLocation.LEFT,
+        location = location,
         modifiers = specialKeysState.keyModifiers,
         keyEventType = keyEventType
       )
@@ -77,6 +84,15 @@ class MobileKeyboardHelperImpl(
   }
 
   init {
+    SimpleButton(
+      text = "Esc",
+      parent = panel,
+      onClick = {
+        fireKeyEvent(key = "Escape", code = "Escape", location = STANDARD, keyEventType = DOWN)
+        fireKeyEvent(key = "Escape", code = "Escape", location = STANDARD, keyEventType = UP)
+      }
+    )
+
     ToggleButton(
       text = "Alt",
       parent = panel,
@@ -84,10 +100,10 @@ class MobileKeyboardHelperImpl(
         specialKeysState.isAltEnabled = newState
 
         if (newState) {
-          fireKeyEvent(key = "Alt", code = "AltLeft", keyEventType = ClientKeyEvent.KeyEventType.DOWN)
+          fireKeyEvent(key = "Alt", code = "AltLeft", location = LEFT, keyEventType = DOWN)
         }
         else {
-          fireKeyEvent(key = "Alt", code = "AltLeft", keyEventType = ClientKeyEvent.KeyEventType.UP)
+          fireKeyEvent(key = "Alt", code = "AltLeft", location = LEFT, keyEventType = UP)
         }
       }
     )
@@ -99,10 +115,10 @@ class MobileKeyboardHelperImpl(
         specialKeysState.isCtrlEnabled = newState
 
         if (newState) {
-          fireKeyEvent(key = "Control", code = "ControlLeft", keyEventType = ClientKeyEvent.KeyEventType.DOWN)
+          fireKeyEvent(key = "Control", code = "ControlLeft", location = LEFT, keyEventType = DOWN)
         }
         else {
-          fireKeyEvent(key = "Control", code = "ControlLeft", keyEventType = ClientKeyEvent.KeyEventType.UP)
+          fireKeyEvent(key = "Control", code = "ControlLeft", location = LEFT, keyEventType = UP)
         }
       }
     )
@@ -114,10 +130,10 @@ class MobileKeyboardHelperImpl(
         specialKeysState.isShiftEnabled = newState
 
         if (newState) {
-          fireKeyEvent(key = "Shift", code = "ShiftLeft", keyEventType = ClientKeyEvent.KeyEventType.DOWN)
+          fireKeyEvent(key = "Shift", code = "ShiftLeft", location = LEFT, keyEventType = DOWN)
         }
         else {
-          fireKeyEvent(key = "Shift", code = "ShiftLeft", keyEventType = ClientKeyEvent.KeyEventType.UP)
+          fireKeyEvent(key = "Shift", code = "ShiftLeft", location = LEFT, keyEventType = UP)
         }
       }
     )
@@ -167,11 +183,49 @@ class MobileKeyboardHelperImpl(
       isEnabled = !isEnabled
       onStateChange(isEnabled)
     }
+  }
 
-    companion object {
+  private class SimpleButton(
+    text: String,
+    parent: Node,
+    private val onClick: () -> Unit
+  ) {
 
-      private const val DISABLED_COLOR = "#ACA"
-      private const val ENABLED_COLOR = "#8F8"
+    private val span = (document.createElement("span") as HTMLSpanElement).apply {
+      style.apply {
+        backgroundColor = DISABLED_COLOR
+        padding = "5px"
+        margin = "5px"
+        cursor = "pointer"
+        asDynamic().userSelect = "none"
+      }
+
+      innerText = text
+
+      onclick = { e ->
+        animate()
+        onClick()
+        e.stopPropagation()
+      }
+      onmousedown = MouseEvent::stopPropagation
+      onmouseup = MouseEvent::stopPropagation
+
+      parent.appendChild(this)
     }
+
+    private fun animate() {
+      span.style.backgroundColor = ENABLED_COLOR
+      window.setTimeout(this::disableColor, timeout = 200)
+    }
+
+    private fun disableColor() {
+      span.style.backgroundColor = DISABLED_COLOR
+    }
+  }
+
+  companion object {
+
+    private const val DISABLED_COLOR = "#ACA"
+    private const val ENABLED_COLOR = "#8F8"
   }
 }
