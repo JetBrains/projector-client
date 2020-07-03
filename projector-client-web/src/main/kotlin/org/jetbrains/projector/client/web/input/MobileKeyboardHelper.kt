@@ -99,10 +99,19 @@ class MobileKeyboardHelperImpl(
     panel.appendChild(this)
   }
 
+  private var virtualKeyboardEnabled = false
+
   private val virtualKeyboardInput = (document.createElement("textarea") as HTMLTextAreaElement).apply {
     style.apply {
       position = "fixed"
       bottom = "-30%"
+    }
+
+    onblur = {
+      if (virtualKeyboardEnabled) {
+        this.focus()
+        this.click()
+      }
     }
 
     onkeydown = { // TODO: this Tab handling doesn't work in mobile because no keydown events are generated there
@@ -276,12 +285,21 @@ class MobileKeyboardHelperImpl(
     )
 
     if (ParamsProvider.MOBILE_SETTING == ParamsProvider.MobileSetting.ALL) {
-      SimpleButton(
+      ToggleButton(
         text = "⌨",  // Keyboard symbol
         parent = panel,
-        onClick = {
-          virtualKeyboardInput.focus()
-          virtualKeyboardInput.click()
+        onStateChange = { newState ->
+          when (newState) {
+            true -> {
+              virtualKeyboardEnabled = true
+              virtualKeyboardInput.focus()
+              virtualKeyboardInput.click()
+            }
+            false -> {
+              virtualKeyboardEnabled = false
+              virtualKeyboardInput.blur()
+            }
+          }
         }
       )
 
