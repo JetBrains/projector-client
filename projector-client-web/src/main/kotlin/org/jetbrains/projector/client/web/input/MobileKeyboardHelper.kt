@@ -107,6 +107,8 @@ class MobileKeyboardHelperImpl(
       bottom = "-30%"
     }
 
+    autocomplete = "off"
+
     onblur = {
       if (virtualKeyboardEnabled) {
         this.focus()
