@@ -126,9 +126,9 @@ class MobileKeyboardHelperImpl(
       resetVirtualKeyboardInput()
 
       when (val inputType = event.asDynamic().inputType) {
-        "insertText" -> event.data.forEach { char ->
+        "insertText", "insertCompositionText" -> event.data.forEach { char ->
           val key = char.toString()
-          val code = "Key${char.toUpperCase()}"
+          val code = "Key${char.toUpperCase()}"  // todo: for special symbols like "(", it's not true; they still work
 
           fireKeyEvent(key = key, code = code, location = STANDARD, keyEventType = DOWN)
           fireKeyPressEvent(key = key)
