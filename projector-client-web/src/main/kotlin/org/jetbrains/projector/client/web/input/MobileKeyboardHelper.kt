@@ -117,9 +117,11 @@ class MobileKeyboardHelperImpl(
       }
     }
 
-    onkeydown = { // TODO: this Tab handling doesn't work in mobile because no keydown events are generated there
-      if (it.code == "Tab") {
+    onkeydown = {
+      // handle Tabs: don't make default action "switch to the next input"
+      if (it.key == "Tab") {  // don't use `it.code == "Tab"` here because `it.code` is empty on mobile devices
         it.preventDefault()
+        it.stopPropagation()
         fireKeyEvent(key = "Tab", code = "Tab", location = STANDARD, keyEventType = DOWN)
         fireKeyEvent(key = "Tab", code = "Tab", location = STANDARD, keyEventType = UP)
       }
