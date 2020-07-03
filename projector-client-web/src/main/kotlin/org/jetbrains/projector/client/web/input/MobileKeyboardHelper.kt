@@ -108,6 +108,7 @@ class MobileKeyboardHelperImpl(
     }
 
     autocomplete = "off"
+    asDynamic().autocapitalize = "none"
 
     onblur = {
       if (virtualKeyboardEnabled) {
@@ -167,7 +168,10 @@ class MobileKeyboardHelperImpl(
     resetVirtualKeyboardInput()
   }
 
+  private var lastSelectionResetTimeStamp = TimeStamp.current
+
   private fun resetVirtualKeyboardInput() {
+    lastSelectionResetTimeStamp = TimeStamp.current
     virtualKeyboardInput.value = TEXTAREA_VALUE
     virtualKeyboardInput.selectionStart = TEXTAREA_VALUE.length / 2
     virtualKeyboardInput.selectionEnd = TEXTAREA_VALUE.length / 2
@@ -181,17 +185,25 @@ class MobileKeyboardHelperImpl(
 
     if (
       document.activeElement == virtualKeyboardInput &&
-      virtualKeyboardInput.value == TEXTAREA_VALUE
+      virtualKeyboardInput.value == TEXTAREA_VALUE &&
+      (virtualKeyboardInput.selectionStart != TEXTAREA_VALUE.length / 2 || virtualKeyboardInput.selectionEnd != TEXTAREA_VALUE.length / 2)
     ) {
-      when (virtualKeyboardInput.selectionStart) {
-        0 -> sendArrow("Up")
-        1 -> sendArrow("Left")
-        3 -> sendArrow("Right")
-        4 -> sendArrow("Down")
-        else -> Unit
+      // The following check is needed to fix behavior on Android Chrome with Gboard:
+      // when Backspace is pressed there, the selection change to the left event is generated immediately after the input event,
+      // and we shouldn't treat it as a command to move left.
+      // So here we make sure that the selection event is received way after the last input event and execute cursor move only if it's true
+      if (TimeStamp.current - lastSelectionResetTimeStamp > MINIMUM_MS_BETWEEN_INPUT_AND_SELECTION_CHANGE) {
+        when (virtualKeyboardInput.selectionStart) {
+          0 -> sendArrow("Up")
+          1 -> sendArrow("Left")
+          3 -> sendArrow("Right")
+          4 -> sendArrow("Down")
+          else -> Unit
+        }
       }
 
-      resetVirtualKeyboardInput()
+      virtualKeyboardInput.selectionStart = TEXTAREA_VALUE.length / 2
+      virtualKeyboardInput.selectionEnd = TEXTAREA_VALUE.length / 2
     }
   }
 
@@ -406,6 +418,8 @@ class MobileKeyboardHelperImpl(
     private const val ENABLED_COLOR = "#8F8"
 
     private const val TEXTAREA_VALUE = "\n--\n"
+
+    private const val MINIMUM_MS_BETWEEN_INPUT_AND_SELECTION_CHANGE = 100
 
     private val logger = Logger(MobileKeyboardHelperImpl::class.simpleName!!)
   }
