@@ -16,9 +16,40 @@ Tested browsers:
 - Chromium.
 - Firefox.
 
-You can set connection parameters like this: `index.html?host=localhost&port=8887`. Supported parameters can be found in the `ParamsProvider.kt` file.
+## Page parameters
+You can set some settings in query parameters like this: `index.html?host=localhost&port=8887&wss`. Actual list of parameters can be found in the `ParamsProvider.kt` file. Here we describe them.
 
-Shortcuts:
+### Main parameters
+Name | Type | Default value | Description 
+---|---|---|---
+`host` | String | Host of the web page | Set the host of `projector-server` to connect.
+`port` | String | `8887` | Set the port of `projector-server` to connect.
+`wss` | Presence | Protocol of the web page | Enable security of WebSocket connection.
+`token` | String? | Not present | Set a password which will be checked by the server on the connection.
+`mobile` | String? | Not present | Enable overlay controls handy for mobile devices. Presented param activates all controls. Provide `onlyButtons` value if you don't use virtual keyboard. 
+
+### Debug/test parameters
+Name | Type | Default value | Description 
+---|---|---|---
+`clipping` | Presence | Not present | Show borders of clipping areas via red and blue lines.
+`logUnsupportedEvents` | Presence | Not present | Log unsupported events received from server to browser console.
+`doubleBuffering` | Presence | Not present | Enable double buffering for every single message from server.
+`enableCompression` | Presence | Not present | Use compression for sending and receiving WebSocket messages.
+`toClientFormat` | String | `protoBuf` | Sets format of data from server to client: `json` or `protoBuf`.
+`imageTtl` | Double | `60_000.0` | Set caching time of unused images in ms.
+`flushDelay` | Int? | `1` | Set buffering time of events from client in ms. If the value is not integer, unbuffered mode is used: every client event is sent to the server immediately.
+`showTextWidth` | Presence | Not present | Show near-text lines of browser width and desired width.
+`showSentReceived` | Presence | Not present | Show blinking indicators in the corner of the screen when events were sent or received.
+`showPing` | Presence | Not present | Show some info of simple ping to and from server.
+`pingAverageCount` | Int? | Not present | Activate displaying average ping of this number of iterations.
+`backgroundColor` | String | `2A2` (green) | Set color of area where there are no windows.
+`userScalingRatio` | Double | `1.0` | Set scaling ratio.
+`pingInterval` | Int | `1000` | Set interval of pinging in ms.
+`showProcessingTime` | Presence | Not present | Log processing time of server messages to browser console.
+`repaintArea` | Presence | Not present | Enable ability to see repainted areas, use a shortcut to toggle (more info below).
+`speculativeTyping` | Presence | Not present | Enable rendering symbols in Editor not waiting for draw events from server.
+
+## Shortcuts
 - `Ctrl + F10` prints statistics to the browser console. Example:  
 ```
 [INFO] :: ClientStats :: Stats:
