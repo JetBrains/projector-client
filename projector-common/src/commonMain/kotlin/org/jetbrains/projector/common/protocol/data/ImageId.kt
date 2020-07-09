@@ -33,9 +33,9 @@ sealed class ImageId {
   @SerialName("a")
   data class BufferedImageId(
     @SerialName("a")
-    val identityHash: Int,
+    val length: Int,
     @SerialName("b")
-    val stateHash: Int
+    val contentHash: Int
   ) : ImageId()
 
   @Serializable
