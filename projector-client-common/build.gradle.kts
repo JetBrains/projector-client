@@ -47,5 +47,18 @@ kotlin {
         api(kotlin("stdlib-js", kotlinVersion))
       }
     }
+
+    val commonTest by getting {
+      dependencies {
+        api(kotlin("test-common", kotlinVersion))
+        api(kotlin("test-annotations-common", kotlinVersion))
+      }
+    }
+
+    val jsTest by getting {
+      dependencies {
+        api(kotlin("test-js", kotlinVersion))
+      }
+    }
   }
 }
