@@ -42,6 +42,8 @@ object SupportedTypesProvider {
   val supportedToClientDecoders: List<ToClientMessageDecoder> = when (ParamsProvider.TO_CLIENT_FORMAT) {
     ParamsProvider.ToClientFormat.KOTLINX_JSON -> listOf(KotlinxJsonToClientMessageDecoder)
 
+    ParamsProvider.ToClientFormat.KOTLINX_JSON_MANUAL -> listOf(ManualJsonToClientMessageDecoder)
+
     ParamsProvider.ToClientFormat.KOTLINX_PROTOBUF -> listOf(KotlinxProtoBufToClientMessageDecoder)
   }
 

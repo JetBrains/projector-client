@@ -82,6 +82,7 @@ actual object ParamsProvider {
       ENABLE_COMPRESSION = searchParams.has("enableCompression")
       TO_CLIENT_FORMAT = when (searchParams.get("toClientFormat")) {
         "json" -> ToClientFormat.KOTLINX_JSON
+        "jsonManual" -> ToClientFormat.KOTLINX_JSON_MANUAL
         "protoBuf" -> ToClientFormat.KOTLINX_PROTOBUF
         else -> DEFAULT_TO_CLIENT_FORMAT
       }
@@ -117,6 +118,7 @@ actual object ParamsProvider {
 
   enum class ToClientFormat {
     KOTLINX_JSON,
+    KOTLINX_JSON_MANUAL,
     KOTLINX_PROTOBUF,
   }
 
