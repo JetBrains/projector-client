@@ -217,5 +217,22 @@ sealed class ServerMarkdownEvent : ServerEvent() {
 @SerialName("p")
 data class ServerWindowColorsEvent(
   @SerialName("a")
-  val colors: Map<String, PaintValue.Color> = emptyMap()
-) : ServerEvent()
+  val colors: ColorsStorage
+) : ServerEvent() {
+
+  @Serializable
+  data class ColorsStorage(
+    @SerialName("a")
+    val windowHeaderActiveBackground: PaintValue.Color,
+    @SerialName("b")
+    val windowHeaderInactiveBackground: PaintValue.Color,
+    @SerialName("c")
+    val windowActiveBorder: PaintValue.Color,
+    @SerialName("d")
+    val windowInactiveBorder: PaintValue.Color,
+    @SerialName("e")
+    val windowHeaderActiveText: PaintValue.Color,
+    @SerialName("f")
+    val windowHeaderInactiveText: PaintValue.Color
+  )
+}

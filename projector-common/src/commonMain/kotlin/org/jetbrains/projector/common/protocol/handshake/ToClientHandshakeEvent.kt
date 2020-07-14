@@ -25,7 +25,7 @@ package org.jetbrains.projector.common.protocol.handshake
 
 import kotlinx.serialization.Serializable
 import org.jetbrains.projector.common.protocol.data.FontDataHolder
-import org.jetbrains.projector.common.protocol.data.PaintValue
+import org.jetbrains.projector.common.protocol.toClient.ServerWindowColorsEvent
 
 @Serializable
 sealed class ToClientHandshakeEvent
@@ -37,7 +37,7 @@ data class ToClientHandshakeSuccessEvent(
   val toServerCompression: CompressionType,
   val toServerProtocol: ProtocolType,
   val fontDataHolders: List<FontDataHolder>,
-  val colors: Map<String, PaintValue.Color>
+  val colors: ServerWindowColorsEvent.ColorsStorage? = null
 ) : ToClientHandshakeEvent()
 
 @Serializable

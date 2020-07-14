@@ -66,9 +66,20 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "m" -> ServerMarkdownEvent.ServerMarkdownSetCssEvent(content["a"] as Int, content["b"] as String)
       "n" -> ServerMarkdownEvent.ServerMarkdownScrollEvent(content["a"] as Int, content["b"] as Int)
       "o" -> ServerMarkdownEvent.ServerMarkdownBrowseUriEvent(content["a"] as String)
-      "p" -> ServerWindowColorsEvent()  // todo: decode map
+      "p" -> ServerWindowColorsEvent(content["a"].unsafeCast<Json>().toColorsStorage())
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }
+  }
+
+  private fun Json.toColorsStorage(): ServerWindowColorsEvent.ColorsStorage {
+    return ServerWindowColorsEvent.ColorsStorage(
+      this["a"].unsafeCast<Json>().toColor(),
+      this["b"].unsafeCast<Json>().toColor(),
+      this["c"].unsafeCast<Json>().toColor(),
+      this["d"].unsafeCast<Json>().toColor(),
+      this["e"].unsafeCast<Json>().toColor(),
+      this["f"].unsafeCast<Json>().toColor()
+    )
   }
 
   private fun Array<Any>.toCaretInfoChange(): ServerCaretInfoChangedEvent.CaretInfoChange {
@@ -288,12 +299,16 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
     }
   }
 
+  private fun Json.toColor(): PaintValue.Color {
+    return PaintValue.Color(this["a"] as Int)
+  }
+
   private fun Array<Any>.toPaintValue(): PaintValue {
     val type = this[0] as String
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
-      "a" -> PaintValue.Color(content["a"] as Int)
+      "a" -> content.toColor()
       "b" -> PaintValue.Gradient(
         content["a"].unsafeCast<Json>().toPoint(), content["b"].unsafeCast<Json>().toPoint(),
         content["c"] as Int, content["d"] as Int

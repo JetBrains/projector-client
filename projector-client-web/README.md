@@ -35,7 +35,7 @@ Name | Type | Default value | Description
 `logUnsupportedEvents` | Presence | Not present | Log unsupported events received from server to browser console.
 `doubleBuffering` | Presence | Not present | Enable double buffering for every single message from server.
 `enableCompression` | Presence | Not present | Use compression for sending and receiving WebSocket messages.
-`toClientFormat` | String | `protoBuf` | Sets format of data from server to client: `json` or `protoBuf`.
+`toClientFormat` | String | `jsonManual` | Sets format of data from server to client: `json`, `jsonManual`, `protoBuf`.
 `imageTtl` | Double | `60_000.0` | Set caching time of unused images in ms.
 `flushDelay` | Int? | `1` | Set buffering time of events from client in ms. If the value is not integer, unbuffered mode is used: every client event is sent to the server immediately.
 `showTextWidth` | Presence | Not present | Show near-text lines of browser width and desired width.

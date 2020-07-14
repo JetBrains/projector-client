@@ -24,7 +24,7 @@
 package org.jetbrains.projector.client.web.state
 
 import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
-import org.jetbrains.projector.common.protocol.data.PaintValue
+import org.jetbrains.projector.common.protocol.toClient.ServerWindowColorsEvent
 
 interface LafListener {
   fun lookAndFeelChanged()
@@ -58,19 +58,13 @@ object ProjectorUI {
   const val borderRadius = 8
   const val borderThickness = 8.0
 
-  fun setColors(colors: Map<String, PaintValue.Color>) {
-    colors.forEach {
-      when (it.key) {
-        "windowHeaderActiveBackground" -> windowHeaderActiveBackgroundArgb = it.value.argb.toLong()
-        "windowHeaderInactiveBackground" -> windowHeaderInactiveBackgroundArgb = it.value.argb.toLong()
-        "windowActiveBorder" -> {
-          windowActiveBorderArgb = it.value.argb.toLong()
-          borderStyle = "1px solid ${windowActiveBorderArgb.argbIntToRgbaString()}"
-        }
-        "windowInactiveBorder" -> windowInactiveBorderArgb = it.value.argb.toLong()
-        "windowHeaderActiveText" -> windowHeaderActiveTextArgb = it.value.argb.toLong()
-        "windowHeaderInactiveText" -> windowHeaderInactiveTextArgb = it.value.argb.toLong()
-      }
-    }
+  fun setColors(colors: ServerWindowColorsEvent.ColorsStorage) {
+    windowHeaderActiveBackgroundArgb = colors.windowHeaderActiveBackground.argb.toLong()
+    windowHeaderInactiveBackgroundArgb = colors.windowHeaderInactiveBackground.argb.toLong()
+    windowActiveBorderArgb = colors.windowActiveBorder.argb.toLong()
+    borderStyle = "1px solid ${windowActiveBorderArgb.argbIntToRgbaString()}"
+    windowInactiveBorderArgb = colors.windowInactiveBorder.argb.toLong()
+    windowHeaderActiveTextArgb = colors.windowHeaderActiveText.argb.toLong()
+    windowHeaderInactiveTextArgb = colors.windowHeaderInactiveText.argb.toLong()
   }
 }

@@ -36,7 +36,7 @@ actual object ParamsProvider {
 
   private val DEFAULT_HOST = getCurrentHostname()
   private const val DEFAULT_PORT = "8887"
-  private val DEFAULT_TO_CLIENT_FORMAT: ToClientFormat = ToClientFormat.KOTLINX_PROTOBUF
+  private val DEFAULT_TO_CLIENT_FORMAT: ToClientFormat = ToClientFormat.KOTLINX_JSON_MANUAL
   private const val DEFAULT_IMAGE_TTL = 60_000.0  // in ms
   private const val DEFAULT_FLUSH_DELAY = 1
   private const val DEFAULT_BACKGROUND_COLOR = "2A2"

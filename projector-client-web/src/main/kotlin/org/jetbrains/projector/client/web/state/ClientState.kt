@@ -182,8 +182,7 @@ sealed class ClientState {
           }
 
           is ToClientHandshakeSuccessEvent -> {
-
-            ProjectorUI.setColors(command.colors)
+            command.colors?.let { ProjectorUI.setColors(it) }
 
             OnScreenMessenger.showText(
               "Loading fonts...",

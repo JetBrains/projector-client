@@ -34,5 +34,6 @@ val COMMON_VERSION = listOf(ServerEvent.serializer(), ClientEvent.serializer())
 
 // Don't change order here: it's used to obtain readable "human id"
 val commonVersionList = listOf(
-  -1663032476
+  -1663032476,
+  615706807
 )
