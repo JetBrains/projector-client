@@ -31,3 +31,8 @@ import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 val COMMON_VERSION = listOf(ServerEvent.serializer(), ClientEvent.serializer())
   .map { it.list.descriptor.compatibilityHash }
   .reduce(Int::xor)
+
+// Don't change order here: it's used to obtain readable "human id"
+val commonVersionList = listOf(
+  -1663032476
+)

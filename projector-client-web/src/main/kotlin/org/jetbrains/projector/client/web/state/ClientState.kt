@@ -49,10 +49,7 @@ import org.jetbrains.projector.common.protocol.MessageDecoder
 import org.jetbrains.projector.common.protocol.MessageEncoder
 import org.jetbrains.projector.common.protocol.compress.MessageCompressor
 import org.jetbrains.projector.common.protocol.compress.MessageDecompressor
-import org.jetbrains.projector.common.protocol.handshake.COMMON_VERSION
-import org.jetbrains.projector.common.protocol.handshake.ToClientHandshakeFailureEvent
-import org.jetbrains.projector.common.protocol.handshake.ToClientHandshakeSuccessEvent
-import org.jetbrains.projector.common.protocol.handshake.ToServerHandshakeEvent
+import org.jetbrains.projector.common.protocol.handshake.*
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toClient.ToClientMessageDecoder
 import org.jetbrains.projector.common.protocol.toServer.*
@@ -133,6 +130,7 @@ sealed class ClientState {
         val handshakeEvent = with(SupportedTypesProvider) {
           ToServerHandshakeEvent(
             commonVersion = COMMON_VERSION,
+            commonVersionId = commonVersionList.indexOf(COMMON_VERSION),
             token = ParamsProvider.HANDSHAKE_TOKEN,
             initialSize = windowSizeController.currentSize,
             supportedToClientCompressions = supportedToClientDecompressors.map(MessageDecompressor<*>::compressionType),

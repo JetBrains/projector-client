@@ -21,19 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.common.protocol.handshake
+package org.jetbrains.projector.common.protocol
 
-import kotlinx.serialization.Serializable
-import org.jetbrains.projector.common.protocol.data.CommonIntSize
+import org.jetbrains.projector.common.protocol.handshake.COMMON_VERSION
+import org.jetbrains.projector.common.protocol.handshake.commonVersionList
+import kotlin.test.Test
+import kotlin.test.assertTrue
 
-@Serializable
-data class ToServerHandshakeEvent(
-  val commonVersion: Int,
-  val commonVersionId: Int,
-  val token: String? = null,
-  val initialSize: CommonIntSize,
-  val supportedToClientCompressions: List<CompressionType>,
-  val supportedToClientProtocols: List<ProtocolType>,
-  val supportedToServerCompressions: List<CompressionType>,
-  val supportedToServerProtocols: List<ProtocolType>
-)
+class CommonVersionPresenceTest {
+
+  @Test
+  fun commonVersionListShouldContainCurrentCommonVersion() {
+    assertTrue(
+      COMMON_VERSION in commonVersionList,
+      """
+        |Current common version of protocol should be in `commonVersionList`.
+        |It seems that protocol has been updated.
+        |Please append the current COMMON_VERSION to the commonVersionList as the last element.
+        |Current values:
+        |COMMON_VERSION = $COMMON_VERSION
+        |commonVersionList = $commonVersionList
+      """.trimMargin()
+    )
+  }
+}
