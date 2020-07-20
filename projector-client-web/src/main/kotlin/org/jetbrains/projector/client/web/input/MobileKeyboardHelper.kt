@@ -34,10 +34,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.LEFT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.STANDARD
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLSpanElement
-import org.w3c.dom.HTMLTextAreaElement
-import org.w3c.dom.Node
+import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.MouseEvent
@@ -358,6 +355,19 @@ class MobileKeyboardHelperImpl(
       }
       onmousedown = { e -> e.stopPropagation() }
       onmouseup = { e -> e.stopPropagation() }
+      asDynamic().ontouchstart = { e: TouchEvent ->
+        e.stopPropagation()
+        e.preventDefault()
+      }
+      asDynamic().ontouchmove = { e: TouchEvent ->
+        e.stopPropagation()
+        e.preventDefault()
+      }
+      asDynamic().ontouchend = { e: TouchEvent ->
+        flipFlop()
+        e.stopPropagation()
+        e.preventDefault()
+      }
 
       parent.appendChild(this)
     }
@@ -400,6 +410,20 @@ class MobileKeyboardHelperImpl(
       }
       onmousedown = MouseEvent::stopPropagation
       onmouseup = MouseEvent::stopPropagation
+      asDynamic().ontouchstart = { e: TouchEvent ->
+        e.stopPropagation()
+        e.preventDefault()
+      }
+      asDynamic().ontouchmove = { e: TouchEvent ->
+        e.stopPropagation()
+        e.preventDefault()
+      }
+      asDynamic().ontouchend = { e: TouchEvent ->
+        animate()
+        onClick()
+        e.stopPropagation()
+        e.preventDefault()
+      }
 
       parent.appendChild(this)
     }

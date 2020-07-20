@@ -32,11 +32,11 @@ import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.window.DragEventsInterceptor
 import org.jetbrains.projector.client.web.window.WindowManager
 import org.jetbrains.projector.common.protocol.toServer.*
+import org.w3c.dom.Touch
+import org.w3c.dom.TouchEvent
 import org.w3c.dom.clipboard.ClipboardEvent
-import org.w3c.dom.events.Event
-import org.w3c.dom.events.KeyboardEvent
-import org.w3c.dom.events.MouseEvent
-import org.w3c.dom.events.WheelEvent
+import org.w3c.dom.events.*
+import org.w3c.dom.get
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.roundToInt
@@ -67,11 +67,30 @@ class InputController(private val openingTimeStamp: Int,
     }
   }
 
+  private fun handleTouchMoveEvent(event: Event) {
+    require(event is TouchEvent)
+    event.preventDefault()
+
+    val touch = event.changedTouches[0] ?: return
+
+    if (mouseButtonsDown.isEmpty()) {
+      fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, event, touch)
+    }
+    else {
+      if (eventsInterceptor != null) {
+        eventsInterceptor!!.onMouseMove(touch.clientX, touch.clientY)
+      }
+      else {
+        fireMouseEvent(ClientMouseEvent.MouseEventType.DRAG, event, touch)
+      }
+    }
+  }
+
   private fun handleMouseDownEvent(event: Event) {
     require(event is MouseEvent)
 
     val topWindow = windowManager.getTopWindow(event.clientX, event.clientY)
-    eventsInterceptor = topWindow?.onMouseDown(event)
+    eventsInterceptor = topWindow?.onMouseDown(event.clientX, event.clientY)
     if (eventsInterceptor == null) {
       fireMouseEvent(ClientMouseEvent.MouseEventType.DOWN, event)
     }
@@ -79,6 +98,23 @@ class InputController(private val openingTimeStamp: Int,
       windowManager.bringToFront(topWindow!!)
     }
     mouseButtonsDown.add(event.button)
+  }
+
+  private fun handleTouchStartEvent(event: Event) {
+    require(event is TouchEvent)
+    event.preventDefault()
+
+    val touch = event.changedTouches[0] ?: return
+
+    val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY)
+    eventsInterceptor = topWindow?.onMouseDown(touch.clientX, touch.clientY)
+    if (eventsInterceptor == null) {
+      fireMouseEvent(ClientMouseEvent.MouseEventType.DOWN, event, touch)
+    }
+    else {
+      windowManager.bringToFront(topWindow!!)
+    }
+    mouseButtonsDown.add(LEFT_MOUSE_BUTTON_ID)
   }
 
   private fun handleMouseUpEvent(event: Event) {
@@ -93,9 +129,41 @@ class InputController(private val openingTimeStamp: Int,
     mouseButtonsDown.remove(event.button)
   }
 
+  private fun handleTouchEndEvent(event: Event) {
+    require(event is TouchEvent)
+    event.preventDefault()
+
+    val touch = event.changedTouches[0] ?: return
+
+    if (eventsInterceptor != null) {
+      eventsInterceptor!!.onMouseUp(touch.clientX, touch.clientY)
+      eventsInterceptor = null
+    }
+    else {
+      fireMouseEvent(ClientMouseEvent.MouseEventType.UP, event, touch)
+    }
+    mouseButtonsDown.remove(LEFT_MOUSE_BUTTON_ID)
+
+    // Generate ClickEvent manually. It's needed but not generated automatically because we preventDefault to disable
+    // generation of duplicating mouse events. If we allow generate mouse events but just skip some of them,
+    // input via mouse will be impossible in mobile mode...
+    val clickEventProperties = MouseEventInit(
+      clientX = touch.clientX,
+      clientY = touch.clientY,
+      button = LEFT_MOUSE_BUTTON_ID,
+      detail = 1,
+      shiftKey = event.shiftKey,
+      ctrlKey = event.ctrlKey,
+      altKey = event.altKey,
+      metaKey = event.metaKey
+    )
+    val clickEvent = MouseEvent("click", clickEventProperties)
+    handleClickEvent(clickEvent)
+  }
+
   private fun handleClickEvent(event: Event) {
     require(event is MouseEvent)
-    if (windowManager.getTopWindow(event.clientX, event.clientY)?.onMouseClick(event) == null) {
+    if (windowManager.getTopWindow(event.clientX, event.clientY)?.onMouseClick(event.clientX, event.clientY) == null) {
       fireMouseEvent(ClientMouseEvent.MouseEventType.CLICK, event)
     }
   }
@@ -128,6 +196,9 @@ class InputController(private val openingTimeStamp: Int,
   private val documentActionListeners = buildMap<String, (Event) -> Unit> {
     putAll(mapOf(
       "paste" to ::handleClipboardChange,
+      "touchstart" to ::handleTouchStartEvent,
+      "touchend" to ::handleTouchEndEvent,
+      "touchmove" to ::handleTouchMoveEvent,
       "mousemove" to ::handleMouseMoveEvent,
       "mousedown" to ::handleMouseDownEvent,
       "mouseup" to ::handleMouseUpEvent,
@@ -203,16 +274,44 @@ class InputController(private val openingTimeStamp: Int,
     stateMachine.fire(ClientAction.AddEvent(message))
   }
 
-  private fun fireMouseEvent(type: ClientMouseEvent.MouseEventType, event: MouseEvent) {
+  private fun fireMouseEvent(type: ClientMouseEvent.MouseEventType, event: MouseEvent) = fireMouseEvent(
+    type = type,
+    eventTimeStamp = event.timeStamp,
+    x = event.clientX,
+    y = event.clientY,
+    button = event.button,
+    clickCount = event.detail,
+    modifiers = event.modifiers
+  )
+
+  private fun fireMouseEvent(type: ClientMouseEvent.MouseEventType, event: TouchEvent, touch: Touch) = fireMouseEvent(
+    type = type,
+    eventTimeStamp = event.timeStamp,
+    x = touch.clientX,
+    y = touch.clientY,
+    button = LEFT_MOUSE_BUTTON_ID,
+    clickCount = 1,
+    modifiers = event.modifiers
+  )
+
+  private fun fireMouseEvent(
+    type: ClientMouseEvent.MouseEventType,
+    eventTimeStamp: Number,
+    x: Int,
+    y: Int,
+    button: Short,
+    clickCount: Int,
+    modifiers: Set<MouseModifier>
+  ) {
     val userScalingRatio = ParamsProvider.USER_SCALING_RATIO
 
     val message = ClientMouseEvent(
-      timeStamp = event.timeStamp.toInt() - openingTimeStamp,
-      x = (event.clientX / userScalingRatio).roundToInt(),
-      y = (event.clientY / userScalingRatio).roundToInt(),
-      button = event.button,
-      clickCount = event.detail,
-      modifiers = event.modifiers,
+      timeStamp = eventTimeStamp.toInt() - openingTimeStamp,
+      x = (x / userScalingRatio).roundToInt(),
+      y = (y / userScalingRatio).roundToInt(),
+      button = button,
+      clickCount = clickCount,
+      modifiers = modifiers,
       mouseEventType = type
     )
 
@@ -279,6 +378,26 @@ class InputController(private val openingTimeStamp: Int,
       return modifiers.union(specialKeysState.mouseModifiers)
     }
 
+  private val TouchEvent.modifiers: Set<MouseModifier>
+    get() {
+      val modifiers = mutableSetOf<MouseModifier>()
+
+      if (shiftKey) {
+        modifiers.add(MouseModifier.SHIFT_KEY)
+      }
+      if (ctrlKey) {
+        modifiers.add(MouseModifier.CTRL_KEY)
+      }
+      if (altKey) {
+        modifiers.add(MouseModifier.ALT_KEY)
+      }
+      if (metaKey) {
+        modifiers.add(MouseModifier.META_KEY)
+      }
+
+      return modifiers.union(specialKeysState.mouseModifiers)
+    }
+
   private val KeyboardEvent.modifiers: Set<KeyModifier>
     get() {
       val modifiers = mutableSetOf<KeyModifier>()
@@ -311,5 +430,7 @@ class InputController(private val openingTimeStamp: Int,
       KeyboardEvent.DOM_KEY_LOCATION_NUMPAD -> ClientKeyEvent.KeyLocation.NUMPAD
       else -> throw IllegalArgumentException("Bad key location: $this")
     }
+
+    private const val LEFT_MOUSE_BUTTON_ID: Short = 0
   }
 }

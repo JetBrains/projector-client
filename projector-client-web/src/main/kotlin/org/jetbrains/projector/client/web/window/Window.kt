@@ -23,12 +23,12 @@
  */
 package org.jetbrains.projector.client.web.window
 
+import org.jetbrains.projector.client.common.DrawEvent
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.DomCanvas
 import org.jetbrains.projector.client.common.canvas.buffering.DoubleBufferedRenderingSurface
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
 import org.jetbrains.projector.client.common.misc.ParamsProvider
-import org.jetbrains.projector.client.common.DrawEvent
-import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.web.misc.toDisplayType
 import org.jetbrains.projector.client.web.misc.toJsCursorType
 import org.jetbrains.projector.client.web.state.ClientAction
@@ -44,7 +44,6 @@ import org.jetbrains.projector.common.protocol.toServer.ClientWindowMoveEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowResizeEvent
 import org.jetbrains.projector.common.protocol.toServer.ResizeDirection
 import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.math.roundToInt
 
@@ -178,12 +177,12 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     return border.bounds.contains(x, y)
   }
 
-  fun onMouseDown(event: MouseEvent): DragEventsInterceptor? {
-    return border.onMouseDown(event.clientX, event.clientY) ?: header?.onMouseDown(event.clientX, event.clientY)
+  fun onMouseDown(x: Int, y: Int): DragEventsInterceptor? {
+    return border.onMouseDown(x, y) ?: header?.onMouseDown(x, y)
   }
 
-  fun onMouseClick(event: MouseEvent): DragEventsInterceptor? {
-    return border.onMouseClick(event.clientX, event.clientY) ?: header?.onMouseClick(event.clientX, event.clientY)
+  fun onMouseClick(x: Int, y: Int): DragEventsInterceptor? {
+    return border.onMouseClick(x, y) ?: header?.onMouseClick(x, y)
   }
 
   private fun onResize(deltaX: Int, deltaY: Int, direction: ResizeDirection) {
