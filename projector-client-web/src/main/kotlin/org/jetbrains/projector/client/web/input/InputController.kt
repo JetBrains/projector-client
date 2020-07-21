@@ -81,7 +81,7 @@ class InputController(private val openingTimeStamp: Int,
         eventsInterceptor!!.onMouseMove(touch.clientX, touch.clientY)
       }
       else {
-        fireMouseEvent(ClientMouseEvent.MouseEventType.DRAG, event, touch)
+        fireMouseEvent(ClientMouseEvent.MouseEventType.TOUCH_DRAG, event, touch)
       }
     }
   }

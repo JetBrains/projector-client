@@ -72,6 +72,7 @@ data class ClientMouseEvent(
   enum class MouseEventType {
     MOVE,
     DRAG,
+    TOUCH_DRAG,
     DOWN,
     UP,
     CLICK,
