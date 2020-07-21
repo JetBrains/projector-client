@@ -57,6 +57,7 @@ import org.khronos.webgl.ArrayBuffer
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import kotlin.browser.document
+import kotlin.browser.window
 import kotlin.math.roundToInt
 
 sealed class ClientState {
@@ -335,6 +336,10 @@ sealed class ClientState {
       else -> MobileKeyboardHelperImpl(openingTimeStamp, inputController.specialKeysState) { stateMachine.fire(ClientAction.AddEvent(it)) }
     }
 
+    private val closeBlocker = CloseBlocker(window).apply {
+      setListener()
+    }
+
     init {
       windowSizeController.addListener()
     }
@@ -457,6 +462,8 @@ sealed class ClientState {
         markdownPanelManager.disposeAll()
 
         mobileKeyboardHelper.dispose()
+
+        closeBlocker.removeListener()
 
         showDisconnectedMessage(action.url, action.closeCode)
 
