@@ -33,7 +33,7 @@ sealed class ImageId {
   @SerialName("a")
   data class BufferedImageId(
     @SerialName("a")
-    val length: Int,
+    val rasterDataBufferSize: Int,
     @SerialName("b")
     val contentHash: Int
   ) : ImageId()
