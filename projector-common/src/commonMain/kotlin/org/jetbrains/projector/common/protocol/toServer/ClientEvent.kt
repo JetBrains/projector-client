@@ -61,6 +61,7 @@ sealed class ClientEvent
 data class ClientMouseEvent(
   /** From connection opening. */
   val timeStamp: Int,
+  val windowId: Int,
   val x: Int,
   val y: Int,
   val button: Short,
@@ -84,6 +85,7 @@ data class ClientMouseEvent(
 data class ClientWheelEvent(
   /** From connection opening. */
   val timeStamp: Int,
+  val windowId: Int,
   val modifiers: Set<MouseModifier>,
   val mode: ScrollingMode,
   val x: Int,

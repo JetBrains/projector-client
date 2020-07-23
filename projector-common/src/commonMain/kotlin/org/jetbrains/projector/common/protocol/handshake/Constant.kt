@@ -36,5 +36,6 @@ val COMMON_VERSION = listOf(ServerEvent.serializer(), ClientEvent.serializer())
 val commonVersionList = listOf(
   -1663032476,
   615706807,
-  891030124
+  891030124,
+  -1205505588
 )

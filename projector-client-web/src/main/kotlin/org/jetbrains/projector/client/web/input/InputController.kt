@@ -54,15 +54,16 @@ class InputController(private val openingTimeStamp: Int,
   private fun handleMouseMoveEvent(event: Event) {
     require(event is MouseEvent)
 
+    val topWindow = windowManager.getTopWindow(event.clientX, event.clientY) ?: return
     if (mouseButtonsDown.isEmpty()) {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, event)
+      fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, topWindow.id, event)
     }
     else {
       if (eventsInterceptor != null) {
         eventsInterceptor!!.onMouseMove(event.clientX, event.clientY)
       }
       else {
-        fireMouseEvent(ClientMouseEvent.MouseEventType.DRAG, event)
+        fireMouseEvent(ClientMouseEvent.MouseEventType.DRAG, topWindow.id, event)
       }
     }
   }
@@ -72,16 +73,17 @@ class InputController(private val openingTimeStamp: Int,
     event.preventDefault()
 
     val touch = event.changedTouches[0] ?: return
+    val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY) ?: return
 
     if (mouseButtonsDown.isEmpty()) {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, event, touch)
+      fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, topWindow.id, event, touch)
     }
     else {
       if (eventsInterceptor != null) {
         eventsInterceptor!!.onMouseMove(touch.clientX, touch.clientY)
       }
       else {
-        fireMouseEvent(ClientMouseEvent.MouseEventType.TOUCH_DRAG, event, touch)
+        fireMouseEvent(ClientMouseEvent.MouseEventType.TOUCH_DRAG, topWindow.id, event, touch)
       }
     }
   }
@@ -89,13 +91,13 @@ class InputController(private val openingTimeStamp: Int,
   private fun handleMouseDownEvent(event: Event) {
     require(event is MouseEvent)
 
-    val topWindow = windowManager.getTopWindow(event.clientX, event.clientY)
-    eventsInterceptor = topWindow?.onMouseDown(event.clientX, event.clientY)
+    val topWindow = windowManager.getTopWindow(event.clientX, event.clientY) ?: return
+    eventsInterceptor = topWindow.onMouseDown(event.clientX, event.clientY)
     if (eventsInterceptor == null) {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.DOWN, event)
+      fireMouseEvent(ClientMouseEvent.MouseEventType.DOWN, topWindow.id, event)
     }
     else {
-      windowManager.bringToFront(topWindow!!)
+      windowManager.bringToFront(topWindow)
     }
     mouseButtonsDown.add(event.button)
   }
@@ -106,13 +108,13 @@ class InputController(private val openingTimeStamp: Int,
 
     val touch = event.changedTouches[0] ?: return
 
-    val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY)
-    eventsInterceptor = topWindow?.onMouseDown(touch.clientX, touch.clientY)
+    val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY) ?: return
+    eventsInterceptor = topWindow.onMouseDown(touch.clientX, touch.clientY)
     if (eventsInterceptor == null) {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.DOWN, event, touch)
+      fireMouseEvent(ClientMouseEvent.MouseEventType.DOWN, topWindow.id, event, touch)
     }
     else {
-      windowManager.bringToFront(topWindow!!)
+      windowManager.bringToFront(topWindow)
     }
     mouseButtonsDown.add(LEFT_MOUSE_BUTTON_ID)
   }
@@ -124,7 +126,9 @@ class InputController(private val openingTimeStamp: Int,
       eventsInterceptor = null
     }
     else {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.UP, event)
+      windowManager.getTopWindow(event.clientX, event.clientY)?.id?.let {
+        fireMouseEvent(ClientMouseEvent.MouseEventType.UP, it, event)
+      }
     }
     mouseButtonsDown.remove(event.button)
   }
@@ -134,13 +138,14 @@ class InputController(private val openingTimeStamp: Int,
     event.preventDefault()
 
     val touch = event.changedTouches[0] ?: return
+    val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY) ?: return
 
     if (eventsInterceptor != null) {
       eventsInterceptor!!.onMouseUp(touch.clientX, touch.clientY)
       eventsInterceptor = null
     }
     else {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.UP, event, touch)
+      fireMouseEvent(ClientMouseEvent.MouseEventType.UP, topWindow.id, event, touch)
     }
     mouseButtonsDown.remove(LEFT_MOUSE_BUTTON_ID)
 
@@ -163,15 +168,17 @@ class InputController(private val openingTimeStamp: Int,
 
   private fun handleClickEvent(event: Event) {
     require(event is MouseEvent)
-    if (windowManager.getTopWindow(event.clientX, event.clientY)?.onMouseClick(event.clientX, event.clientY) == null) {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.CLICK, event)
+    val topWindow = windowManager.getTopWindow(event.clientX, event.clientY) ?: return
+    if (topWindow.onMouseClick(event.clientX, event.clientY) == null) {
+      fireMouseEvent(ClientMouseEvent.MouseEventType.CLICK, topWindow.id, event)
     }
   }
 
   // This is extremely dangerous method, because it is called when mouse leave ANY canvas inside document!
   private fun handleMouseOutEvent(event: Event) {
     require(event is MouseEvent)
-    fireMouseEvent(ClientMouseEvent.MouseEventType.OUT, event)
+    val topWindow = windowManager.getTopWindow(event.clientX, event.clientY) ?: return
+    fireMouseEvent(ClientMouseEvent.MouseEventType.OUT, topWindow.id, event)
   }
 
   private fun handleKeyDownEvent(event: Event) {
@@ -259,10 +266,12 @@ class InputController(private val openingTimeStamp: Int,
   private fun fireWheelEvent(event: Event) {
     require(event is WheelEvent)
 
+    val topWindow = windowManager.getTopWindow(event.clientX, event.clientY) ?: return
     val userScalingRatio = ParamsProvider.USER_SCALING_RATIO
 
     val message = ClientWheelEvent(
       timeStamp = event.timeStamp.toInt() - openingTimeStamp,
+      windowId = topWindow.id,
       modifiers = event.modifiers,
       mode = event.deltaMode.toScrollingMode(),
       x = (event.clientX / userScalingRatio).roundToInt(),
@@ -274,8 +283,9 @@ class InputController(private val openingTimeStamp: Int,
     stateMachine.fire(ClientAction.AddEvent(message))
   }
 
-  private fun fireMouseEvent(type: ClientMouseEvent.MouseEventType, event: MouseEvent) = fireMouseEvent(
+  private fun fireMouseEvent(type: ClientMouseEvent.MouseEventType, windowId: Int, event: MouseEvent) = fireMouseEvent(
     type = type,
+    windowId = windowId,
     eventTimeStamp = event.timeStamp,
     x = event.clientX,
     y = event.clientY,
@@ -284,8 +294,9 @@ class InputController(private val openingTimeStamp: Int,
     modifiers = event.modifiers
   )
 
-  private fun fireMouseEvent(type: ClientMouseEvent.MouseEventType, event: TouchEvent, touch: Touch) = fireMouseEvent(
+  private fun fireMouseEvent(type: ClientMouseEvent.MouseEventType, windowId: Int, event: TouchEvent, touch: Touch) = fireMouseEvent(
     type = type,
+    windowId = windowId,
     eventTimeStamp = event.timeStamp,
     x = touch.clientX,
     y = touch.clientY,
@@ -296,6 +307,7 @@ class InputController(private val openingTimeStamp: Int,
 
   private fun fireMouseEvent(
     type: ClientMouseEvent.MouseEventType,
+    windowId: Int,
     eventTimeStamp: Number,
     x: Int,
     y: Int,
@@ -307,6 +319,7 @@ class InputController(private val openingTimeStamp: Int,
 
     val message = ClientMouseEvent(
       timeStamp = eventTimeStamp.toInt() - openingTimeStamp,
+      windowId = windowId,
       x = (x / userScalingRatio).roundToInt(),
       y = (y / userScalingRatio).roundToInt(),
       button = button,
