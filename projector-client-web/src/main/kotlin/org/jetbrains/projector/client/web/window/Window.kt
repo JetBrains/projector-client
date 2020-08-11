@@ -45,6 +45,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientWindowResizeEvent
 import org.jetbrains.projector.common.protocol.toServer.ResizeDirection
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.browser.document
+import kotlin.dom.addClass
 import kotlin.math.roundToInt
 
 class Window(windowData: WindowData, private val stateMachine: ClientStateMachine) : LafListener {
@@ -201,6 +202,8 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     style.background = ParamsProvider.BACKGROUND_COLOR
     style.position = "fixed"
     style.display = isShowing.toDisplayType()
+
+    addClass("window")  // to easily locate windows in integration tests
 
     document.body!!.appendChild(this)
   }
