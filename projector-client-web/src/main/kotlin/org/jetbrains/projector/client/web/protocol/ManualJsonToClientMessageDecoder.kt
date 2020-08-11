@@ -125,7 +125,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
     return WindowData(
       this["a"] as Int,
       this["b"] as String?,
-      this["c"].unsafeCast<Array<Array<Any>>>().map { it.toImageId() },
+      this["c"].unsafeCast<Array<Array<Any>>?>()?.map { it.toImageId() },
       this["d"] as Boolean,
       this["e"] as Int,
       this["f"].unsafeCast<Json>().toCommonRectangle(),
