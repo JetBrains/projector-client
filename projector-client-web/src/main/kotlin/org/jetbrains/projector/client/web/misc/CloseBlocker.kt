@@ -29,7 +29,8 @@ import org.w3c.dom.events.Event
 
 class CloseBlocker(private val window: Window) {
 
-  private fun onBeforeUnload(e: Event) {
+  // Can't use simple function here because its reference isn't equal to itself: KT-15101
+  private val onBeforeUnload = fun(e: Event) {
     require(e is BeforeUnloadEvent)
 
     e.preventDefault()
@@ -37,11 +38,11 @@ class CloseBlocker(private val window: Window) {
   }
 
   fun setListener() {
-    window.addEventListener(beforeUnloadType, this::onBeforeUnload)
+    window.addEventListener(beforeUnloadType, onBeforeUnload)
   }
 
   fun removeListener() {
-    window.removeEventListener(beforeUnloadType, this::onBeforeUnload)
+    window.removeEventListener(beforeUnloadType, onBeforeUnload)
   }
 
   companion object {
