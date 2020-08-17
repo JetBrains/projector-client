@@ -69,6 +69,7 @@ actual object ParamsProvider {
   val ENABLE_WSS: Boolean
   val HANDSHAKE_TOKEN: String?
   val MOBILE_SETTING: MobileSetting
+  val IDE_WINDOW_ID: Int?
   val SCALING_RATIO: Double
     get() = SYSTEM_SCALING_RATIO * USER_SCALING_RATIO
 
@@ -113,6 +114,7 @@ actual object ParamsProvider {
         }
         false -> MobileSetting.DISABLED
       }
+      IDE_WINDOW_ID = searchParams.get("ideWindow")?.toIntOrNull()
     }
   }
 
