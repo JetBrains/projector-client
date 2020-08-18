@@ -340,6 +340,10 @@ sealed class ClientState {
       setListener()
     }
 
+    private val selectionBlocker = SelectionBlocker(window).apply {
+      blockSelection()
+    }
+
     init {
       windowSizeController.addListener()
     }
@@ -464,6 +468,8 @@ sealed class ClientState {
         mobileKeyboardHelper.dispose()
 
         closeBlocker.removeListener()
+
+        selectionBlocker.unblockSelection()
 
         showDisconnectedMessage(action.url, action.closeCode)
 
