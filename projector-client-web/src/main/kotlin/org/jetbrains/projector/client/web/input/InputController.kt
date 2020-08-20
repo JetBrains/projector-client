@@ -25,6 +25,7 @@ package org.jetbrains.projector.client.web.input
 
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.RepaintAreaSetting
+import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.web.misc.ClientStats
 import org.jetbrains.projector.client.web.misc.toScrollingMode
 import org.jetbrains.projector.client.web.state.ClientAction
@@ -50,6 +51,9 @@ class InputController(private val openingTimeStamp: Int,
   private val mouseButtonsDown = mutableSetOf<Short>()
 
   private var eventsInterceptor: DragEventsInterceptor? = null
+
+  private var lastTouchStartTimeStamp = TimeStamp.current
+  private var touchClickCount = 1
 
   private fun handleMouseMoveEvent(event: Event) {
     require(event is MouseEvent)
@@ -108,6 +112,14 @@ class InputController(private val openingTimeStamp: Int,
 
     val touch = event.changedTouches[0] ?: return
 
+    if (event.timeStamp.toDouble() - lastTouchStartTimeStamp < DOUBLE_CLICK_DELTA_MS) {
+      ++touchClickCount
+    }
+    else {
+      touchClickCount = 1
+    }
+    lastTouchStartTimeStamp = event.timeStamp.toDouble()
+
     val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY) ?: return
     eventsInterceptor = topWindow.onMouseDown(touch.clientX, touch.clientY)
     if (eventsInterceptor == null) {
@@ -156,7 +168,7 @@ class InputController(private val openingTimeStamp: Int,
       clientX = touch.clientX,
       clientY = touch.clientY,
       button = LEFT_MOUSE_BUTTON_ID,
-      detail = 1,
+      detail = touchClickCount,
       shiftKey = event.shiftKey,
       ctrlKey = event.ctrlKey,
       altKey = event.altKey,
@@ -301,7 +313,7 @@ class InputController(private val openingTimeStamp: Int,
     x = touch.clientX,
     y = touch.clientY,
     button = LEFT_MOUSE_BUTTON_ID,
-    clickCount = 1,
+    clickCount = touchClickCount,
     modifiers = event.modifiers
   )
 
@@ -445,5 +457,7 @@ class InputController(private val openingTimeStamp: Int,
     }
 
     private const val LEFT_MOUSE_BUTTON_ID: Short = 0
+
+    private const val DOUBLE_CLICK_DELTA_MS = 500
   }
 }
