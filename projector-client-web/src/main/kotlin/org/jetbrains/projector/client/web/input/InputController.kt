@@ -33,7 +33,6 @@ import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.window.DragEventsInterceptor
 import org.jetbrains.projector.client.web.window.WindowManager
 import org.jetbrains.projector.common.protocol.toServer.*
-import org.w3c.dom.Touch
 import org.w3c.dom.TouchEvent
 import org.w3c.dom.clipboard.ClipboardEvent
 import org.w3c.dom.events.*
@@ -54,6 +53,8 @@ class InputController(private val openingTimeStamp: Int,
 
   private var lastTouchStartTimeStamp = TimeStamp.current
   private var touchClickCount = 1
+  private var lastTouchX = 1
+  private var lastTouchY = 1
 
   private fun handleMouseMoveEvent(event: Event) {
     require(event is MouseEvent)
@@ -80,14 +81,14 @@ class InputController(private val openingTimeStamp: Int,
     val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY) ?: return
 
     if (mouseButtonsDown.isEmpty()) {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, topWindow.id, event, touch)
+      fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, topWindow.id, event, x = touch.clientX, y = touch.clientY)
     }
     else {
       if (eventsInterceptor != null) {
         eventsInterceptor!!.onMouseMove(touch.clientX, touch.clientY)
       }
       else {
-        fireMouseEvent(ClientMouseEvent.MouseEventType.TOUCH_DRAG, topWindow.id, event, touch)
+        fireMouseEvent(ClientMouseEvent.MouseEventType.TOUCH_DRAG, topWindow.id, event, x = touch.clientX, y = touch.clientY)
       }
     }
   }
@@ -117,13 +118,15 @@ class InputController(private val openingTimeStamp: Int,
     }
     else {
       touchClickCount = 1
+      lastTouchX = touch.clientX
+      lastTouchY = touch.clientY
     }
     lastTouchStartTimeStamp = event.timeStamp.toDouble()
 
     val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY) ?: return
     eventsInterceptor = topWindow.onMouseDown(touch.clientX, touch.clientY)
     if (eventsInterceptor == null) {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.DOWN, topWindow.id, event, touch)
+      fireMouseEvent(ClientMouseEvent.MouseEventType.DOWN, topWindow.id, event, x = lastTouchX, y = lastTouchY)
     }
     else {
       windowManager.bringToFront(topWindow)
@@ -152,12 +155,19 @@ class InputController(private val openingTimeStamp: Int,
     val touch = event.changedTouches[0] ?: return
     val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY) ?: return
 
+    val (x, y) = if (event.timeStamp.toDouble() - lastTouchStartTimeStamp < DOUBLE_CLICK_DELTA_MS) {
+      lastTouchX to lastTouchY
+    }
+    else {
+      touch.clientX to touch.clientY
+    }
+
     if (eventsInterceptor != null) {
       eventsInterceptor!!.onMouseUp(touch.clientX, touch.clientY)
       eventsInterceptor = null
     }
     else {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.UP, topWindow.id, event, touch)
+      fireMouseEvent(ClientMouseEvent.MouseEventType.UP, topWindow.id, event, x = x, y = y)
     }
     mouseButtonsDown.remove(LEFT_MOUSE_BUTTON_ID)
 
@@ -165,8 +175,8 @@ class InputController(private val openingTimeStamp: Int,
     // generation of duplicating mouse events. If we allow generate mouse events but just skip some of them,
     // input via mouse will be impossible in mobile mode...
     val clickEventProperties = MouseEventInit(
-      clientX = touch.clientX,
-      clientY = touch.clientY,
+      clientX = x,
+      clientY = y,
       button = LEFT_MOUSE_BUTTON_ID,
       detail = touchClickCount,
       shiftKey = event.shiftKey,
@@ -306,12 +316,12 @@ class InputController(private val openingTimeStamp: Int,
     modifiers = event.modifiers
   )
 
-  private fun fireMouseEvent(type: ClientMouseEvent.MouseEventType, windowId: Int, event: TouchEvent, touch: Touch) = fireMouseEvent(
+  private fun fireMouseEvent(type: ClientMouseEvent.MouseEventType, windowId: Int, event: TouchEvent, x: Int, y: Int) = fireMouseEvent(
     type = type,
     windowId = windowId,
     eventTimeStamp = event.timeStamp,
-    x = touch.clientX,
-    y = touch.clientY,
+    x = x,
+    y = y,
     button = LEFT_MOUSE_BUTTON_ID,
     clickCount = touchClickCount,
     modifiers = event.modifiers
