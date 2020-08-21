@@ -39,7 +39,7 @@ data class CommonRectangle(
   @SerialName("c")
   val width: Double,
   @SerialName("d")
-  val height: Double
+  val height: Double,
 ) : CommonShape() {
 
   fun contains(x: Int, y: Int) = this.x <= x && x < this.x + this.width && this.y <= y && y < this.y + this.height
@@ -53,7 +53,7 @@ data class CommonPath(
   @SerialName("a")
   val segments: List<PathSegment> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
   @SerialName("b")
-  val winding: WindingType
+  val winding: WindingType,
 ) : CommonShape() {
 
   @Serializable

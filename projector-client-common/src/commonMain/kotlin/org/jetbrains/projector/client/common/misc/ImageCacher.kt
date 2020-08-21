@@ -41,7 +41,7 @@ object ImageCacher {
     val width: Int,
     val height: Int,
     val singleRenderingSurfaceProcessor: SingleRenderingSurfaceProcessor,
-    val offscreenCanvas: Canvas.ImageSource
+    val offscreenCanvas: Canvas.ImageSource,
   )
 
   private val cache = mutableMapOf<ImageId, LivingEntity<Canvas.ImageSource>>()

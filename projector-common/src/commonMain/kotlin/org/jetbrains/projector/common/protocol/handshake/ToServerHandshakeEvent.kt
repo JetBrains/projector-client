@@ -35,5 +35,5 @@ data class ToServerHandshakeEvent(
   val supportedToClientCompressions: List<CompressionType>,
   val supportedToClientProtocols: List<ProtocolType>,
   val supportedToServerCompressions: List<CompressionType>,
-  val supportedToServerProtocols: List<ProtocolType>
+  val supportedToServerProtocols: List<ProtocolType>,
 )

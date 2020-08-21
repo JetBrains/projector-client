@@ -23,8 +23,8 @@
  */
 package org.jetbrains.projector.client.web.misc
 
-import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.misc.Logger
+import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.common.statistics.Average
 import org.jetbrains.projector.common.statistics.Rate
 import org.jetbrains.projector.common.statistics.RoundingStrategy

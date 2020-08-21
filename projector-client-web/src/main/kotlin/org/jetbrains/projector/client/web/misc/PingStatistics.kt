@@ -32,7 +32,7 @@ import org.jetbrains.projector.common.protocol.toClient.ServerPingReplyEvent
 
 class PingStatistics(
   private val openingTimeStamp: Int,
-  private val requestPing: () -> Unit
+  private val requestPing: () -> Unit,
 ) {
 
   private val pingShower = when (ParamsProvider.SHOW_PING) {

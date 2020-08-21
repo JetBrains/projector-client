@@ -111,7 +111,8 @@ object Extensions {
     AlphaCompositeRule.XOR -> Context2d.CompositeOperationType.XOR
     AlphaCompositeRule.SRC,
     AlphaCompositeRule.CLEAR,
-    AlphaCompositeRule.DST -> Context2d.CompositeOperationType.SRC_OVER.also {
+    AlphaCompositeRule.DST,
+    -> Context2d.CompositeOperationType.SRC_OVER.also {
       logger.info { "Missing implementation for $this, applying source-over" }
     }
   }

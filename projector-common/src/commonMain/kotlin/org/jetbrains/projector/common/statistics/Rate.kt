@@ -28,7 +28,7 @@ class Rate<ValueType : Number> private constructor(
   private val value: StatsValue<ValueType>,
   private val unit: String?,
   private val name: String,
-  private val roundingStrategy: RoundingStrategy
+  private val roundingStrategy: RoundingStrategy,
 ) {
 
   private var lastTimeStampMs: Double? = null

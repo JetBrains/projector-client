@@ -78,5 +78,5 @@ data class WindowData(
    * If the window has not a header on the host, headerHeight == null.
    */
   @SerialName("l")
-  val headerHeight: Int? = null
+  val headerHeight: Int? = null,
 )

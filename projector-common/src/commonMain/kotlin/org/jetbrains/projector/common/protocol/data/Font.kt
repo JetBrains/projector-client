@@ -28,7 +28,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FontDataHolder(
   val fontId: Short,
-  val fontData: TtfFontData  // todo: provide other variants like type1font and unserializableFont(name, style)
+  val fontData: TtfFontData,  // todo: provide other variants like type1font and unserializableFont(name, style)
 )
 
 @Serializable

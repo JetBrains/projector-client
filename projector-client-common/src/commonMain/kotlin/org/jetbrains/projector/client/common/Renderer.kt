@@ -585,7 +585,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
       var rule: AlphaCompositeRule = DEFAULT_RULE,
       var alpha: Double = DEFAULT_ALPHA,
       var fillStyle: PaintColor? = DEFAULT_FILL_STYLE,
-      var strokeStyle: PaintColor? = DEFAULT_STROKE_STYLE
+      var strokeStyle: PaintColor? = DEFAULT_STROKE_STYLE,
     ) {
 
       fun reset() {
@@ -619,7 +619,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
       var font: String = "${Defaults.FONT_SIZE}px Arial",
       var rule: AlphaCompositeRule = AlphaCompositeRule.SRC_OVER,
       var alpha: Double = 1.0,
-      var paint: PaintColor? = SolidColor(Defaults.FOREGROUND_COLOR_ARGB)
+      var paint: PaintColor? = SolidColor(Defaults.FOREGROUND_COLOR_ARGB),
     )
   }
 }

@@ -37,7 +37,7 @@ data class ServerImageDataReplyEvent(
   @SerialName("a")
   val imageId: ImageId,
   @SerialName("b")
-  val imageData: ImageData
+  val imageData: ImageData,
 ) : ServerEvent()
 
 @Serializable
@@ -48,21 +48,21 @@ data class ServerPingReplyEvent(
   val clientTimeStamp: Int,
   /** From connection opening. */
   @SerialName("b")
-  val serverReadEventTimeStamp: Int
+  val serverReadEventTimeStamp: Int,
 ) : ServerEvent()
 
 @Serializable
 @SerialName("c")
 data class ServerClipboardEvent(
   @SerialName("a")
-  val stringContent: String  // TODO: support more types
+  val stringContent: String,  // TODO: support more types
 ) : ServerEvent()
 
 @Serializable
 @SerialName("d")
 data class ServerWindowSetChangedEvent(
   @SerialName("a")
-  val windowDataList: List<WindowData> = emptyList()  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
+  val windowDataList: List<WindowData> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
 ) : ServerEvent()
 
 @Serializable
@@ -71,7 +71,7 @@ data class ServerDrawCommandsEvent(
   @SerialName("a")
   val target: Target,
   @SerialName("b")
-  val drawEvents: List<ServerWindowEvent> = emptyList()  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
+  val drawEvents: List<ServerWindowEvent> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
 ) : ServerEvent() {
 
   @Serializable
@@ -81,7 +81,7 @@ data class ServerDrawCommandsEvent(
     @SerialName("a")
     data class Onscreen(
       @SerialName("a")
-      val windowId: Int
+      val windowId: Int,
     ) : Target()
 
     @Serializable
@@ -92,7 +92,7 @@ data class ServerDrawCommandsEvent(
       @SerialName("b")
       val width: Int,
       @SerialName("c")
-      val height: Int
+      val height: Int,
     ) : Target()
   }
 }
@@ -101,7 +101,7 @@ data class ServerDrawCommandsEvent(
 @SerialName("f")
 data class ServerCaretInfoChangedEvent(
   @SerialName("a")
-  val data: CaretInfoChange
+  val data: CaretInfoChange,
 ) : ServerEvent() {
 
   @Serializable
@@ -127,7 +127,7 @@ data class ServerCaretInfoChangedEvent(
       @SerialName("f")
       val editorWindowId: Int,
       @SerialName("g")
-      val editorMetrics: CommonRectangle
+      val editorMetrics: CommonRectangle,
     ) : CaretInfoChange()
   }
 }
@@ -141,7 +141,7 @@ sealed class ServerMarkdownEvent : ServerEvent() {
     @SerialName("a")
     val panelId: Int,
     @SerialName("b")
-    val show: Boolean
+    val show: Boolean,
   ) : ServerMarkdownEvent()
 
   @Serializable
@@ -150,7 +150,7 @@ sealed class ServerMarkdownEvent : ServerEvent() {
     @SerialName("a")
     val panelId: Int,
     @SerialName("b")
-    val size: CommonIntSize
+    val size: CommonIntSize,
   ) : ServerMarkdownEvent()
 
   @Serializable
@@ -159,14 +159,14 @@ sealed class ServerMarkdownEvent : ServerEvent() {
     @SerialName("a")
     val panelId: Int,
     @SerialName("b")
-    val point: Point
+    val point: Point,
   ) : ServerMarkdownEvent()
 
   @Serializable
   @SerialName("j")
   data class ServerMarkdownDisposeEvent(
     @SerialName("a")
-    val panelId: Int
+    val panelId: Int,
   ) : ServerMarkdownEvent()
 
   @Serializable
@@ -175,7 +175,7 @@ sealed class ServerMarkdownEvent : ServerEvent() {
     @SerialName("a")
     val panelId: Int,
     @SerialName("b")
-    val windowId: Int
+    val windowId: Int,
   ) : ServerMarkdownEvent()
 
   @Serializable
@@ -184,7 +184,7 @@ sealed class ServerMarkdownEvent : ServerEvent() {
     @SerialName("a")
     val panelId: Int,
     @SerialName("b")
-    val html: String
+    val html: String,
   ) : ServerMarkdownEvent()
 
   @Serializable
@@ -193,7 +193,7 @@ sealed class ServerMarkdownEvent : ServerEvent() {
     @SerialName("a")
     val panelId: Int,
     @SerialName("b")
-    val css: String
+    val css: String,
   ) : ServerMarkdownEvent()
 
   @Serializable
@@ -202,14 +202,14 @@ sealed class ServerMarkdownEvent : ServerEvent() {
     @SerialName("a")
     val panelId: Int,
     @SerialName("b")
-    val scrollOffset: Int
+    val scrollOffset: Int,
   ) : ServerMarkdownEvent()
 
   @Serializable
   @SerialName("o")
   data class ServerMarkdownBrowseUriEvent(
     @SerialName("a")
-    val link: String
+    val link: String,
   ) : ServerMarkdownEvent()
 }
 
@@ -217,7 +217,7 @@ sealed class ServerMarkdownEvent : ServerEvent() {
 @SerialName("p")
 data class ServerWindowColorsEvent(
   @SerialName("a")
-  val colors: ColorsStorage
+  val colors: ColorsStorage,
 ) : ServerEvent() {
 
   @Serializable
@@ -233,6 +233,6 @@ data class ServerWindowColorsEvent(
     @SerialName("e")
     val windowHeaderActiveText: PaintValue.Color,
     @SerialName("f")
-    val windowHeaderInactiveText: PaintValue.Color
+    val windowHeaderInactiveText: PaintValue.Color,
   )
 }

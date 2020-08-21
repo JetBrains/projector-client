@@ -110,7 +110,7 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     dx: Double,
     dy: Double,
     dw: Double,
-    dh: Double
+    dh: Double,
   ) {
     myContext2d.drawImage(imageSource.asPlatformImageSource().canvasElement, sx, sy, sw, sh, dx, dy, dw, dh)
   }
@@ -163,14 +163,16 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     myContext2d.rect(x, y, w, h)
   }
 
-  override fun ellipse(x: Double,
-                       y: Double,
-                       radiusX: Double,
-                       radiusY: Double,
-                       rotation: Double,
-                       startAngle: Double,
-                       endAngle: Double,
-                       anticlockwise: Boolean) {
+  override fun ellipse(
+    x: Double,
+    y: Double,
+    radiusX: Double,
+    radiusY: Double,
+    rotation: Double,
+    startAngle: Double,
+    endAngle: Double,
+    anticlockwise: Boolean,
+  ) {
     myContext2d.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise)
   }
 

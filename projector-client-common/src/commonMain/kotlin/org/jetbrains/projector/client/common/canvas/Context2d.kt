@@ -41,7 +41,7 @@ interface Context2d {
     dx: Double,
     dy: Double,
     dw: Double,
-    dh: Double
+    dh: Double,
   )
 
   fun beginPath()
@@ -56,14 +56,16 @@ interface Context2d {
   fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double)
   fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double)
   fun rect(x: Double, y: Double, w: Double, h: Double)
-  fun ellipse(x: Double,
-              y: Double,
-              radiusX: Double,
-              radiusY: Double,
-              rotation: Double,
-              startAngle: Double,
-              endAngle: Double,
-              anticlockwise: Boolean = false)
+  fun ellipse(
+    x: Double,
+    y: Double,
+    radiusX: Double,
+    radiusY: Double,
+    rotation: Double,
+    startAngle: Double,
+    endAngle: Double,
+    anticlockwise: Boolean = false,
+  )
 
   fun save()
   fun restore()

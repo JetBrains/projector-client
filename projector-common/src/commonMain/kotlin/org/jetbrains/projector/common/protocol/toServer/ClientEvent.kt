@@ -67,7 +67,7 @@ data class ClientMouseEvent(
   val button: Short,
   val clickCount: Int,
   val modifiers: Set<MouseModifier>,
-  val mouseEventType: MouseEventType
+  val mouseEventType: MouseEventType,
 ) : ClientEvent() {
 
   enum class MouseEventType {
@@ -91,7 +91,7 @@ data class ClientWheelEvent(
   val x: Int,
   val y: Int,
   val deltaX: Double,
-  val deltaY: Double
+  val deltaY: Double,
 ) : ClientEvent() {
 
   enum class ScrollingMode {
@@ -109,7 +109,7 @@ data class ClientKeyEvent(
   val code: String,
   val location: KeyLocation,
   val modifiers: Set<KeyModifier>,
-  val keyEventType: KeyEventType
+  val keyEventType: KeyEventType,
 ) : ClientEvent() {
 
   enum class KeyEventType {
@@ -130,7 +130,7 @@ data class ClientKeyPressEvent(
   /** From connection opening. */
   val timeStamp: Int,
   val key: String,
-  val modifiers: Set<KeyModifier>
+  val modifiers: Set<KeyModifier>,
 ) : ClientEvent()
 
 @Serializable
@@ -141,30 +141,30 @@ data class ClientRequestImageDataEvent(val imageId: ImageId) : ClientEvent()
 
 @Serializable
 data class ClientClipboardEvent(
-  val stringContent: String  // TODO: support more types
+  val stringContent: String,  // TODO: support more types
 ) : ClientEvent()
 
 @Serializable
 data class ClientRequestPingEvent(
   /** From connection opening. */
-  val clientTimeStamp: Int
+  val clientTimeStamp: Int,
 ) : ClientEvent()
 
 @Serializable
 data class ClientSetKeymapEvent(
-  val keymap: UserKeymap
+  val keymap: UserKeymap,
 ) : ClientEvent()
 
 @Serializable
 data class ClientOpenLinkEvent(
-  val link: String
+  val link: String,
 ) : ClientEvent()
 
 @Serializable
 data class ClientWindowMoveEvent(
   val windowId: Int,
   val deltaX: Int,
-  val deltaY: Int
+  val deltaY: Int,
 ) : ClientEvent()
 
 // If delta is negative, we resizing to the left top
@@ -173,10 +173,10 @@ data class ClientWindowResizeEvent(
   val windowId: Int,
   val deltaX: Int,
   val deltaY: Int,
-  val direction: ResizeDirection
+  val direction: ResizeDirection,
 ) : ClientEvent()
 
 @Serializable
 data class ClientWindowCloseEvent(
-  val windowId: Int
+  val windowId: Int,
 ) : ClientEvent()

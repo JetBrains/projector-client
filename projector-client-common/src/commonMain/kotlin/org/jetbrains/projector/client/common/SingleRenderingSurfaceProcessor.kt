@@ -26,9 +26,9 @@ package org.jetbrains.projector.client.common
 import org.jetbrains.projector.client.common.Renderer.Companion.RequestedRenderingState
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
+import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
-import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.ImageEventInfo
 import org.jetbrains.projector.common.protocol.data.PaintValue

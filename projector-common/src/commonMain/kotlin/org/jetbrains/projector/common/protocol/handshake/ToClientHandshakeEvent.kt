@@ -37,10 +37,10 @@ data class ToClientHandshakeSuccessEvent(
   val toServerCompression: CompressionType,
   val toServerProtocol: ProtocolType,
   val fontDataHolders: List<FontDataHolder>,
-  val colors: ServerWindowColorsEvent.ColorsStorage? = null
+  val colors: ServerWindowColorsEvent.ColorsStorage? = null,
 ) : ToClientHandshakeEvent()
 
 @Serializable
 data class ToClientHandshakeFailureEvent(
-  val reason: String
+  val reason: String,
 ) : ToClientHandshakeEvent()

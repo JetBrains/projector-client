@@ -41,9 +41,11 @@ import org.w3c.dom.events.*
 import org.w3c.dom.get
 import kotlin.math.roundToInt
 
-class InputController(private val openingTimeStamp: Int,
-                      private val stateMachine: ClientStateMachine,
-                      private val windowManager: WindowManager) {
+class InputController(
+  private val openingTimeStamp: Int,
+  private val stateMachine: ClientStateMachine,
+  private val windowManager: WindowManager,
+) {
 
   val specialKeysState = SpecialKeysState()
 
@@ -335,7 +337,7 @@ class InputController(private val openingTimeStamp: Int,
     y: Int,
     button: Short,
     clickCount: Int,
-    modifiers: Set<MouseModifier>
+    modifiers: Set<MouseModifier>,
   ) {
     val userScalingRatio = ParamsProvider.USER_SCALING_RATIO
 

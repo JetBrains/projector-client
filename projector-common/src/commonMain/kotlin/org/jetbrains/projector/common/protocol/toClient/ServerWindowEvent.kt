@@ -58,7 +58,7 @@ data class ServerPaintArcEvent(
   @SerialName("f")
   val startAngle: Int,
   @SerialName("g")
-  val arcAngle: Int
+  val arcAngle: Int,
 ) : ServerWindowToDoPaintEvent()
 
 @Serializable
@@ -73,7 +73,7 @@ data class ServerPaintOvalEvent(
   @SerialName("d")
   val width: Int,
   @SerialName("e")
-  val height: Int
+  val height: Int,
 ) : ServerWindowPaintEvent()
 
 @Serializable
@@ -92,7 +92,7 @@ data class ServerPaintRoundRectEvent(
   @SerialName("f")
   val arcWidth: Int,
   @SerialName("g")
-  val arcHeight: Int
+  val arcHeight: Int,
 ) : ServerWindowPaintEvent()
 
 @Serializable
@@ -107,7 +107,7 @@ data class ServerPaintRectEvent(
   @SerialName("d")
   val width: Double,
   @SerialName("e")
-  val height: Double
+  val height: Double,
 ) : ServerWindowPaintEvent()
 
 @Serializable
@@ -120,7 +120,7 @@ data class ServerDrawLineEvent(
   @SerialName("c")
   val x2: Int,
   @SerialName("d")
-  val y2: Int
+  val y2: Int,
 ) : ServerWindowPaintEvent()
 
 @Serializable
@@ -137,7 +137,7 @@ data class ServerCopyAreaEvent(
   @SerialName("e")
   val dx: Int,
   @SerialName("f")
-  val dy: Int
+  val dy: Int,
 ) : ServerWindowPaintEvent()
 
 @Serializable
@@ -146,21 +146,21 @@ data class ServerSetFontEvent(
   @SerialName("a")
   val fontId: Short? = null,
   @SerialName("b")
-  val fontSize: Int
+  val fontSize: Int,
 ) : ServerWindowStateEvent()
 
 @Serializable
 @SerialName("h")
 data class ServerSetClipEvent(
   @SerialName("a")
-  val shape: CommonShape? = null
+  val shape: CommonShape? = null,
 ) : ServerWindowStateEvent()
 
 @Serializable
 @SerialName("i")
 data class ServerSetStrokeEvent(
   @SerialName("a")
-  val strokeData: StrokeData
+  val strokeData: StrokeData,
 ) : ServerWindowStateEvent()
 
 @Serializable
@@ -177,7 +177,7 @@ data class ServerDrawImageEvent(
   @SerialName("a")
   val imageId: ImageId,
   @SerialName("b")
-  val imageEventInfo: ImageEventInfo
+  val imageEventInfo: ImageEventInfo,
 ) : ServerWindowPaintEvent()
 
 @Serializable
@@ -190,7 +190,7 @@ data class ServerDrawStringEvent(
   @SerialName("c")
   val y: Double,
   @SerialName("d")
-  val desiredWidth: Double
+  val desiredWidth: Double,
 ) : ServerWindowPaintEvent()
 
 @Serializable
@@ -199,21 +199,21 @@ data class ServerPaintPolygonEvent(
   @SerialName("a")
   val paintType: PaintType,
   @SerialName("b")
-  val points: List<Point> = emptyList()  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
+  val points: List<Point> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
 ) : ServerWindowPaintEvent()
 
 @Serializable
 @SerialName("o")
 data class ServerDrawPolylineEvent(
   @SerialName("a")
-  val points: List<Point> = emptyList()  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
+  val points: List<Point> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
 ) : ServerWindowPaintEvent()
 
 @Serializable
 @SerialName("p")
 data class ServerSetTransformEvent(
   @SerialName("a")
-  val tx: List<Double> = emptyList()  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
+  val tx: List<Double> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
 ) : ServerWindowStateEvent()
 
 @Serializable
@@ -222,26 +222,26 @@ data class ServerPaintPathEvent(
   @SerialName("a")
   val paintType: PaintType,
   @SerialName("b")
-  val path: CommonPath
+  val path: CommonPath,
 ) : ServerWindowPaintEvent()
 
 @Serializable
 @SerialName("r")
 data class ServerSetCompositeEvent(
   @SerialName("a")
-  val composite: CommonComposite
+  val composite: CommonComposite,
 ) : ServerWindowStateEvent()
 
 @Serializable
 @SerialName("s")
 data class ServerSetPaintEvent(
   @SerialName("a")
-  val paint: PaintValue
+  val paint: PaintValue,
 ) : ServerWindowStateEvent()
 
 @Serializable
 @SerialName("t")
 data class ServerSetUnknownStrokeEvent(
   @SerialName("a")
-  val className: String
+  val className: String,
 ) : ServerWindowToDoStateEvent()

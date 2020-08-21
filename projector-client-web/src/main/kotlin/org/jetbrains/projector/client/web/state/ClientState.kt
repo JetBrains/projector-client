@@ -119,7 +119,7 @@ sealed class ClientState {
   class WaitingOpening(
     private val stateMachine: ClientStateMachine,
     private val webSocket: WebSocket,
-    private val windowSizeController: WindowSizeController
+    private val windowSizeController: WindowSizeController,
   ) : ClientState() {
 
     override fun consume(action: ClientAction) = when (action) {
@@ -167,7 +167,7 @@ sealed class ClientState {
     private val stateMachine: ClientStateMachine,
     private val webSocket: WebSocket,
     private val windowSizeController: WindowSizeController,
-    private val openingTimeStamp: Int
+    private val openingTimeStamp: Int,
   ) : ClientState() {
 
     override fun consume(action: ClientAction) = when (action) {
@@ -235,7 +235,7 @@ sealed class ClientState {
     private val encoder: ToServerMessageEncoder,
     private val decoder: ToClientMessageDecoder,
     private val decompressor: MessageDecompressor<ByteArray>,
-    private val compressor: MessageCompressor<String>
+    private val compressor: MessageCompressor<String>,
   ) : ClientState() {
 
     override fun consume(action: ClientAction) = when (action) {
@@ -268,7 +268,7 @@ sealed class ClientState {
     private val encoder: ToServerMessageEncoder,
     private val decoder: ToClientMessageDecoder,
     private val decompressor: MessageDecompressor<ByteArray>,
-    private val compressor: MessageCompressor<String>
+    private val compressor: MessageCompressor<String>,
   ) : ClientState() {
 
     private val eventsToSend = mutableListOf<ClientEvent>(ClientSetKeymapEvent(nativeKeymap))

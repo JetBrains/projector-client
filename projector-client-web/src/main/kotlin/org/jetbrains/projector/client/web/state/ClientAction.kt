@@ -31,7 +31,7 @@ sealed class ClientAction {
   class Start(
     val stateMachine: ClientStateMachine,
     val url: String,
-    val windowSizeController: WindowSizeController
+    val windowSizeController: WindowSizeController,
   ) : ClientAction()
 
   sealed class WebSocket : ClientAction() {

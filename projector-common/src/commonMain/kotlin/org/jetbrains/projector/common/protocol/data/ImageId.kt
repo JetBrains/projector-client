@@ -35,20 +35,20 @@ sealed class ImageId {
     @SerialName("a")
     val rasterDataBufferSize: Int,
     @SerialName("b")
-    val contentHash: Int
+    val contentHash: Int,
   ) : ImageId()
 
   @Serializable
   @SerialName("b")
   data class PVolatileImageId(
     @SerialName("a")
-    val id: Long
+    val id: Long,
   ) : ImageId()
 
   @Serializable
   @SerialName("c")
   data class Unknown(
     @SerialName("a")
-    val className: String
+    val className: String,
   ) : ImageId()
 }

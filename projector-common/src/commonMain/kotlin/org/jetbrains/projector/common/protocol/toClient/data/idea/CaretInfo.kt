@@ -30,5 +30,5 @@ import org.jetbrains.projector.common.protocol.data.Point
 @Serializable
 data class CaretInfo(
   @SerialName("a")
-  val locationInWindow: Point
+  val locationInWindow: Point,
 )

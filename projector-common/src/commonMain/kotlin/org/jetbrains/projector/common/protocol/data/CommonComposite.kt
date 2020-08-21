@@ -35,7 +35,7 @@ data class CommonAlphaComposite(
   @SerialName("a")
   val rule: AlphaCompositeRule,
   @SerialName("b")
-  val alpha: Float
+  val alpha: Float,
 ) : CommonComposite()
 
 @Serializable
@@ -81,5 +81,5 @@ enum class AlphaCompositeRule {
 @SerialName("b")
 data class UnknownComposite(
   @SerialName("a")
-  val message: String
+  val message: String,
 ) : CommonComposite()

@@ -28,5 +28,5 @@ import org.jetbrains.projector.common.protocol.toClient.ServerWindowStateEvent
 
 data class DrawEvent(
   val prerequisites: List<ServerWindowStateEvent>,
-  val paintEvent: ServerWindowPaintEvent
+  val paintEvent: ServerWindowPaintEvent,
 )

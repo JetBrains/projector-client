@@ -27,7 +27,7 @@ import kotlinx.browser.window
 
 sealed class MessagingPolicy(
   protected val isFlushNeeded: () -> Boolean,
-  protected val flush: () -> Unit
+  protected val flush: () -> Unit,
 ) {
 
   abstract fun onHandshakeFinished()

@@ -31,5 +31,5 @@ data class CommonIntSize(
   @SerialName("a")
   val width: Int,
   @SerialName("b")
-  val height: Int
+  val height: Int,
 )

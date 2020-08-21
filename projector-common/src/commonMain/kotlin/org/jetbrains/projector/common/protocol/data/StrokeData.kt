@@ -43,7 +43,7 @@ sealed class StrokeData {
     @SerialName("e")
     val dashPhase: Float,
     @SerialName("f")
-    val dashArray: List<Float>? = null
+    val dashArray: List<Float>? = null,
   ) : StrokeData() {
 
     @Serializable

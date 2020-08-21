@@ -33,14 +33,14 @@ sealed class PathSegment {
   @SerialName("a")
   data class MoveTo(
     @SerialName("a")
-    val point: Point
+    val point: Point,
   ) : PathSegment()
 
   @Serializable
   @SerialName("b")
   data class LineTo(
     @SerialName("a")
-    val point: Point
+    val point: Point,
   ) : PathSegment()
 
   @Serializable
@@ -49,7 +49,7 @@ sealed class PathSegment {
     @SerialName("a")
     val point1: Point,
     @SerialName("b")
-    val point2: Point
+    val point2: Point,
   ) : PathSegment()
 
   @Serializable
@@ -60,7 +60,7 @@ sealed class PathSegment {
     @SerialName("b")
     val point2: Point,
     @SerialName("c")
-    val point3: Point
+    val point3: Point,
   ) : PathSegment()
 
   @Serializable

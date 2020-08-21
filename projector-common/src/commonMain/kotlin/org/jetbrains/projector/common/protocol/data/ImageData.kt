@@ -33,7 +33,7 @@ sealed class ImageData {
   @SerialName("a")
   data class PngBase64(
     @SerialName("a")
-    val pngBase64: String
+    val pngBase64: String,
   ) : ImageData()
 
   @Serializable

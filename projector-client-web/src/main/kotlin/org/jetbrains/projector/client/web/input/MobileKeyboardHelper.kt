@@ -55,7 +55,7 @@ object NopMobileKeyboardHelper : MobileKeyboardHelper {
 class MobileKeyboardHelperImpl(
   private val openingTimeStamp: Int,
   private val specialKeysState: SpecialKeysState,
-  private val clientEventConsumer: (ClientEvent) -> Unit
+  private val clientEventConsumer: (ClientEvent) -> Unit,
 ) : MobileKeyboardHelper {
 
   private val panel = (document.createElement("div") as HTMLDivElement).apply {
@@ -210,7 +210,7 @@ class MobileKeyboardHelperImpl(
     key: String,
     code: String,
     location: ClientKeyEvent.KeyLocation,
-    keyEventType: ClientKeyEvent.KeyEventType
+    keyEventType: ClientKeyEvent.KeyEventType,
   ) {
     clientEventConsumer(
       ClientKeyEvent(
@@ -332,7 +332,7 @@ class MobileKeyboardHelperImpl(
   private class ToggleButton(
     text: String,
     parent: Node,
-    private val onStateChange: (newState: Boolean) -> Unit
+    private val onStateChange: (newState: Boolean) -> Unit,
   ) {
 
     private var isEnabled = false
@@ -388,7 +388,7 @@ class MobileKeyboardHelperImpl(
   private class SimpleButton(
     text: String,
     parent: Node,
-    private val onClick: () -> Unit
+    private val onClick: () -> Unit,
   ) {
 
     private val span = (document.createElement("span") as HTMLSpanElement).apply {

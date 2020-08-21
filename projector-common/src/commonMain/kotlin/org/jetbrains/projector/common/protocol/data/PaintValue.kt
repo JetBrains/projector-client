@@ -33,7 +33,7 @@ sealed class PaintValue {
   @SerialName("a")
   data class Color(
     @SerialName("a")
-    val argb: Int
+    val argb: Int,
   ) : PaintValue()
 
   @Serializable
@@ -46,13 +46,13 @@ sealed class PaintValue {
     @SerialName("c")
     val argb1: Int,
     @SerialName("d")
-    val argb2: Int
+    val argb2: Int,
   ) : PaintValue()
 
   @Serializable
   @SerialName("c")
   data class Unknown(
     @SerialName("a")
-    val info: String
+    val info: String,
   ) : PaintValue()
 }
