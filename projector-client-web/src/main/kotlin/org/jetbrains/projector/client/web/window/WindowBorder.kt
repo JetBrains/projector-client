@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.window
 
+import kotlinx.browser.document
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.misc.toJsResizeDirection
 import org.jetbrains.projector.client.web.state.LafListener
@@ -33,7 +34,6 @@ import org.jetbrains.projector.common.protocol.toServer.ResizeDirection
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
-import kotlin.browser.document
 
 class WindowBorder(private val resizeable: Boolean) : DragEventsInterceptor, LafListener {
 

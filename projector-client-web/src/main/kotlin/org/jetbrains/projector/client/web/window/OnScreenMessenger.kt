@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.window
 
+import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
@@ -31,7 +32,6 @@ import org.jetbrains.projector.client.web.state.LafListener
 import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.w3c.dom.HTMLDivElement
-import kotlin.browser.document
 
 object OnScreenMessenger : LafListener {
 

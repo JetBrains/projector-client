@@ -23,11 +23,12 @@
  */
 package org.jetbrains.projector.client.web
 
-import org.jetbrains.projector.client.common.misc.Logger
+import kotlinx.browser.window
 import org.jetbrains.projector.client.common.DrawEvent
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
-import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.common.misc.ImageCacher
+import org.jetbrains.projector.client.common.misc.Logger
+import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.misc.PingStatistics
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.state.ProjectorUI
@@ -35,7 +36,6 @@ import org.jetbrains.projector.client.web.window.OnScreenMessenger
 import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.toClient.*
-import kotlin.browser.window
 
 class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEventsProcessor) {
 

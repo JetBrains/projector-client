@@ -23,15 +23,15 @@
  */
 package org.jetbrains.projector.common.protocol.toServer
 
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 
 object KotlinxJsonClientEventSerializer {
 
-  private val json = Json(JsonConfiguration.Stable)
+  private val json = Json {}
 
-  fun serializeList(msg: List<ClientEvent>): String = json.stringify(ClientEvent.serializer().list, msg)
+  private val serializer = ListSerializer(ClientEvent.serializer())
 
-  fun deserializeList(data: String): List<ClientEvent> = json.parse(ClientEvent.serializer().list, data)
+  fun serializeList(msg: List<ClientEvent>): String = json.encodeToString(serializer, msg)
+  fun deserializeList(data: String): List<ClientEvent> = json.decodeFromString(serializer, data)
 }

@@ -23,12 +23,12 @@
  */
 package org.jetbrains.projector.client.web.misc
 
-import org.jetbrains.projector.client.common.misc.TimeStamp
+import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ParamsProvider
+import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.web.debug.DivPingShower
 import org.jetbrains.projector.client.web.debug.NoPingShower
 import org.jetbrains.projector.common.protocol.toClient.ServerPingReplyEvent
-import kotlin.browser.window
 
 class PingStatistics(
   private val openingTimeStamp: Int,

@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.window
 
+import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Context2d
 import org.jetbrains.projector.client.common.canvas.DomCanvas
 import org.jetbrains.projector.client.common.canvas.PaintColor
@@ -35,7 +36,6 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.Image
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
-import kotlin.browser.document
 import kotlin.math.roundToInt
 
 class WindowHeader(var title: String? = null) : DragEventsInterceptor, LafListener {

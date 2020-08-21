@@ -23,12 +23,12 @@
  */
 package org.jetbrains.projector.client.web.speculative
 
+import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
 import org.jetbrains.projector.client.common.misc.ParamsProvider.SCALING_RATIO
 import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
-import kotlin.browser.document
 
 sealed class Typing {
 

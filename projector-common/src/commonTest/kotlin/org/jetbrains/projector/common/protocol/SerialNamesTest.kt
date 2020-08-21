@@ -23,12 +23,15 @@
  */
 package org.jetbrains.projector.common.protocol
 
-import kotlinx.serialization.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.*
 import org.jetbrains.projector.common.protocol.toClient.ServerEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@OptIn(ExperimentalSerializationApi::class)
 class SerialNamesTest {
 
   private fun checkProjectorDescriptor(descriptor: SerialDescriptor) {
@@ -37,7 +40,7 @@ class SerialNamesTest {
     }
 
     if (descriptor.kind in DESCRIPTOR_KINDS_TO_CHECK) {
-      val elementNames = descriptor.elementNames()
+      val elementNames = descriptor.elementNames.toList()
       val elementNamesSet = elementNames.toSet()
 
       assertEquals(elementNames.size, elementNamesSet.size, "Similar element names $descriptor: $elementNames")
@@ -61,8 +64,8 @@ class SerialNamesTest {
       )
     }
 
-    if (descriptor.kind !is UnionKind.ENUM_KIND) {
-      descriptor.elementDescriptors().forEach(::checkProjectorDescriptor)
+    if (descriptor.kind !is SerialKind.ENUM) {
+      descriptor.elementDescriptors.forEach(::checkProjectorDescriptor)
     }
   }
 
@@ -80,8 +83,8 @@ class SerialNamesTest {
     private val DESCRIPTOR_KINDS_TO_CHECK = setOf(
       StructureKind.OBJECT,  // our objects
       StructureKind.CLASS,  // our data classes
-      UnionKind.ENUM_KIND,  // our enums
-      UnionKind.CONTEXTUAL  // generated info about children of our sealed class
+      SerialKind.ENUM,  // our enums
+      SerialKind.CONTEXTUAL  // generated info about children of our sealed class
     )
   }
 }

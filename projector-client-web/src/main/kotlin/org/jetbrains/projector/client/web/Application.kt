@@ -23,11 +23,11 @@
  */
 package org.jetbrains.projector.client.web
 
+import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
-import kotlin.browser.window
 import kotlin.js.Json
 import kotlin.js.Promise
 import kotlin.js.json

@@ -23,8 +23,8 @@
  */
 package org.jetbrains.projector.client.common.misc
 
+import kotlinx.browser.window
 import org.w3c.dom.url.URL
-import kotlin.browser.window
 
 actual object ParamsProvider {
 

@@ -23,9 +23,9 @@
  */
 package org.jetbrains.projector.client.web.misc
 
+import kotlinx.dom.addClass
+import kotlinx.dom.removeClass
 import org.w3c.dom.Window
-import kotlin.dom.addClass
-import kotlin.dom.removeClass
 
 class SelectionBlocker(private val window: Window) {
 

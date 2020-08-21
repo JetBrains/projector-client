@@ -23,11 +23,11 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
+import kotlinx.browser.document
 import org.w3c.dom.CanvasImageSource
 import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.Image
-import kotlin.browser.document
 
 actual object CanvasFactory {
   actual fun create(): Canvas {

@@ -23,9 +23,9 @@
  */
 package org.jetbrains.projector.client.web.misc
 
+import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
 import org.jetbrains.projector.common.protocol.data.TtfFontData
-import kotlin.browser.document
 import kotlin.js.Promise
 
 private external class FontFace(family: String, src: String) {  // todo: remove after https://youtrack.jetbrains.com/issue/KT-34124

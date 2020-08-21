@@ -36,16 +36,12 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-        api(kotlin("stdlib-common", kotlinVersion))
         api(kotlin("reflect", kotlinVersion))
         implementation(project(":projector-common"))
       }
     }
 
     val jsMain by getting {
-      dependencies {
-        api(kotlin("stdlib-js", kotlinVersion))
-      }
     }
 
     val commonTest by getting {

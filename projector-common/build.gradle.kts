@@ -37,12 +37,15 @@ kotlin {
   jvm()
 
   sourceSets {
+    all {
+      languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+    }
+
     val commonMain by getting {
       dependencies {
-        api(kotlin("stdlib-common", kotlinVersion))
         api(kotlin("reflect", kotlinVersion))
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$serializationVersion")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf-common:$serializationVersion")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:$serializationVersion")
       }
     }
 
@@ -54,11 +57,6 @@ kotlin {
     }
 
     val jsMain by getting {
-      dependencies {
-        api(kotlin("stdlib-js", kotlinVersion))
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$serializationVersion")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf-js:$serializationVersion")
-      }
     }
 
     val jsTest by getting {
@@ -68,11 +66,6 @@ kotlin {
     }
 
     val jvmMain by getting {
-      dependencies {
-        api(kotlin("stdlib-jdk8", kotlinVersion))
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serializationVersion")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:$serializationVersion")
-      }
     }
 
     val jvmTest by getting {

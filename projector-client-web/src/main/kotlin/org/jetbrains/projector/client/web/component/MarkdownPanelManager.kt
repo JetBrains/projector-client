@@ -23,6 +23,8 @@
  */
 package org.jetbrains.projector.client.web.component
 
+import kotlinx.browser.document
+import kotlinx.dom.clear
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.CommonIntSize
@@ -32,10 +34,8 @@ import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.Node
 import org.w3c.dom.get
 import org.w3c.dom.parsing.DOMParser
-import kotlin.browser.document
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.dom.clear
 import kotlin.math.absoluteValue
 
 class MarkdownPanelManager(private val zIndexByWindowIdGetter: (Int) -> Int?, private val openInExternalBrowser: (String) -> Unit) {

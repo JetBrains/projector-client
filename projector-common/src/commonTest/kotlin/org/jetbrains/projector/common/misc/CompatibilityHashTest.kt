@@ -26,7 +26,7 @@ package org.jetbrains.projector.common.misc
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -198,14 +198,14 @@ class CompatibilityHashTest {
             equal = equal
           ),
           TestData(
-            serializer1 = serializer1.list,
-            serializer2 = serializer2.list,
+            serializer1 = ListSerializer(serializer1),
+            serializer2 = ListSerializer(serializer2),
             testMessage = "[list] $testMessage",
             equal = equal
           ),
           TestData(
-            serializer1 = serializer1.list.list,
-            serializer2 = serializer2.list.list,
+            serializer1 = ListSerializer(ListSerializer(serializer1)),
+            serializer2 = ListSerializer(ListSerializer(serializer2)),
             testMessage = "[list x 2] $testMessage",
             equal = equal
           )

@@ -41,7 +41,7 @@ class WindowManager(private val stateMachine: ClientStateMachine) : Iterable<Win
   fun getWindowZIndex(windowId: Int): Int? = windows[windowId]?.zIndex
 
   /** Returns topmost visible window, containing point. Contain check includes window header and borders.  */
-  fun getTopWindow(x: Int, y: Int): Window? = windows.values.filter { it.isShowing && it.contains(x, y) }.maxBy { it.zIndex }
+  fun getTopWindow(x: Int, y: Int): Window? = windows.values.filter { it.isShowing && it.contains(x, y) }.maxByOrNull { it.zIndex }
 
   fun getOrCreate(windowData: WindowData): Window {
     val window = windows[windowData.id] ?: Window(windowData, stateMachine)
@@ -70,7 +70,7 @@ class WindowManager(private val stateMachine: ClientStateMachine) : Iterable<Win
   override fun iterator(): Iterator<Window> = windows.values.iterator()
 
   fun bringToFront(window: Window) {
-    val topWindow = windows.maxBy { it.value.zIndex }?.value ?: return
+    val topWindow = windows.maxByOrNull { it.value.zIndex }?.value ?: return
     if (topWindow == window) {
       return
     }

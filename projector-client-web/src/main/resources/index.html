@@ -48,11 +48,11 @@
     ));
 
     function onLoad() {
-      if (window['projectorClientWeb']) {
-        window['projectorClientWeb'].org.jetbrains.projector.client.web.onLoad();
+      if (window['projector-client-web']) {
+        window['projector-client-web'].org.jetbrains.projector.client.web.onLoad();
       }
       else {
-        alert("Can't find window['projectorClientWeb']... Maybe the deployment is broken and there is no JS.");
+        alert("Can't find window['projector-client-web']... Maybe the deployment is broken and there is no JS.");
       }
     }
   </script>

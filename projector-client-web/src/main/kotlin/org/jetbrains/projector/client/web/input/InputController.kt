@@ -23,6 +23,8 @@
  */
 package org.jetbrains.projector.client.web.input
 
+import kotlinx.browser.document
+import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.RepaintAreaSetting
 import org.jetbrains.projector.client.common.misc.TimeStamp
@@ -37,8 +39,6 @@ import org.w3c.dom.TouchEvent
 import org.w3c.dom.clipboard.ClipboardEvent
 import org.w3c.dom.events.*
 import org.w3c.dom.get
-import kotlin.browser.document
-import kotlin.browser.window
 import kotlin.math.roundToInt
 
 class InputController(private val openingTimeStamp: Int,

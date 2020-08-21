@@ -23,9 +23,9 @@
  */
 package org.jetbrains.projector.client.web.debug
 
+import kotlinx.browser.document
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.w3c.dom.HTMLDivElement
-import kotlin.browser.document
 import kotlin.math.roundToInt
 
 interface PingShower {
@@ -92,8 +92,8 @@ class DivPingShower : PingShower {
 
           it.innerText += """
             |
-            |Min: ${pings.min()} ms
-            |Max: ${pings.max()} ms
+            |Min: ${pings.minOrNull()!!} ms
+            |Max: ${pings.maxOrNull()!!} ms
             |Average: $averagePing ms
           """.trimMargin()
         }

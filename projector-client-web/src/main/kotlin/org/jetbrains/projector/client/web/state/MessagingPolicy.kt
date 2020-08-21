@@ -23,7 +23,7 @@
  */
 package org.jetbrains.projector.client.web.state
 
-import kotlin.browser.window
+import kotlinx.browser.window
 
 sealed class MessagingPolicy(
   protected val isFlushNeeded: () -> Boolean,

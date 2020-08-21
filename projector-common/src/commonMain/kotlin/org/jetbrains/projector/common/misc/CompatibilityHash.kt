@@ -23,10 +23,11 @@
  */
 package org.jetbrains.projector.common.misc
 
-import kotlinx.serialization.SerialDescriptor
-import kotlinx.serialization.UnionKind
-import kotlinx.serialization.elementDescriptors
-import kotlinx.serialization.elementNames
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.SerialKind
+import kotlinx.serialization.descriptors.elementDescriptors
+import kotlinx.serialization.descriptors.elementNames
 
 private val List<Int>.compatibilityHash: Int get() = reduce { acc, c -> 31 * acc + c }
 
@@ -34,12 +35,13 @@ private val String.compatibilityHash: Int get() = map(Char::toInt).compatibility
 
 private val Boolean.compatibilityHash: Int get() = if (this) 1 else 0
 
+@OptIn(ExperimentalSerializationApi::class)
 val SerialDescriptor.compatibilityHash: Int
   get() {
     val subDescriptorsHashes = when (kind) {
-      is UnionKind.ENUM_KIND -> emptyList()
+      is SerialKind.ENUM -> emptyList()
 
-      else -> elementDescriptors().map(SerialDescriptor::compatibilityHash)
+      else -> elementDescriptors.map(SerialDescriptor::compatibilityHash)
     }
 
     return listOf(
@@ -47,7 +49,7 @@ val SerialDescriptor.compatibilityHash: Int
       kind.toString().compatibilityHash,
       isNullable.compatibilityHash,
       elementsCount,
-      *elementNames().map(String::compatibilityHash).toTypedArray(),
+      *elementNames.map(String::compatibilityHash).toTypedArray(),
       *subDescriptorsHashes.toTypedArray()
     )
       .compatibilityHash

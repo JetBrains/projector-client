@@ -23,7 +23,7 @@
  */
 package org.jetbrains.projector.client.common.misc
 
-import kotlin.browser.window
+import kotlinx.browser.window
 
 actual object TimeStamp {
 

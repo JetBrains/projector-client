@@ -23,6 +23,8 @@
  */
 package org.jetbrains.projector.client.web.input
 
+import kotlinx.browser.document
+import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
@@ -38,8 +40,6 @@ import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.MouseEvent
-import kotlin.browser.document
-import kotlin.browser.window
 import kotlin.math.roundToInt
 
 interface MobileKeyboardHelper {

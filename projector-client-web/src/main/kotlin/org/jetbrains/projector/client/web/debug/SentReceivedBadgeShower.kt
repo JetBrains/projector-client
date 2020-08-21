@@ -23,10 +23,10 @@
  */
 package org.jetbrains.projector.client.web.debug
 
+import kotlinx.browser.document
+import kotlinx.browser.window
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLSpanElement
-import kotlin.browser.document
-import kotlin.browser.window
 
 interface SentReceivedBadgeShower {
 

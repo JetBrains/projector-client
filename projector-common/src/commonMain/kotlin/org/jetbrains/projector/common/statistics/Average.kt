@@ -33,26 +33,24 @@ class Average<ValueType : Number> private constructor(
   private var iterations: Long = 0
 
   fun add(measurement: ValueType) {
-    synchronized(this) {
-      ++iterations
-      value.add(measurement)
-    }
+    // todo: synchronization is needed here
+    ++iterations
+    value.add(measurement)
   }
 
   fun reset(): ResetResult {
-    synchronized(this) {
-      val data = when (iterations) {
-        0L -> Data.Empty
+    // todo: synchronization is needed here
+    val data = when (iterations) {
+      0L -> Data.Empty
 
-        else -> {
-          val resetValue = value.reset()
+      else -> {
+        val resetValue = value.reset()
 
-          Data.Success(resetValue.toDouble() / iterations, iterations).also { iterations = 0 }
-        }
+        Data.Success(resetValue.toDouble() / iterations, iterations).also { iterations = 0 }
       }
-
-      return ResetResult(data)
     }
+
+    return ResetResult(data)
   }
 
   inner class ResetResult(val data: Data) {

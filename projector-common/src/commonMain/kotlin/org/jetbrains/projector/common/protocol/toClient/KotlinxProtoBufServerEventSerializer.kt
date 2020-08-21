@@ -23,18 +23,19 @@
  */
 package org.jetbrains.projector.common.protocol.toClient
 
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.protobuf.ProtoBuf
 
+@OptIn(ExperimentalSerializationApi::class)
 object KotlinxProtoBufServerEventSerializer {
 
-  // todo: remove after https://github.com/Kotlin/kotlinx.serialization/issues/93 is resolved
-  @Serializable
-  private class ListWrapper(val value: List<ServerEvent> = emptyList())  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
+  private val protoBuf = ProtoBuf {
+    encodeDefaults = false
+  }
 
-  private val protoBuf = ProtoBuf(encodeDefaults = false)
+  private val serializer = ListSerializer(ServerEvent.serializer())
 
-  fun serializeList(msg: List<ServerEvent>): ByteArray = protoBuf.dump(ListWrapper.serializer(), ListWrapper(msg))
-
-  fun deserializeList(data: ByteArray): List<ServerEvent> = protoBuf.load(ListWrapper.serializer(), data).value
+  fun serializeList(msg: List<ServerEvent>): ByteArray = protoBuf.encodeToByteArray(serializer, msg)
+  fun deserializeList(data: ByteArray): List<ServerEvent> = protoBuf.decodeFromByteArray(serializer, data)
 }

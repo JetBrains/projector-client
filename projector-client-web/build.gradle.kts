@@ -21,6 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDceDsl
+
 plugins {
   kotlin("js")
   `maven-publish`
@@ -32,13 +34,13 @@ dependencies {
   implementation(project(":projector-common"))
   implementation(project(":projector-client-common"))
 
-  // todo: this should be taken from projector-common project automatically
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$serializationVersion")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
 }
 
 kotlin {
-  target {
+  js {
     browser {
+      @OptIn(ExperimentalDceDsl::class)
       dceTask {
         keep.add("projector-client-projector-client-web.org.jetbrains.projector.client.web.onLoad")
       }

@@ -23,13 +23,13 @@
  */
 package org.jetbrains.projector.client.web
 
+import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.common.protocol.data.CommonIntSize
 import org.jetbrains.projector.common.protocol.toServer.ClientResizeEvent
 import org.w3c.dom.events.Event
-import kotlin.browser.window
 import kotlin.math.roundToInt
 
 class WindowSizeController(private val stateMachine: ClientStateMachine) {

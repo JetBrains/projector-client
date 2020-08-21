@@ -34,33 +34,31 @@ class Rate<ValueType : Number> private constructor(
   private var lastTimeStampMs: Double? = null
 
   fun add(measurement: ValueType) {
-    synchronized(this) {
-      value.add(measurement)
-    }
+    // todo: synchronization is needed here
+    value.add(measurement)
   }
 
   fun reset(currentTimeStampMs: Double): ResetResult {
-    synchronized(this) {
-      val lastMs = lastTimeStampMs
+    // todo: synchronization is needed here
+    val lastMs = lastTimeStampMs
 
-      lastTimeStampMs = currentTimeStampMs
+    lastTimeStampMs = currentTimeStampMs
 
-      if (lastMs == null) {
-        return ResetResult(Data.Empty)
-      }
-
-      val data = when (val delta = currentTimeStampMs - lastMs) {
-        0.0 -> Data.Empty
-
-        else -> {
-          val resetValue = value.reset()
-
-          Data.Success(resetValue.toDouble() / delta, delta)
-        }
-      }
-
-      return ResetResult(data)
+    if (lastMs == null) {
+      return ResetResult(Data.Empty)
     }
+
+    val data = when (val delta = currentTimeStampMs - lastMs) {
+      0.0 -> Data.Empty
+
+      else -> {
+        val resetValue = value.reset()
+
+        Data.Success(resetValue.toDouble() / delta, delta)
+      }
+    }
+
+    return ResetResult(data)
   }
 
   inner class ResetResult(val data: Data) {

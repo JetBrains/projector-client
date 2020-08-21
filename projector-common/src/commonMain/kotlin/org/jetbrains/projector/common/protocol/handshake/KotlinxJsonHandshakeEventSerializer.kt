@@ -24,17 +24,19 @@
 package org.jetbrains.projector.common.protocol.handshake
 
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 
 object KotlinxJsonHandshakeEventSerializer {
 
-  private val json = Json(JsonConfiguration.Stable.copy(encodeDefaults = false))
+  private val json = Json {
+    encodeDefaults = false
+  }
 
-  fun serializeToClientEvent(msg: ToClientHandshakeEvent): String = json.stringify(ToClientHandshakeEvent.serializer(), msg)
+  private val toClientSerializer = ToClientHandshakeEvent.serializer()
+  private val toServerSerializer = ToServerHandshakeEvent.serializer()
 
-  fun deserializeToClientEvent(data: String): ToClientHandshakeEvent = json.parse(ToClientHandshakeEvent.serializer(), data)
+  fun serializeToClientEvent(msg: ToClientHandshakeEvent): String = json.encodeToString(toClientSerializer, msg)
+  fun deserializeToClientEvent(data: String): ToClientHandshakeEvent = json.decodeFromString(toClientSerializer, data)
 
-  fun serializeToServerEvent(msg: ToServerHandshakeEvent): String = json.stringify(ToServerHandshakeEvent.serializer(), msg)
-
-  fun deserializeToServerEvent(data: String): ToServerHandshakeEvent = json.parse(ToServerHandshakeEvent.serializer(), data)
+  fun serializeToServerEvent(msg: ToServerHandshakeEvent): String = json.encodeToString(toServerSerializer, msg)
+  fun deserializeToServerEvent(data: String): ToServerHandshakeEvent = json.decodeFromString(toServerSerializer, data)
 }

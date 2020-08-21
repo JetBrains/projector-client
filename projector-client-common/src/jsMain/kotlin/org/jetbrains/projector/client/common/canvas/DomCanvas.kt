@@ -23,11 +23,11 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
+import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Canvas.ImageSource
 import org.jetbrains.projector.client.common.canvas.Canvas.Snapshot
 import org.jetbrains.projector.client.common.misc.Logger
 import org.w3c.dom.*
-import kotlin.browser.document
 
 class DomCanvas(private val myCanvas: HTMLCanvasElement) : Canvas {
 

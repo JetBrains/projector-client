@@ -23,10 +23,10 @@
  */
 package org.jetbrains.projector.client.common.misc
 
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.CanvasFactory
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
-import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.ImageData
 import org.jetbrains.projector.common.protocol.data.ImageId
@@ -115,9 +115,8 @@ object ImageCacher {
   }
 
   fun extractImagesToRequest(): List<ClientRequestImageDataEvent> {
-    synchronized(imagesToRequest) {
-      return imagesToRequest.map(::ClientRequestImageDataEvent).also { imagesToRequest.clear() }
-    }
+    // todo: synchronization is needed here
+    return imagesToRequest.map(::ClientRequestImageDataEvent).also { imagesToRequest.clear() }
   }
 
   private fun putImageAsync(imageId: ImageId, imageData: ImageData, repainter: () -> Unit) {

@@ -23,6 +23,8 @@
  */
 package org.jetbrains.projector.client.web.window
 
+import kotlinx.browser.document
+import kotlinx.dom.addClass
 import org.jetbrains.projector.client.common.DrawEvent
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.DomCanvas
@@ -44,8 +46,6 @@ import org.jetbrains.projector.common.protocol.toServer.ClientWindowMoveEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowResizeEvent
 import org.jetbrains.projector.common.protocol.toServer.ResizeDirection
 import org.w3c.dom.HTMLCanvasElement
-import kotlin.browser.document
-import kotlin.dom.addClass
 import kotlin.math.roundToInt
 
 class Window(windowData: WindowData, private val stateMachine: ClientStateMachine) : LafListener {

@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.window
 
+import kotlinx.browser.document
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.Logger
@@ -36,7 +37,6 @@ import org.jetbrains.projector.common.protocol.toClient.WindowType
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLLinkElement
-import kotlin.browser.document
 import kotlin.collections.isNotEmpty
 
 class WindowDataEventsProcessor(private val windowManager: WindowManager) {

@@ -23,8 +23,10 @@
  */
 package org.jetbrains.projector.client.web.protocol
 
-import kotlinx.serialization.DynamicObjectParser
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.decodeFromDynamic
+import kotlinx.serialization.json.Json
 import org.jetbrains.projector.common.protocol.handshake.ProtocolType
 import org.jetbrains.projector.common.protocol.toClient.KotlinxJsonServerEventSerializer
 import org.jetbrains.projector.common.protocol.toClient.ServerEvent
@@ -35,15 +37,17 @@ object KotlinxJsonToClientMessageDecoder : ToClientMessageDecoder {
 
   override val protocolType = ProtocolType.KOTLINX_JSON
 
-  private val dynamicObjectParser = DynamicObjectParser(configuration = KotlinxJsonServerEventSerializer.jsonConfiguration)
+  private val json = Json(builderAction = KotlinxJsonServerEventSerializer.jsonConfiguration)
 
-  @OptIn(ExperimentalStdlibApi::class)
+  private val serializer = ListSerializer(ServerEvent.serializer())
+
+  @OptIn(ExperimentalSerializationApi::class)
   override fun decode(message: ByteArray): ToClientMessageType {
     val string = message.decodeToString()
 
     // don't do KotlinxJsonServerEventSerializer.deserializeList(string) because it's slow on JS
     val nativelyParsedString = JSON.parse<Any>(string)
 
-    return dynamicObjectParser.parse(nativelyParsedString, ServerEvent.serializer().list)
+    return json.decodeFromDynamic(serializer, nativelyParsedString)
   }
 }

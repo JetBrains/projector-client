@@ -23,10 +23,10 @@
  */
 package org.jetbrains.projector.client.web.misc
 
+import kotlinx.browser.window
 import org.jetbrains.projector.common.protocol.data.UserKeymap
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
-import kotlin.browser.window
 
 val currentTimeStamp: Double get() = window.performance.now()
 
