@@ -81,6 +81,17 @@ sealed class ClientState {
       }
 
       OnScreenMessenger.showText("Starting connection", "Waiting for response from $url...", canReload = false)
+
+      if (!(window.asDynamic().isSecureContext as Boolean) && ParamsProvider.SHOW_NOT_SECURE_WARNING) {
+        window.alert(buildString {
+          append("Warning: You have opened this page in a not secure context. ")
+          append("This means that the browser will restrict usage of some features such as the clipboard access. ")
+          append("You can find the full list here: ")
+          append("https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts/features_restricted_to_secure_contexts. ")
+          appendLine("To make the context secure, please use HTTPS for the web page or host it locally.")
+          append("To disable this warning, please add `notSecureWarning=false` query parameter.")
+        })
+      }
     }
 
     override fun consume(action: ClientAction) = when (action) {
