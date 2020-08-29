@@ -35,6 +35,7 @@ import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
+import org.openqa.selenium.NoAlertPresentException
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -53,12 +54,8 @@ class CloseBlockingTest {
         switchTo().alert()
         return true
       }
-      catch (e: Throwable) {
-        if ("NoAlertPresentException" == e::class.java.simpleName) {
-          return false
-        }
-
-        throw IllegalStateException("Unexpected exception while checking for alert existence", e)
+      catch (e: NoAlertPresentException) {
+        return false
       }
     }
   }
