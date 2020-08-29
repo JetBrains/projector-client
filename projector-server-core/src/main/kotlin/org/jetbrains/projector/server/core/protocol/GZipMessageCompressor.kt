@@ -21,19 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
+package org.jetbrains.projector.server.core.protocol
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
+import org.jetbrains.projector.common.protocol.compress.MessageCompressor
+import org.jetbrains.projector.common.protocol.handshake.CompressionType
+import org.jetbrains.projector.common.protocol.toClient.ToClientTransferableType
+import java.io.ByteArrayOutputStream
+import java.util.zip.GZIPOutputStream
+
+object GZipMessageCompressor : MessageCompressor<ToClientTransferableType> {
+
+  override fun compress(data: ToClientTransferableType): ToClientTransferableType {
+    return ByteArrayOutputStream()
+      .apply {
+        GZIPOutputStream(this).apply {
+          write(data)
+          close()
+        }
+      }
+      .toByteArray()
   }
+
+  override val compressionType = CompressionType.GZIP
 }
-
-rootProject.name = "projector-client"
-
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")

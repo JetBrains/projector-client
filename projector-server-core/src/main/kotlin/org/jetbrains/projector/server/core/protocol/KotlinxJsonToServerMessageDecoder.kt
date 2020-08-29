@@ -21,19 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
+package org.jetbrains.projector.server.core.protocol
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
+import org.jetbrains.projector.common.protocol.handshake.ProtocolType
+import org.jetbrains.projector.common.protocol.toServer.KotlinxJsonClientEventSerializer
+import org.jetbrains.projector.common.protocol.toServer.ToServerMessageDecoder
+import org.jetbrains.projector.common.protocol.toServer.ToServerMessageType
+import org.jetbrains.projector.common.protocol.toServer.ToServerTransferableType
+
+object KotlinxJsonToServerMessageDecoder : ToServerMessageDecoder {
+
+  override val protocolType = ProtocolType.KOTLINX_JSON
+
+  override fun decode(message: ToServerTransferableType): ToServerMessageType {
+    return KotlinxJsonClientEventSerializer.deserializeList(message)
   }
 }
-
-rootProject.name = "projector-client"
-
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")
