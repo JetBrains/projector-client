@@ -34,9 +34,9 @@ import org.jetbrains.projector.common.protocol.toClient.ToClientTransferableType
 import org.jetbrains.projector.common.protocol.toServer.ToServerMessageDecoder
 import org.jetbrains.projector.common.protocol.toServer.ToServerTransferableType
 
-object HandshakeTypesSelector {
+public object HandshakeTypesSelector {
 
-  fun selectToClientCompressor(supportedToClientCompressions: List<CompressionType>): MessageCompressor<ToClientTransferableType>? {
+  public fun selectToClientCompressor(supportedToClientCompressions: List<CompressionType>): MessageCompressor<ToClientTransferableType>? {
     fun CompressionType.toToClientCompressor(): MessageCompressor<ToClientTransferableType>? = when (this) {
       CompressionType.GZIP -> GZipMessageCompressor
 
@@ -46,7 +46,7 @@ object HandshakeTypesSelector {
     return supportedToClientCompressions.mapNotNull(CompressionType::toToClientCompressor).firstOrNull()
   }
 
-  fun selectToClientEncoder(supportedToClientProtocols: List<ProtocolType>): ToClientMessageEncoder? {
+  public fun selectToClientEncoder(supportedToClientProtocols: List<ProtocolType>): ToClientMessageEncoder? {
     fun ProtocolType.toToClientEncoder(): ToClientMessageEncoder? = when (this) {
       ProtocolType.KOTLINX_JSON -> KotlinxJsonToClientMessageEncoder
       ProtocolType.KOTLINX_PROTOBUF -> KotlinxProtoBufToClientMessageEncoder
@@ -55,7 +55,7 @@ object HandshakeTypesSelector {
     return supportedToClientProtocols.mapNotNull(ProtocolType::toToClientEncoder).firstOrNull()
   }
 
-  fun selectToServerDecompressor(supportedToServerCompressions: List<CompressionType>): MessageDecompressor<ToServerTransferableType>? {
+  public fun selectToServerDecompressor(supportedToServerCompressions: List<CompressionType>): MessageDecompressor<ToServerTransferableType>? {
     fun CompressionType.toToServerDecompressor(): MessageDecompressor<ToServerTransferableType>? = when (this) {
       CompressionType.NONE -> NotDecompressor()
 
@@ -65,7 +65,7 @@ object HandshakeTypesSelector {
     return supportedToServerCompressions.mapNotNull(CompressionType::toToServerDecompressor).firstOrNull()
   }
 
-  fun selectToServerDecoder(supportedToServerProtocols: List<ProtocolType>): ToServerMessageDecoder? {
+  public fun selectToServerDecoder(supportedToServerProtocols: List<ProtocolType>): ToServerMessageDecoder? {
     fun ProtocolType.toToServerDecoder(): ToServerMessageDecoder? = when (this) {
       ProtocolType.KOTLINX_JSON -> KotlinxJsonToServerMessageDecoder
       ProtocolType.KOTLINX_PROTOBUF -> KotlinxJsonToServerMessageDecoder

@@ -30,6 +30,10 @@ plugins {
   idea
 }
 
+kotlin {
+  explicitApi()
+}
+
 val coroutinesVersion: String by project
 val kotlinVersion: String by project
 val ktorVersion: String by project

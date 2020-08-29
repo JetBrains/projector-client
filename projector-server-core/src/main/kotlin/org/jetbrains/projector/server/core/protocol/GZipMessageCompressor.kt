@@ -29,7 +29,7 @@ import org.jetbrains.projector.common.protocol.toClient.ToClientTransferableType
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPOutputStream
 
-object GZipMessageCompressor : MessageCompressor<ToClientTransferableType> {
+internal object GZipMessageCompressor : MessageCompressor<ToClientTransferableType> {
 
   override fun compress(data: ToClientTransferableType): ToClientTransferableType {
     return ByteArrayOutputStream()

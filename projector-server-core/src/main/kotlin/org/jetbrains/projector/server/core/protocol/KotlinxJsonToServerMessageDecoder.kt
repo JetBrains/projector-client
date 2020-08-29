@@ -29,7 +29,7 @@ import org.jetbrains.projector.common.protocol.toServer.ToServerMessageDecoder
 import org.jetbrains.projector.common.protocol.toServer.ToServerMessageType
 import org.jetbrains.projector.common.protocol.toServer.ToServerTransferableType
 
-object KotlinxJsonToServerMessageDecoder : ToServerMessageDecoder {
+internal object KotlinxJsonToServerMessageDecoder : ToServerMessageDecoder {
 
   override val protocolType = ProtocolType.KOTLINX_JSON
 

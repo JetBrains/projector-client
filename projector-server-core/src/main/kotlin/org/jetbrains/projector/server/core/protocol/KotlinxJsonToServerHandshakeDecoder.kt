@@ -29,9 +29,9 @@ import org.jetbrains.projector.common.protocol.handshake.ProtocolType
 import org.jetbrains.projector.common.protocol.handshake.ToServerHandshakeEvent
 import org.jetbrains.projector.common.protocol.toServer.ToServerTransferableType
 
-object KotlinxJsonToServerHandshakeDecoder : MessageDecoder<ToServerTransferableType, ToServerHandshakeEvent> {
+public object KotlinxJsonToServerHandshakeDecoder : MessageDecoder<ToServerTransferableType, ToServerHandshakeEvent> {
 
-  override val protocolType = ProtocolType.KOTLINX_JSON
+  override val protocolType: ProtocolType = ProtocolType.KOTLINX_JSON
 
   override fun decode(message: ToServerTransferableType): ToServerHandshakeEvent {
     return KotlinxJsonHandshakeEventSerializer.deserializeToServerEvent(message)

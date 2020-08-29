@@ -29,7 +29,7 @@ import org.jetbrains.projector.common.protocol.toClient.ToClientMessageEncoder
 import org.jetbrains.projector.common.protocol.toClient.ToClientMessageType
 import org.jetbrains.projector.common.protocol.toClient.ToClientTransferableType
 
-object KotlinxProtoBufToClientMessageEncoder : ToClientMessageEncoder {
+internal object KotlinxProtoBufToClientMessageEncoder : ToClientMessageEncoder {
 
   override val protocolType = ProtocolType.KOTLINX_PROTOBUF
 
