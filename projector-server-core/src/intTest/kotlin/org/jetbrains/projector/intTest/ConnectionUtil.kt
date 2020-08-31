@@ -26,6 +26,8 @@ package org.jetbrains.projector.intTest
 import io.ktor.application.install
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
+import io.ktor.http.content.files
+import io.ktor.http.content.static
 import io.ktor.routing.routing
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
@@ -114,7 +116,7 @@ object ConnectionUtil {
   }
 
   fun startServerAndDoHandshake(
-    port: Int = 8887,
+    port: Int = 8887,  // todo: take from constant "default server port"
     afterHandshake: suspend DefaultWebSocketServerSession.(senderReceiver: SenderReceiver) -> Unit,
   ): ApplicationEngine =
     embeddedServer(Netty, port) {
@@ -127,4 +129,12 @@ object ConnectionUtil {
         }
       }
     }
+
+  fun hostFiles(port: Int, host: String): ApplicationEngine = embeddedServer(Netty, port, host) {
+    routing {
+      static("/") {
+        files(clientFile.parentFile)
+      }
+    }
+  }
 }
