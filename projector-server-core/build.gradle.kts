@@ -89,6 +89,8 @@ val integrationTest = task<Test>("integrationTest") {
   testClassesDirs = sourceSets[intTestSourceSetName].output.classesDirs
   classpath = sourceSets[intTestSourceSetName].runtimeClasspath
 
+  systemProperties = System.getProperties().map { (k, v) -> k.toString() to v }.toMap()
+
   shouldRunAfter("test")
   dependsOn(":projector-client-web:browserProductionWebpack", downloadIntTestFont)
 }
