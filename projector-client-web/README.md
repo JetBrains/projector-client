@@ -77,3 +77,21 @@ total (sum) time rate:          134.92 ms per second (21.7 seconds)
 Stats are reset!
 ```
 - `Ctrl + F11` toggles showing repainted areas (if `repaintArea` query param is enabled).
+
+## Known issues
+### Incomplete clipboard synchronization
+There are some limitations with clipboard.
+
+#### To-server
+When your clipboard is changed on the client side, the server needs to apply the change on its side.
+
+We implement it on the client side via setting ["paste" listener](https://developer.mozilla.org/en-US/docs/Web/API/Element/paste_event). So clipboard is updated on the server only if you invoke that listener, for example, by hitting Ctrl+V or Ctrl+Shift+V. **If you have an application on the server side with a "paste" button, a click on it can paste outdated information unless the listener wasn't invoked**.
+
+Unfortunately, we can't just continuously get clipboard data from [`window.clipboard.navigator`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard) and send it to the server because when it's invoked not from user's context, there will be alert from the browser like "the site wants to read clipboard info, do you grant?".
+
+#### To-client
+It's vice versa: when your clipboard is changed on the server side, the client needs to apply the change on its side.
+
+We set the clipboard on the client side via [`window.clipboard.navigator`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard). **This doesn't work in [insecure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts/features_restricted_to_secure_contexts), so the client needs to be opened using HTTPS or on localhost to support this**.
+
+We can't use ["copy" listener](https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event) because when this event is generated, we don't have a message from the server with actual clipboard data yet. Also, this method won't work if you click a "copy" button in your application.
