@@ -34,6 +34,14 @@ kotlin {
   explicitApi()
 }
 
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      from(components["java"])
+    }
+  }
+}
+
 val coroutinesVersion: String by project
 val kotlinVersion: String by project
 val ktorVersion: String by project
