@@ -283,4 +283,37 @@ class KeyboardTest {
 
     server.stop(500, 1000)
   }
+
+  @Test
+  fun testCtrlLetter() {
+    val keyEvents = Channel<List<KeyEvent?>>()
+
+    val server = createServerAndReceiveKeyEvents(keyEvents)
+    server.start()
+
+    open(clientUrl)
+    element(".window").should(appear)
+
+    element("body").sendKeys(Keys.chord(Keys.CONTROL, "z"))  // test Ctrl+Z
+
+    val events = runBlocking { keyEvents.receive() }
+
+    // expected (tested Ctrl+Z press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
+    //java.awt.event.KeyEvent[KEY_PRESSED,keyCode=90,keyText=Z,keyChar='',modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
+    //java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='',modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
+    //java.awt.event.KeyEvent[KEY_RELEASED,keyCode=90,keyText=Z,keyChar='',modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
+    //java.awt.event.KeyEvent[KEY_RELEASED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+
+    withReadableException(events) {
+      assertEquals(5, events.size)
+      checkEvent(it[0], KeyEvent.KEY_PRESSED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 128)
+      checkEvent(it[1], KeyEvent.KEY_PRESSED, 90, '', KeyEvent.KEY_LOCATION_STANDARD, 128)
+      checkEvent(it[2], KeyEvent.KEY_TYPED, 0, '', KeyEvent.KEY_LOCATION_UNKNOWN, 128)
+      checkEvent(it[3], KeyEvent.KEY_RELEASED, 90, '', KeyEvent.KEY_LOCATION_STANDARD, 128)
+      checkEvent(it[4], KeyEvent.KEY_RELEASED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
+    }
+
+    server.stop(500, 1000)
+  }
 }

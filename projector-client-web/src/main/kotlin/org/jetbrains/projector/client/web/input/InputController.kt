@@ -407,6 +407,13 @@ class InputController(
           )))
         }
       }
+      else if (isBrowserKeyStroke && message.code.startsWith("Key") && type == ClientKeyEvent.KeyEventType.DOWN) {
+        stateMachine.fire(ClientAction.AddEvent(ClientKeyPressEvent(
+          timeStamp = message.timeStamp,
+          key = message.code,
+          modifiers = message.modifiers,
+        )))
+      }
     }
   }
 

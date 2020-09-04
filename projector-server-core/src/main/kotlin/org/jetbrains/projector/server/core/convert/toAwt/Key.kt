@@ -31,7 +31,11 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 
 public fun ClientKeyPressEvent.toAwtKeyEvent(connectionMillis: Long, target: Component, errorLogger: (() -> String) -> Unit): KeyEvent? {
-  val keyChar = this.key.toJavaCharOrNull() ?: run {
+  @Suppress("MoveVariableDeclarationIntoWhen") val isKeystroke = KeyModifier.CTRL_KEY in this.modifiers
+  val keyChar = when (isKeystroke) {
+                  true -> this.key.toJavaCodeOrNull()?.toJavaControlCharOrNull()
+                  false -> this.key.toJavaCharOrNull()
+                } ?: run {
     errorLogger { "$this.toAwtKeyEvent(...): unknown key, skipping" }
     return null
   }
