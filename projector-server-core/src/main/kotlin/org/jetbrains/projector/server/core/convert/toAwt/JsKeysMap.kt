@@ -52,6 +52,7 @@ private val jsCodeLocation = mapOf(
 // todo: transfer more events here
 private val jsVisibleCharsMap = mapOf(
   "Tab" to KeyEvent.VK_TAB,
+  "Enter" to KeyEvent.VK_ENTER,
 )
 
 private val jsCodeMap = mapOf(
@@ -83,7 +84,6 @@ private val jsCodeMap = mapOf(
   "KeyP" to KeyEvent.VK_P,
   "BracketLeft" to KeyEvent.VK_OPEN_BRACKET,
   "BracketRight" to KeyEvent.VK_CLOSE_BRACKET,
-  "Enter" to KeyEvent.VK_ENTER,
   "ControlLeft" to KeyEvent.VK_CONTROL,
   "Control" to KeyEvent.VK_CONTROL,
   "Meta" to KeyEvent.VK_META,
