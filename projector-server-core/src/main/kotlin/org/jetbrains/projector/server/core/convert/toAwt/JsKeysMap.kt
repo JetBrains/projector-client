@@ -53,6 +53,7 @@ private val jsCodeLocation = mapOf(
 private val jsVisibleCharsMap = mapOf(
   "Tab" to KeyEvent.VK_TAB,
   "Enter" to KeyEvent.VK_ENTER,
+  "Backspace" to KeyEvent.VK_BACK_SPACE,
 )
 
 private val jsCodeMap = mapOf(
@@ -71,7 +72,6 @@ private val jsCodeMap = mapOf(
   "Digit0" to KeyEvent.VK_0,
   "Minus" to KeyEvent.VK_MINUS,
   "Equal" to KeyEvent.VK_EQUALS,
-  "Backspace" to KeyEvent.VK_BACK_SPACE,
   "KeyQ" to KeyEvent.VK_Q,
   "KeyW" to KeyEvent.VK_W,
   "KeyE" to KeyEvent.VK_E,

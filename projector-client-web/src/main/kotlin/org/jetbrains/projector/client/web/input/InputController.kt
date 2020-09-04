@@ -400,7 +400,7 @@ class InputController(
         // (if somebody knows a way to stop browser reactions without blocking generation, please share!):
 
         when (message.key) {
-          "Tab", "Enter" -> stateMachine.fire(ClientAction.AddEvent(ClientKeyPressEvent(
+          "Tab", "Enter", "Backspace" -> stateMachine.fire(ClientAction.AddEvent(ClientKeyPressEvent(
             timeStamp = message.timeStamp,
             key = message.key,
             modifiers = message.modifiers,

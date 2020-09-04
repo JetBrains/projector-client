@@ -225,4 +225,33 @@ class KeyboardTest {
 
     server.stop(500, 1000)
   }
+
+  @Test
+  fun testBackspace() {
+    val keyEvents = Channel<List<KeyEvent?>>()
+
+    val server = createServerAndReceiveKeyEvents(keyEvents)
+    server.start()
+
+    open(clientUrl)
+    element(".window").should(appear)
+
+    element("body").sendKeys(Keys.BACK_SPACE)  // test BACKSPACE
+
+    val events = runBlocking { keyEvents.receive() }
+
+    // expected (tested Backspace press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=8,keyText=Backspace,keyChar=Backspace,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Backspace,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=8,keyText=Backspace,keyChar=Backspace,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+
+    withReadableException(events) {
+      assertEquals(3, events.size)
+      checkEvent(it[0], KeyEvent.KEY_PRESSED, 8, '\b', KeyEvent.KEY_LOCATION_STANDARD, 0)
+      checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\b', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+      checkEvent(it[2], KeyEvent.KEY_RELEASED, 8, '\b', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    }
+
+    server.stop(500, 1000)
+  }
 }
