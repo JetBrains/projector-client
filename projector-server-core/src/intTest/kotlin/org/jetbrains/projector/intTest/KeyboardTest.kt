@@ -316,4 +316,31 @@ class KeyboardTest {
 
     server.stop(500, 1000)
   }
+
+  @Test
+  fun testFunctionalKey() {
+    val keyEvents = Channel<List<KeyEvent?>>()
+
+    val server = createServerAndReceiveKeyEvents(keyEvents)
+    server.start()
+
+    open(clientUrl)
+    element(".window").should(appear)
+
+    element("body").sendKeys(Keys.F6)  // test F6
+
+    val events = runBlocking { keyEvents.receive() }
+
+    // expected (tested F6 press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+
+    withReadableException(events) {
+      assertEquals(2, events.size)
+      checkEvent(it[0], KeyEvent.KEY_PRESSED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
+      checkEvent(it[1], KeyEvent.KEY_RELEASED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
+    }
+
+    server.stop(500, 1000)
+  }
 }
