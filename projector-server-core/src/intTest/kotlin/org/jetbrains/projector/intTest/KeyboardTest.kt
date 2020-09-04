@@ -38,6 +38,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
 import org.jetbrains.projector.server.core.convert.toAwt.toAwtKeyEvent
+import org.openqa.selenium.Keys
 import java.awt.event.KeyEvent
 import javax.swing.JLabel
 import kotlin.test.Test
@@ -62,7 +63,7 @@ class KeyboardTest {
       assertEquals(id, actual.id)
       assertEquals(keyCode, actual.keyCode)
       // keyText is generated from keyCode so no need to compare it
-      assertEquals(keyChar, actual.keyChar)
+      assertEquals(keyChar, actual.keyChar, "expected int: ${keyChar.toInt()} but was int: ${actual.keyChar.toInt()}")
       assertEquals(keyLocation, actual.keyLocation)
       if (modifiersEx >= 0) {
         assertEquals(modifiersEx, actual.modifiersEx)
@@ -162,6 +163,35 @@ class KeyboardTest {
       checkEvent(it[2], KeyEvent.KEY_TYPED, 0, 'H', KeyEvent.KEY_LOCATION_UNKNOWN, 64)
       checkEvent(it[3], KeyEvent.KEY_RELEASED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
       checkEvent(it[4], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
+    }
+
+    server.stop(500, 1000)
+  }
+
+  @Test
+  fun testTab() {
+    val keyEvents = Channel<List<KeyEvent?>>()
+
+    val server = createServerAndReceiveKeyEvents(keyEvents)
+    server.start()
+
+    open(clientUrl)
+    element(".window").should(appear)
+
+    element("body").sendKeys(Keys.TAB)  // test TAB
+
+    val events = runBlocking { keyEvents.receive() }
+
+    // expected (tested TAB click in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=9,keyText=Tab,keyChar=Tab,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Tab,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=9,keyText=Tab,keyChar=Tab,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+
+    withReadableException(events) {
+      assertEquals(3, events.size)
+      checkEvent(it[0], KeyEvent.KEY_PRESSED, 9, '\t', KeyEvent.KEY_LOCATION_STANDARD, 0)
+      checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\t', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+      checkEvent(it[2], KeyEvent.KEY_RELEASED, 9, '\t', KeyEvent.KEY_LOCATION_STANDARD, 0)
     }
 
     server.stop(500, 1000)

@@ -31,10 +31,10 @@ internal fun Int.toJavaControlCharOrNull() = jControlCharMap[this]
 internal fun String.toJavaCharOrNull(): Char? {
   singleOrNull()?.let { return it }
 
-  return jsCodeMap[this]?.toChar()
+  return jsVisibleCharsMap[this]?.toChar()
 }
 
-internal fun String.toJavaCodeOrNull() = jsCodeMap[this]
+internal fun String.toJavaCodeOrNull() = jsVisibleCharsMap[this] ?: jsCodeMap[this]
 
 internal fun String.extractLocationOrNull() = jsCodeLocation[this]
 
@@ -47,6 +47,11 @@ private val jsCodeLocation = mapOf(
   "MetaRight" to ClientKeyEvent.KeyLocation.RIGHT,
   "ShiftRight" to ClientKeyEvent.KeyLocation.RIGHT,
   "AltRight" to ClientKeyEvent.KeyLocation.RIGHT,
+)
+
+// todo: transfer more events here
+private val jsVisibleCharsMap = mapOf(
+  "Tab" to KeyEvent.VK_TAB,
 )
 
 private val jsCodeMap = mapOf(
@@ -66,7 +71,6 @@ private val jsCodeMap = mapOf(
   "Minus" to KeyEvent.VK_MINUS,
   "Equal" to KeyEvent.VK_EQUALS,
   "Backspace" to KeyEvent.VK_BACK_SPACE,
-  "Tab" to KeyEvent.VK_TAB,
   "KeyQ" to KeyEvent.VK_Q,
   "KeyW" to KeyEvent.VK_W,
   "KeyE" to KeyEvent.VK_E,

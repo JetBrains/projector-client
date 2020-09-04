@@ -392,6 +392,21 @@ class InputController(
     }
     else {
       stateMachine.fire(ClientAction.AddEvent(message))
+
+      if (isBrowserSpecialKey && type == ClientKeyEvent.KeyEventType.DOWN) {
+        // we've blocked special keys like Tab to stop the browser react
+        // but we also disabled generation of PRESS events
+        // so need to send them manually
+        // (if somebody knows a way to stop browser reactions without blocking generation, please share!):
+
+        when (message.key) {
+          "Tab" -> stateMachine.fire(ClientAction.AddEvent(ClientKeyPressEvent(
+            timeStamp = message.timeStamp,
+            key = message.key,
+            modifiers = message.modifiers,
+          )))
+        }
+      }
     }
   }
 

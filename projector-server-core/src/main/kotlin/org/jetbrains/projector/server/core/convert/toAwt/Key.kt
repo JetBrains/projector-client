@@ -58,7 +58,7 @@ public fun ClientKeyEvent.toAwtKeyEvent(connectionMillis: Long, target: Componen
   @Suppress("MoveVariableDeclarationIntoWhen") val isKeystroke = KeyModifier.CTRL_KEY in this.modifiers
   val key = when (isKeystroke) {
               true -> code.toJavaControlCharOrNull()
-              false -> this.key.singleOrNull()
+              false -> this.key.toJavaCharOrNull()
             } ?: KeyEvent.CHAR_UNDEFINED
 
   return KeyEvent(
