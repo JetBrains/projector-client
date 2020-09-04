@@ -119,7 +119,7 @@ class KeyboardTest {
 
     val events = runBlocking { keyEvents.receive() }
 
-    // expected (tested "h" click in a headful app):
+    // expected (tested "h" press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='h',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='h',keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=72,keyText=H,keyChar='h',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
@@ -148,7 +148,7 @@ class KeyboardTest {
 
     val events = runBlocking { keyEvents.receive() }
 
-    // expected (tested "H" click in a headful app):
+    // expected (tested "H" press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
@@ -182,7 +182,7 @@ class KeyboardTest {
 
     val events = runBlocking { keyEvents.receive() }
 
-    // expected (tested TAB click in a headful app):
+    // expected (tested TAB press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=9,keyText=Tab,keyChar=Tab,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Tab,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=9,keyText=Tab,keyChar=Tab,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
