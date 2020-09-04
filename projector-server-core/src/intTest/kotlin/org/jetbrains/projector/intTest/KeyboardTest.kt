@@ -270,4 +270,15 @@ class KeyboardTest {
                -128)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
     checkEvent(it[6], KeyEvent.KEY_RELEASED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
   }
+
+  @Test
+  fun testArrow() = test(Keys.ARROW_RIGHT) {
+    // expected (tested Right Arrow press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=39,keyText=Right,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=39,keyText=Right,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+
+    assertEquals(2, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 39, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_RELEASED, 39, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
+  }
 }
