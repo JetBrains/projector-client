@@ -26,6 +26,7 @@ package org.jetbrains.projector.intTest
 import com.codeborne.selenide.Condition.appear
 import com.codeborne.selenide.Selenide.element
 import com.codeborne.selenide.Selenide.open
+import io.ktor.server.engine.ApplicationEngine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
@@ -63,7 +64,43 @@ class KeyboardTest {
       // keyText is generated from keyCode so no need to compare it
       assertEquals(keyChar, actual.keyChar)
       assertEquals(keyLocation, actual.keyLocation)
-      assertEquals(modifiersEx, actual.modifiersEx)
+      if (modifiersEx >= 0) {
+        assertEquals(modifiersEx, actual.modifiersEx)
+      }
+    }
+
+    private fun createServerAndReceiveKeyEvents(keyEvents: Channel<List<KeyEvent?>>): ApplicationEngine {
+      return startServerAndDoHandshake { (sender, receiver) ->
+        val window = WindowData(
+          id = 1,
+          isShowing = true,
+          zOrder = 0,
+          bounds = CommonRectangle(10.0, 10.0, 100.0, 100.0),
+          resizable = true,
+          modal = false,
+          undecorated = false,
+          windowType = WindowType.IDEA_WINDOW
+        )
+
+        sender(listOf(ServerWindowSetChangedEvent(listOf(window))))
+
+        while (true) {
+          val list = mutableListOf<KeyEvent?>()
+
+          val events = receiver()
+          events.forEach {
+            when (it) {
+              is ClientKeyPressEvent -> list.add(it.toAwtKeyEvent(0, JLabel()) { println(it()) })
+              is ClientKeyEvent -> list.add(it.toAwtKeyEvent(0, JLabel()) { println(it()) })
+              else -> Unit
+            }
+          }
+
+          if (list.isNotEmpty()) {
+            keyEvents.send(list)
+          }
+        }
+      }
     }
   }
 
@@ -71,37 +108,7 @@ class KeyboardTest {
   fun testSimpleSymbol() {
     val keyEvents = Channel<List<KeyEvent?>>()
 
-    val server = startServerAndDoHandshake { (sender, receiver) ->
-      val window = WindowData(
-        id = 1,
-        isShowing = true,
-        zOrder = 0,
-        bounds = CommonRectangle(10.0, 10.0, 100.0, 100.0),
-        resizable = true,
-        modal = false,
-        undecorated = false,
-        windowType = WindowType.IDEA_WINDOW
-      )
-
-      sender(listOf(ServerWindowSetChangedEvent(listOf(window))))
-
-      while (true) {
-        val list = mutableListOf<KeyEvent?>()
-
-        val events = receiver()
-        events.forEach {
-          when (it) {
-            is ClientKeyPressEvent -> list.add(it.toAwtKeyEvent(0, JLabel()) { println(it()) })
-            is ClientKeyEvent -> list.add(it.toAwtKeyEvent(0, JLabel()) { println(it()) })
-            else -> Unit
-          }
-        }
-
-        if (list.isNotEmpty()) {
-          keyEvents.send(list)
-        }
-      }
-    }
+    val server = createServerAndReceiveKeyEvents(keyEvents)
     server.start()
 
     open(clientUrl)
@@ -121,6 +128,40 @@ class KeyboardTest {
       checkEvent(it[0], KeyEvent.KEY_PRESSED, 72, 'h', KeyEvent.KEY_LOCATION_STANDARD, 0)
       checkEvent(it[1], KeyEvent.KEY_TYPED, 0, 'h', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
       checkEvent(it[2], KeyEvent.KEY_RELEASED, 72, 'h', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    }
+
+    server.stop(500, 1000)
+  }
+
+  @Test
+  fun testShiftedSimpleSymbol() {
+    val keyEvents = Channel<List<KeyEvent?>>()
+
+    val server = createServerAndReceiveKeyEvents(keyEvents)
+    server.start()
+
+    open(clientUrl)
+    element(".window").should(appear)
+
+    element("body").sendKeys("H")  // test letter "H"
+
+    val events = runBlocking { keyEvents.receive() }
+
+    // expected (tested "H" click in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+
+    withReadableException(events) {
+      assertEquals(5, events.size)
+      checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT,
+                 -64)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
+      checkEvent(it[1], KeyEvent.KEY_PRESSED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
+      checkEvent(it[2], KeyEvent.KEY_TYPED, 0, 'H', KeyEvent.KEY_LOCATION_UNKNOWN, 64)
+      checkEvent(it[3], KeyEvent.KEY_RELEASED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
+      checkEvent(it[4], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
     }
 
     server.stop(500, 1000)

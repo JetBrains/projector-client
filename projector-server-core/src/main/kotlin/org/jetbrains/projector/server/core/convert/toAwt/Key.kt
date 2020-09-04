@@ -68,7 +68,7 @@ public fun ClientKeyEvent.toAwtKeyEvent(connectionMillis: Long, target: Componen
     this.modifiers.toInt(),
     code,
     key,
-    this.location.toJavaLocation(),
+    (this.code.extractLocationOrNull() ?: this.location).toJavaLocation(),
   )
 }
 

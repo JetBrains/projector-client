@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.server.core.convert.toAwt
 
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
 import java.awt.event.KeyEvent
 
 internal fun Int.toJavaControlCharOrNull() = jControlCharMap[this]
@@ -34,6 +35,19 @@ internal fun String.toJavaCharOrNull(): Char? {
 }
 
 internal fun String.toJavaCodeOrNull() = jsCodeMap[this]
+
+internal fun String.extractLocationOrNull() = jsCodeLocation[this]
+
+private val jsCodeLocation = mapOf(
+  "ControlLeft" to ClientKeyEvent.KeyLocation.LEFT,
+  "MetaLeft" to ClientKeyEvent.KeyLocation.LEFT,
+  "ShiftLeft" to ClientKeyEvent.KeyLocation.LEFT,
+  "AltLeft" to ClientKeyEvent.KeyLocation.LEFT,
+  "ControlRight" to ClientKeyEvent.KeyLocation.RIGHT,
+  "MetaRight" to ClientKeyEvent.KeyLocation.RIGHT,
+  "ShiftRight" to ClientKeyEvent.KeyLocation.RIGHT,
+  "AltRight" to ClientKeyEvent.KeyLocation.RIGHT,
+)
 
 private val jsCodeMap = mapOf(
   "" to KeyEvent.VK_UNDEFINED,
