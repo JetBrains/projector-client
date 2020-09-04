@@ -103,51 +103,41 @@ class KeyboardTest {
         }
       }
     }
+
+    private fun test(vararg keysToSend: CharSequence, tester: (events: List<KeyEvent?>) -> Unit) {
+      val keyEvents = Channel<List<KeyEvent?>>()
+
+      val server = createServerAndReceiveKeyEvents(keyEvents)
+      server.start()
+
+      open(clientUrl)
+      element(".window").should(appear)
+
+      element("body").sendKeys(*keysToSend)
+
+      val events = runBlocking { keyEvents.receive() }
+
+      withReadableException(events, tester)
+
+      server.stop(500, 1000)
+    }
   }
 
   @Test
-  fun testSimpleSymbol() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys("h")  // test letter "h"
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testSimpleSymbol() = test("h") {
     // expected (tested "h" press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='h',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='h',keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=72,keyText=H,keyChar='h',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    withReadableException(events) {
-      assertEquals(3, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 72, 'h', KeyEvent.KEY_LOCATION_STANDARD, 0)
-      checkEvent(it[1], KeyEvent.KEY_TYPED, 0, 'h', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
-      checkEvent(it[2], KeyEvent.KEY_RELEASED, 72, 'h', KeyEvent.KEY_LOCATION_STANDARD, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 72, 'h', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, 'h', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 72, 'h', KeyEvent.KEY_LOCATION_STANDARD, 0)
   }
 
   @Test
-  fun testShiftedSimpleSymbol() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys("H")  // test letter "H"
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testShiftedSimpleSymbol() = test("H") {
     // expected (tested "H" press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
@@ -155,149 +145,69 @@ class KeyboardTest {
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    withReadableException(events) {
-      assertEquals(5, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT,
-                 -64)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
-      checkEvent(it[1], KeyEvent.KEY_PRESSED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
-      checkEvent(it[2], KeyEvent.KEY_TYPED, 0, 'H', KeyEvent.KEY_LOCATION_UNKNOWN, 64)
-      checkEvent(it[3], KeyEvent.KEY_RELEASED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
-      checkEvent(it[4], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(5, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT,
+               -64)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
+    checkEvent(it[1], KeyEvent.KEY_PRESSED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
+    checkEvent(it[2], KeyEvent.KEY_TYPED, 0, 'H', KeyEvent.KEY_LOCATION_UNKNOWN, 64)
+    checkEvent(it[3], KeyEvent.KEY_RELEASED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
+    checkEvent(it[4], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
   }
 
   @Test
-  fun testTab() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys(Keys.TAB)  // test TAB
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testTab() = test(Keys.TAB) {
     // expected (tested TAB press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=9,keyText=Tab,keyChar=Tab,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Tab,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=9,keyText=Tab,keyChar=Tab,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    withReadableException(events) {
-      assertEquals(3, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 9, '\t', KeyEvent.KEY_LOCATION_STANDARD, 0)
-      checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\t', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
-      checkEvent(it[2], KeyEvent.KEY_RELEASED, 9, '\t', KeyEvent.KEY_LOCATION_STANDARD, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 9, '\t', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\t', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 9, '\t', KeyEvent.KEY_LOCATION_STANDARD, 0)
   }
 
   @Test
-  fun testEnter() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys(Keys.ENTER)  // test ENTER
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testEnter() = test(Keys.ENTER) {  // test ENTER
     // expected (tested Enter press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=10,keyText=Enter,keyChar=Enter,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Enter,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=10,keyText=Enter,keyChar=Enter,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    withReadableException(events) {
-      assertEquals(3, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 10, '\n', KeyEvent.KEY_LOCATION_STANDARD, 0)
-      checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\n', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
-      checkEvent(it[2], KeyEvent.KEY_RELEASED, 10, '\n', KeyEvent.KEY_LOCATION_STANDARD, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 10, '\n', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\n', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 10, '\n', KeyEvent.KEY_LOCATION_STANDARD, 0)
   }
 
   @Test
-  fun testBackspace() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys(Keys.BACK_SPACE)  // test BACKSPACE
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testBackspace() = test(Keys.BACK_SPACE) {
     // expected (tested Backspace press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=8,keyText=Backspace,keyChar=Backspace,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Backspace,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=8,keyText=Backspace,keyChar=Backspace,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    withReadableException(events) {
-      assertEquals(3, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 8, '\b', KeyEvent.KEY_LOCATION_STANDARD, 0)
-      checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\b', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
-      checkEvent(it[2], KeyEvent.KEY_RELEASED, 8, '\b', KeyEvent.KEY_LOCATION_STANDARD, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 8, '\b', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\b', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 8, '\b', KeyEvent.KEY_LOCATION_STANDARD, 0)
   }
 
   @Test
-  fun testSpace() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys(Keys.SPACE)  // test SPACE
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testSpace() = test(Keys.SPACE) {
     // expected (tested Space press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=32,keyText=Space,keyChar=' ',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=' ',keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=32,keyText=Space,keyChar=' ',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    withReadableException(events) {
-      assertEquals(3, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 32, ' ', KeyEvent.KEY_LOCATION_STANDARD, 0)
-      checkEvent(it[1], KeyEvent.KEY_TYPED, 0, ' ', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
-      checkEvent(it[2], KeyEvent.KEY_RELEASED, 32, ' ', KeyEvent.KEY_LOCATION_STANDARD, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 32, ' ', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, ' ', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 32, ' ', KeyEvent.KEY_LOCATION_STANDARD, 0)
   }
 
   @Test
-  fun testCtrlLetter() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys(Keys.chord(Keys.CONTROL, "z"))  // test Ctrl+Z
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testCtrlLetter() = test(Keys.chord(Keys.CONTROL, "z")) {
     // expected (tested Ctrl+Z press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
     //java.awt.event.KeyEvent[KEY_PRESSED,keyCode=90,keyText=Z,keyChar='',modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
@@ -305,90 +215,42 @@ class KeyboardTest {
     //java.awt.event.KeyEvent[KEY_RELEASED,keyCode=90,keyText=Z,keyChar='',modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
     //java.awt.event.KeyEvent[KEY_RELEASED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    withReadableException(events) {
-      assertEquals(5, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 128)
-      checkEvent(it[1], KeyEvent.KEY_PRESSED, 90, '', KeyEvent.KEY_LOCATION_STANDARD, 128)
-      checkEvent(it[2], KeyEvent.KEY_TYPED, 0, '', KeyEvent.KEY_LOCATION_UNKNOWN, 128)
-      checkEvent(it[3], KeyEvent.KEY_RELEASED, 90, '', KeyEvent.KEY_LOCATION_STANDARD, 128)
-      checkEvent(it[4], KeyEvent.KEY_RELEASED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(5, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 128)
+    checkEvent(it[1], KeyEvent.KEY_PRESSED, 90, '', KeyEvent.KEY_LOCATION_STANDARD, 128)
+    checkEvent(it[2], KeyEvent.KEY_TYPED, 0, '', KeyEvent.KEY_LOCATION_UNKNOWN, 128)
+    checkEvent(it[3], KeyEvent.KEY_RELEASED, 90, '', KeyEvent.KEY_LOCATION_STANDARD, 128)
+    checkEvent(it[4], KeyEvent.KEY_RELEASED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
   }
 
   @Test
-  fun testFunctionalKey() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys(Keys.F6)  // test F6
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testFunctionalKey() = test(Keys.F6) {
     // expected (tested F6 press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    withReadableException(events) {
-      assertEquals(2, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
-      checkEvent(it[1], KeyEvent.KEY_RELEASED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(2, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_RELEASED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
   }
 
   @Test
-  fun testShiftedFunctionalKey() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys(Keys.chord(Keys.SHIFT, Keys.F6))  // test Shift+F6
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testShiftedFunctionalKey() = test(Keys.chord(Keys.SHIFT, Keys.F6)) {
     // expected (tested Shift+F6 press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    withReadableException(events) {
-      assertEquals(4, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 64)
-      checkEvent(it[1], KeyEvent.KEY_PRESSED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 64)
-      checkEvent(it[2], KeyEvent.KEY_RELEASED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 64)
-      checkEvent(it[3], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(4, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 64)
+    checkEvent(it[1], KeyEvent.KEY_PRESSED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 64)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 64)
+    checkEvent(it[3], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
   }
 
   @Test
-  fun testCtrlShiftedLetter() {
-    val keyEvents = Channel<List<KeyEvent?>>()
-
-    val server = createServerAndReceiveKeyEvents(keyEvents)
-    server.start()
-
-    open(clientUrl)
-    element(".window").should(appear)
-
-    element("body").sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "k"))  // test Ctrl+Shift+K
-
-    val events = runBlocking { keyEvents.receive() }
-
+  fun testCtrlShiftedLetter() = test(Keys.chord(Keys.CONTROL, Keys.SHIFT, "k")) {
     // expected (tested Ctrl+Shift+K press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Ctrl+Shift,extModifiers=Ctrl+Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 192
@@ -398,18 +260,14 @@ class KeyboardTest {
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on dialog0 128
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on dialog0 0
 
-    withReadableException(events) {
-      assertEquals(7, events.size)
-      checkEvent(it[0], KeyEvent.KEY_PRESSED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 128)
-      checkEvent(it[1], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 192)
-      checkEvent(it[2], KeyEvent.KEY_PRESSED, 75, '', KeyEvent.KEY_LOCATION_STANDARD, 192)
-      checkEvent(it[3], KeyEvent.KEY_TYPED, 0, '', KeyEvent.KEY_LOCATION_UNKNOWN, 192)
-      checkEvent(it[4], KeyEvent.KEY_RELEASED, 75, '', KeyEvent.KEY_LOCATION_STANDARD, 192)
-      checkEvent(it[5], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT,
-                 -128)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
-      checkEvent(it[6], KeyEvent.KEY_RELEASED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
-    }
-
-    server.stop(500, 1000)
+    assertEquals(7, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 128)
+    checkEvent(it[1], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 192)
+    checkEvent(it[2], KeyEvent.KEY_PRESSED, 75, '', KeyEvent.KEY_LOCATION_STANDARD, 192)
+    checkEvent(it[3], KeyEvent.KEY_TYPED, 0, '', KeyEvent.KEY_LOCATION_UNKNOWN, 192)
+    checkEvent(it[4], KeyEvent.KEY_RELEASED, 75, '', KeyEvent.KEY_LOCATION_STANDARD, 192)
+    checkEvent(it[5], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT,
+               -128)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
+    checkEvent(it[6], KeyEvent.KEY_RELEASED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
   }
 }
