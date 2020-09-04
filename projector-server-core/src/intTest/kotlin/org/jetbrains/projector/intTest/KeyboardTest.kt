@@ -343,4 +343,35 @@ class KeyboardTest {
 
     server.stop(500, 1000)
   }
+
+  @Test
+  fun testShiftedFunctionalKey() {
+    val keyEvents = Channel<List<KeyEvent?>>()
+
+    val server = createServerAndReceiveKeyEvents(keyEvents)
+    server.start()
+
+    open(clientUrl)
+    element(".window").should(appear)
+
+    element("body").sendKeys(Keys.chord(Keys.SHIFT, Keys.F6))  // test Shift+F6
+
+    val events = runBlocking { keyEvents.receive() }
+
+    // expected (tested Shift+F6 press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+
+    withReadableException(events) {
+      assertEquals(4, events.size)
+      checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 64)
+      checkEvent(it[1], KeyEvent.KEY_PRESSED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 64)
+      checkEvent(it[2], KeyEvent.KEY_RELEASED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 64)
+      checkEvent(it[3], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
+    }
+
+    server.stop(500, 1000)
+  }
 }
