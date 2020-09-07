@@ -57,10 +57,10 @@ object ImageCacher {
     filterDeadEntitiesOutOfMutableMap(requestedImages)
   }
 
-  fun putImageData(imageId: ImageId, imageData: ImageData, repainter: () -> Unit) {
+  fun putImageData(imageId: ImageId, imageData: ImageData) {
     requestedImages[imageId] = LivingEntity(TimeStamp.current, null) // Added new image to requested
 
-    putImageAsync(imageId, imageData, repainter)
+    putImageAsync(imageId, imageData)
   }
 
   fun getImageData(imageId: ImageId): Canvas.ImageSource? = when (imageId) {
@@ -119,10 +119,9 @@ object ImageCacher {
     return imagesToRequest.map(::ClientRequestImageDataEvent).also { imagesToRequest.clear() }
   }
 
-  private fun putImageAsync(imageId: ImageId, imageData: ImageData, repainter: () -> Unit) {
+  private fun putImageAsync(imageId: ImageId, imageData: ImageData) {
     fun onLoad(image: Canvas.ImageSource) {
       cache[imageId] = LivingEntity(TimeStamp.current, image)
-      repainter()
     }
 
     Do exhaustive when (imageData) {

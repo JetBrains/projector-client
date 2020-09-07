@@ -55,7 +55,6 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
         is ServerImageDataReplyEvent -> ImageCacher.putImageData(
           command.imageId,
           command.imageData,
-          windowDataEventsProcessor::redrawWindows
         )
 
         is ServerCaretInfoChangedEvent -> typing.changeCaretInfo(command.data)

@@ -50,6 +50,7 @@ Name | Type | Default value | Description
 `showProcessingTime` | Presence | Not present | Log processing time of server messages to browser console.
 `repaintArea` | Presence | Not present | Enable ability to see repainted areas, use a shortcut to toggle (more info below).
 `speculativeTyping` | Presence | Not present | Enable rendering symbols in Editor not waiting for draw events from server.
+`repaintInterval` | Int | `333` | Set interval of repainting that is needed to paint loaded images.
 
 ## Shortcuts
 - `Ctrl + F10` prints statistics to the browser console. Example:  

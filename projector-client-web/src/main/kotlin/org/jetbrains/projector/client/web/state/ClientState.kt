@@ -288,6 +288,11 @@ sealed class ClientState {
 
     private val windowDataEventsProcessor = WindowDataEventsProcessor(windowManager)
 
+    private val repainter = window.setInterval(
+      handler = { windowDataEventsProcessor.redrawWindows() },
+      timeout = ParamsProvider.REPAINT_INTERVAL_MS,
+    )
+
     private val serverEventsProcessor = ServerEventsProcessor(windowDataEventsProcessor)
 
     private val messagingPolicy = (
@@ -463,6 +468,8 @@ sealed class ClientState {
 
       is ClientAction.WebSocket.Close -> {
         logger.info { "Connection is closed..." }
+
+        window.clearInterval(repainter)
 
         pingStatistics.onClose()
 
