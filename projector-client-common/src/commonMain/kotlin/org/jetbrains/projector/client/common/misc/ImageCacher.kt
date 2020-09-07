@@ -35,7 +35,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientRequestImageDataEv
 
 object ImageCacher {
 
-  private data class LivingEntity<out EntityType>(var lastUsageTimestamp: Double, val data: EntityType)
+  private data class LivingEntity<out EntityType>(var lastUsageTimestamp: Double, val size: Int, val data: EntityType)
 
   private data class OffscreenImage(
     val width: Int,
@@ -43,6 +43,8 @@ object ImageCacher {
     val singleRenderingSurfaceProcessor: SingleRenderingSurfaceProcessor,
     val offscreenCanvas: Canvas.ImageSource,
   )
+
+  private var currentSize = 0
 
   private val cache = mutableMapOf<ImageId, LivingEntity<Canvas.ImageSource>>()
 
@@ -53,12 +55,14 @@ object ImageCacher {
   private val offscreenImages = mutableMapOf<Long, OffscreenImage>()  // todo: support image removal
 
   fun collectGarbage() {
-    filterDeadEntitiesOutOfMutableMap(cache)
+    if (currentSize > ParamsProvider.IMAGE_CACHE_SIZE_CHARS) {
+      filterDeadEntitiesOutOfMutableMap(cache)
+    }
     filterDeadEntitiesOutOfMutableMap(requestedImages)
   }
 
   fun putImageData(imageId: ImageId, imageData: ImageData) {
-    requestedImages[imageId] = LivingEntity(TimeStamp.current, null) // Added new image to requested
+    requestedImages[imageId] = LivingEntity(TimeStamp.current, 0, null) // Added new image to requested
 
     putImageAsync(imageId, imageData)
   }
@@ -72,7 +76,7 @@ object ImageCacher {
       if (imageData == null) {
         if (imageId !in requestedImages) {
           imagesToRequest.add(imageId)
-          requestedImages[imageId] = LivingEntity(TimeStamp.current, null)
+          requestedImages[imageId] = LivingEntity(TimeStamp.current, 0, null)
         }
 
         null
@@ -120,8 +124,14 @@ object ImageCacher {
   }
 
   private fun putImageAsync(imageId: ImageId, imageData: ImageData) {
+    val size = when (imageData) {
+      is ImageData.PngBase64 -> imageData.pngBase64.length
+      is ImageData.Empty -> 0
+    }
+
     fun onLoad(image: Canvas.ImageSource) {
-      cache[imageId] = LivingEntity(TimeStamp.current, image)
+      cache[imageId] = LivingEntity(TimeStamp.current, size, image)
+      currentSize += size
     }
 
     Do exhaustive when (imageData) {
@@ -148,6 +158,7 @@ object ImageCacher {
 
       if (!isAlive(next, timestamp)) {
         iterator.remove()
+        currentSize -= next.value.size
       }
     }
   }

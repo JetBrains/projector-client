@@ -30,6 +30,7 @@ expect object ParamsProvider {
   val REPAINT_AREA: RepaintAreaSetting
   val LOG_UNSUPPORTED_EVENTS: Boolean
   val IMAGE_TTL: Double
+  val IMAGE_CACHE_SIZE_CHARS: Int
 }
 
 sealed class RepaintAreaSetting {
