@@ -61,16 +61,16 @@ class InputController(
   private fun handleMouseMoveEvent(event: Event) {
     require(event is MouseEvent)
 
-    val topWindow = windowManager.getTopWindow(event.clientX, event.clientY) ?: return
+    val topWindow = windowManager.getTopWindow(event.clientX, event.clientY)
     if (mouseButtonsDown.isEmpty()) {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, topWindow.id, event)
+      topWindow?.let { fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, it.id, event) }
     }
     else {
       if (eventsInterceptor != null) {
         eventsInterceptor!!.onMouseMove(event.clientX, event.clientY)
       }
       else {
-        fireMouseEvent(ClientMouseEvent.MouseEventType.DRAG, topWindow.id, event)
+        topWindow?.let { fireMouseEvent(ClientMouseEvent.MouseEventType.DRAG, it.id, event) }
       }
     }
   }
@@ -80,17 +80,17 @@ class InputController(
     event.preventDefault()
 
     val touch = event.changedTouches[0] ?: return
-    val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY) ?: return
+    val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY)
 
     if (mouseButtonsDown.isEmpty()) {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, topWindow.id, event, x = touch.clientX, y = touch.clientY)
+      topWindow?.let { fireMouseEvent(ClientMouseEvent.MouseEventType.MOVE, it.id, event, x = touch.clientX, y = touch.clientY) }
     }
     else {
       if (eventsInterceptor != null) {
         eventsInterceptor!!.onMouseMove(touch.clientX, touch.clientY)
       }
       else {
-        fireMouseEvent(ClientMouseEvent.MouseEventType.TOUCH_DRAG, topWindow.id, event, x = touch.clientX, y = touch.clientY)
+        topWindow?.let { fireMouseEvent(ClientMouseEvent.MouseEventType.TOUCH_DRAG, it.id, event, x = touch.clientX, y = touch.clientY) }
       }
     }
   }
@@ -155,39 +155,40 @@ class InputController(
     event.preventDefault()
 
     val touch = event.changedTouches[0] ?: return
-    val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY) ?: return
-
-    val (x, y) = if (event.timeStamp.toDouble() - lastTouchStartTimeStamp < DOUBLE_CLICK_DELTA_MS) {
-      lastTouchX to lastTouchY
-    }
-    else {
-      touch.clientX to touch.clientY
-    }
 
     if (eventsInterceptor != null) {
       eventsInterceptor!!.onMouseUp(touch.clientX, touch.clientY)
       eventsInterceptor = null
     }
     else {
-      fireMouseEvent(ClientMouseEvent.MouseEventType.UP, topWindow.id, event, x = x, y = y)
+      val topWindow = windowManager.getTopWindow(touch.clientX, touch.clientY)
+
+      val (x, y) = if (event.timeStamp.toDouble() - lastTouchStartTimeStamp < DOUBLE_CLICK_DELTA_MS) {
+        lastTouchX to lastTouchY
+      }
+      else {
+        touch.clientX to touch.clientY
+      }
+
+      topWindow?.let { fireMouseEvent(ClientMouseEvent.MouseEventType.UP, it.id, event, x = x, y = y) }
+
+      // Generate ClickEvent manually. It's needed but not generated automatically because we preventDefault to disable
+      // generation of duplicating mouse events. If we allow generate mouse events but just skip some of them,
+      // input via mouse will be impossible in mobile mode...
+      val clickEventProperties = MouseEventInit(
+        clientX = x,
+        clientY = y,
+        button = LEFT_MOUSE_BUTTON_ID,
+        detail = touchClickCount,
+        shiftKey = event.shiftKey,
+        ctrlKey = event.ctrlKey,
+        altKey = event.altKey,
+        metaKey = event.metaKey
+      )
+      val clickEvent = MouseEvent("click", clickEventProperties)
+      handleClickEvent(clickEvent)
     }
     mouseButtonsDown.remove(LEFT_MOUSE_BUTTON_ID)
-
-    // Generate ClickEvent manually. It's needed but not generated automatically because we preventDefault to disable
-    // generation of duplicating mouse events. If we allow generate mouse events but just skip some of them,
-    // input via mouse will be impossible in mobile mode...
-    val clickEventProperties = MouseEventInit(
-      clientX = x,
-      clientY = y,
-      button = LEFT_MOUSE_BUTTON_ID,
-      detail = touchClickCount,
-      shiftKey = event.shiftKey,
-      ctrlKey = event.ctrlKey,
-      altKey = event.altKey,
-      metaKey = event.metaKey
-    )
-    val clickEvent = MouseEvent("click", clickEventProperties)
-    handleClickEvent(clickEvent)
   }
 
   private fun handleClickEvent(event: Event) {
