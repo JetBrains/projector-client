@@ -1,0 +1,38 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  main:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master code
+        uses: actions/checkout@v2
+        with:
+          path: master
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+
+      - name: Build project
+        run: |
+          cd master
+          ./gradlew :projector-client-web:browserProductionWebpack
+          rm projector-client-web/build/distributions/*.map
+
+      - name: Checkout gh-pages code
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+          path: gh-pages
+      - name: Copy distribution to gh-pages
+        run: cp master/projector-client-web/build/distributions/* gh-pages
+      - name: Commit and push
+        run: |
+          cd gh-pages
+          git add -A
+          git commit -m "Deploy revision $GITHUB_SHA" && git push
