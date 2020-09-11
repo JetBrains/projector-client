@@ -34,5 +34,7 @@ jobs:
       - name: Commit and push
         run: |
           cd gh-pages
+          git config --global user.email "servb@jetbrains.com"
+          git config --global user.name "GH Actions Bot"
           git add -A
           git commit -m "Deploy revision $GITHUB_SHA" && git push
