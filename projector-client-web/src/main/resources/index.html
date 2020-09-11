@@ -28,8 +28,9 @@
   <meta charset="UTF-8">
   <meta content="yes" name="apple-mobile-web-app-capable"/>
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-  <link href="pj.png" rel="shortcut icon" type="image/x-icon">
+  <link href="pj.svg" rel="shortcut icon" type="image/x-icon">
   <link href="styles.css" rel="stylesheet" type="text/css">
+  <link href="manifest.webmanifest" rel="manifest">
 
   <script src="https://cdn.jsdelivr.net/pako/1.0.3/pako.min.js"></script>
   <script>
@@ -54,6 +55,19 @@
       else {
         alert("Can't find window['projector-client-web']... Maybe the deployment is broken and there is no JS.");
       }
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+          .register('/projector-client/serviceworker.js')
+          .then(
+              function () {
+                console.log('Service Worker registered');
+              },
+              function (e) {
+                console.log('Service Worker registration failed', e);
+              },
+          );
     }
   </script>
 </head>

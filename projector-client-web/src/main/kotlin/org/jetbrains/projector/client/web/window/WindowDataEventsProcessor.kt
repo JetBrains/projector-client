@@ -107,7 +107,7 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
     val selectedIconUrl = when (val selectedIcon = selectedIconId?.let { ImageCacher.getImageData(it) }) {
       is HTMLCanvasElement -> selectedIcon.toDataURL()
       is HTMLImageElement -> selectedIcon.src
-      else -> "pj.png"
+      else -> "pj.svg"
     }
 
     fun getFavIconLink() = document.querySelector("link[rel*='icon']") ?: document.createElement("link")
