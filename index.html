@@ -56,48 +56,22 @@
         alert("Can't find window['projector-client-web']... Maybe the deployment is broken and there is no JS.");
       }
     }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+          .register('/projector-client/serviceworker.js')
+          .then(
+              function () {
+                console.log('Service Worker registered');
+              },
+              function (e) {
+                console.log('Service Worker registration failed', e);
+              },
+          );
+    }
   </script>
 </head>
 
 <body onload="onLoad()">
-<button id="install-pwa-button">Install as Application</button>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-        .register('/projector-client/serviceworker.js')
-        .then(
-            function () {
-              console.log('Service Worker registered');
-            },
-            function (e) {
-              console.log('Service Worker registration failed', e);
-            },
-        );
-  }
-
-  let deferredPrompt;
-  const installPwaBtn = document.querySelector('#install-pwa-button');
-  installPwaBtn.style.display = 'none';
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installPwaBtn.style.display = 'block';
-
-    installPwaBtn.addEventListener('click', (e) => {
-      installPwaBtn.style.display = 'none';
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the A2HS prompt');
-        }
-        else {
-          console.log('User dismissed the A2HS prompt');
-        }
-        deferredPrompt = null;
-      });
-    });
-  });
-</script>
 </body>
 </html>
