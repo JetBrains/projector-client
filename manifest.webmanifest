@@ -1,0 +1,15 @@
+{
+  "background_color": "gray",
+  "description": "Projector client for accessing Swing apps",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "pj.png",
+      "sizes": "160x160",
+      "type": "image/png"
+    }
+  ],
+  "name": "Projector Web Client",
+  "short_name": "projector-client-web",
+  "start_url": "/projector-client/index.html"
+}

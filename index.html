@@ -55,6 +55,19 @@
         alert("Can't find window['projector-client-web']... Maybe the deployment is broken and there is no JS.");
       }
     }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+          .register('/projector-client/serviceworker.js')
+          .then(
+              function () {
+                console.log('Service Worker registered');
+              },
+              function (e) {
+                console.log('Service Worker registration failed', e);
+              },
+          );
+    }
   </script>
 </head>
 
