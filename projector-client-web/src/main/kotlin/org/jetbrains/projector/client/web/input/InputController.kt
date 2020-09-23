@@ -367,7 +367,8 @@ class InputController(
     )
 
     val isBrowserSpecialKey = message.key.length > 1  // like Tab
-    val isKeystroke = KeyModifier.CTRL_KEY in message.modifiers  // like Ctrl+S
+    val isKeystroke = KeyModifier.CTRL_KEY in message.modifiers ||  // like Ctrl+S
+                      KeyModifier.META_KEY in message.modifiers  // like Cmd+N
     val isBrowserKeyStroke = isKeystroke && (message.code != "KeyV")  // don't block paste keystroke
 
     if (type == ClientKeyEvent.KeyEventType.DOWN && event.key == "F10" && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
