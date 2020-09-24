@@ -1,6 +1,14 @@
 # projector-client-web
 A web client for Projector.
 
+Contents:
+* [Building](#building).
+* [Running](#running).
+* [Notes](#notes) &mdash; tested browsers.
+* [Page parameters](#page-parameters) &mdash; set up the connection.
+* [Shortcuts](#shortcuts) &mdash; currently they are needed for debug purposes.
+* [Known issues](#known-issues) &mdash; the current state of limitations we believe there is no way to handle.
+
 ## Building
 ```shell script
 ./gradlew :projector-client-web:browserProductionWebpack
