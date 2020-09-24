@@ -93,6 +93,8 @@ Stats are reset!
 - `Ctrl + F11` toggles showing repainted areas (if `repaintArea` query param is enabled).
 
 ## Known issues
+Due to limitations of web browsers, there are some issues in the Web Client. They can be solved via native implementations of the client.
+
 ### Some hotkeys are intercepted by the browser
 For example, `Ctrl+Q` in Windows/Linux or `Cmd+N` in Mac is handled by the browser.
 
@@ -120,3 +122,6 @@ It's vice versa: when your clipboard is changed on the server side, the client n
 We set the clipboard on the client side via [`window.navigator.clipboard`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard). **This doesn't work in [insecure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts/features_restricted_to_secure_contexts), so the client needs to be opened using HTTPS or on localhost to support this**.
 
 We can't use ["copy" listener](https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event) because when this event is generated, we don't have a message from the server with actual clipboard data yet. Also, this method won't work if you click a "copy" button in your application.
+
+### It's not possible to connect to insecure WebSocket from a secure web page
+This is a limitation of browsers. So for example you can't use GitHub Pages distribution to access an insecure server.
