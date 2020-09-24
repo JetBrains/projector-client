@@ -356,6 +356,18 @@ class InputController(
     stateMachine.fire(ClientAction.AddEvent(message))
   }
 
+  private fun ClientKeyEvent.orCtrlQ(): ClientKeyEvent {
+    if (this@orCtrlQ.code != "F1") {
+      return this@orCtrlQ
+    }
+
+    return this@orCtrlQ.copy(
+      key = "q",
+      code = "KeyQ",
+      modifiers = setOf(KeyModifier.CTRL_KEY),
+    )
+  }
+
   private fun fireKeyEvent(type: ClientKeyEvent.KeyEventType, event: KeyboardEvent) {
     val message = ClientKeyEvent(
       timeStamp = event.timeStamp.toInt() - openingTimeStamp,
@@ -364,7 +376,7 @@ class InputController(
       location = event.location.toCommonKeyLocation(),
       modifiers = event.modifiers,
       keyEventType = type
-    )
+    ).orCtrlQ()
 
     val isBrowserSpecialKey = message.key.length > 1  // like Tab
     val isKeystroke = KeyModifier.CTRL_KEY in message.modifiers ||  // like Ctrl+S
