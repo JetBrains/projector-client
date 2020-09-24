@@ -27,7 +27,20 @@ import org.w3c.dom.BeforeUnloadEvent
 import org.w3c.dom.Window
 import org.w3c.dom.events.Event
 
-class CloseBlocker(private val window: Window) {
+interface CloseBlocker {
+
+  fun setListener()
+  fun removeListener()
+}
+
+object NopCloseBlocker : CloseBlocker {
+
+  override fun setListener() {}
+
+  override fun removeListener() {}
+}
+
+class CloseBlockerImpl(private val window: Window) : CloseBlocker {
 
   // Can't use simple function here because its reference isn't equal to itself: KT-15101
   private val onBeforeUnload = fun(e: Event) {
@@ -37,11 +50,11 @@ class CloseBlocker(private val window: Window) {
     e.returnValue = ""
   }
 
-  fun setListener() {
+  override fun setListener() {
     window.addEventListener(beforeUnloadType, onBeforeUnload)
   }
 
-  fun removeListener() {
+  override fun removeListener() {
     window.removeEventListener(beforeUnloadType, onBeforeUnload)
   }
 

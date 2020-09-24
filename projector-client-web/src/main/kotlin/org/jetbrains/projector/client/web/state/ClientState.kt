@@ -352,7 +352,10 @@ sealed class ClientState {
       else -> MobileKeyboardHelperImpl(openingTimeStamp, inputController.specialKeysState) { stateMachine.fire(ClientAction.AddEvent(it)) }
     }
 
-    private val closeBlocker = CloseBlocker(window).apply {
+    private val closeBlocker = when (ParamsProvider.BLOCK_CLOSING) {
+      true -> CloseBlockerImpl(window)
+      false -> NopCloseBlocker
+    }.apply {
       setListener()
     }
 

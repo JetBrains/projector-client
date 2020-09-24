@@ -46,6 +46,7 @@ actual object ParamsProvider {
   private const val DEFAULT_SHOW_NOT_SECURE_WARNING = true.toString()
   private const val DEFAULT_REPAINT_INTERVAL_MS = 333
   private const val DEFAULT_IMAGE_CACHE_SIZE_CHARS = 5_000_000
+  private const val DEFAULT_BLOCK_CLOSING = true
 
   val SYSTEM_SCALING_RATIO
     get() = window.devicePixelRatio  // get every time because it can be changed
@@ -76,6 +77,7 @@ actual object ParamsProvider {
   val SHOW_NOT_SECURE_WARNING: Boolean
   val REPAINT_INTERVAL_MS: Int
   actual val IMAGE_CACHE_SIZE_CHARS: Int
+  val BLOCK_CLOSING: Boolean
   val SCALING_RATIO: Double
     get() = SYSTEM_SCALING_RATIO * USER_SCALING_RATIO
 
@@ -124,6 +126,7 @@ actual object ParamsProvider {
       SHOW_NOT_SECURE_WARNING = (searchParams.get("notSecureWarning") ?: DEFAULT_SHOW_NOT_SECURE_WARNING).toBoolean()
       REPAINT_INTERVAL_MS = searchParams.get("repaintInterval")?.toIntOrNull() ?: DEFAULT_REPAINT_INTERVAL_MS
       IMAGE_CACHE_SIZE_CHARS = searchParams.get("cacheSize")?.toIntOrNull() ?: DEFAULT_IMAGE_CACHE_SIZE_CHARS
+      BLOCK_CLOSING = searchParams.get("blockClosing")?.toBoolean() ?: DEFAULT_BLOCK_CLOSING
     }
   }
 

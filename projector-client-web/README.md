@@ -52,6 +52,7 @@ Name | Type | Default value | Description
 `speculativeTyping` | Presence | Not present | Enable rendering symbols in Editor not waiting for draw events from server.
 `repaintInterval` | Int | `333` | Set interval of repainting that is needed to paint loaded images in ms.
 `cacheSize` | Int | `5M` | Set size of cache for images in Chars.
+`blockClosing` | Boolean | `true` | Enable blocking of accidental closing of the web page
 
 ## Shortcuts
 - `Ctrl + F10` prints statistics to the browser console. Example:  
