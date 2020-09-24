@@ -2,21 +2,24 @@
 A web client for Projector.
 
 Contents:
-* [Building](#building).
 * [Running](#running).
+* [Building](#building).
 * [Notes](#notes) &mdash; tested browsers.
 * [Page parameters](#page-parameters) &mdash; set up the connection.
 * [Shortcuts](#shortcuts) &mdash; currently they are needed for debug purposes.
 * [Known issues](#known-issues) &mdash; the current state of limitations we believe there is no way to handle.
 
+## Running
+The latest commit in master is built and deployed to GitHub Pages. So the latest commit is available here: <https://jetbrains.github.io/projector-client/index.html?host=HOST&port=PORT> (don't forget to set `HOST` and `PORT` to match your server's).
+
+The latest version can be downloaded at the [Artifacts page](https://github.com/JetBrains/projector-client/releases).
+
 ## Building
+The client needs only static files. The following script will build the client files in the `projector-client-web/build/distributions` dir:
 ```shell script
 ./gradlew :projector-client-web:browserProductionWebpack
 ```
 
-This will build the client files in the `projector-client-web/build/distributions` dir.
-
-## Running
 After building, you can run the HTML page: `projector-client-web/build/distributions/index.html`.
 
 ## Notes
