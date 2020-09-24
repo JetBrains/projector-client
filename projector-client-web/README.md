@@ -82,6 +82,17 @@ Stats are reset!
 - `Ctrl + F11` toggles showing repainted areas (if `repaintArea` query param is enabled).
 
 ## Known issues
+### Some hotkeys are intercepted by the browser
+For example, `Ctrl+Q` in Windows/Linux or `Cmd+N` in Mac is handled by the browser.
+
+Since some shortcuts close the tab or the window, we implemented a confirmation which is shown when the page is about to close (if `blockClosing` parameter is enabled).
+
+Also, we consider `Ctrl+Q` shortcut as frequently used, so we mapped it to the `F1` button.
+
+It seems that we can't do anything more about that, at least in a normal browser window.
+
+The proposed **workaround** here is to you the feature of browsers called [PWA](https://en.wikipedia.org/wiki/Progressive_web_application). It's a way to install a web page as a separate application. We've tested it in Chrome and in this mode, all the tested shortcuts are handled by Projector, not by the browser. The instructions are as follows: simply create a shortcut by selecting `Menu` | `More Tools` | `Create Shortcut...` and `Open as window`. Instructions with screenshots can be googled, for example, [this one](https://ccm.net/faq/9934-create-a-desktop-shortcut-on-google-chrome).
+
 ### Incomplete clipboard synchronization
 There are some limitations with clipboard.
 
