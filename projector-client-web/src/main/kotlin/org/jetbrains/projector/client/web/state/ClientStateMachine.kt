@@ -26,6 +26,7 @@ package org.jetbrains.projector.client.web.state
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import org.jetbrains.projector.client.common.misc.Logger
 
 class ClientStateMachine {
 
@@ -45,8 +46,18 @@ class ClientStateMachine {
     scope.launch {
       while (true) {
         val action = eventQueue.receive()
-        currentState = currentState.consume(action)
+        try {
+          currentState = currentState.consume(action)
+        }
+        catch (t: Throwable) {
+          logger.error(t) { "Error consuming action, skipping the action" }
+        }
       }
     }
+  }
+
+  private companion object {
+
+    private val logger = Logger(ClientStateMachine::class.simpleName!!)
   }
 }
