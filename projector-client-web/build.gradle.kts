@@ -28,12 +28,14 @@ plugins {
   `maven-publish`
 }
 
+val coroutinesVersion: String by project
 val serializationVersion: String by project
 
 dependencies {
   implementation(project(":projector-common"))
   implementation(project(":projector-client-common"))
 
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
 }
 

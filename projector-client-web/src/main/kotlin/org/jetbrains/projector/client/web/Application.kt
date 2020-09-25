@@ -66,6 +66,8 @@ class Application {
         windowSizeController = windowSizeController
       )
     )
+
+    stateMachine.runMainLoop()
   }
 
   private fun setClipboardPermissions() {

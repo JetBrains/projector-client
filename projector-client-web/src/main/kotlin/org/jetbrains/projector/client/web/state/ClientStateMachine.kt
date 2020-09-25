@@ -23,12 +23,30 @@
  */
 package org.jetbrains.projector.client.web.state
 
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+
 class ClientStateMachine {
+
+  private val scope = MainScope()
+
+  private val eventQueue = Channel<ClientAction>(capacity = Channel.UNLIMITED)
 
   private var currentState: ClientState = ClientState.UninitializedPage
 
   fun fire(action: ClientAction) {
-    // todo: use kotlinx coroutines channels or smth similar here to support buffering of state changing events here
-    currentState = currentState.consume(action)
+    scope.launch {
+      eventQueue.send(action)
+    }
+  }
+
+  fun runMainLoop() {
+    scope.launch {
+      while (true) {
+        val action = eventQueue.receive()
+        currentState = currentState.consume(action)
+      }
+    }
   }
 }
