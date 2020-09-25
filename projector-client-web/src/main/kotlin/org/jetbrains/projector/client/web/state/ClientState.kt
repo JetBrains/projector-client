@@ -67,7 +67,7 @@ sealed class ClientState {
     return this
   }
 
-  object Uninitialized : ClientState() {
+  object UninitializedPage : ClientState() {
 
     private fun configureWebPage(url: String) {
       document.body!!.apply {
@@ -98,23 +98,7 @@ sealed class ClientState {
       is ClientAction.Start -> {
         configureWebPage(action.url)
 
-        val webSocket = WebSocket(action.url).apply {
-          binaryType = BinaryType.ARRAYBUFFER
-
-          onopen = fun(_: Event) {
-            action.stateMachine.fire(ClientAction.WebSocket.Open(openingTimeStamp = TimeStamp.current.roundToInt()))
-          }
-
-          onclose = fun(event: Event) {
-            require(event is CloseEvent)
-
-            action.stateMachine.fire(ClientAction.WebSocket.Close(this@apply.url, event.code))
-          }
-
-          onmessage = fun(messageEvent: MessageEvent) {
-            action.stateMachine.fire(ClientAction.WebSocket.Message(message = (messageEvent.data as ArrayBuffer).asByteArray()))
-          }
-        }
+        val webSocket = createWebSocketConnection(action.url, action.stateMachine)
 
         WaitingOpening(
           stateMachine = action.stateMachine,
@@ -195,6 +179,8 @@ sealed class ClientState {
 
           is ToClientHandshakeSuccessEvent -> {
             command.colors?.let { ProjectorUI.setColors(it) }
+
+            FontFaceAppender.removeAppendedFonts()
 
             OnScreenMessenger.showText(
               "Loading fonts...",
@@ -492,9 +478,16 @@ sealed class ClientState {
 
         selectionBlocker.unblockSelection()
 
-        showDisconnectedMessage(action.url, action.closeCode)
+        if (action.closeCode in setOf(NORMAL_CLOSURE_STATUS_CODE, GOING_AWAY_STATUS_CODE)) {
+          showDisconnectedMessage(action.url, action.closeCode)
 
-        Disconnected
+          Disconnected
+        }
+        else {
+          val newConnection = createWebSocketConnection(webSocket.url, stateMachine)
+
+          WaitingOpening(stateMachine, newConnection, windowSizeController)
+        }
       }
 
       else -> super.consume(action)
@@ -529,6 +522,26 @@ sealed class ClientState {
           },
           canReload = true
         )
+      }
+    }
+
+    private fun createWebSocketConnection(url: String, stateMachine: ClientStateMachine): WebSocket {
+      return WebSocket(url).apply {
+        binaryType = BinaryType.ARRAYBUFFER
+
+        onopen = fun(_: Event) {
+          stateMachine.fire(ClientAction.WebSocket.Open(openingTimeStamp = TimeStamp.current.roundToInt()))
+        }
+
+        onclose = fun(event: Event) {
+          require(event is CloseEvent)
+
+          stateMachine.fire(ClientAction.WebSocket.Close(this@apply.url, event.code))
+        }
+
+        onmessage = fun(messageEvent: MessageEvent) {
+          stateMachine.fire(ClientAction.WebSocket.Message(message = (messageEvent.data as ArrayBuffer).asByteArray()))
+        }
       }
     }
   }

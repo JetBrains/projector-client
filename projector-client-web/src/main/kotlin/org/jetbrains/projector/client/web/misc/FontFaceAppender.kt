@@ -50,4 +50,9 @@ object FontFaceAppender {
       onLoad(loadedFonts)
     }
   }
+
+  fun removeAppendedFonts() {
+    document.asDynamic().fonts.clear()  // todo: remove asDynamic() after https://youtrack.jetbrains.com/issue/KT-34124
+    loadedFonts = 0
+  }
 }

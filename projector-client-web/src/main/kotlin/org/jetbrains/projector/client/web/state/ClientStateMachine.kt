@@ -25,7 +25,7 @@ package org.jetbrains.projector.client.web.state
 
 class ClientStateMachine {
 
-  private var currentState: ClientState = ClientState.Uninitialized
+  private var currentState: ClientState = ClientState.UninitializedPage
 
   fun fire(action: ClientAction) {
     // todo: use kotlinx coroutines channels or smth similar here to support buffering of state changing events here
