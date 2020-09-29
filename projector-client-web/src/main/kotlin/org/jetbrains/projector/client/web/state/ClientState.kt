@@ -349,6 +349,10 @@ sealed class ClientState {
       blockSelection()
     }
 
+    private val connectionWatcher = ConnectionWatcher().apply {
+      setWatcher()
+    }
+
     init {
       windowSizeController.addListener()
     }
@@ -356,6 +360,8 @@ sealed class ClientState {
     @OptIn(ExperimentalStdlibApi::class)
     override fun consume(action: ClientAction) = when (action) {
       is ClientAction.WebSocket.Message -> {
+        connectionWatcher.resetTime()
+
         val receiveTimeStamp = TimeStamp.current
         val decompressed = decompressor.decompress(action.message)
         val decompressTimeStamp = TimeStamp.current
@@ -477,6 +483,8 @@ sealed class ClientState {
         closeBlocker.removeListener()
 
         selectionBlocker.unblockSelection()
+
+        connectionWatcher.removeWatcher()
 
         if (action.closeCode in setOf(NORMAL_CLOSURE_STATUS_CODE, GOING_AWAY_STATUS_CODE)) {
           showDisconnectedMessage(action.url, action.closeCode)

@@ -40,7 +40,10 @@ import org.jetbrains.projector.common.protocol.data.TtfFontData
 import org.jetbrains.projector.common.protocol.handshake.COMMON_VERSION
 import org.jetbrains.projector.common.protocol.handshake.ToClientHandshakeSuccessEvent
 import org.jetbrains.projector.common.protocol.handshake.commonVersionList
+import org.jetbrains.projector.common.protocol.toClient.ServerPingReplyEvent
 import org.jetbrains.projector.common.protocol.toClient.ToClientMessageType
+import org.jetbrains.projector.common.protocol.toServer.ClientEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientRequestPingEvent
 import org.jetbrains.projector.common.protocol.toServer.ToServerMessageType
 import org.jetbrains.projector.server.core.protocol.HandshakeTypesSelector
 import org.jetbrains.projector.server.core.protocol.KotlinxJsonToClientHandshakeEncoder
@@ -68,7 +71,7 @@ object ConnectionUtil {
     val receiver: suspend () -> ToServerMessageType,
   )
 
-  private suspend fun DefaultWebSocketServerSession.doHandshake(): SenderReceiver {
+  private suspend fun DefaultWebSocketServerSession.doHandshake(handlePing: Boolean): SenderReceiver {
     val handshakeText = (incoming.receive() as Frame.Text).readText()
     val toServerHandshakeEvent = KotlinxJsonToServerHandshakeDecoder.decode(handshakeText)
 
@@ -109,14 +112,36 @@ object ConnectionUtil {
 
     incoming.receive()  // this message means the client is ready
 
-    return SenderReceiver(
-      sender = { outgoing.send(Frame.Binary(true, toClientCompressor.compress(toClientEncoder.encode(it)))) },
-      receiver = { toServerDecoder.decode(toServerDecompressor.decompress((incoming.receive() as Frame.Text).readText())) }
-    )
+    val sender: suspend (ToClientMessageType) -> Unit = {
+      outgoing.send(Frame.Binary(true, toClientCompressor.compress(toClientEncoder.encode(it))))
+    }
+
+    val receiver: suspend () -> ToServerMessageType = {
+      val events = toServerDecoder.decode(toServerDecompressor.decompress((incoming.receive() as Frame.Text).readText()))
+
+      val answer = mutableListOf<ClientEvent>()
+
+      events.forEach {
+        if (handlePing && it is ClientRequestPingEvent) {
+          sender(listOf(ServerPingReplyEvent(
+            clientTimeStamp = it.clientTimeStamp,
+            serverReadEventTimeStamp = it.clientTimeStamp,  // todo: maybe need to send actual info here
+          )))
+        }
+        else {
+          answer.add(it)
+        }
+      }
+
+      answer
+    }
+
+    return SenderReceiver(sender = sender, receiver = receiver)
   }
 
   fun startServerAndDoHandshake(
     port: Int = 8887,  // todo: take from constant "default server port"
+    handlePing: Boolean = true,
     afterHandshake: suspend DefaultWebSocketServerSession.(senderReceiver: SenderReceiver) -> Unit,
   ): ApplicationEngine =
     embeddedServer(Netty, port) {
@@ -124,7 +149,7 @@ object ConnectionUtil {
 
       routing {
         webSocket("/") {
-          val senderReceiver = doHandshake()
+          val senderReceiver = doHandshake(handlePing)
           afterHandshake(senderReceiver)
         }
       }
