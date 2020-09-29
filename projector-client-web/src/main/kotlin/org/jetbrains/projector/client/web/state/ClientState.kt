@@ -465,25 +465,15 @@ sealed class ClientState {
         logger.info { "Connection is closed..." }
 
         window.clearInterval(repainter)
-
         pingStatistics.onClose()
-
         windowDataEventsProcessor.onClose()
-
         inputController.removeListeners()
-
         windowSizeController.removeListener()
-
         typing.dispose()
-
         markdownPanelManager.disposeAll()
-
         mobileKeyboardHelper.dispose()
-
         closeBlocker.removeListener()
-
         selectionBlocker.unblockSelection()
-
         connectionWatcher.removeWatcher()
 
         if (action.closeCode in setOf(NORMAL_CLOSURE_STATUS_CODE, GOING_AWAY_STATUS_CODE)) {
