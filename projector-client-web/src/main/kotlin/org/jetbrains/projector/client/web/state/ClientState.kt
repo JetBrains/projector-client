@@ -115,6 +115,7 @@ sealed class ClientState {
     private val stateMachine: ClientStateMachine,
     private val webSocket: WebSocket,
     private val windowSizeController: WindowSizeController,
+    private val onHandshakeFinish: () -> Unit = {},
   ) : ClientState() {
 
     override fun consume(action: ClientAction) = when (action) {
@@ -144,12 +145,14 @@ sealed class ClientState {
           stateMachine = stateMachine,
           webSocket = webSocket,
           windowSizeController = windowSizeController,
-          openingTimeStamp = action.openingTimeStamp
+          openingTimeStamp = action.openingTimeStamp,
+          onHandshakeFinish = onHandshakeFinish,
         )
       }
 
       is ClientAction.WebSocket.Close -> {
-        showDisconnectedMessage(action.url, action.closeCode)
+        showDisconnectedMessage(webSocket.url, action.closeCode)
+        onHandshakeFinish()
 
         Disconnected
       }
@@ -163,6 +166,7 @@ sealed class ClientState {
     private val webSocket: WebSocket,
     private val windowSizeController: WindowSizeController,
     private val openingTimeStamp: Int,
+    private val onHandshakeFinish: () -> Unit,
   ) : ClientState() {
 
     override fun consume(action: ClientAction) = when (action) {
@@ -173,6 +177,7 @@ sealed class ClientState {
           is ToClientHandshakeFailureEvent -> {
             OnScreenMessenger.showText("Handshake failure", "Reason: ${command.reason}", canReload = true)
             webSocket.close()
+            onHandshakeFinish()
 
             this  // todo: handle this case
           }
@@ -214,7 +219,8 @@ sealed class ClientState {
               encoder = SupportedTypesProvider.supportedToServerEncoders.first { it.protocolType == command.toServerProtocol },
               decoder = SupportedTypesProvider.supportedToClientDecoders.first { it.protocolType == command.toClientProtocol },
               decompressor = SupportedTypesProvider.supportedToClientDecompressors.first { it.compressionType == command.toClientCompression },
-              compressor = SupportedTypesProvider.supportedToServerCompressors.first { it.compressionType == command.toServerCompression }
+              compressor = SupportedTypesProvider.supportedToServerCompressors.first { it.compressionType == command.toServerCompression },
+              onHandshakeFinish = onHandshakeFinish,
             )
           }
         }
@@ -233,6 +239,7 @@ sealed class ClientState {
     private val decoder: ToClientMessageDecoder,
     private val decompressor: MessageDecompressor<ByteArray>,
     private val compressor: MessageCompressor<String>,
+    private val onHandshakeFinish: () -> Unit,
   ) : ClientState() {
 
     override fun consume(action: ClientAction) = when (action) {
@@ -240,6 +247,7 @@ sealed class ClientState {
         logger.debug { "All fonts are loaded. Ready to draw!" }
 
         webSocket.send("Unused string meaning fonts loading is done")  // todo: change this string
+        onHandshakeFinish()
 
         ReadyToDraw(
           stateMachine = stateMachine,
@@ -349,7 +357,7 @@ sealed class ClientState {
       blockSelection()
     }
 
-    private val connectionWatcher = ConnectionWatcher().apply {
+    private val connectionWatcher = ConnectionWatcher { stateMachine.fire(ClientAction.WebSocket.NoReplies(it)) }.apply {
       setWatcher()
     }
 
@@ -462,33 +470,74 @@ sealed class ClientState {
       }
 
       is ClientAction.WebSocket.Close -> {
-        logger.info { "Connection is closed..." }
+        Do exhaustive when (action) {
+          is ClientAction.WebSocket.Close.FinishNormal -> {
+            logger.info { "Connection is closed..." }
 
-        window.clearInterval(repainter)
-        pingStatistics.onClose()
-        windowDataEventsProcessor.onClose()
-        inputController.removeListeners()
-        windowSizeController.removeListener()
-        typing.dispose()
-        markdownPanelManager.disposeAll()
-        mobileKeyboardHelper.dispose()
-        closeBlocker.removeListener()
-        selectionBlocker.unblockSelection()
-        connectionWatcher.removeWatcher()
+            window.clearInterval(repainter)
+            pingStatistics.onClose()
+            windowDataEventsProcessor.onClose()
+            inputController.removeListeners()
+            windowSizeController.removeListener()
+            typing.dispose()
+            markdownPanelManager.disposeAll()
+            mobileKeyboardHelper.dispose()
+            closeBlocker.removeListener()
+            selectionBlocker.unblockSelection()
+            connectionWatcher.removeWatcher()
 
-        if (action.closeCode in setOf(NORMAL_CLOSURE_STATUS_CODE, GOING_AWAY_STATUS_CODE)) {
-          showDisconnectedMessage(action.url, action.closeCode)
+            showDisconnectedMessage(webSocket.url, action.closeCode)
+            Disconnected
+          }
 
-          Disconnected
-        }
-        else {
-          val newConnection = createWebSocketConnection(webSocket.url, stateMachine)
-
-          WaitingOpening(stateMachine, newConnection, windowSizeController)
+          is ClientAction.WebSocket.Close.FinishError ->
+            reloadConnection("Connection is closed unexpectedly, retrying the connection...")
         }
       }
 
+      is ClientAction.WebSocket.NoReplies ->
+        reloadConnection("No messages from server for ${action.elapsedTimeMs} ms, retrying the connection...")
+
       else -> super.consume(action)
+    }
+
+    private fun reloadConnection(messageText: String): ClientState {
+      logger.info { messageText }
+
+      window.clearInterval(repainter)
+      pingStatistics.onClose()
+      inputController.removeListeners()
+      windowSizeController.removeListener()
+      typing.dispose()
+      mobileKeyboardHelper.dispose()
+      connectionWatcher.removeWatcher()
+
+      val message = (document.createElement("span") as HTMLSpanElement).apply {
+        style.position = "absolute"
+        style.bottom = "80px"
+        style.right = "5%"
+        style.zIndex = "1"
+        style.asDynamic().pointerEvents = "none"
+
+        style.padding = "5px"
+        style.background = "red"
+        style.display = "block"
+
+        className = "connection-watcher-warning"
+
+        innerText = messageText
+
+        document.body!!.appendChild(this)
+      }
+
+      val newConnection = createWebSocketConnection(webSocket.url, stateMachine)
+      return WaitingOpening(stateMachine, newConnection, windowSizeController) {
+        windowDataEventsProcessor.onClose()
+        markdownPanelManager.disposeAll()
+        closeBlocker.removeListener()
+        selectionBlocker.unblockSelection()
+        message.remove()
+      }
     }
   }
 
@@ -534,7 +583,12 @@ sealed class ClientState {
         onclose = fun(event: Event) {
           require(event is CloseEvent)
 
-          stateMachine.fire(ClientAction.WebSocket.Close(this@apply.url, event.code))
+          val action = when (event.code) {
+            NORMAL_CLOSURE_STATUS_CODE, GOING_AWAY_STATUS_CODE -> ClientAction.WebSocket.Close.FinishNormal(event.code)
+            else -> ClientAction.WebSocket.Close.FinishError(event.code)
+          }
+
+          stateMachine.fire(action)
         }
 
         onmessage = fun(messageEvent: MessageEvent) {

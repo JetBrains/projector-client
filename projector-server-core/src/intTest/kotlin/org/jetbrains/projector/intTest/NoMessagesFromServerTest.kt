@@ -31,6 +31,7 @@ import io.ktor.server.engine.ApplicationEngine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.jetbrains.projector.common.protocol.toClient.ServerPingReplyEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientRequestPingEvent
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
@@ -45,6 +46,7 @@ class NoMessagesFromServerTest {
   private companion object {
 
     private const val PING_INTERVAL = 1000L
+    private const val TIMEOUT = 10 * PING_INTERVAL
 
     private fun openClient() {
       open("$clientUrl?pingInterval=$PING_INTERVAL")
@@ -58,7 +60,7 @@ class NoMessagesFromServerTest {
   @BeforeTest
   fun before() {
     oldTimeout = Configuration.timeout
-    Configuration.timeout = 10 * PING_INTERVAL
+    Configuration.timeout = TIMEOUT
     clientLoadNotifier = Channel()
   }
 
@@ -69,14 +71,24 @@ class NoMessagesFromServerTest {
   }
 
   @Test
-  fun shouldShowWarningWhenNoMessagesFromServer() {
-    server = startServerAndDoHandshake(handlePing = false) { (_, receiver) ->
-      clientLoadNotifier.send(Unit)
+  fun shouldShowWarningAndReconnectWhenNoMessagesFromServer() {
+    var canDoHandshake = true
 
-      while (true) {
-        receiver()
+    server = startServerAndDoHandshake(
+      handlePing = false,
+      beforeHandshake = {
+        while (!canDoHandshake) {
+          delay(PING_INTERVAL / 2)
+        }
+      },
+      afterHandshake = { (_, receiver) ->
+        clientLoadNotifier.send(Unit)
+
+        while (true) {
+          receiver()
+        }
       }
-    }
+    )
     server.start()
 
     openClient()
@@ -84,7 +96,14 @@ class NoMessagesFromServerTest {
     runBlocking {
       clientLoadNotifier.receive()
     }
+    canDoHandshake = false
     element(".connection-watcher-warning").should(appear)
+    canDoHandshake = true
+    runBlocking {
+      withTimeout(TIMEOUT) {  // should reconnect
+        clientLoadNotifier.receive()
+      }
+    }
   }
 
   @Test
@@ -112,26 +131,35 @@ class NoMessagesFromServerTest {
   }
 
   @Test
-  fun shouldHideWarningWhenReceivedMessagesFromServer() {
+  fun shouldHideWarningWhenReconnectedToReplyingServer() {
+    var canDoHandshake = true
     var canAnswerPing = false
 
-    server = startServerAndDoHandshake(handlePing = false) { (sender, receiver) ->
-      clientLoadNotifier.send(Unit)
+    server = startServerAndDoHandshake(
+      handlePing = false,
+      beforeHandshake = {
+        while (!canDoHandshake) {
+          delay(PING_INTERVAL / 2)
+        }
+      },
+      afterHandshake = { (sender, receiver) ->
+        clientLoadNotifier.send(Unit)
 
-      while (true) {
-        val events = receiver()
-        if (canAnswerPing) {
-          events.forEach {
-            if (it is ClientRequestPingEvent) {
-              sender(listOf(ServerPingReplyEvent(
-                clientTimeStamp = it.clientTimeStamp,
-                serverReadEventTimeStamp = it.clientTimeStamp,  // todo: maybe need to send actual info here
-              )))
+        while (true) {
+          val events = receiver()
+          if (canAnswerPing) {
+            events.forEach {
+              if (it is ClientRequestPingEvent) {
+                sender(listOf(ServerPingReplyEvent(
+                  clientTimeStamp = it.clientTimeStamp,
+                  serverReadEventTimeStamp = it.clientTimeStamp,  // todo: maybe need to send actual info here
+                )))
+              }
             }
           }
         }
       }
-    }
+    )
     server.start()
 
     openClient()
@@ -139,12 +167,16 @@ class NoMessagesFromServerTest {
     runBlocking {
       clientLoadNotifier.receive()
     }
+    canDoHandshake = false
     element(".connection-watcher-warning").should(appear)
 
     canAnswerPing = true
+    canDoHandshake = true
+    runBlocking {
+      withTimeout(TIMEOUT) {  // should reconnect
+        clientLoadNotifier.receive()
+      }
+    }
     element(".connection-watcher-warning").should(disappear)
-
-    canAnswerPing = false
-    element(".connection-watcher-warning").should(appear)
   }
 }

@@ -142,6 +142,7 @@ object ConnectionUtil {
   fun startServerAndDoHandshake(
     port: Int = 8887,  // todo: take from constant "default server port"
     handlePing: Boolean = true,
+    beforeHandshake: suspend () -> Unit = {},
     afterHandshake: suspend DefaultWebSocketServerSession.(senderReceiver: SenderReceiver) -> Unit,
   ): ApplicationEngine =
     embeddedServer(Netty, port) {
@@ -149,6 +150,7 @@ object ConnectionUtil {
 
       routing {
         webSocket("/") {
+          beforeHandshake()
           val senderReceiver = doHandshake(handlePing)
           afterHandshake(senderReceiver)
         }
