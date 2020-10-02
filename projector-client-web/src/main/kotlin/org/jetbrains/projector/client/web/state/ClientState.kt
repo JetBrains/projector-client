@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web.state
 
+import kotlinext.js.jsObject
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ImageCacher
@@ -43,6 +44,8 @@ import org.jetbrains.projector.client.web.protocol.KotlinxJsonToClientHandshakeD
 import org.jetbrains.projector.client.web.protocol.KotlinxJsonToServerHandshakeEncoder
 import org.jetbrains.projector.client.web.protocol.SupportedTypesProvider
 import org.jetbrains.projector.client.web.speculative.Typing
+import org.jetbrains.projector.client.web.ui.ReconnectionMessage
+import org.jetbrains.projector.client.web.ui.ReconnectionMessageProps
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
 import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.client.web.window.WindowManager
@@ -58,6 +61,8 @@ import org.jetbrains.projector.common.protocol.toServer.*
 import org.khronos.webgl.ArrayBuffer
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
+import react.createElement
+import react.dom.render
 import kotlin.math.roundToInt
 
 sealed class ClientState {
@@ -67,9 +72,13 @@ sealed class ClientState {
     return this
   }
 
+  private class AppLayers(
+    val reconnectionMessageUpdater: (String?) -> Unit,
+  )
+
   object UninitializedPage : ClientState() {
 
-    private fun configureWebPage(url: String) {
+    private fun configureWebPage(url: String): AppLayers {
       document.body!!.apply {
         style.apply {
           backgroundColor = "#2A2"
@@ -79,6 +88,31 @@ sealed class ClientState {
 
         oncontextmenu = { false }
       }
+
+      val reloadingMessageLayer = (document.createElement("div") as HTMLDivElement).apply {
+        id = "reloading-message-layer"
+        style.apply {
+          position = "absolute"
+          zIndex = "1"
+          margin = "0px"
+          width = "100%"
+          height = "100%"
+          top = "0px"
+          left = "0px"
+          asDynamic().pointerEvents = "none"
+        }
+
+        document.body!!.appendChild(this)
+      }
+
+      val reconnectionMessageUpdater = { newMessage: String? ->
+        val reconnectionMessage = createElement(ReconnectionMessage::class.js, jsObject<ReconnectionMessageProps> {
+          this.message = newMessage
+        })
+        render(reconnectionMessage, reloadingMessageLayer)
+      }
+
+      reconnectionMessageUpdater(null)
 
       OnScreenMessenger.showText("Starting connection", "Waiting for response from $url...", canReload = false)
 
@@ -92,18 +126,23 @@ sealed class ClientState {
           append("To disable this warning, please add `notSecureWarning=false` query parameter.")
         })
       }
+
+      return AppLayers(
+        reconnectionMessageUpdater = reconnectionMessageUpdater,
+      )
     }
 
     override fun consume(action: ClientAction) = when (action) {
       is ClientAction.Start -> {
-        configureWebPage(action.url)
+        val layers = configureWebPage(action.url)
 
         val webSocket = createWebSocketConnection(action.url, action.stateMachine)
 
         WaitingOpening(
           stateMachine = action.stateMachine,
           webSocket = webSocket,
-          windowSizeController = action.windowSizeController
+          windowSizeController = action.windowSizeController,
+          layers = layers,
         )
       }
 
@@ -111,10 +150,11 @@ sealed class ClientState {
     }
   }
 
-  class WaitingOpening(
+  private class WaitingOpening(
     private val stateMachine: ClientStateMachine,
     private val webSocket: WebSocket,
     private val windowSizeController: WindowSizeController,
+    private val layers: AppLayers,
     private val onHandshakeFinish: () -> Unit = {},
   ) : ClientState() {
 
@@ -147,6 +187,7 @@ sealed class ClientState {
           windowSizeController = windowSizeController,
           openingTimeStamp = action.openingTimeStamp,
           onHandshakeFinish = onHandshakeFinish,
+          layers = layers,
         )
       }
 
@@ -161,12 +202,13 @@ sealed class ClientState {
     }
   }
 
-  class WaitingHandshakeReply(
+  private class WaitingHandshakeReply(
     private val stateMachine: ClientStateMachine,
     private val webSocket: WebSocket,
     private val windowSizeController: WindowSizeController,
     private val openingTimeStamp: Int,
     private val onHandshakeFinish: () -> Unit,
+    private val layers: AppLayers,
   ) : ClientState() {
 
     override fun consume(action: ClientAction) = when (action) {
@@ -221,6 +263,7 @@ sealed class ClientState {
               decompressor = SupportedTypesProvider.supportedToClientDecompressors.first { it.compressionType == command.toClientCompression },
               compressor = SupportedTypesProvider.supportedToServerCompressors.first { it.compressionType == command.toServerCompression },
               onHandshakeFinish = onHandshakeFinish,
+              layers = layers,
             )
           }
         }
@@ -230,7 +273,7 @@ sealed class ClientState {
     }
   }
 
-  class LoadingFonts(
+  private class LoadingFonts(
     private val stateMachine: ClientStateMachine,
     private val webSocket: WebSocket,
     private val windowSizeController: WindowSizeController,
@@ -240,6 +283,7 @@ sealed class ClientState {
     private val decompressor: MessageDecompressor<ByteArray>,
     private val compressor: MessageCompressor<String>,
     private val onHandshakeFinish: () -> Unit,
+    private val layers: AppLayers,
   ) : ClientState() {
 
     override fun consume(action: ClientAction) = when (action) {
@@ -257,7 +301,8 @@ sealed class ClientState {
           encoder = encoder,
           decoder = decoder,
           decompressor = decompressor,
-          compressor = compressor
+          compressor = compressor,
+          layers = layers,
         )
       }
 
@@ -265,7 +310,7 @@ sealed class ClientState {
     }
   }
 
-  class ReadyToDraw(
+  private class ReadyToDraw(
     private val stateMachine: ClientStateMachine,
     private val webSocket: WebSocket,
     private val windowSizeController: WindowSizeController,
@@ -274,6 +319,7 @@ sealed class ClientState {
     private val decoder: ToClientMessageDecoder,
     private val decompressor: MessageDecompressor<ByteArray>,
     private val compressor: MessageCompressor<String>,
+    private val layers: AppLayers,
   ) : ClientState() {
 
     private val eventsToSend = mutableListOf<ClientEvent>(ClientSetKeymapEvent(nativeKeymap))
@@ -512,31 +558,15 @@ sealed class ClientState {
       mobileKeyboardHelper.dispose()
       connectionWatcher.removeWatcher()
 
-      val message = (document.createElement("span") as HTMLSpanElement).apply {
-        style.position = "absolute"
-        style.bottom = "80px"
-        style.right = "5%"
-        style.zIndex = "1"
-        style.asDynamic().pointerEvents = "none"
-
-        style.padding = "5px"
-        style.background = "red"
-        style.display = "block"
-
-        className = "connection-watcher-warning"
-
-        innerText = messageText
-
-        document.body!!.appendChild(this)
-      }
+      layers.reconnectionMessageUpdater(messageText)
 
       val newConnection = createWebSocketConnection(webSocket.url, stateMachine)
-      return WaitingOpening(stateMachine, newConnection, windowSizeController) {
+      return WaitingOpening(stateMachine, newConnection, windowSizeController, layers) {
         windowDataEventsProcessor.onClose()
         markdownPanelManager.disposeAll()
         closeBlocker.removeListener()
         selectionBlocker.unblockSelection()
-        message.remove()
+        layers.reconnectionMessageUpdater(null)
       }
     }
   }

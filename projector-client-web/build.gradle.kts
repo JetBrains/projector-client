@@ -29,7 +29,12 @@ plugins {
 }
 
 val coroutinesVersion: String by project
+val inlineStylePrefixerVersion: String by project
+val kotlinReactVersion: String by project
+val kotlinStyledComponentsVersion: String by project
+val reactVersion: String by project
 val serializationVersion: String by project
+val styledComponentsVersion: String by project
 
 dependencies {
   implementation(project(":projector-common"))
@@ -37,6 +42,14 @@ dependencies {
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
+
+  implementation("org.jetbrains:kotlin-react:$kotlinReactVersion")
+  implementation("org.jetbrains:kotlin-react-dom:$kotlinReactVersion")
+  implementation(npm("react", reactVersion))
+  implementation(npm("react-dom", reactVersion))
+  implementation("org.jetbrains:kotlin-styled:$kotlinStyledComponentsVersion")
+  implementation(npm("styled-components", styledComponentsVersion))
+  implementation(npm("inline-style-prefixer", inlineStylePrefixerVersion))
 }
 
 kotlin {
