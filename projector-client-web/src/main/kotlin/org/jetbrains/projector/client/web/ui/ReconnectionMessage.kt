@@ -24,11 +24,14 @@
 package org.jetbrains.projector.client.web.ui
 
 import kotlinx.css.*
+import org.jetbrains.projector.client.web.externalDeclarartion.loadingIndicator
+import org.jetbrains.projector.client.web.externalDeclarartion.styleRoot
 import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
 import styled.css
+import styled.styledH1
 import styled.styledSpan
 
 external interface ReconnectionMessageProps : RProps {
@@ -43,18 +46,37 @@ class ReconnectionMessage : RComponent<ReconnectionMessageProps, RState>() {
       styledSpan {
         css {
           position = Position.absolute
-          bottom = 80.px
-          right = 5.pct
+          width = 100.pct
+          height = 100.pct
+          top = 0.px
+          left = 0.px
           pointerEvents = PointerEvents.none
 
-          padding(5.px)
-          background = "red"
+          background = "rgba(127, 127, 127, 0.5)"
           display = Display.block
+
+          textAlign = TextAlign.center
 
           classes.add("connection-watcher-warning")
         }
 
-        +message
+        styledH1 {
+          css {
+            put("text-shadow", "-1px 0 #ccc, 0 1px #ccc, 1px 0 #ccc, 0 -1px #ccc")  // border
+          }
+
+          +message
+        }
+
+        styleRoot {
+          loadingIndicator {
+            attrs {
+              segmentLength = 50.0
+              segmentWidth = 10.0
+              spacing = 20.0
+            }
+          }
+        }
       }
     }
   }

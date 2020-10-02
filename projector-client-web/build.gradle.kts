@@ -32,7 +32,9 @@ val coroutinesVersion: String by project
 val inlineStylePrefixerVersion: String by project
 val kotlinReactVersion: String by project
 val kotlinStyledComponentsVersion: String by project
+val radiumVersion: String by project
 val reactVersion: String by project
+val reactLoadingIndicatorVersion: String by project
 val serializationVersion: String by project
 val styledComponentsVersion: String by project
 
@@ -50,6 +52,8 @@ dependencies {
   implementation("org.jetbrains:kotlin-styled:$kotlinStyledComponentsVersion")
   implementation(npm("styled-components", styledComponentsVersion))
   implementation(npm("inline-style-prefixer", inlineStylePrefixerVersion))
+  implementation(npm("radium", radiumVersion))
+  implementation(npm("react-loading-indicator", reactLoadingIndicatorVersion))
 }
 
 kotlin {
