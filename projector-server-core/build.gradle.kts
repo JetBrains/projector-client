@@ -43,6 +43,7 @@ publishing {
 }
 
 val coroutinesVersion: String by project
+val javaWebSocketVersion: String by project
 val kotlinVersion: String by project
 val ktorVersion: String by project
 val selenideVersion: String by project
@@ -108,6 +109,7 @@ val integrationTest = task<Test>("integrationTest") {
 
 dependencies {
   implementation(project(":projector-common"))
+  api("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
 
   // todo: remove these dependencies: they should be exported from projector-common but now it seems not working
   testImplementation(kotlin("test", kotlinVersion))
