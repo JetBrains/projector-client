@@ -37,6 +37,13 @@ import org.java_websocket.util.Charsetfunctions
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 
+public class GetRequestResult(
+  public val statusCode: Short,
+  public val statusText: String,
+  public val contentType: String,
+  public val content: ByteArray,
+)
+
 private val ClientHandshake.isHttp: Boolean get() = this.getFieldValue("Upgrade").isNullOrBlank()
 
 public abstract class HttpWsServer(port: Int) {
@@ -56,20 +63,20 @@ public abstract class HttpWsServer(port: Int) {
     }
 
     override fun createHandshake(handshakedata: Handshakedata, withcontent: Boolean): List<ByteBuffer> {
-      val content = this@HttpWsServer.onGetRequest(handshakedata.getFieldValue(PATH_FIELD))
+      val result = this@HttpWsServer.onGetRequest(handshakedata.getFieldValue(PATH_FIELD))
 
       val header = Charsetfunctions.asciiBytes(
-        "HTTP/1.0 200 OK\r\n" +
+        "HTTP/1.0 ${result.statusCode} ${result.statusText}\r\n" +
         "Mime-Version: 1.0\r\n" +
-        "Content-Type: text/html\r\n" +
-        "Content-Length: ${content.size}\r\n" +
+        "Content-Type: ${result.contentType}\r\n" +
+        "Content-Length: ${result.content.size}\r\n" +
         "Connection: close\r\n" +
         "\r\n"
       )
 
-      val bytebuffer = ByteBuffer.allocate(content.size + header.size)
+      val bytebuffer = ByteBuffer.allocate(result.content.size + header.size)
       bytebuffer.put(header)
-      bytebuffer.put(content)
+      bytebuffer.put(result.content)
       bytebuffer.flip()
       return listOf(bytebuffer)
     }
@@ -149,7 +156,8 @@ public abstract class HttpWsServer(port: Int) {
     webSocketServer.start()
   }
 
-  public fun stop(timeout: Int) {
+  @JvmOverloads
+  public fun stop(timeout: Int = 0) {
     webSocketServer.stop(timeout)
   }
 
@@ -167,5 +175,5 @@ public abstract class HttpWsServer(port: Int) {
   public abstract fun onWsClose(connection: WebSocket)
   public abstract fun onWsMessage(connection: WebSocket, message: String)
   public abstract fun onWsMessage(connection: WebSocket, message: ByteBuffer)
-  public abstract fun onGetRequest(path: String): ByteArray
+  public abstract fun onGetRequest(path: String): GetRequestResult
 }

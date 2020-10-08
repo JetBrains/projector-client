@@ -120,8 +120,19 @@ dependencies {
   intTestImplementation("io.ktor:ktor-server-core:$ktorVersion")
   intTestImplementation("io.ktor:ktor-server-netty:$ktorVersion")
   intTestImplementation("io.ktor:ktor-websockets:$ktorVersion")
+  intTestImplementation("io.ktor:ktor-client-cio:$ktorVersion")
 
   // todo: remove these dependencies: they should be exported from projector-common but now it seems not working
   intTestImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
   intTestImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
 }
+
+val copyProjectorClientWebDistributionToResources = task<Copy>("copyProjectorClientWebDistributionToResources") {
+  from("../projector-client-web/build/distributions")
+  into("src/main/resources/projector-client-web-distribution")
+  exclude("*.js.map")
+
+  dependsOn(":projector-client-web:browserProductionWebpack")
+}
+
+tasks.processResources { dependsOn(copyProjectorClientWebDistributionToResources) }
