@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 import java.net.URL
+import java.util.*
 import java.util.zip.ZipFile
 
 plugins {
@@ -47,6 +48,13 @@ val javaWebSocketVersion: String by project
 val kotlinVersion: String by project
 val ktorVersion: String by project
 val selenideVersion: String by project
+
+val devBuilding = rootProject.file("local.properties").let {
+  when (it.canRead()) {
+    true -> Properties().apply { load(it.inputStream()) }.getProperty("projectorDevBuilding")?.toBoolean() ?: false
+    false -> false
+  }
+}
 
 val downloadIntTestFont = task("downloadIntTestFont") {
   doLast {
@@ -101,7 +109,11 @@ val integrationTest = task<Test>("integrationTest") {
   systemProperties = System.getProperties().map { (k, v) -> k.toString() to v }.toMap()
 
   shouldRunAfter("test")
-  dependsOn(":projector-client-web:browserProductionWebpack", downloadIntTestFont)
+  dependsOn(downloadIntTestFont)
+  when (devBuilding) {
+    true -> dependsOn(":projector-client-web:browserDevelopmentWebpack")
+    false -> dependsOn(":projector-client-web:browserProductionWebpack")
+  }
 }
 
 // todo: understand why it doesn't work on CI (https://github.com/JetBrains/projector-client/runs/1045863376)
@@ -130,9 +142,16 @@ dependencies {
 val copyProjectorClientWebDistributionToResources = task<Copy>("copyProjectorClientWebDistributionToResources") {
   from("../projector-client-web/build/distributions")
   into("src/main/resources/projector-client-web-distribution")
-  exclude("*.js.map")
 
-  dependsOn(":projector-client-web:browserProductionWebpack")
+  when (devBuilding) {
+    true -> {
+      dependsOn(":projector-client-web:browserDevelopmentWebpack")
+    }
+    false -> {
+      exclude("*.js.map")
+      dependsOn(":projector-client-web:browserProductionWebpack")
+    }
+  }
 }
 
 tasks.processResources { dependsOn(copyProjectorClientWebDistributionToResources) }
