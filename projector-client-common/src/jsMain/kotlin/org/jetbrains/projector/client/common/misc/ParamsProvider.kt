@@ -34,8 +34,13 @@ actual object ParamsProvider {
     else -> hostname
   }
 
+  private fun getCurrentPort(): String = when (val port = window.location.port) {
+    "" -> "8887"  // when you open it on site (for example, "http://example.com"), port is empty, so assume default port is preferred
+    else -> port
+  }
+
   private val DEFAULT_HOST = getCurrentHostname()
-  private const val DEFAULT_PORT = "8887"
+  private val DEFAULT_PORT = getCurrentPort()
   private val DEFAULT_TO_CLIENT_FORMAT: ToClientFormat = ToClientFormat.KOTLINX_JSON_MANUAL
   private const val DEFAULT_IMAGE_TTL = 60_000.0  // in ms
   private const val DEFAULT_FLUSH_DELAY = 1
