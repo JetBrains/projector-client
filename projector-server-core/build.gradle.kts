@@ -120,7 +120,7 @@ val integrationTest = task<Test>("integrationTest") {
 //tasks.check { dependsOn(integrationTest) }
 
 dependencies {
-  implementation(project(":projector-common"))
+  api(project(":projector-common"))
   api("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
 
   // todo: remove these dependencies: they should be exported from projector-common but now it seems not working

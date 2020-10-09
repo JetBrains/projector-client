@@ -23,6 +23,8 @@
  */
 package org.jetbrains.projector.server.core
 
+import org.jetbrains.projector.common.protocol.toClient.MainWindow
+import org.jetbrains.projector.common.protocol.toClient.toJson
 import org.jetbrains.projector.server.core.util.GetRequestResult
 import org.jetbrains.projector.server.core.util.HttpWsServer
 
@@ -64,6 +66,18 @@ public abstract class ProjectorHttpWsServer(port: Int) : HttpWsServer(port) {
 
   final override fun onGetRequest(path: String): GetRequestResult {
     val pathWithoutParams = path.substringBefore('?').substringBefore('#')
+
+    if (pathWithoutParams == "/mainWindows") {
+      val mainWindows = getMainWindows()
+      val json = mainWindows.toJson().toByteArray()
+      return GetRequestResult(
+        statusCode = 200,
+        statusText = "OK",
+        contentType = "text/json",
+        content = json,
+      )
+    }
+
     val resourceFileName = getResourceName(pathWithoutParams)
     val resourceBytes = getResource(resourceFileName)
 
@@ -83,4 +97,6 @@ public abstract class ProjectorHttpWsServer(port: Int) : HttpWsServer(port) {
       content = "<h1>404 Not found requested path: $path</h1>".toByteArray(),
     )
   }
+
+  public abstract fun getMainWindows(): List<MainWindow>
 }

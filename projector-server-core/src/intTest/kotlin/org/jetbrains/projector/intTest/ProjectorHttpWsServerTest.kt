@@ -36,6 +36,8 @@ import io.ktor.http.contentType
 import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.runBlocking
 import org.java_websocket.WebSocket
+import org.jetbrains.projector.common.protocol.toClient.MainWindow
+import org.jetbrains.projector.common.protocol.toClient.toMainWindowList
 import org.jetbrains.projector.server.core.ProjectorHttpWsServer
 import java.io.File
 import java.nio.ByteBuffer
@@ -69,6 +71,13 @@ class ProjectorHttpWsServerTest {
       override fun onWsMessage(connection: WebSocket, message: String) {}
 
       override fun onWsMessage(connection: WebSocket, message: ByteBuffer) {}
+
+      override fun getMainWindows(): List<MainWindow> = listOf(
+        MainWindow(
+          title = "abc",
+          pngBase64Icon = "png base 64",
+        )
+      )
     }
   }
 
@@ -116,6 +125,21 @@ class ProjectorHttpWsServerTest {
 
     assertEquals(expected, responseBytes)
     assertEquals(ContentType.Text.Html, response.contentType())
+
+    client.close()
+    server.stop()
+  }
+
+  @Test
+  fun testMainWindows() {
+    val server = createServer().also { it.start() }
+    val client = HttpClient()
+
+    val response = runBlocking { client.get<String>(prj("/mainWindows")) }.toMainWindowList()
+
+    assertEquals(1, response.size)
+    assertEquals("abc", response[0].title)
+    assertEquals("png base 64", response[0].pngBase64Icon)
 
     client.close()
     server.stop()
