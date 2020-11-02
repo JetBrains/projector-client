@@ -21,23 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
-
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
-  }
+plugins {
+  `kotlin-dsl`
 }
 
-rootProject.name = "projector-client"
+repositories {
+  mavenCentral()
+}
 
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")
-include("projector-util-agent")
+sourceSets.main.get().java.srcDir("src/main/kotlin")
+
+// todo: when Gradle starts using Kotlin 1.4, declare this module as explicitApi()

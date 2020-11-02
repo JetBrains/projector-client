@@ -21,23 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
+package org.jetbrains.projector.agent.common
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
-  }
+import javassist.ByteArrayClassPath
+import javassist.ClassPool
+import javassist.CtClass
+
+public fun getClassFromClassfileBuffer(pool: ClassPool, classSlashedName: String, classfileBuffer: ByteArray): CtClass {
+  val fqn = classSlashedName.replace('/', '.')
+  pool.insertClassPath(ByteArrayClassPath(fqn, classfileBuffer))
+  return pool.get(fqn)
 }
-
-rootProject.name = "projector-client"
-
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")
-include("projector-util-agent")

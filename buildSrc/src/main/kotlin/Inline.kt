@@ -21,23 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
+import org.gradle.api.NamedDomainObjectProvider
+import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
-  }
+fun Project.inline(conf: NamedDomainObjectProvider<Configuration>): Iterable<Any> {
+  return conf.get().map { if (it.isDirectory) it else zipTree(it) }
 }
-
-rootProject.name = "projector-client"
-
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")
-include("projector-util-agent")

@@ -21,23 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
+import org.gradle.jvm.tasks.Jar
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
-  }
+plugins {
+  kotlin("jvm")
 }
 
-rootProject.name = "projector-client"
+kotlin {
+  explicitApi()
+}
 
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")
-include("projector-util-agent")
+val javassistVersion: String by project
+
+dependencies {
+  implementation(project(":projector-agent-common"))
+  implementation("org.javassist:javassist:$javassistVersion")
+}
+
+val agentClass = "org.jetbrains.projector.agent.ijInjector.IjInjectorAgent"
+
+tasks.withType<Jar> {
+  manifest {
+    attributes(
+      "Can-Redefine-Classes" to true,
+      "Can-Retransform-Classes" to true,
+      "Agent-Class" to agentClass
+    )
+  }
+
+  from(inline(configurations.runtimeClasspath))
+}

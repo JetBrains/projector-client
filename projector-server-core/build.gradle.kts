@@ -44,6 +44,7 @@ publishing {
 }
 
 val coroutinesVersion: String by project
+val javassistVersion: String by project
 val javaWebSocketVersion: String by project
 val kotlinVersion: String by project
 val ktorVersion: String by project
@@ -121,6 +122,8 @@ val integrationTest = task<Test>("integrationTest") {
 
 dependencies {
   api(project(":projector-common"))
+  implementation(project(":projector-util-agent"))
+  implementation("org.javassist:javassist:$javassistVersion")
   api("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
 
   // todo: remove these dependencies: they should be exported from projector-common but now it seems not working
@@ -154,4 +157,17 @@ val copyProjectorClientWebDistributionToResources = task<Copy>("copyProjectorCli
   }
 }
 
-tasks.processResources { dependsOn(copyProjectorClientWebDistributionToResources) }
+val copyProjectorAgentIjInjectorJarToResources = task<Copy>("copyProjectorAgentIjInjectorJarToResources") {
+  include("projector-agent-ij-injector-*.jar")
+  from("../projector-agent-ij-injector/build/libs")
+  into("src/main/resources/projector-agent/")
+  rename { "projector-agent-ij-injector.jar" }
+  dependsOn(":projector-agent-ij-injector:jar")
+}
+
+tasks.processResources {
+  dependsOn(
+    copyProjectorClientWebDistributionToResources,
+    copyProjectorAgentIjInjectorJarToResources
+  )
+}

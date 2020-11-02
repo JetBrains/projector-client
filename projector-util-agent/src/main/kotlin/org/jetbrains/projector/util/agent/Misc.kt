@@ -21,23 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
+package org.jetbrains.projector.util.agent
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
+import com.sun.tools.attach.VirtualMachine
+import java.io.File
+import java.io.InputStream
+import java.lang.management.ManagementFactory
+
+public fun attachAgent(agentJarPath: String, args: String?) {
+  println("dynamically attaching agent: jar=$agentJarPath, args=$args")
+
+  val pidOfRunningVM = ManagementFactory.getRuntimeMXBean().name.substringBefore('@')
+
+  try {
+    VirtualMachine.attach(pidOfRunningVM)!!.apply {
+      loadAgent(agentJarPath, args)
+      detach()
+    }
   }
+  catch (e: Exception) {
+    throw RuntimeException(e)
+  }
+
+  println("dynamically attaching agent... - done")
 }
 
-rootProject.name = "projector-client"
-
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")
-include("projector-util-agent")
+public fun copyAgentToTempJarAndAttach(agentJar: InputStream, args: String?) {
+  val tempJar = File.createTempFile("projector-agent", ".jar").apply {
+    deleteOnExit()
+  }
+  agentJar.transferTo(tempJar.outputStream())
+  attachAgent(agentJarPath = tempJar.absolutePath, args = args)
+}

@@ -21,23 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
+package org.jetbrains.projector.server.core.ij.md
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.JarURLConnection
+import java.net.URL
+
+internal object CssProcessor {
+
+  fun makeCss(inlineCss: String?, cssFileUrls: List<String?>): String = buildString {
+    appendLine(inlineCss.orEmpty())
+
+    cssFileUrls.forEach {
+      it ?: return@forEach
+
+      try {
+        val connection = URL(it).openConnection() as JarURLConnection
+
+        val reader = BufferedReader(InputStreamReader(connection.inputStream))
+
+        while (true) {
+          val line = reader.readLine() ?: break
+
+          appendLine(line)
+        }
+      }
+      catch (t: Throwable) {
+        println("Can't process file, skipping")
+        t.printStackTrace()
+      }
+    }
   }
 }
-
-rootProject.name = "projector-client"
-
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")
-include("projector-util-agent")

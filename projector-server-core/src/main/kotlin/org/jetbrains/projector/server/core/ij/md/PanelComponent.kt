@@ -21,23 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
+package org.jetbrains.projector.server.core.ij.md
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
+import java.awt.BorderLayout
+import java.awt.Dimension
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JTextArea
+
+internal class PanelComponent : JPanel(BorderLayout()) {
+
+  private val textArea = JTextArea().apply {
+    lineWrap = true
+    minimumSize = Dimension(0, 0)
+  }
+
+  init {
+    val header = JLabel("Debug markdown representation (if you see this, your client doesn't support markdown):")
+
+    add(header, BorderLayout.NORTH)
+    add(textArea, BorderLayout.CENTER)
+  }
+
+  fun setText(text: String) {
+    textArea.text = text
   }
 }
-
-rootProject.name = "projector-client"
-
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")
-include("projector-util-agent")

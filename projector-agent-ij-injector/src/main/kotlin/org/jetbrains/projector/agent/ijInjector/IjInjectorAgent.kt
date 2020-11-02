@@ -21,23 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val kotlinVersion: String by settings
+package org.jetbrains.projector.agent.ijInjector
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
+import java.lang.instrument.Instrumentation
+
+public object IjInjectorAgent {
+
+  @JvmStatic
+  public fun agentmain(args: String, instrumentation: Instrumentation) {
+    println("IjInjectorAgent agentmain start, args=$args")
+
+    val (
+      ijClProviderClass, ijClProviderMethod,
+      mdPanelMakerClass, mdPanelMakerMethod,
+    ) = args.split(';')
+
+    IjInjector.agentmain(
+      instrumentation,
+      ijClProviderClass = ijClProviderClass, ijClProviderMethod = ijClProviderMethod,
+      mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod,
+    )
+
+    println("IjInjectorAgent agentmain finish")
   }
 }
-
-rootProject.name = "projector-client"
-
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-server-core")
-include("projector-util-agent")
