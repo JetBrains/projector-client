@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDceDsl
 
 plugins {
   kotlin("js")
-  `maven-publish`
 }
 
 val coroutinesVersion: String by project
