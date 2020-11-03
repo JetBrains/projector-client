@@ -171,3 +171,5 @@ tasks.processResources {
     copyProjectorAgentIjInjectorJarToResources
   )
 }
+
+// todo: clean these generated resources on "clean" task
