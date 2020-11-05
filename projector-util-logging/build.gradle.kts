@@ -21,30 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.agent.ijInjector
+plugins {
+  kotlin("multiplatform")
+  `maven-publish`
+}
 
-import org.jetbrains.projector.util.logging.Logger
-import java.lang.instrument.Instrumentation
+val kotlinVersion: String by project
 
-public object IjInjectorAgent {
+kotlin {
+  explicitApi()
 
-  private val logger = Logger<IjInjectorAgent>()
+  js {
+    browser()
+  }
+  jvm()
 
-  @JvmStatic
-  public fun agentmain(args: String, instrumentation: Instrumentation) {
-    logger.debug { "IjInjectorAgent agentmain start, args=$args" }
+  sourceSets {
+    val commonMain by getting {
+    }
 
-    val (
-      ijClProviderClass, ijClProviderMethod,
-      mdPanelMakerClass, mdPanelMakerMethod,
-    ) = args.split(';')
+    val jsMain by getting {
+    }
 
-    IjInjector.agentmain(
-      instrumentation,
-      ijClProviderClass = ijClProviderClass, ijClProviderMethod = ijClProviderMethod,
-      mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod,
-    )
-
-    logger.debug { "IjInjectorAgent agentmain finish" }
+    val jvmMain by getting {
+    }
   }
 }

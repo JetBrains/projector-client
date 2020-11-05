@@ -23,12 +23,15 @@
  */
 package org.jetbrains.projector.server.core.ij.md
 
+import org.jetbrains.projector.util.logging.Logger
 import java.awt.Component
 import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 internal class PanelDelegate {
+
+  private val logger = Logger<PanelDelegate>()
 
   val id = NEXT_ID.incrementAndGet()
 
@@ -140,8 +143,7 @@ internal class PanelDelegate {
       PanelUpdater.setHtml(id)
     }
     catch (t: Throwable) {
-      print("Can't set HTML in Panel #$id...")
-      t.printStackTrace()
+      logger.error { "Can't set HTML in Panel #$id..." }
     }
   }
 

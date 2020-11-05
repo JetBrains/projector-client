@@ -26,6 +26,7 @@ package org.jetbrains.projector.agent.ijInjector
 import javassist.ClassPool
 import javassist.LoaderClassPath
 import org.jetbrains.projector.agent.common.getClassFromClassfileBuffer
+import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
 
@@ -55,14 +56,13 @@ internal class IjMdTransformer private constructor(
       }
     }
     catch (e: Exception) {
-      println("Class transform error")
-      e.printStackTrace()
+      logger.error(e) { "Class transform error" }
       null
     }
   }
 
   private fun transformMdHtmlPanelProvider(previewType: MdPreviewType, className: String, classfileBuffer: ByteArray): ByteArray {
-    println("Transforming MdHtmlPanelProvider (${previewType.displayName})...")
+    logger.debug { "Transforming MdHtmlPanelProvider (${previewType.displayName})..." }
     val clazz = getClassFromClassfileBuffer(mdCp, className, classfileBuffer)
     clazz.defrost()
 
@@ -113,6 +113,8 @@ internal class IjMdTransformer private constructor(
 
   companion object {
 
+    private val logger = Logger<IjMdTransformer>()
+
     private const val MD_EXTENSION_ID = "org.intellij.markdown.html.panel.provider"
 
     private const val javaFxClass = "org.intellij.plugins.markdown.ui.preview.javafx.JavaFxHtmlPanelProvider"
@@ -124,7 +126,7 @@ internal class IjMdTransformer private constructor(
       utils: IjInjector.Utils,
       mdPanelMakerClass: String, mdPanelMakerMethod: String,
     ) {
-      println("IjMdTransformer agentmain start")
+      logger.debug { "IjMdTransformer agentmain start" }
 
       val extensionPointName = utils.createExtensionPointName(MD_EXTENSION_ID)
       val extensions = utils.extensionPointNameGetExtensions(extensionPointName)
@@ -146,12 +148,11 @@ internal class IjMdTransformer private constructor(
           utils.instrumentation.retransformClasses(Class.forName(clazz, false, mdClassloader))
         }
         catch (t: Throwable) {
-          println("Class retransform error")
-          t.printStackTrace()
+          logger.error(t) { "Class retransform error" }
         }
       }
 
-      println("IjMdTransformer agentmain finish")
+      logger.debug { "IjMdTransformer agentmain finish" }
     }
   }
 }

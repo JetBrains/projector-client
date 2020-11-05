@@ -26,7 +26,7 @@ package org.jetbrains.projector.client.common.canvas
 import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Canvas.ImageSource
 import org.jetbrains.projector.client.common.canvas.Canvas.Snapshot
-import org.jetbrains.projector.client.common.misc.Logger
+import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.*
 
 class DomCanvas(private val myCanvas: HTMLCanvasElement) : Canvas {
@@ -67,7 +67,8 @@ class DomCanvas(private val myCanvas: HTMLCanvasElement) : Canvas {
   }
 
   companion object {
-    val logger = Logger(DomCanvas::class.simpleName!!)
+
+    private val logger = Logger<DomCanvas>()
 
     fun CanvasImageSource.isEmpty(): Boolean =
       when (this) {

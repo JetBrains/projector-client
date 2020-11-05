@@ -23,15 +23,16 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.AlphaCompositeRule
 import org.jetbrains.projector.common.protocol.data.CommonPath
 import org.jetbrains.projector.common.protocol.data.StrokeData
+import org.jetbrains.projector.util.logging.Logger
 import kotlin.math.absoluteValue
 
 object Extensions {
-  val logger = Logger(Extensions::class.simpleName!!)
+
+  private val logger = Logger<Extensions>()
 
   fun Canvas.resizeSavingImage(width: Int, height: Int) {
     if (this.width == width && this.height == height) {

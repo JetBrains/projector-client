@@ -35,6 +35,7 @@ val javassistVersion: String by project
 
 dependencies {
   implementation(project(":projector-agent-common"))
+  implementation(project(":projector-util-logging"))
   implementation("org.javassist:javassist:$javassistVersion")
 }
 

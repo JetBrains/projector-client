@@ -21,30 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.agent.ijInjector
+package org.jetbrains.projector.server.core.ij.log
 
 import org.jetbrains.projector.util.logging.Logger
-import java.lang.instrument.Instrumentation
 
-public object IjInjectorAgent {
+// todo: check for IDEA Logger settings and suppress disabled log levels
+internal class IjJvmLogger(ideaClassLoader: ClassLoader, tag: String) : Logger {
 
-  private val logger = Logger<IjInjectorAgent>()
+  private val loggerClass = Class.forName("com.intellij.openapi.diagnostic.Logger", false, ideaClassLoader)
 
-  @JvmStatic
-  public fun agentmain(args: String, instrumentation: Instrumentation) {
-    logger.debug { "IjInjectorAgent agentmain start, args=$args" }
+  private val logger = loggerClass
+    .getDeclaredMethod("getInstance", String::class.java)
+    .invoke(null, tag)
 
-    val (
-      ijClProviderClass, ijClProviderMethod,
-      mdPanelMakerClass, mdPanelMakerMethod,
-    ) = args.split(';')
+  private val errorMethod = loggerClass
+    .getDeclaredMethod("error", String::class.java, Throwable::class.java)
 
-    IjInjector.agentmain(
-      instrumentation,
-      ijClProviderClass = ijClProviderClass, ijClProviderMethod = ijClProviderMethod,
-      mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod,
-    )
+  private val infoMethod = loggerClass
+    .getDeclaredMethod("info", String::class.java, Throwable::class.java)
 
-    logger.debug { "IjInjectorAgent agentmain finish" }
+  private val debugMethod = loggerClass
+    .getDeclaredMethod("debug", String::class.java, Throwable::class.java)
+
+  override fun error(t: Throwable?, lazyMessage: () -> String) {
+    errorMethod.invoke(logger, lazyMessage(), t)
+  }
+
+  override fun info(t: Throwable?, lazyMessage: () -> String) {
+    infoMethod.invoke(logger, lazyMessage(), t)
+  }
+
+  override fun debug(t: Throwable?, lazyMessage: () -> String) {
+    debugMethod.invoke(logger, lazyMessage(), t)
   }
 }

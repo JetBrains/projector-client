@@ -21,21 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.common.misc
+package org.jetbrains.projector.util.logging
 
-actual class Logger actual constructor(private val tag: String) {
-  actual fun error(t: Throwable?, lazyMessage: () -> String) {
-    console.error("[ERROR] :: $tag :: ${lazyMessage()}")
-    t?.let { console.error(t) }
-  }
-
-  actual fun info(t: Throwable?, lazyMessage: () -> String) {
-    console.info("[INFO] :: $tag :: ${lazyMessage()}")
-    t?.let { console.info(t) }
-  }
-
-  actual fun debug(t: Throwable?, lazyMessage: () -> String) {
-    console.log("[DEBUG] :: $tag :: ${lazyMessage()}")
-    t?.let { console.log(t) }
-  }
-}
+@Suppress("FunctionName")  // to make the function look like class, its name starts with a capital
+public inline fun <reified Tag : Any> Logger(): Logger = Logger(Tag::class.simpleName!!)

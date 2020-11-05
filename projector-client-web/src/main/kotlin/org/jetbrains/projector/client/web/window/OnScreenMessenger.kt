@@ -25,17 +25,17 @@ package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.misc.toDisplayType
 import org.jetbrains.projector.client.web.state.LafListener
 import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
+import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLDivElement
 
 object OnScreenMessenger : LafListener {
 
-  private val logger = Logger(OnScreenMessenger::class.simpleName!!)
+  private val logger = Logger<OnScreenMessenger>()
 
   private val header = WindowHeader().apply {
     undecorated = true

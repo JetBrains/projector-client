@@ -24,12 +24,15 @@
 package org.jetbrains.projector.util.agent
 
 import com.sun.tools.attach.VirtualMachine
+import org.jetbrains.projector.util.logging.Logger
 import java.io.File
 import java.io.InputStream
 import java.lang.management.ManagementFactory
 
+private val logger = Logger("util.agent.MiscKt")
+
 public fun attachAgent(agentJarPath: String, args: String?) {
-  println("dynamically attaching agent: jar=$agentJarPath, args=$args")
+  logger.debug { "dynamically attaching agent: jar=$agentJarPath, args=$args" }
 
   val pidOfRunningVM = ManagementFactory.getRuntimeMXBean().name.substringBefore('@')
 
@@ -43,7 +46,7 @@ public fun attachAgent(agentJarPath: String, args: String?) {
     throw RuntimeException(e)
   }
 
-  println("dynamically attaching agent... - done")
+  logger.debug { "dynamically attaching agent is done: jar=$agentJarPath, args=$args" }
 }
 
 public fun copyAgentToTempJarAndAttach(agentJar: InputStream, args: String?) {

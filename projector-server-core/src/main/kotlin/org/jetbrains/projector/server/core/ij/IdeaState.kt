@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.server.core.ij
 
+import org.jetbrains.projector.util.logging.Logger
 import kotlin.concurrent.thread
 
 private fun isIdeaInProperState(ideaClassLoader: ClassLoader?): Boolean {
@@ -37,14 +38,18 @@ private fun isIdeaInProperState(ideaClassLoader: ClassLoader?): Boolean {
     .invoke(loadingState) as Boolean
 }
 
+private val logger = Logger("IdeState")
+
 public fun invokeWhenIdeaIsInitialized(
   purpose: String,
   onNoIdeaFound: (() -> Unit)? = null,
   onInitialized: (ideaClassLoader: ClassLoader) -> Unit,
 ) {
   thread(isDaemon = true) {
+    //val logger = Logger("invokeWhenIdeaIsInitialized: $purpose")  // todo: can't do that because Logger calls this fun recursively
+
     if (onNoIdeaFound == null) {
-      println("Starting attempts to $purpose")
+      logger.debug { "Starting attempts to $purpose" }
     }
 
     while (true) {
@@ -60,7 +65,7 @@ public fun invokeWhenIdeaIsInitialized(
             onInitialized(ideaClassLoader)
 
             if (onNoIdeaFound == null) {
-              println("\"$purpose\" is done")
+              logger.debug { "\"$purpose\" is done" }
             }
             break
           }
@@ -68,8 +73,7 @@ public fun invokeWhenIdeaIsInitialized(
       }
       catch (t: Throwable) {
         if (onNoIdeaFound == null) {
-          println("Can't $purpose. It's OK if you don't run an IntelliJ platform based app.")
-          t.printStackTrace()
+          logger.info(t) { "Can't $purpose. It's OK if you don't run an IntelliJ platform based app." }
         }
         else {
           onNoIdeaFound()

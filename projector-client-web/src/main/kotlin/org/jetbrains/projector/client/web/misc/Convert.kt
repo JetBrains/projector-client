@@ -23,12 +23,10 @@
  */
 package org.jetbrains.projector.client.web.misc
 
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.common.protocol.data.CursorType
 import org.jetbrains.projector.common.protocol.toServer.ClientWheelEvent
 import org.jetbrains.projector.common.protocol.toServer.ResizeDirection
 import org.w3c.dom.events.WheelEvent
-
 
 fun ResizeDirection.toJsResizeDirection(): String = when (this) {
   ResizeDirection.NW -> "nw-resize"
@@ -65,5 +63,3 @@ fun Int.toScrollingMode(): ClientWheelEvent.ScrollingMode = when (this) {
 
   else -> throw IllegalArgumentException("Unknown scrolling mode")
 }
-
-private val logger = Logger("ConvertKt")

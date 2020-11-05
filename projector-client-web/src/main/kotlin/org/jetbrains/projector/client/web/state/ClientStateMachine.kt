@@ -26,7 +26,7 @@ package org.jetbrains.projector.client.web.state
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import org.jetbrains.projector.client.common.misc.Logger
+import org.jetbrains.projector.util.logging.Logger
 
 class ClientStateMachine {
 
@@ -58,6 +58,6 @@ class ClientStateMachine {
 
   private companion object {
 
-    private val logger = Logger(ClientStateMachine::class.simpleName!!)
+    private val logger = Logger<ClientStateMachine>()
   }
 }

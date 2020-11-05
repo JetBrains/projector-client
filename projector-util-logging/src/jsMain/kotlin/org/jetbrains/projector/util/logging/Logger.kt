@@ -21,10 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.common.misc
+package org.jetbrains.projector.util.logging
 
-expect class Logger(tag: String) {
-  fun error(t: Throwable? = null, lazyMessage: () -> String)
-  fun info(t: Throwable? = null, lazyMessage: () -> String)
-  fun debug(t: Throwable? = null, lazyMessage: () -> String)
+@Suppress("FunctionName")  // to make the function look like class, its name starts with a capital
+public actual fun Logger(tag: String): Logger = JsLoggerImpl(tag)
+
+private class JsLoggerImpl(private val tag: String) : Logger {
+
+  override fun error(t: Throwable?, lazyMessage: () -> String) = log(console::error, LogLevel.ERROR, tag, t, lazyMessage)
+  override fun info(t: Throwable?, lazyMessage: () -> String) = log(console::info, LogLevel.INFO, tag, t, lazyMessage)
+  override fun debug(t: Throwable?, lazyMessage: () -> String) = log(console::log, LogLevel.DEBUG, tag, t, lazyMessage)
+
+  private enum class LogLevel(val prefix: String) {
+
+    ERROR("ERROR"),
+    INFO("INFO"),
+    DEBUG("DEBUG"),
+  }
+
+  private companion object {
+
+    private fun log(f: (Array<out Any?>) -> Unit, level: LogLevel, tag: String, t: Throwable?, lazyMessage: () -> String) {
+      val fullMessage = "[${level.prefix}] :: $tag :: ${lazyMessage()}"
+      val logArguments = t?.let { arrayOf(fullMessage, t) } ?: arrayOf(fullMessage)
+      f(logArguments)
+    }
+  }
 }

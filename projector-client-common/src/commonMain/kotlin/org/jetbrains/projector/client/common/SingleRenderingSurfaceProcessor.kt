@@ -27,12 +27,12 @@ import org.jetbrains.projector.client.common.Renderer.Companion.RequestedRenderi
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
 import org.jetbrains.projector.client.common.misc.ImageCacher
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.ImageEventInfo
 import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.*
+import org.jetbrains.projector.util.logging.Logger
 
 class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
 
@@ -242,7 +242,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
 
   companion object {
 
-    private val logger = Logger(SingleRenderingSurfaceProcessor::class.simpleName!!)
+    private val logger = Logger<SingleRenderingSurfaceProcessor>()
 
     private fun logUnsupportedCommand(command: ServerWindowEvent) {
       if (ParamsProvider.LOG_UNSUPPORTED_EVENTS) {

@@ -21,30 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.agent.ijInjector
+package org.jetbrains.projector.util.logging
 
-import org.jetbrains.projector.util.logging.Logger
-import java.lang.instrument.Instrumentation
-
-public object IjInjectorAgent {
-
-  private val logger = Logger<IjInjectorAgent>()
-
-  @JvmStatic
-  public fun agentmain(args: String, instrumentation: Instrumentation) {
-    logger.debug { "IjInjectorAgent agentmain start, args=$args" }
-
-    val (
-      ijClProviderClass, ijClProviderMethod,
-      mdPanelMakerClass, mdPanelMakerMethod,
-    ) = args.split(';')
-
-    IjInjector.agentmain(
-      instrumentation,
-      ijClProviderClass = ijClProviderClass, ijClProviderMethod = ijClProviderMethod,
-      mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod,
-    )
-
-    logger.debug { "IjInjectorAgent agentmain finish" }
-  }
-}
+@Suppress("FunctionName")  // to make the function look like class, its name starts with a capital
+public expect fun Logger(tag: String): Logger

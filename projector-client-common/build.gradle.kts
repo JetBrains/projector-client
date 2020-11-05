@@ -38,6 +38,7 @@ kotlin {
       dependencies {
         api(kotlin("reflect", kotlinVersion))
         implementation(project(":projector-common"))
+        implementation(project(":projector-util-logging"))
       }
     }
 

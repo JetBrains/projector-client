@@ -25,7 +25,6 @@ package org.jetbrains.projector.client.web.input
 
 import kotlinx.browser.document
 import kotlinx.browser.window
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.web.misc.toDisplayType
@@ -36,6 +35,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.LEFT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.STANDARD
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
+import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.InputEvent
@@ -447,6 +447,6 @@ class MobileKeyboardHelperImpl(
 
     private const val MINIMUM_MS_BETWEEN_INPUT_AND_SELECTION_CHANGE = 100
 
-    private val logger = Logger(MobileKeyboardHelperImpl::class.simpleName!!)
+    private val logger = Logger<MobileKeyboardHelperImpl>()
   }
 }

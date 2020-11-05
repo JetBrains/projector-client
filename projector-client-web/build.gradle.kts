@@ -40,6 +40,7 @@ val styledComponentsVersion: String by project
 dependencies {
   implementation(project(":projector-common"))
   implementation(project(":projector-client-common"))
+  implementation(project(":projector-util-logging"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")

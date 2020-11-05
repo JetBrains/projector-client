@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.server.core.ij.md
 
+import org.jetbrains.projector.util.logging.Logger
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.Point
@@ -31,6 +32,8 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 public object PanelUpdater {
+
+  private val logger = Logger<PanelUpdater>()
 
   public var showCallback: ((id: Int, shown: Boolean) -> Unit)? = null
   public var resizeCallback: ((id: Int, size: Dimension) -> Unit)? = null
@@ -43,7 +46,7 @@ public object PanelUpdater {
   public var browseUriCallback: ((link: String) -> Unit)? = null  // todo: was used in safe opener, move somewhere else (maybe to Desktop?)
 
   public fun openInExternalBrowser(link: String) {
-    println("opening link is not implemented... $link")
+    logger.info { "opening link is not implemented... Tried to open: $link" }
     //SafeOpener.openInExternalBrowser(link)  // todo: fix link opening, for 202 we can do MarkdownAccessor.getSafeOpenerAccessor.openLink(link) via reflection
   }
 

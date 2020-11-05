@@ -37,3 +37,7 @@ publishing {
     }
   }
 }
+
+dependencies {
+  implementation(project(":projector-util-logging"))
+}

@@ -32,6 +32,7 @@ import org.jetbrains.projector.common.protocol.data.ImageData
 import org.jetbrains.projector.common.protocol.data.ImageId
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientRequestImageDataEvent
+import org.jetbrains.projector.util.logging.Logger
 
 object ImageCacher {
 
@@ -163,5 +164,5 @@ object ImageCacher {
     }
   }
 
-  private val logger = Logger(ImageCacher::class.simpleName!!)
+  private val logger = Logger<ImageCacher>()
 }

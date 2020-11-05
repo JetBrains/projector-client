@@ -35,13 +35,13 @@ import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
 import org.jetbrains.projector.client.common.canvas.PaintColor
 import org.jetbrains.projector.client.common.canvas.PaintColor.SolidColor
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.ParamsProvider.REPAINT_AREA
 import org.jetbrains.projector.client.common.misc.RepaintAreaSetting
 import org.jetbrains.projector.common.misc.Defaults
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.*
+import org.jetbrains.projector.util.logging.Logger
 import kotlin.math.PI
 import kotlin.random.Random
 
@@ -570,7 +570,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
       return SolidColor(this)
     }
 
-    private val logger = Logger(Renderer::class.simpleName!!)
+    private val logger = Logger<Renderer>()
 
     private fun createNextRandomColor(): PaintColor {
       // Random argb color with 0.5 alpha

@@ -91,8 +91,8 @@ class KeyboardTest {
           val events = receiver()
           events.forEach {
             when (it) {
-              is ClientKeyPressEvent -> list.add(it.toAwtKeyEvent(0, JLabel()) { println(it()) })
-              is ClientKeyEvent -> list.add(it.toAwtKeyEvent(0, JLabel()) { println(it()) })
+              is ClientKeyPressEvent -> list.add(it.toAwtKeyEvent(0, JLabel()))
+              is ClientKeyEvent -> list.add(it.toAwtKeyEvent(0, JLabel()))
               else -> Unit
             }
           }

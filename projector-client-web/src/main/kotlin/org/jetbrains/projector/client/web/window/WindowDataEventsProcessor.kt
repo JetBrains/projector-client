@@ -26,7 +26,6 @@ package org.jetbrains.projector.client.web.window
 import kotlinx.browser.document
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.misc.ImageCacher
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.common.misc.firstNotNullOrNull
 import org.jetbrains.projector.common.protocol.data.ImageId
@@ -34,6 +33,7 @@ import org.jetbrains.projector.common.protocol.toClient.ServerWindowEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowSetChangedEvent
 import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
+import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLLinkElement
@@ -158,7 +158,7 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
   }
 
   companion object {
-    private val logger = Logger(WindowDataEventsProcessor::class.simpleName!!)
+    private val logger = Logger<WindowDataEventsProcessor>()
     private const val DEFAULT_TITLE = "Projector"
   }
 }

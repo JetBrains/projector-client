@@ -27,7 +27,6 @@ import kotlinext.js.jsObject
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ImageCacher
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.web.ServerEventsProcessor
@@ -58,6 +57,7 @@ import org.jetbrains.projector.common.protocol.handshake.*
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toClient.ToClientMessageDecoder
 import org.jetbrains.projector.common.protocol.toServer.*
+import org.jetbrains.projector.util.logging.Logger
 import org.khronos.webgl.ArrayBuffer
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
@@ -575,7 +575,7 @@ sealed class ClientState {
 
   companion object {
 
-    private val logger = Logger(ClientState::class.simpleName!!)
+    private val logger = Logger<ClientState>()
 
     private const val NORMAL_CLOSURE_STATUS_CODE: Short = 1000
     private const val GOING_AWAY_STATUS_CODE: Short = 1001

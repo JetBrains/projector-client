@@ -25,10 +25,10 @@ package org.jetbrains.projector.client.web.component
 
 import kotlinx.browser.document
 import kotlinx.dom.clear
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.CommonIntSize
 import org.jetbrains.projector.common.protocol.data.Point
+import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.Node
@@ -210,7 +210,7 @@ class MarkdownPanelManager(private val zIndexByWindowIdGetter: (Int) -> Int?, pr
 
   companion object {
 
-    private val logger = Logger(MarkdownPanelManager::class.simpleName!!)
+    private val logger = Logger<MarkdownPanelManager>()
 
     private val domParser = DOMParser()
 

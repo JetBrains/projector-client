@@ -23,12 +23,15 @@
  */
 package org.jetbrains.projector.server.core.ij.md
 
+import org.jetbrains.projector.util.logging.Logger
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.JarURLConnection
 import java.net.URL
 
 internal object CssProcessor {
+
+  private val logger = Logger<CssProcessor>()
 
   fun makeCss(inlineCss: String?, cssFileUrls: List<String?>): String = buildString {
     appendLine(inlineCss.orEmpty())
@@ -48,8 +51,7 @@ internal object CssProcessor {
         }
       }
       catch (t: Throwable) {
-        println("Can't process file, skipping")
-        t.printStackTrace()
+        logger.error(t) { "Can't process file, skipping" }
       }
     }
   }

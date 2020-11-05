@@ -24,10 +24,10 @@
 package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
-import org.jetbrains.projector.client.common.misc.Logger
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
+import org.jetbrains.projector.util.logging.Logger
 import kotlin.js.Json
 import kotlin.js.Promise
 import kotlin.js.json
@@ -87,6 +87,6 @@ class Application {
 
   companion object {
 
-    private val logger = Logger(Application::class.simpleName!!)
+    private val logger = Logger<Application>()
   }
 }
