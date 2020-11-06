@@ -51,6 +51,13 @@ public abstract class ProjectorHttpWsServer(port: Int) : HttpWsServer(port) {
         }
       }
       .let {
+        // support paths for PWA (start_url from webmanifest) – it's the name of repo so PWA could work for GH Pages too
+        when (it.startsWith("/projector-client/")) {
+          true -> it.removePrefix("/projector-client")
+          false -> it
+        }
+      }
+      .let {
         // support root
         when (it == "/") {
           true -> "/index.html"
