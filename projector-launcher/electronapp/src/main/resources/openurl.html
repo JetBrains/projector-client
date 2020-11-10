@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <base href="./">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/styles.css" crossorigin="anonymous">
+    <title>Projector</title>
+</head>
+<body class="text-center">
+<div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+
+<header class="stdhead mb-auto">
+    <div class="inner">
+        <h3 class="stdhead-brand"><a href="#" class="navbar-left"><img class="stdhead-brand-img" src="assets/img/pj512px.png"></a>Projector</h3>
+        <nav class="nav nav-stdhead justify-content-center">
+            <a class="nav-link" href="https://github.com/JetBrains/projector-server">GitHub</a>
+            <a class="nav-link"
+               href="https://github.com/JetBrains/projector-server/blob/master/README-JETBRAINS.md">Readme</a>
+            <a class="nav-link" href="https://jetbrains.com">JetBrains</a>
+        </nav>
+    </div>
+</header>
+
+<main role="main" class="inner cover">
+    <div class="container cont-md">
+        <div *ngIf="pconnections.length > 0" class="row">
+            <div class="col-md-12">
+<!--                <h1>Connection URL</h1>-->
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12" style="padding-bottom: 20px;">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="url-text-field" aria-describedby="URL" placeholder="Connection URL">
+                    <small id="passwordHelpBlock" class="form-text text-muted">
+                        Standard URL template: http://void:8887/?host=void&port=8887
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" id="connect-button" class="btn btn-lg btn-main">Connect</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="stdfoot mt-auto">
+    <div class="inner">
+        <p></p>
+    </div>
+</footer>
+
+</div>
+
+<script src="assets/js/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="assets/js/jquery-3.5.1.slim.min.js"><\/script>')</script>
+<script src="assets/js/popper.min.js" crossorigin="anonymous"></script>
+<script src="assets/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script src="assets/js/main.js" crossorigin="anonymous"></script>
+</body>
+</html>
