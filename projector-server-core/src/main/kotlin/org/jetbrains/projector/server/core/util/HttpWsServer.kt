@@ -36,6 +36,9 @@ import org.java_websocket.server.WebSocketServer
 import org.java_websocket.util.Charsetfunctions
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
+
 
 public class GetRequestResult(
   public val statusCode: Short,
@@ -121,6 +124,28 @@ public abstract class HttpWsServer(port: Int) {
 
   private val webSocketServer = object : WebSocketServer(InetSocketAddress(port), listOf(HttpDraft(), Draft_6455())) {
 
+    @Volatile
+    var wasInitialized: Boolean? = null
+    private val lock = ReentrantLock()
+    private val condition = lock.newCondition()
+
+
+    val wasStarted: Boolean
+      get() {
+        while (wasInitialized == null) {
+          lock.withLock {
+            if (wasInitialized == null) {
+              condition.await()
+            }
+            else {
+              return wasInitialized!!
+            }
+          }
+        }
+
+        return wasInitialized!!
+      }
+
     init {
       isReuseAddr = true
       isTcpNoDelay = true
@@ -148,9 +173,28 @@ public abstract class HttpWsServer(port: Int) {
       this@HttpWsServer.onWsMessage(conn, message)
     }
 
-    override fun onError(conn: WebSocket?, ex: Exception) = this@HttpWsServer.onError(connection = conn, e = ex)
-    override fun onStart() = this@HttpWsServer.onStart()
+    override fun onError(conn: WebSocket?, ex: Exception) {
+      this@HttpWsServer.onError(connection = conn, e = ex)
+
+      if (ex is java.net.SocketException) {
+        lock.withLock {
+          wasInitialized = false
+          condition.signal()
+        }
+      }
+    }
+
+    override fun onStart() {
+      this@HttpWsServer.onStart()
+
+      lock.withLock {
+        wasInitialized = true
+        condition.signal()
+      }
+    }
   }
+
+  public val wasStarted: Boolean by webSocketServer::wasStarted
 
   public fun start() {
     webSocketServer.start()
