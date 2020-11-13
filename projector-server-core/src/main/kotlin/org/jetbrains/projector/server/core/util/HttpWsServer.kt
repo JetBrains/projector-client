@@ -125,7 +125,7 @@ public abstract class HttpWsServer(port: Int) {
   private val webSocketServer = object : WebSocketServer(InetSocketAddress(port), listOf(HttpDraft(), Draft_6455())) {
 
     @Volatile
-    var wasInitialized: Boolean? = null
+    private var wasInitialized: Boolean? = null
     private val lock = ReentrantLock()
     private val condition = lock.newCondition()
 
