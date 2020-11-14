@@ -47,7 +47,7 @@ tasks.named("jsNodeTest") {
 val copyResources = task("copyResources") {
     copy {
         from("src/main/resources")
-        into("build/js/packages/projector-launcher-electronapp")
+        into("../build/js/packages/projector-launcher-electronapp")
     }
 }
 
