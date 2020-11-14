@@ -8,13 +8,7 @@
     "build": "./gradlew build",
     "run": "electron build/js/packages/projector-launcher-electronapp",
     "gradle-node": "./gradlew -p electronapp jsNodeRun",
-    "packager": "electron-packager --executable-name=projector --out=./out --overwrite --icon=./electronapp/src/main/resources/assets/img/electron-icon.ico --all ./build/js/packages/projector-launcher-electronapp projector",
-    "copy-deps-mac": "ncp \"./build/js/node_modules\" \"./out/projector-darwin-x64/projector.app/Contents/Resources/app/node_modules\"",
-    "copy-deps-win": "ncp \"./build/js/node_modules\" \"./out/projector-win32-x64/resources/app/node_modules\"",
-    "copy-deps-lin": "ncp \"./build/js/node_modules\" \"./out/projector-linux-x64/resources/app/node_modules\"",
-    "package-mac": "npm run build && npm run packager && npm run copy-deps-mac",
-    "package-win": "npm run build && npm run packager && npm run copy-deps-win",
-    "package-lin": "npm run build && npm run packager && npm run copy-deps-lin"
+    "packager": "electron-packager --executable-name=projector --out=./out --overwrite --icon=./electronapp/src/main/resources/assets/img/electron-icon.ico --all ./build/js/packages/projector-launcher-electronapp projector"
   },
   "keywords": [
     "projector",
