@@ -67,33 +67,6 @@ jobs:
           asset_path: projector-launcher/out/projector-darwin-x64.zip
           asset_name: projector-darwin-x64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
           asset_content_type: application/zip
-      - name: Upload Release Asset (linux-arm64)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: projector-launcher/out/projector-linux-arm64.zip
-          asset_name: projector-linux-arm64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset (linux-armv7l)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: projector-launcher/out/projector-linux-armv7l.zip
-          asset_name: projector-linux-armv7l-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset (linux-ia32)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: projector-launcher/out/projector-linux-ia32.zip
-          asset_name: projector-linux-ia32-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
-          asset_content_type: application/zip
       - name: Upload Release Asset (linux-x64)
         uses: actions/upload-release-asset@v1
         env:
@@ -102,33 +75,6 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: projector-launcher/out/projector-linux-x64.zip
           asset_name: projector-linux-x64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset (mas-x64)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: projector-launcher/out/projector-mas-x64.zip
-          asset_name: projector-mas-x64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset (win32-arm64)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: projector-launcher/out/projector-win32-arm64.zip
-          asset_name: projector-win32-arm64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset (win32-ia32)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: projector-launcher/out/projector-win32-ia32.zip
-          asset_name: projector-win32-ia32-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
           asset_content_type: application/zip
       - name: Upload Release Asset (win32-x64)
         uses: actions/upload-release-asset@v1
