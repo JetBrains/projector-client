@@ -6,7 +6,14 @@ pluginManagement {
             }
         }
     }
-}
-rootProject.name = 'projector-launcher'
 
-include "electronapp"
+    val kotlinVersion: String by settings
+
+    plugins {
+        kotlin("multiplatform") version kotlinVersion apply false
+    }
+}
+
+rootProject.name = "projector-launcher"
+
+include("electronapp")
