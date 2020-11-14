@@ -51,7 +51,7 @@ val copyResources = task("copyResources") {
     }
 }
 
-tasks.named("compileKotlinJs").get().dependsOn(copyResources)
+tasks["compileKotlinJs"].dependsOn(copyResources)
 
 rootProject.plugins.withType<NodeJsRootPlugin> {
     rootProject.the<NodeJsRootExtension>().download = false
