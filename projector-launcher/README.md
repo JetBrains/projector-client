@@ -1,9 +1,6 @@
 # Projector Electron Launcher
-
 ## Building
-
 ### Prerequisites
-
 - Install Java: <https://bell-sw.com/pages/downloads>
 - Install Node.js and NPM: <https://nodejs.org/en/download>
     - You have to use 12.16.1 version
@@ -22,10 +19,12 @@
         - `dnf install winehq-stable` 
 
 ### Building from source
+```shell script
+npm install
+sudo npm install -g electron-packager
+sudo npm install -g ncp
+./gradlew build
+./gradlew dist
+```
 
-- `npm install`
-- `npm install -g electron-packager`
-- `npm install -g ncp`
-- `./gradlew build`
-- `./gradlew dist`
-
+After that, executables will be generated in the `out` dir.
