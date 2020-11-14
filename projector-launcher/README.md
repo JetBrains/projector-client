@@ -14,7 +14,7 @@
     - Mac: 
         - `brew cask install xquartz`
         - `brew cask install wine-stable`
-    - Ubuntu, Debian: `apt-get install wine`
+    - Ubuntu, Debian: `apt install wine-stable`
     - ArchLinux: `pacman -S wine`
     - Fedora:
         - Fedora 33: `dnf config-manager --add-repo https://dl.winehq.org/wine-builds/fedora/33/winehq.repo`
