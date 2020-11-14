@@ -1,4 +1,7 @@
 # Projector Electron Launcher
+## Downloading
+Please check [releases](https://github.com/JetBrains/projector-client/releases) beginning with the `launcher-` prefix.
+ 
 ## Building
 ### Prerequisites
 - Install Java: <https://bell-sw.com/pages/downloads>
