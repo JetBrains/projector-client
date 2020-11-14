@@ -28,21 +28,12 @@ jobs:
       - name: Set executable
         run: |
           cd projector-launcher/out
-          chmod +x projector-linux-arm64/projector
-          chmod +x projector-linux-armv7l/projector
-          chmod +x projector-linux-ia32/projector
           chmod +x projector-linux-x64/projector
       - name: Generate archives
         run: |
           cd projector-launcher/out
           zip -r projector-darwin-x64.zip projector-darwin-x64
-          zip -r projector-linux-arm64.zip projector-linux-arm64
-          zip -r projector-linux-armv7l.zip projector-linux-armv7l
-          zip -r projector-linux-ia32.zip projector-linux-ia32
           zip -r projector-linux-x64.zip projector-linux-x64
-          zip -r projector-mas-x64.zip projector-mas-x64
-          zip -r projector-win32-arm64.zip projector-win32-arm64
-          zip -r projector-win32-ia32.zip projector-win32-ia32
           zip -r projector-win32-x64.zip projector-win32-x64
       - name: Create Release
         id: create_release
