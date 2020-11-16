@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 
 plugins {
-    kotlin("multiplatform")
+    kotlin("js")
 }
 
 val electronVersion: String by project
@@ -25,22 +25,17 @@ kotlin {
             }
         }
     }
-
-    sourceSets {
-        val jsMain by getting {
-            kotlin.srcDir("src/main")
-            dependencies {
-                implementation(npm("electron", electronVersion))
-                implementation(npm("open", openVersion))
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion")
-                implementation("org.jetbrains:kotlin-extensions:$kotlinExtensionsVersion")
-            }
-        }
-    }
 }
 
-tasks.named("jsNodeTest") {
+dependencies {
+    implementation(npm("electron", electronVersion))
+    implementation(npm("open", openVersion))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion")
+    implementation("org.jetbrains:kotlin-extensions:$kotlinExtensionsVersion")
+}
+
+tasks.named("nodeTest") {
     enabled = false
 }
 

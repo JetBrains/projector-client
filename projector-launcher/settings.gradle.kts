@@ -1,16 +1,8 @@
 pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "kotlin2js") {
-                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
-            }
-        }
-    }
-
     val kotlinVersion: String by settings
 
     plugins {
-        kotlin("multiplatform") version kotlinVersion apply false
+        kotlin("js") version kotlinVersion apply false
     }
 }
 
