@@ -1,12 +1,9 @@
 @file:Suppress("JSCODE_ARGUMENT_SHOULD_BE_CONSTANT")
 
 import Electron.*
-import kotlinext.js.jsObject
-import kotlinext.js.js
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
-import kotlin.js.json
 
 external fun encodeURI(data: String): String
 
@@ -23,7 +20,7 @@ class ElectronApp(val url: String) {
     lateinit var mainWindowUrl: String
     lateinit var mainWindowPrevUrl: String
     lateinit var mainWindowNextUrl: String
-    var initialized = false;
+    var initialized = false
 
     fun navigateMainWindow(url: String) {
         GlobalScope.launch(block = {
@@ -66,7 +63,7 @@ class ElectronApp(val url: String) {
           frameProcessId: Number,
           frameRoutingId: Number ->
 
-            initialized = true;
+            initialized = true
             if (isMainFrame) {
                 Logger.debug("Navigation: go to $url")
             }
@@ -82,7 +79,7 @@ class ElectronApp(val url: String) {
                     console.log("Can't load the URL: $validatedURL")
                     that.mainWindow.loadFile("openurl.html").await()
                 } else {
-                    Logger.direct("Loading failed, fallback activated: ${that.mainWindowNextUrl} -> ${that.mainWindowUrl}");
+                    Logger.direct("Loading failed, fallback activated: ${that.mainWindowNextUrl} -> ${that.mainWindowUrl}")
                     that.navigateMainWindow(that.mainWindowUrl)
                 }
             })
@@ -90,9 +87,9 @@ class ElectronApp(val url: String) {
 
         this.mainWindow.on("closed", genericListener = {
             this.app.quit()
-        });
+        })
 
-        this.navigateMainWindow(url);
+        this.navigateMainWindow(url)
     }
 
     fun messageInvalidURL(validatedURL: String) {
@@ -121,25 +118,25 @@ class ElectronApp(val url: String) {
     }
 
     fun testUrl(url: String): Boolean {
-        var result: Boolean = true;
+        var result: Boolean = true
         try {
             val newUrl = URL(url)
         } catch (e: Throwable) {
-            result = false;
+            result = false
         }
-        return result;
+        return result
     }
 
     fun registerGlobalShortcuts() {
-        ElectronUtil.disableAllStandardShortcuts();
+        ElectronUtil.disableAllStandardShortcuts()
 
         ElectronUtil.registerGlobalShortcut(app, "Alt+F4") {
-            this.quitApp();
-        };
+            this.quitApp()
+        }
 
         ElectronUtil.registerGlobalShortcut(app, "Cmd+Q") {
-            this.quitApp();
-        };
+            this.quitApp()
+        }
     }
 
     fun registerApplicationLevelEvents() {
@@ -148,7 +145,7 @@ class ElectronApp(val url: String) {
             this.registerGlobalShortcuts()
 
             if (GlobalSettings.DEVELOPER_TOOLS_ENABLED) {
-                this.mainWindow.webContents.openDevTools();
+                this.mainWindow.webContents.openDevTools()
             }
         }
 
@@ -161,7 +158,7 @@ class ElectronApp(val url: String) {
 
             var defaultUrl = this.configData.defaultUrl
             if (null != defaultUrl) {
-                event.sender.send("projector-set-url", defaultUrl);
+                event.sender.send("projector-set-url", defaultUrl)
             }
         }
 
@@ -173,15 +170,15 @@ class ElectronApp(val url: String) {
 
         app.on("web-contents-created", listener = { e: Event, contents: WebContents ->
             contents.on("new-window", listener = { e: Event, url: String ->
-                e.preventDefault();
-                require("open")(url);
+                e.preventDefault()
+                require("open")(url)
             })
 
 
             contents.on("will-navigate", navigationListener = { e: Event, url: String ->
                 if (url !== contents.getURL()) {
                     e.preventDefault()
-                    require("open")(url);
+                    require("open")(url)
                 }
             })
         })
@@ -192,10 +189,10 @@ class ElectronApp(val url: String) {
             messageInvalidURL(newUrl)
         }
         val urlToAddOptions = URL(newUrl)
-        urlToAddOptions.searchParams.append("blockClosing", "false");
-        urlToAddOptions.searchParams.append("notSecureWarning", "false");
+        urlToAddOptions.searchParams.append("blockClosing", "false")
+        urlToAddOptions.searchParams.append("notSecureWarning", "false")
         if (!password.isNullOrBlank()) {
-            urlToAddOptions.searchParams.append("token", password);
+            urlToAddOptions.searchParams.append("token", password)
         }
         this.configData.defaultUrl = newUrl
         this.savedb()
@@ -212,18 +209,18 @@ class ElectronApp(val url: String) {
     }
 
     fun savedb() {
-        var data = JSON.stringify(this.configData);
+        var data = JSON.stringify(this.configData)
 
         if (!node_fs.existsSync(GlobalSettings.USER_CONFIG_DIR)){
-            node_fs.mkdirSync(GlobalSettings.USER_CONFIG_DIR);
+            node_fs.mkdirSync(GlobalSettings.USER_CONFIG_DIR)
         }
-        node_fs.writeFileSync(GlobalSettings.USER_CONFIG_FILE, data);
+        node_fs.writeFileSync(GlobalSettings.USER_CONFIG_FILE, data)
     }
 
     fun loaddb() {
         if (node_fs.existsSync(GlobalSettings.USER_CONFIG_FILE)) {
-            var buffer = node_fs.readFileSync(GlobalSettings.USER_CONFIG_FILE);
-            this.configData = JSON.parse(buffer.toString());
+            var buffer = node_fs.readFileSync(GlobalSettings.USER_CONFIG_FILE)
+            this.configData = JSON.parse(buffer.toString())
         }
     }
 }

@@ -7,5 +7,3 @@ pluginManagement {
 }
 
 rootProject.name = "projector-launcher"
-
-include("electronapp")

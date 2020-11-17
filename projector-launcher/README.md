@@ -26,7 +26,6 @@ Please check [releases](https://github.com/JetBrains/projector-client/releases) 
 npm install
 sudo npm install -g electron-packager
 sudo npm install -g ncp
-./gradlew build
 ./gradlew dist
 ```
 

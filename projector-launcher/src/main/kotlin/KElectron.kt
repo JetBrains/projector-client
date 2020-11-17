@@ -11,20 +11,12 @@
 )
 package Electron
 
-import kotlin.js.*
-import kotlin.js.Json
-import org.khronos.webgl.*
-import org.w3c.dom.*
-import org.w3c.dom.events.*
-import org.w3c.dom.parsing.*
-import org.w3c.dom.svg.*
-import org.w3c.dom.url.*
-import org.w3c.fetch.*
-import org.w3c.files.*
-import org.w3c.notifications.*
-import org.w3c.performance.*
-import org.w3c.workers.*
-import org.w3c.xhr.*
+import org.khronos.webgl.Uint8Array
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.MessagePort
+import org.w3c.dom.events.EventListener
+import kotlin.js.Date
+import kotlin.js.Promise
 
 //import NodeJS.EventEmitter
 //import Buffer
@@ -33,14 +25,14 @@ import org.w3c.xhr.*
 //import NodeJS.Process
 //import tsstdlib.EventListenerObject
 
-external open class EventEmitter
-external open class Buffer
-external open class Record<T, M>
-external open class GlobalEvent
-external open class Process
-external open class EventListenerObject
-external open class NodeEventEmitter
-external open class Accelerator
+open external class EventEmitter
+open external class Buffer
+open external class Record<T, M>
+open external class GlobalEvent
+open external class Process
+open external class EventListenerObject
+open external class NodeEventEmitter
+open external class Accelerator
 
 external var NodeEventEmitter: Any
 
@@ -232,7 +224,7 @@ external interface BluetoothDevice {
     var deviceName: String
 }
 
-external open class BrowserView(options: BrowserViewConstructorOptions = definedExternally) {
+open external class BrowserView(options: BrowserViewConstructorOptions = definedExternally) {
     open fun destroy()
     open fun getBounds(): Rectangle
     open fun isDestroyed(): Boolean
@@ -249,7 +241,7 @@ external open class BrowserView(options: BrowserViewConstructorOptions = defined
     }
 }
 
-external open class BrowserWindow(options: BrowserWindowConstructorOptions = definedExternally) : NodeEventEmitter {
+open external class BrowserWindow(options: BrowserWindowConstructorOptions = definedExternally) : NodeEventEmitter {
     open fun on(event: String /* 'always-on-top-changed' */, listener: (event: Event, isAlwaysOnTop: Boolean) -> Unit): BrowserWindow /* this */
     open fun once(event: String /* 'always-on-top-changed' */, listener: (event: Event, isAlwaysOnTop: Boolean) -> Unit): BrowserWindow /* this */
     open fun addListener(event: String /* 'always-on-top-changed' */, listener: (event: Event, isAlwaysOnTop: Boolean) -> Unit): BrowserWindow /* this */
@@ -447,7 +439,7 @@ external open class BrowserWindow(options: BrowserWindowConstructorOptions = def
     }
 }
 
-external open class BrowserWindowProxy {
+open external class BrowserWindowProxy {
     open fun blur()
     open fun close()
     open fun eval(code: String)
@@ -479,7 +471,7 @@ external interface CertificatePrincipal {
     var state: String
 }
 
-external open class ClientRequest : NodeEventEmitter {
+open external class ClientRequest : NodeEventEmitter {
     open fun on(event: String /* 'abort' | 'close' | 'finish' */, listener: Function<*>): ClientRequest /* this */
     open fun once(event: String /* 'abort' | 'close' | 'finish' */, listener: Function<*>): ClientRequest /* this */
     open fun addListener(event: String /* 'abort' | 'close' | 'finish' */, listener: Function<*>): ClientRequest /* this */
@@ -537,7 +529,7 @@ external interface Clipboard {
     fun writeText(text: String, type: String /* 'selection' | 'clipboard' */ = definedExternally)
 }
 
-external open class CommandLine {
+open external class CommandLine {
     open fun appendArgument(value: String)
     open fun appendSwitch(the_switch: String, value: String = definedExternally)
     open fun getSwitchValue(the_switch: String): String
@@ -583,7 +575,7 @@ external interface Cookie {
     var value: String
 }
 
-external open class Cookies : NodeEventEmitter {
+open external class Cookies : NodeEventEmitter {
     open fun on(event: String /* 'changed' */, listener: Function<*>): Cookies /* this */
     open fun once(event: String /* 'changed' */, listener: Function<*>): Cookies /* this */
     open fun addListener(event: String /* 'changed' */, listener: Function<*>): Cookies /* this */
@@ -623,7 +615,7 @@ external interface CustomScheme {
     var scheme: String
 }
 
-external open class Debugger : NodeEventEmitter {
+open external class Debugger : NodeEventEmitter {
     open fun on(event: String /* 'detach' */, listener: (event: Event, reason: String) -> Unit): Debugger /* this */
     open fun once(event: String /* 'detach' */, listener: (event: Event, reason: String) -> Unit): Debugger /* this */
     open fun addListener(event: String /* 'detach' */, listener: (event: Event, reason: String) -> Unit): Debugger /* this */
@@ -685,7 +677,7 @@ external interface Display {
     var workAreaSize: Size
 }
 
-external open class Dock {
+open external class Dock {
     open fun bounce(type: String /* 'critical' | 'informational' */ = definedExternally): Number
     open fun cancelBounce(id: Number)
     open fun downloadFinished(filePath: String)
@@ -700,7 +692,7 @@ external open class Dock {
     open fun show(): Promise<Unit>
 }
 
-external open class DownloadItem : NodeEventEmitter {
+open external class DownloadItem : NodeEventEmitter {
     open fun on(event: String /* 'done' */, listener: (event: Event, state: String /* 'completed' | 'cancelled' | 'interrupted' */) -> Unit): DownloadItem /* this */
     open fun once(event: String /* 'done' */, listener: (event: Event, state: String /* 'completed' | 'cancelled' | 'interrupted' */) -> Unit): DownloadItem /* this */
     open fun addListener(event: String /* 'done' */, listener: (event: Event, state: String /* 'completed' | 'cancelled' | 'interrupted' */) -> Unit): DownloadItem /* this */
@@ -798,7 +790,7 @@ external interface InAppPurchase : EventEmitter {
     fun restoreCompletedTransactions()
 }
 
-external open class IncomingMessage : NodeEventEmitter {
+open external class IncomingMessage : NodeEventEmitter {
     open fun on(event: String /* 'aborted' | 'end' | 'error' */, listener: Function<*>): IncomingMessage /* this */
     open fun once(event: String /* 'aborted' | 'end' | 'error' */, listener: Function<*>): IncomingMessage /* this */
     open fun addListener(event: String /* 'aborted' | 'end' | 'error' */, listener: Function<*>): IncomingMessage /* this */
@@ -950,7 +942,7 @@ external interface MemoryUsageDetails {
     var size: Number
 }
 
-external open class Menu {
+open external class Menu {
     open fun on(event: String /* 'menu-will-close' | 'menu-will-show' */, listener: (event: Event) -> Unit): Menu /* this */
     open fun once(event: String /* 'menu-will-close' | 'menu-will-show' */, listener: (event: Event) -> Unit): Menu /* this */
     open fun addListener(event: String /* 'menu-will-close' | 'menu-will-show' */, listener: (event: Event) -> Unit): Menu /* this */
@@ -970,7 +962,7 @@ external open class Menu {
     }
 }
 
-external open class MenuItem(options: MenuItemConstructorOptions) {
+open external class MenuItem(options: MenuItemConstructorOptions) {
     open var accelerator: Accelerator
     open var checked: Boolean
     open var click: Function<*>
@@ -989,12 +981,12 @@ external open class MenuItem(options: MenuItemConstructorOptions) {
     open var visible: Boolean
 }
 
-external open class MessageChannelMain : NodeEventEmitter {
+open external class MessageChannelMain : NodeEventEmitter {
     open var port1: MessagePortMain
     open var port2: MessagePortMain
 }
 
-external open class MessagePortMain : NodeEventEmitter {
+open external class MessagePortMain : NodeEventEmitter {
     open fun on(event: String /* 'close' */, listener: Function<*>): MessagePortMain /* this */
     open fun once(event: String /* 'close' */, listener: Function<*>): MessagePortMain /* this */
     open fun addListener(event: String /* 'close' */, listener: Function<*>): MessagePortMain /* this */
@@ -1070,7 +1062,7 @@ external interface MouseWheelInputEvent : MouseInputEvent {
         set(value) = definedExternally
 }
 
-external open class NativeImage {
+open external class NativeImage {
     open fun addRepresentation(options: AddRepresentationOptions)
     open fun crop(rect: Rectangle): NativeImage
     open fun getAspectRatio(scaleFactor: Number = definedExternally): Number
@@ -1127,7 +1119,7 @@ external interface NewWindowWebContentsEvent : Event {
         set(value) = definedExternally
 }
 
-external open class Notification(options: NotificationConstructorOptions = definedExternally) : NodeEventEmitter {
+open external class Notification(options: NotificationConstructorOptions = definedExternally) : NodeEventEmitter {
     open fun on(event: String /* 'action' */, listener: (event: Event, index: Number) -> Unit): Notification /* this */
     open fun once(event: String /* 'action' */, listener: (event: Event, index: Number) -> Unit): Notification /* this */
     open fun addListener(event: String /* 'action' */, listener: (event: Event, index: Number) -> Unit): Notification /* this */
@@ -1417,7 +1409,7 @@ external interface ServiceWorkerInfo {
     var scriptUrl: String
 }
 
-external open class ServiceWorkers : NodeEventEmitter {
+open external class ServiceWorkers : NodeEventEmitter {
     open fun on(event: String /* 'console-message' */, listener: (event: Event, messageDetails: MessageDetails) -> Unit): ServiceWorkers /* this */
     open fun once(event: String /* 'console-message' */, listener: (event: Event, messageDetails: MessageDetails) -> Unit): ServiceWorkers /* this */
     open fun addListener(event: String /* 'console-message' */, listener: (event: Event, messageDetails: MessageDetails) -> Unit): ServiceWorkers /* this */
@@ -1426,7 +1418,7 @@ external open class ServiceWorkers : NodeEventEmitter {
     open fun getFromVersionID(versionId: Number): ServiceWorkerInfo
 }
 
-external open class Session : NodeEventEmitter {
+open external class Session : NodeEventEmitter {
     open fun on(event: String /* 'preconnect' */, listener: (event: Event, preconnectUrl: String, allowCredentials: Boolean) -> Unit): Session /* this */
     open fun once(event: String /* 'preconnect' */, listener: (event: Event, preconnectUrl: String, allowCredentials: Boolean) -> Unit): Session /* this */
     open fun addListener(event: String /* 'preconnect' */, listener: (event: Event, preconnectUrl: String, allowCredentials: Boolean) -> Unit): Session /* this */
@@ -1603,7 +1595,7 @@ external interface ThumbarButton {
         set(value) = definedExternally
 }
 
-external open class TouchBar(options: TouchBarConstructorOptions) {
+open external class TouchBar(options: TouchBarConstructorOptions) {
     open var escapeItem: dynamic /* TouchBarButton? | TouchBarColorPicker? | TouchBarGroup? | TouchBarLabel? | TouchBarPopover? | TouchBarScrubber? | TouchBarSegmentedControl? | TouchBarSlider? | TouchBarSpacer? */
 
     companion object {
@@ -1620,7 +1612,7 @@ external open class TouchBar(options: TouchBarConstructorOptions) {
     }
 }
 
-external open class TouchBarButton(options: TouchBarButtonConstructorOptions) {
+open external class TouchBarButton(options: TouchBarButtonConstructorOptions) {
     open var accessibilityLabel: String
     open var backgroundColor: String
     open var enabled: Boolean
@@ -1628,27 +1620,27 @@ external open class TouchBarButton(options: TouchBarButtonConstructorOptions) {
     open var label: String
 }
 
-external open class TouchBarColorPicker(options: TouchBarColorPickerConstructorOptions) : NodeEventEmitter {
+open external class TouchBarColorPicker(options: TouchBarColorPickerConstructorOptions) : NodeEventEmitter {
     open var availableColors: Array<String>
     open var selectedColor: String
 }
 
-external open class TouchBarGroup(options: TouchBarGroupConstructorOptions) : NodeEventEmitter
+open external class TouchBarGroup(options: TouchBarGroupConstructorOptions) : NodeEventEmitter
 
-external open class TouchBarLabel(options: TouchBarLabelConstructorOptions) : NodeEventEmitter {
+open external class TouchBarLabel(options: TouchBarLabelConstructorOptions) : NodeEventEmitter {
     open var accessibilityLabel: String
     open var label: String
     open var textColor: String
 }
 
-external open class TouchBarOtherItemsProxy : NodeEventEmitter
+open external class TouchBarOtherItemsProxy : NodeEventEmitter
 
-external open class TouchBarPopover(options: TouchBarPopoverConstructorOptions) : NodeEventEmitter {
+open external class TouchBarPopover(options: TouchBarPopoverConstructorOptions) : NodeEventEmitter {
     open var icon: NativeImage
     open var label: String
 }
 
-external open class TouchBarScrubber(options: TouchBarScrubberConstructorOptions) : NodeEventEmitter {
+open external class TouchBarScrubber(options: TouchBarScrubberConstructorOptions) : NodeEventEmitter {
     open var continuous: Boolean
     open var items: Array<ScrubberItem>
     open var mode: String /* 'fixed' | 'free' */
@@ -1657,20 +1649,20 @@ external open class TouchBarScrubber(options: TouchBarScrubberConstructorOptions
     open var showArrowButtons: Boolean
 }
 
-external open class TouchBarSegmentedControl(options: TouchBarSegmentedControlConstructorOptions) : NodeEventEmitter {
+open external class TouchBarSegmentedControl(options: TouchBarSegmentedControlConstructorOptions) : NodeEventEmitter {
     open var segments: Array<SegmentedControlSegment>
     open var segmentStyle: String
     open var selectedIndex: Number
 }
 
-external open class TouchBarSlider(options: TouchBarSliderConstructorOptions) : NodeEventEmitter {
+open external class TouchBarSlider(options: TouchBarSliderConstructorOptions) : NodeEventEmitter {
     open var label: String
     open var maxValue: Number
     open var minValue: Number
     open var value: Number
 }
 
-external open class TouchBarSpacer(options: TouchBarSpacerConstructorOptions) : NodeEventEmitter
+open external class TouchBarSpacer(options: TouchBarSpacerConstructorOptions) : NodeEventEmitter
 
 external interface TraceCategoriesAndOptions {
     var categoryFilter: String
@@ -1717,7 +1709,7 @@ external interface Transaction {
     var transactionState: String /* 'purchasing' | 'purchased' | 'failed' | 'restored' | 'deferred' */
 }
 
-external open class Tray : NodeEventEmitter {
+open external class Tray : NodeEventEmitter {
     open fun on(event: String /* 'balloon-click' | 'balloon-closed' | 'balloon-show' | 'drag-end' | 'drag-enter' | 'drag-leave' | 'drop' */, listener: Function<*>): Tray /* this */
     open fun once(event: String /* 'balloon-click' | 'balloon-closed' | 'balloon-show' | 'drag-end' | 'drag-enter' | 'drag-leave' | 'drop' */, listener: Function<*>): Tray /* this */
     open fun addListener(event: String /* 'balloon-click' | 'balloon-closed' | 'balloon-show' | 'drag-end' | 'drag-enter' | 'drag-leave' | 'drop' */, listener: Function<*>): Tray /* this */
@@ -1792,7 +1784,7 @@ external interface UploadRawData {
     var type: String
 }
 
-external open class WebContents : NodeEventEmitter {
+open external class WebContents : NodeEventEmitter {
     open fun on(event: String /* 'before-input-event' */, listener: (event: Event, input: Input) -> Unit): WebContents /* this */
     open fun once(event: String /* 'before-input-event' */, listener: (event: Event, input: Input) -> Unit): WebContents /* this */
     open fun addListener(event: String /* 'before-input-event' */, listener: (event: Event, input: Input) -> Unit): WebContents /* this */
@@ -2076,7 +2068,7 @@ external interface WebFrame : EventEmitter {
     var top: WebFrame?
 }
 
-external open class WebRequest {
+open external class WebRequest {
     open fun onBeforeRedirect(filter: Filter, listener: ((details: OnBeforeRedirectListenerDetails) -> Unit)?)
     open fun onBeforeRedirect(listener: ((details: OnBeforeRedirectListenerDetails) -> Unit)?)
     open fun onBeforeRequest(filter: Filter, listener: ((details: OnBeforeRequestListenerDetails, callback: (response: Response) -> Unit) -> Unit)?)

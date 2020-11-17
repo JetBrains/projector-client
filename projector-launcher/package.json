@@ -8,7 +8,7 @@
     "build": "./gradlew build",
     "run": "electron build/js/packages/projector-launcher-electronapp",
     "gradle-node": "./gradlew -p electronapp nodeRun",
-    "packager": "electron-packager --executable-name=projector --out=./out --overwrite --icon=./electronapp/src/main/resources/assets/img/electron-icon.ico --all ./electronapp/build/distributions projector"
+    "packager": "electron-packager --executable-name=projector --out=./out --overwrite --icon=./src/main/resources/assets/img/electron-icon.ico --all ./build/distributions projector"
   },
   "keywords": [
     "projector",
