@@ -8,6 +8,8 @@ open external class URL(a: String) {
 }
 
 fun main(args: Array<String>) {
+    require("bootstrap/dist/css/bootstrap.min.css")
+
     val argv = commandLineArguments()
     var url = argv.last()
 
