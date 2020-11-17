@@ -15,32 +15,20 @@ val npmCommand = when (DefaultNativePlatform.getCurrentOperatingSystem().isWindo
     false -> listOf("npm")
 }
 
-val distElectron by tasks.creating(Exec::class) {
+val npmInstall by tasks.creating(Exec::class) {
     group = "dist"
+    workingDir(project.file("electronapp/build/distributions"))
+    commandLine(npmCommand + listOf("install"))
+}
+
+val runPackager by tasks.creating(Exec::class) {
+    group = "dist"
+    dependsOn(npmInstall)
     workingDir(project.projectDir)
     commandLine(npmCommand + listOf("run", "packager"))
 }
 
-val copyDeps by tasks.creating(Copy::class) {
-    group = "dist"
-    dependsOn(distElectron)
-
-    // inspired by https://stackoverflow.com/a/42133267/6639500
-    val filesToCopy = copySpec {
-        from("build/js/node_modules")
-    }
-
-    into("out")
-
-    val destinations = listOf(
-            "projector-linux-x64/resources/app/node_modules",
-            "projector-win32-x64/resources/app/node_modules",
-            "projector-darwin-x64/projector.app/Contents/Resources/app/node_modules"
-    )
-    destinations.forEach { into(it) { with(filesToCopy) } }
-}
-
 tasks.create("dist") {
     group = "dist"
-    dependsOn(copyDeps)
+    dependsOn(runPackager)
 }

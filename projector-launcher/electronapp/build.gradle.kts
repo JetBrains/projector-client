@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
-
 plugins {
     kotlin("js")
 }
@@ -13,17 +10,9 @@ val kotlinExtensionsVersion: String by project
 
 kotlin {
     js {
-        nodejs {
-            compilations.all {
-                kotlinOptions {
-                    kotlinOptions.moduleKind = "umd"
-                    kotlinOptions.sourceMap = true
-                    kotlinOptions.sourceMapEmbedSources = "always"
-                    kotlinOptions.metaInfo = true
-                    kotlinOptions.main = "call"
-                }
-            }
-        }
+        // todo: switch to nodejs or electron (KT-35327)
+        //       while webpack is not supported in nodejs target, need to override target in webpack.config.d
+        browser()
     }
 }
 
@@ -33,21 +22,4 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion")
     implementation("org.jetbrains:kotlin-extensions:$kotlinExtensionsVersion")
-}
-
-tasks.named("nodeTest") {
-    enabled = false
-}
-
-val copyResources = task("copyResources") {
-    copy {
-        from("src/main/resources")
-        into("../build/js/packages/projector-launcher-electronapp")
-    }
-}
-
-tasks["compileKotlinJs"].dependsOn(copyResources)
-
-rootProject.plugins.withType<NodeJsRootPlugin> {
-    rootProject.the<NodeJsRootExtension>().download = false
 }

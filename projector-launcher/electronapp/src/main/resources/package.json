@@ -1,0 +1,25 @@
+{
+  "main": "electronapp.js",
+  "devDependencies": {},
+  "dependencies": {
+    "electron": "^10.1.2",
+    "open": "^7.2.1"
+  },
+  "scripts": {
+    "electron": "electron ."
+  },
+  "peerDependencies": {},
+  "optionalDependencies": {},
+  "bundledDependencies": [],
+  "keywords": [
+    "projector",
+    "jetbrains",
+    "kotlin",
+    "kotlin-js"
+  ],
+  "author": "projector",
+  "license": "MIT",
+  "name": "projector-launcher",
+  "description": "Desktop launcher for Projector, written in Kotlin, Electron and Node",
+  "version": "1.0.0"
+}
