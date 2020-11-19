@@ -21,8 +21,4 @@ jobs:
       - name: check projector-launcher building
         run: |
           cd projector-launcher
-          npm install
-          sudo npm install -g electron-packager
-          sudo npm install -g ncp
-          ./gradlew build
-          ./gradlew dist
+          ./gradlew distZip

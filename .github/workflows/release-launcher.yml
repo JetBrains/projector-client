@@ -20,21 +20,7 @@ jobs:
       - name: Build project
         run: |
           cd projector-launcher
-          npm install
-          sudo npm install -g electron-packager
-          sudo npm install -g ncp
-          ./gradlew build
-          ./gradlew dist
-      - name: Set executable
-        run: |
-          cd projector-launcher/out
-          chmod +x projector-linux-x64/projector
-      - name: Generate archives
-        run: |
-          cd projector-launcher/out
-          zip -r projector-darwin-x64.zip projector-darwin-x64
-          zip -r projector-linux-x64.zip projector-linux-x64
-          zip -r projector-win32-x64.zip projector-win32-x64
+          ./gradlew distZip
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -55,7 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: projector-launcher/out/projector-darwin-x64.zip
+          asset_path: projector-launcher/build/electronOut/projector-darwin-x64.zip
           asset_name: projector-darwin-x64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
           asset_content_type: application/zip
       - name: Upload Release Asset (linux-x64)
@@ -64,7 +50,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: projector-launcher/out/projector-linux-x64.zip
+          asset_path: projector-launcher/build/electronOut/projector-linux-x64.zip
           asset_name: projector-linux-x64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
           asset_content_type: application/zip
       - name: Upload Release Asset (win32-x64)
@@ -73,6 +59,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: projector-launcher/out/projector-win32-x64.zip
+          asset_path: projector-launcher/build/electronOut/projector-win32-x64.zip
           asset_name: projector-win32-x64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
           asset_content_type: application/zip

@@ -23,10 +23,12 @@ Please check [releases](https://github.com/JetBrains/projector-client/releases) 
 
 ### Building from source
 ```shell script
-npm install
-sudo npm install -g electron-packager
-sudo npm install -g ncp
 ./gradlew dist
 ```
 
-After that, executables will be generated in the `out` dir.
+After that, executables will be generated in the `build/electronOut` dir.
+
+### Running from source
+```shell script
+./gradlew electronProductionRun
+```
