@@ -11,6 +11,7 @@ To learn more about modules, check out README files inside them:
 * [projector-common](projector-common/README.md).
 * [projector-client-common](projector-client-common/README.md).
 * [projector-client-web](projector-client-web/README.md).
+* [projector-launcher](projector-launcher/README.md).
 
 ## License
 [MIT](LICENSE.txt).
