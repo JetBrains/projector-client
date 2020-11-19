@@ -77,6 +77,7 @@ class ElectronApp(val url: String) {
                     }
 
                     console.log("Can't load the URL: $validatedURL")
+                    console.log("errorDescription: $errorDescription, errorCode: $errorCode")
                     that.mainWindow.loadFile("openurl.html").await()
                 } else {
                     Logger.direct("Loading failed, fallback activated: ${that.mainWindowNextUrl} -> ${that.mainWindowUrl}")
@@ -182,6 +183,17 @@ class ElectronApp(val url: String) {
                 }
             })
         })
+
+        // todo: to allow self-signed certificates, we just allow all certificates.
+        //       it seems to be quite unsecure. we should probably show a dialog like "bad cert, do you wish to go on?"
+        // from: https://stackoverflow.com/a/46789486/6639500
+        // SSL/TSL: this is the self signed certificate support
+        app.on("certificate-error") { event, webContents, url, error, certificate, callback ->
+            // On certificate error we disable default behaviour (stop loading the page)
+            // and we then say "it is all fine - true" to the callback
+            event.preventDefault()
+            callback(true)
+        }
     }
 
     fun connect(newUrl: String, password: String? = null) {
