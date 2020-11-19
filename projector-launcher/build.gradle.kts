@@ -7,14 +7,13 @@ plugins {
 }
 
 val bootstrapVersion: String by project
+val coroutinesVersion: String by project
 val electronVersion: String by project
 val electronPackagerVersion: String by project
 val jqueryVersion: String by project
-val openVersion: String by project
-val popperVersion: String by project
 val kotlinVersion: String by project
-val coroutinesVersion: String by project
 val kotlinExtensionsVersion: String by project
+val openVersion: String by project
 
 kotlin {
     js {
