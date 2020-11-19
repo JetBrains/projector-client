@@ -276,7 +276,10 @@ class InputController(
       modifiers = event.modifiers
     )
 
-    if (message.key.toLowerCase() == "v" && KeyModifier.CTRL_KEY in message.modifiers) {
+    if (
+      message.key.toLowerCase() == "v" &&
+      (KeyModifier.CTRL_KEY in message.modifiers || KeyModifier.META_KEY in message.modifiers)
+    ) {
       // let "paste" event go to server and only after it send the keystroke
       window.setTimeout(
         handler = { stateMachine.fire(ClientAction.AddEvent(message)) },
