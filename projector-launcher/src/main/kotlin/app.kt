@@ -4,24 +4,24 @@ external val __dirname: dynamic
 external val JSON: dynamic
 
 open external class URL(a: String) {
-    var searchParams: dynamic
+  var searchParams: dynamic
 }
 
 fun main(args: Array<String>) {
-    require("bootstrap/dist/css/bootstrap.min.css")
+  require("bootstrap/dist/css/bootstrap.min.css")
 
-    val argv = commandLineArguments()
-    var url = argv.last()
+  val argv = commandLineArguments()
+  var url = argv.last()
 
-    if (url.endsWith("projector.exe")) {
-        url = ""
-    }
+  if (url.endsWith("projector.exe")) {
+    url = ""
+  }
 
-    console.log("URL: $url")
-    val eapp = ElectronApp(url)
-    eapp.start()
+  console.log("URL: $url")
+  val eapp = ElectronApp(url)
+  eapp.start()
 }
 
 fun commandLineArguments(): Array<String> {
-    return process.argv as Array<String>
+  return process.argv as Array<String>
 }

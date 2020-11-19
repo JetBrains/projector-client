@@ -101,6 +101,7 @@ body {
   .stdhead-brand {
     float: left;
   }
+
   .nav-stdhead {
     float: right;
   }
@@ -113,6 +114,7 @@ body {
 .cover {
   padding: 0 1.6rem;
 }
+
 .cover .btn-lg {
   padding: .74rem 1.24rem;
   font-weight: 600;
@@ -131,6 +133,6 @@ body {
 }
 
 .hidden {
-  display:none;
-  visibility:hidden;
+  display: none;
+  visibility: hidden;
 }

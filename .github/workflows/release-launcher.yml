@@ -18,9 +18,7 @@ jobs:
           java-version: '11'
       - run: sudo apt update && sudo apt install wine-stable -y
       - name: Build project
-        run: |
-          cd projector-launcher
-          ./gradlew distZip
+        run: ./gradlew :projector-launcher:distZip
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

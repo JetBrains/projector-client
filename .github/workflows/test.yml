@@ -19,6 +19,4 @@ jobs:
           java-version: '11'
       - run: sudo apt update && sudo apt install wine-stable -y
       - name: check projector-launcher building
-        run: |
-          cd projector-launcher
-          ./gradlew distZip
+        run: ./gradlew :projector-launcher:distZip

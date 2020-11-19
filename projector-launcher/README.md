@@ -23,12 +23,12 @@ Please check [releases](https://github.com/JetBrains/projector-client/releases) 
 
 ### Building from source
 ```shell script
-./gradlew dist
+./gradlew :projector-launcher:dist
 ```
 
 After that, executables will be generated in the `build/electronOut` dir.
 
 ### Running from source
 ```shell script
-./gradlew electronProductionRun
+./gradlew :projector-launcher:electronProductionRun
 ```
