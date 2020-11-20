@@ -88,6 +88,8 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
       typing.removeSpeculativeImage()
     }
 
+    drawCommandsEvents.sortWith(drawingOrderComparator)
+
     drawCommandsEvents.forEach { event ->
       Do exhaustive when (val target = event.target) {
         is ServerDrawCommandsEvent.Target.Onscreen -> windowDataEventsProcessor.draw(target.windowId, event.drawEvents)
@@ -129,5 +131,24 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
   companion object {
 
     private val logger = Logger<ServerEventsProcessor>()
+
+    // todo: sorting is added only as a hacky temporary workaround for PRJ-20.
+    //       Please see commit description for details how this should be fixed
+    private val drawingOrderComparator = compareBy<ServerDrawCommandsEvent>(
+      // render offscreen surfaces first
+      {
+        when (it.target) {
+          is ServerDrawCommandsEvent.Target.Offscreen -> 0
+          is ServerDrawCommandsEvent.Target.Onscreen -> 1
+        }
+      },
+      // render older surfaces last
+      {
+        when (val target = it.target) {
+          is ServerDrawCommandsEvent.Target.Offscreen -> -target.pVolatileImageId
+          is ServerDrawCommandsEvent.Target.Onscreen -> -target.windowId
+        }
+      },
+    )
   }
 }
