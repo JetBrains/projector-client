@@ -23,14 +23,16 @@
  */
 package org.jetbrains.projector.util.logging
 
+import kotlin.js.Console
+
 @Suppress("FunctionName")  // to make the function look like class, its name starts with a capital
 public actual fun Logger(tag: String): Logger = JsLoggerImpl(tag)
 
 private class JsLoggerImpl(private val tag: String) : Logger {
 
-  override fun error(t: Throwable?, lazyMessage: () -> String) = log(console::error, LogLevel.ERROR, tag, t, lazyMessage)
-  override fun info(t: Throwable?, lazyMessage: () -> String) = log(console::info, LogLevel.INFO, tag, t, lazyMessage)
-  override fun debug(t: Throwable?, lazyMessage: () -> String) = log(console::log, LogLevel.DEBUG, tag, t, lazyMessage)
+  override fun error(t: Throwable?, lazyMessage: () -> String) = log(wrapper::error, LogLevel.ERROR, tag, t, lazyMessage)
+  override fun info(t: Throwable?, lazyMessage: () -> String) = log(wrapper::info, LogLevel.INFO, tag, t, lazyMessage)
+  override fun debug(t: Throwable?, lazyMessage: () -> String) = log(wrapper::log, LogLevel.DEBUG, tag, t, lazyMessage)
 
   private enum class LogLevel(val prefix: String) {
 
@@ -40,6 +42,16 @@ private class JsLoggerImpl(private val tag: String) : Logger {
   }
 
   private companion object {
+
+    // Remove console wrapper after https://youtrack.jetbrains.com/issue/KT-43497 is resolved
+    private val wrapper = object : Console {
+
+      override fun dir(o: Any) = console.dir(o)
+      override fun error(vararg o: Any?) = console.error(*o)
+      override fun info(vararg o: Any?) = console.info(*o)
+      override fun log(vararg o: Any?) = console.log(*o)
+      override fun warn(vararg o: Any?) = console.warn(*o)
+    }
 
     private fun log(f: (Array<out Any?>) -> Unit, level: LogLevel, tag: String, t: Throwable?, lazyMessage: () -> String) {
       val fullMessage = "[${level.prefix}] :: $tag :: ${lazyMessage()}"
