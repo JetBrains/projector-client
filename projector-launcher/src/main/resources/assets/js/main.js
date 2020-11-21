@@ -22,11 +22,20 @@
  * SOFTWARE.
  */
 document.querySelector('#connect-button').addEventListener('click', function () {
+  connect()
+});
+
+document.querySelector('#url-text-field').addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    connect()
+  }
+});
+
+function connect() {
   let url = document.getElementById("url-text-field").value;
   const {ipcRenderer} = require('electron')
   ipcRenderer.send("projector-connect", url);
-
-});
+}
 
 //$( document ).ready(function() {
 const {ipcRenderer} = require('electron')
