@@ -27,6 +27,7 @@ import Electron.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
+import org.w3c.dom.url.URL
 
 external fun encodeURI(data: String): String
 

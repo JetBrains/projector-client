@@ -44,14 +44,11 @@ dependencies {
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
 
   implementation("org.jetbrains:kotlin-react:$kotlinReactVersion")
   implementation("org.jetbrains:kotlin-react-dom:$kotlinReactVersion")
-  implementation(npm("react", reactVersion))
-  implementation(npm("react-dom", reactVersion))
   implementation("org.jetbrains:kotlin-styled:$kotlinStyledComponentsVersion")
-  implementation(npm("styled-components", styledComponentsVersion))
-  implementation(npm("inline-style-prefixer", inlineStylePrefixerVersion))
   implementation(npm("radium", radiumVersion))
   implementation(npm("react-loading-indicator", reactLoadingIndicatorVersion))
 }

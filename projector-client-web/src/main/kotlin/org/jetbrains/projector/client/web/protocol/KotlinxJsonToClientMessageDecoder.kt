@@ -25,8 +25,8 @@ package org.jetbrains.projector.client.web.protocol
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.decodeFromDynamic
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromDynamic
 import org.jetbrains.projector.common.protocol.handshake.ProtocolType
 import org.jetbrains.projector.common.protocol.toClient.KotlinxJsonServerEventSerializer
 import org.jetbrains.projector.common.protocol.toClient.ServerEvent

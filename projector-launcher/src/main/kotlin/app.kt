@@ -24,11 +24,6 @@
 external fun require(module: String): dynamic
 external val process: dynamic
 external val __dirname: dynamic
-external val JSON: dynamic
-
-open external class URL(a: String) {
-  var searchParams: dynamic
-}
 
 fun main(args: Array<String>) {
   require("bootstrap/dist/css/bootstrap.min.css")
@@ -46,5 +41,5 @@ fun main(args: Array<String>) {
 }
 
 fun commandLineArguments(): Array<String> {
-  return process.argv as Array<String>
+  return process.argv
 }
