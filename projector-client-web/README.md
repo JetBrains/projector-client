@@ -104,7 +104,7 @@ Also, we consider `Ctrl+Q` shortcut as frequently used, so we mapped it to the `
 
 It seems that we can't do anything more about that, at least in a normal browser window.
 
-The proposed **workaround** here is to you the feature of browsers called [PWA](https://en.wikipedia.org/wiki/Progressive_web_application). It's a way to install a web page as a separate application. We've tested it in Chrome and in this mode, all the tested shortcuts are handled by Projector, not by the browser. The instructions are as follows: simply create a shortcut by selecting `Menu` | `More Tools` | `Create Shortcut...` and `Open as window`. Instructions with screenshots can be googled, for example, [this one](https://ccm.net/faq/9934-create-a-desktop-shortcut-on-google-chrome).
+The proposed **workaround** here is to you the feature of browsers called [PWA](https://en.wikipedia.org/wiki/Progressive_web_application). It's a way to install a web page as a separate application. We've tested it in Chrome and in this mode, all the tested shortcuts are handled by Projector, not by the browser. The instructions are as follows: simply create a shortcut by selecting `Menu` | `More Tools` | `Create Shortcut...` and `Open as window`. Instructions with screenshots can be googled, for example, [this one](https://ccm.net/faq/9934-create-a-desktop-shortcut-on-google-chrome). The similar can be achieved in Firefox: for example, [take this](https://www.maketecheasier.com/enable-site-specific-browser-firefox/) instruction.
 
 ### Incomplete clipboard synchronization
 There are some limitations with clipboard.
