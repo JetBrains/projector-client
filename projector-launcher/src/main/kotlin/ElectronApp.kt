@@ -159,22 +159,10 @@ class ElectronApp(val url: String) {
     return result
   }
 
-  fun registerGlobalShortcuts() {
-    ElectronUtil.disableAllStandardShortcuts()
-
-    ElectronUtil.registerGlobalShortcut(app, "Alt+F4") {
-      this.quitApp()
-    }
-
-    ElectronUtil.registerGlobalShortcut(app, "Cmd+Q") {
-      this.quitApp()
-    }
-  }
-
   fun registerApplicationLevelEvents() {
     app.whenReady().then {
       this.createWindow()
-      this.registerGlobalShortcuts()
+      ElectronUtil.disableAllStandardShortcuts()
 
       if (GlobalSettings.DEVELOPER_TOOLS_ENABLED) {
         this.mainWindow.webContents.openDevTools()
@@ -186,7 +174,7 @@ class ElectronApp(val url: String) {
     }
 
     ipcMain.on("projector-dom-ready") { event, arg: dynamic ->
-      registerGlobalShortcuts()
+      ElectronUtil.disableAllStandardShortcuts()
 
       var defaultUrl = this.configData.defaultUrl
       if (null != defaultUrl) {
@@ -211,6 +199,18 @@ class ElectronApp(val url: String) {
         if (url !== contents.getURL()) {
           e.preventDefault()
           require("open")(url)
+        }
+      })
+
+      contents.on("before-input-event", listener = { e: Event, input: Input ->
+        if (process.platform.equals("darwin")) {
+          if (input.key === "Q" && !input.control && !input.alt && input.meta && !input.shift) {
+            this.quitApp()
+          }
+        } else {
+          if (input.key === "F4" && !input.control && input.alt && !input.meta && !input.shift) {
+            this.quitApp()
+          }
         }
       })
     })
