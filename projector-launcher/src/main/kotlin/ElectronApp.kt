@@ -202,7 +202,15 @@ class ElectronApp(val url: String) {
         }
       })
 
-      contents.on("before-input-event", listener = { e: Event, input: Input ->
+      contents.on("before-input-event") handleExitHotkey@ { _: Event, input: Input ->
+        if (input.type != "keyDown") {
+          // For every input, two events can be generated: keyDown and keyUp.
+          // When we close an app above our electron app, keyUp can be sent to our app because
+          // the hotkey can be released after the app above is closed.
+          // So need to react only to keyDown event.
+          return@handleExitHotkey
+        }
+
         if (process.platform.equals("darwin")) {
           if (input.key === "Q" && !input.control && !input.alt && input.meta && !input.shift) {
             this.quitApp()
@@ -212,7 +220,7 @@ class ElectronApp(val url: String) {
             this.quitApp()
           }
         }
-      })
+      }
     })
 
     // todo: to allow self-signed certificates, we just allow all certificates.
