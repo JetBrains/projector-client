@@ -127,6 +127,7 @@ class WindowHeader(var title: String? = null) : DragEventsInterceptor, LafListen
     style.borderRight = ProjectorUI.borderStyle
   }
 
+  @Suppress("UNUSED_PARAMETER")  // actually, parameter is used in function refs
   private fun onMouseLeave(event: Event) {
     if (closeIcon != closeIconNormal) {
       closeIcon = closeIconNormal

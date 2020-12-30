@@ -47,6 +47,7 @@ subprojects {
   tasks.withType<KotlinCompile<*>> {
     kotlinOptions {
       freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+      //allWarningsAsErrors = true  // todo: resolve "different Kotlin JARs in runtime classpath" and "bundled Kotlin runtime"
     }
   }
 

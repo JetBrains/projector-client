@@ -35,12 +35,14 @@ class ElectronUtil {
       browserWindow.setMenu(null)
     }
 
+    @Suppress("UNUSED_PARAMETER")  // todo: remove unused
     fun registerGlobalShortcut(recipient: App, activationKey: dynamic, callback: () -> Unit) {
       app.whenReady().then {
         globalShortcut.register(activationKey, callback)
       }
     }
 
+    @Suppress("UNUSED_PARAMETER")  // todo: remove unused
     fun registerGlobalShortcut(recipient: BrowserWindow, activationKey: Accelerator, callback: () -> Unit) {
       app.whenReady().then {
         globalShortcut.register(activationKey, callback)

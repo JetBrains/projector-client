@@ -176,6 +176,7 @@ class MobileKeyboardHelperImpl(
     virtualKeyboardInput.selectionEnd = TEXTAREA_VALUE.length / 2
   }
 
+  @Suppress("UNUSED_PARAMETER")  // actually, parameter is used in function refs
   private fun handleVirtualKeyboardSelection(unused: Event) {
     fun sendArrow(direction: String) {
       fireKeyEvent(key = "Arrow$direction", code = "Arrow$direction", location = STANDARD, keyEventType = DOWN)

@@ -25,7 +25,7 @@ external fun require(module: String): dynamic
 external val process: dynamic
 external val __dirname: dynamic
 
-fun main(args: Array<String>) {
+fun main() {
   require("bootstrap/dist/css/bootstrap.min.css")
 
   val argv = commandLineArguments()

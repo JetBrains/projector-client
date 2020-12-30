@@ -83,11 +83,11 @@ class ElectronApp(val url: String) {
 
     this.mainWindow.webContents.on("did-navigate-in-page")
     {
-      event: Event,
+      _: Event,
       url: String,
       isMainFrame: Boolean,
-      frameProcessId: Number,
-      frameRoutingId: Number,
+      _: Number,
+      _: Number,
       ->
 
       initialized = true
@@ -97,7 +97,7 @@ class ElectronApp(val url: String) {
     }
 
     this.mainWindow.webContents.on("did-fail-load",
-                                   didFailLoadListener = { event: Event, errorCode: Number, errorDescription: String, validatedURL: String, isMainFrame: Boolean, frameProcessId: Number, frameRoutingId: Number ->
+                                   didFailLoadListener = { _: Event, errorCode: Number, errorDescription: String, validatedURL: String, _: Boolean, _: Number, _: Number ->
                                      GlobalScope.launch(block = {
                                        if (!that.initialized) {
                                          if (!validatedURL.isNullOrBlank()) {
@@ -127,16 +127,16 @@ class ElectronApp(val url: String) {
     dialog.showMessageBoxSync(that.mainWindow, object : MessageBoxSyncOptions {
       override var message: String
         get() = "Can't load the URL"
-        set(value) {}
+        set(_) {}
       override var detail: String?
         get() = validatedURL
-        set(value) {}
+        set(_) {}
       override var type: String?
         get() = "error"
-        set(value) {}
+        set(_) {}
       override var title: String?
         get() = "Invalid URL"
-        set(value) {}
+        set(_) {}
     })
   }
 
@@ -151,7 +151,7 @@ class ElectronApp(val url: String) {
   fun testUrl(url: String): Boolean {
     var result: Boolean = true
     try {
-      val newUrl = URL(url)
+      URL(url)
     }
     catch (e: Throwable) {
       result = false
@@ -169,11 +169,11 @@ class ElectronApp(val url: String) {
       }
     }
 
-    ipcMain.on("projector-connect") { event, arg: dynamic ->
+    ipcMain.on("projector-connect") { _, arg: dynamic ->
       this.connect(arg)
     }
 
-    ipcMain.on("projector-dom-ready") { event, arg: dynamic ->
+    ipcMain.on("projector-dom-ready") { event, _ ->
       ElectronUtil.disableAllStandardShortcuts()
 
       var defaultUrl = this.configData.defaultUrl
@@ -188,7 +188,7 @@ class ElectronApp(val url: String) {
       }
     })
 
-    app.on("web-contents-created", listener = { e: Event, contents: WebContents ->
+    app.on("web-contents-created", listener = { _: Event, contents: WebContents ->
       contents.on("new-window", listener = { e: Event, url: String ->
         e.preventDefault()
         require("open")(url)
@@ -227,7 +227,7 @@ class ElectronApp(val url: String) {
     //       it seems to be quite unsecure. we should probably show a dialog like "bad cert, do you wish to go on?"
     // from: https://stackoverflow.com/a/46789486/6639500
     // SSL/TSL: this is the self signed certificate support
-    app.on("certificate-error") { event, webContents, url, error, certificate, callback ->
+    app.on("certificate-error") { event, _, _, _, _, callback ->
       // On certificate error we disable default behaviour (stop loading the page)
       // and we then say "it is all fine - true" to the callback
       event.preventDefault()
@@ -254,7 +254,7 @@ class ElectronApp(val url: String) {
     app.exit(0)
   }
 
-  open fun start() {
+  fun start() {
     loaddb()
     registerApplicationLevelEvents()
   }
