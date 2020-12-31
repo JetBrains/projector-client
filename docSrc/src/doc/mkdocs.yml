@@ -1,0 +1,82 @@
+site_name: Projector documentation
+
+# Repository (add link to repository in header)
+# TODO: rename to "projector"?
+repo_name: JetBrains/projector-client
+# TODO: rename to "projector"?
+repo_url: https://github.com/JetBrains/projector-client
+edit_uri: edit/master/docSrc/src/doc/docs/
+
+# Copyright (shown at the footer)
+copyright: 'Copyright &copy; 2019-2020 JetBrains s.r.o.'
+
+theme:
+  name: material
+  favicon: favicon.svg
+  logo: favicon.svg
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.expand
+    - navigation.instant
+    - navigation.sections
+    - toc.integrate
+  palette:
+    primary: white
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      # TODO: rename to "projector"?
+      link: https://github.com/JetBrains/projector-client
+      # TODO: other sites?
+#    - type: 'twitter'
+#      link: 'https://twitter.com/you'
+
+plugins:
+  - search
+
+# TODO: do we need it?
+#       Besides basic page views, site search can also be tracked to understand better how people
+#       use your documentation and what they expect to find.
+# Google Analytics
+#google_analytics:
+#  - 'UA-111111111-1'
+#  - 'auto'
+
+# Extensions
+markdown_extensions:
+  - abbr
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - meta
+  - def_list
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+
+# Dev server binding
+dev_addr: 0.0.0.0:8000
+
+nav:
+  - Home: index.md
+  - User guide – IntelliJ IDEs:
+      - JetBrains IDEs: ij_user_guide/jetbrains.md
+      - Running remote app – servers: ij_user_guide/running.md
+      - Accessing remote app – clients: ij_user_guide/accessing.md
+  - User guide – other Swing apps:
+      - TODO: swing_user_guide/todo.md
+  - Developer guide:
+      - TODO: dev_guide/todo.md
+  - About:
+      - Versions: about/versions.md
+      - Contributing: about/contributing.md
+      - Code of conduct: about/coc.md

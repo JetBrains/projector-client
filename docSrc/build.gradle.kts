@@ -21,28 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val gradleMkdocsPluginVersion: String by settings
-  val kotlinVersion: String by settings
-
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
-    id("ru.vyarus.mkdocs") version gradleMkdocsPluginVersion apply false
-  }
+plugins {
+  id("ru.vyarus.mkdocs")
 }
 
-rootProject.name = "projector-client"
+python {
+  // ru.vyarus.mkdocs uses quite old versions by default so need to override them:
+  pip("pymdown-extensions:8.1")
+  pip("mkdocs-material:6.2.3")
+  pip("Pygments:2.7.3")
+}
 
-include("docSrc")
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-launcher")
-include("projector-server-core")
-include("projector-util-agent")
-include("projector-util-logging")
+mkdocs {
+  // todo: need to support versions:
+  publish.docPath = "latest"
+  publish.rootRedirect = false
+}
