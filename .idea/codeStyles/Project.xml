@@ -9,6 +9,11 @@
     <option name="LINE_SEPARATOR" value="&#10;" />
     <option name="RIGHT_MARGIN" value="140" />
     <option name="FORMATTER_TAGS_ENABLED" value="true" />
+    <option name="DO_NOT_FORMAT">
+      <list>
+        <fileSet type="namedScope" name="md" pattern="file[projector-client.docSrc]:src//*" />
+      </list>
+    </option>
     <GroovyCodeStyleSettings>
       <option name="STATIC_METHODS_ORDER_WEIGHT" value="5" />
       <option name="METHODS_ORDER_WEIGHT" value="4" />
