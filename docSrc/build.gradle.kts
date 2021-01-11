@@ -35,5 +35,5 @@ python {
 mkdocs {
   // todo: need to support versions:
   publish.docPath = "latest"
-  publish.rootRedirect = false
+  publish.rootRedirect = true
 }
