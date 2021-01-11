@@ -33,7 +33,7 @@ jobs:
       - name: Copy distribution to gh-pages
         run: |
           cp master/projector-client-web/build/distributions/* gh-pages
-          cp -r docSrc/build/mkdocs gh-pages
+          cp -r master/docSrc/build/mkdocs gh-pages
       - name: Commit and push
         run: |
           cd gh-pages
