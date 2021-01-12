@@ -248,9 +248,45 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        JetBrains IDEs
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
     <a href="./" class="md-nav__link md-nav__link--active">
       JetBrains IDEs
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#use-cases" class="md-nav__link">
+    Use cases
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    Quick start
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -319,8 +355,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../../swing_user_guide/todo/" class="md-nav__link">
-      TODO
+    <a href="../../swing_user_guide/arbitrary/" class="md-nav__link">
+      Arbitrary Swing app
     </a>
   </li>
 
@@ -462,7 +498,28 @@
                 
                 
                 <h1 id="jetbrains-ides">JetBrains IDEs<a class="headerlink" href="#jetbrains-ides" title="Permanent link">&para;</a></h1>
-<p>Current <a href="https://www.jetbrains.com/products/#type=ide">JetBrains IDEs</a> use Swing to draw <abbr title="Graphical User Interface">GUI</abbr>. The same is true for other IntelliJ-based apps like <a href="https://developer.android.com/studio/">Android Studio</a>. Therefore, Projector is a good way to run and access these apps remotely. This section of documentation describes how Projector is adapted to IntelliJ-based apps.</p>
+<p>Current <a href="https://www.jetbrains.com/products/#type=ide">JetBrains IDEs</a> use Swing to draw <abbr title="Graphical User Interface">GUI</abbr>. The same is true for other IntelliJ-based apps like <a href="https://developer.android.com/studio/">Android Studio</a>. Therefore, Projector that is a technology for rendering Swing <abbr title="Graphical User Interface">GUI</abbr> over the network is a good way to run and access these apps remotely. It should be compatible with all existing JetBrains IDEs. This section of documentation describes how Projector is adapted to IntelliJ-based apps.</p>
+<h2 id="use-cases">Use cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
+<p>We believe there are many cases when you may want to use Projector. Let's enumerate some of them to inspire you:</p>
+<ol>
+<li>Running the code from IDE located <strong>near</strong> the <strong>runtime</strong> (whatever it is) or <strong>near</strong> the <strong>database</strong> to reduce roundtrips;</li>
+<li><strong>High-security</strong> zones and corporate environments;</li>
+<li>Really <strong>huge projects</strong>;</li>
+<li>No source code on a laptop;</li>
+<li><strong>Slow</strong> or <strong>hot</strong> users’ <strong>laptops</strong>;</li>
+<li><strong>Thin</strong> clients and <strong>cheap</strong> <strong>hardware</strong> like Android tablets;</li>
+<li>Running the IDE in a GNU/Linux environment on Windows machines or even on exotic operating systems like ChromeOS;</li>
+<li>The ability to turn off your computer, while your app continues to work on the server;</li>
+<li>Slow internet connection;</li>
+<li><strong>Remote debugging</strong> on a server-side (devtest, devprod);</li>
+<li>VM or Docker images with debug sources and pre-configured IDE.</li>
+<li>Any configuration that requires remote access.</li>
+</ol>
+<p><img alt="" src="https://hsto.org/webt/bn/rf/rk/bnrfrkzogrdfp5sxs6t5g7hllc4.jpeg" /></p>
+<p><em>IntelliJ IDEA on Android tablet (Huawei MediaPad M5)</em></p>
+<h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<p>You should decide how you run a remote IDE and how you access it. This info is given at <a href="../running/">servers</a> and <a href="../accessing/">clients</a> pages respectively.</p>
+<p>TODO: give tl;dr (docker and bundled client).</p>
                 
               
               

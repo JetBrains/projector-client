@@ -274,9 +274,180 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Accessing remote app – clients
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
     <a href="./" class="md-nav__link md-nav__link--active">
       Accessing remote app – clients
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#web-browser" class="md-nav__link">
+    Web browser
+  </a>
+  
+    <nav class="md-nav" aria-label="Web browser">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bundled-client" class="md-nav__link">
+    Bundled client
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-pages-client" class="md-nav__link">
+    GitHub Pages client
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues" class="md-nav__link">
+    Known issues
+  </a>
+  
+    <nav class="md-nav" aria-label="Known issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipad-as-a-client" class="md-nav__link">
+    iPad as a client
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#some-hotkeys-are-intercepted-by-the-browser" class="md-nav__link">
+    Some hotkeys are intercepted by the browser
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#incomplete-clipboard-synchronization" class="md-nav__link">
+    Incomplete clipboard synchronization
+  </a>
+  
+    <nav class="md-nav" aria-label="Incomplete clipboard synchronization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to-server" class="md-nav__link">
+    To-server
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-client" class="md-nav__link">
+    To-client
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page" class="md-nav__link">
+    It's not possible to connect to insecure WebSocket from a secure web page
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-options-and-shortcuts" class="md-nav__link">
+    Advanced options and shortcuts
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#client-app-launcher" class="md-nav__link">
+    Client app ("launcher")
+  </a>
+  
+    <nav class="md-nav" aria-label="Client app ("launcher")">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#downloading" class="md-nav__link">
+    Downloading
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running" class="md-nav__link">
+    Running
+  </a>
+  
+    <nav class="md-nav" aria-label="Running">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    Windows
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux" class="md-nav__link">
+    Linux
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mac" class="md-nav__link">
+    Mac
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -319,8 +490,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../../swing_user_guide/todo/" class="md-nav__link">
-      TODO
+    <a href="../../swing_user_guide/arbitrary/" class="md-nav__link">
+      Arbitrary Swing app
     </a>
   </li>
 
@@ -462,6 +633,75 @@
                 
                 
                 <h1 id="accessing-remote-app-client">Accessing remote app (client)<a class="headerlink" href="#accessing-remote-app-client" title="Permanent link">&para;</a></h1>
+<p>To access a remotely run app, you need to use a client. There are multiple variants available.</p>
+<table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#web-browser">Web browser</a></td>
+<td>Any</td>
+</tr>
+<tr>
+<td><a href="#client-app-launcher">Client app ("launcher")</a></td>
+<td>Windows, Linux, MacOS</td>
+</tr>
+</tbody>
+</table>
+<h2 id="web-browser">Web browser<a class="headerlink" href="#web-browser" title="Permanent link">&para;</a></h2>
+<h3 id="bundled-client">Bundled client<a class="headerlink" href="#bundled-client" title="Permanent link">&para;</a></h3>
+<p>Recent versions of servers have bundled client files. So for example if you start a server on port 9999, you can access it via a browser locally opening <a href="http://localhost:9999/">http://localhost:9999/</a> (or <a href="https://...">https://...</a> if your server is secure).</p>
+<p>If your server is located remotely, just use the corresponding host address instead of <code>localhost</code>.</p>
+<h3 id="github-pages-client">GitHub Pages client<a class="headerlink" href="#github-pages-client" title="Permanent link">&para;</a></h3>
+<p>The latest client is always available at GitHub Pages: <a href="https://JetBrains.github.io/projector-client/?host=HOST&amp;port=PORT">https://JetBrains.github.io/projector-client/?host=HOST&amp;port=PORT</a>. So this variant is useful if you want to check out the recent update in the client.</p>
+<p>You should set <code>HOST</code> and <code>PORT</code> matching your server. For the previous example, it will be <a href="https://JetBrains.github.io/projector-client/?host=localhost&amp;port=9999">https://JetBrains.github.io/projector-client/?host=localhost&amp;port=9999</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Secure connection is required for GitHub client</p>
+<p>Your server must be secure when using GitHub client because GitHub is secure itself. Before connection, make sure that your browser trusts the certificate you use on your server (in this case, connection via the bundled client should succeed). For more info, read <a href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page">below</a>.</p>
+</div>
+<h3 id="known-issues">Known issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h3>
+<p>Due to limitations of web browsers, there are some issues in the Web Client. They can be solved via native implementations of the client.</p>
+<h4 id="ipad-as-a-client">iPad as a client<a class="headerlink" href="#ipad-as-a-client" title="Permanent link">&para;</a></h4>
+<p>iPads don't support self-signed WebSockets, so if you want to use a browser on iPad as a client, you now have to disable security on the server.</p>
+<h4 id="some-hotkeys-are-intercepted-by-the-browser">Some hotkeys are intercepted by the browser<a class="headerlink" href="#some-hotkeys-are-intercepted-by-the-browser" title="Permanent link">&para;</a></h4>
+<p>For example, <code>Ctrl+Q</code> in Windows/Linux or <code>Cmd+N</code> in Mac is handled by the browser.</p>
+<p>Since some shortcuts close the tab or the window, we implemented a confirmation which is shown when the page is about to close (if <code>blockClosing</code> parameter is enabled).</p>
+<p>Also, we consider <code>Ctrl+Q</code> shortcut as frequently used, so we mapped it to the <code>F1</code> button.</p>
+<p>It seems that we can't do anything more about that, at least in a normal browser window.</p>
+<p>The proposed <strong>workaround</strong> here is to you the feature of browsers called <a href="https://en.wikipedia.org/wiki/Progressive_web_application">PWA</a>. It's a way to install a web page as a separate application. We've tested it in Chrome and in this mode, all the tested shortcuts are handled by Projector, not by the browser. The instructions are as follows: simply create a shortcut by selecting <code>Menu</code> | <code>More Tools</code> | <code>Create Shortcut...</code> and <code>Open as window</code>. Instructions with screenshots can be googled, for example, <a href="https://ccm.net/faq/9934-create-a-desktop-shortcut-on-google-chrome">this one</a>. The similar can be achieved in Firefox: for example, <a href="https://www.maketecheasier.com/enable-site-specific-browser-firefox/">take this</a> instruction.</p>
+<h4 id="incomplete-clipboard-synchronization">Incomplete clipboard synchronization<a class="headerlink" href="#incomplete-clipboard-synchronization" title="Permanent link">&para;</a></h4>
+<p>There are some limitations with clipboard.</p>
+<h5 id="to-server">To-server<a class="headerlink" href="#to-server" title="Permanent link">&para;</a></h5>
+<p>When your clipboard is changed on the client side, the server needs to apply the change on its side.</p>
+<p>We implement it on the client side via setting <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/paste_event">"paste" listener</a>. So clipboard is updated on the server only if you invoke that listener, for example, by hitting Ctrl+V or Ctrl+Shift+V. <strong>If you have an application on the server side with a "paste" button, a click on it can paste outdated information unless the listener wasn't invoked</strong>.</p>
+<p>Unfortunately, we can't just continuously get clipboard data from <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard"><code>window.navigator.clipboard</code></a> and send it to the server because when it's invoked not from user's context, there will be alert from the browser like "the site wants to read clipboard info, do you grant?".</p>
+<h5 id="to-client">To-client<a class="headerlink" href="#to-client" title="Permanent link">&para;</a></h5>
+<p>It's vice versa: when your clipboard is changed on the server side, the client needs to apply the change on its side.</p>
+<p>We set the clipboard on the client side via <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard"><code>window.navigator.clipboard</code></a>. <strong>This doesn't work in <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts/features_restricted_to_secure_contexts">insecure contexts</a>, so the client needs to be opened using HTTPS or on localhost to support this</strong>.</p>
+<p>We can't use <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event">"copy" listener</a> because when this event is generated, we don't have a message from the server with actual clipboard data yet. Also, this method won't work if you click a "copy" button in your application.</p>
+<h4 id="its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page">It's not possible to connect to insecure WebSocket from a secure web page<a class="headerlink" href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page" title="Permanent link">&para;</a></h4>
+<p>This is a limitation of browsers. So for example you can't use GitHub Pages client to access an insecure server.</p>
+<h3 id="advanced-options-and-shortcuts">Advanced options and shortcuts<a class="headerlink" href="#advanced-options-and-shortcuts" title="Permanent link">&para;</a></h3>
+<p>The web client has some hidden <a href="https://github.com/JetBrains/projector-client/tree/master/projector-client-web#page-parameters">options</a> and keyboard <a href="https://github.com/JetBrains/projector-client/tree/master/projector-client-web#shortcuts">shortcuts</a>. Please use the links if you want to know more info.</p>
+<p>In the future, welcome screen (<a href="https://youtrack.jetbrains.com/issue/PRJ-126">PRJ-126</a>) and actions panel (<a href="https://youtrack.jetbrains.com/issue/PRJ-248">PRJ-248</a>) will make these features more explicit.</p>
+<h2 id="client-app-launcher">Client app ("launcher")<a class="headerlink" href="#client-app-launcher" title="Permanent link">&para;</a></h2>
+<p>Also, we have a special app called <code>launcher</code> that wraps web page and allows to overcome some limitations of web browsers such as <strong>shortcut interception</strong> and <strong>low performance</strong>.</p>
+<p>Currently, it's a small app, and it's easy to use. It has just a single text field for the URL you want to connect.</p>
+<h3 id="downloading">Downloading<a class="headerlink" href="#downloading" title="Permanent link">&para;</a></h3>
+<p>Please check <a href="https://github.com/JetBrains/projector-client/releases">releases</a> beginning with the <code>launcher-</code> prefix. Download the file for your OS.</p>
+<h3 id="running">Running<a class="headerlink" href="#running" title="Permanent link">&para;</a></h3>
+<p>After unpacking the archive, run the executable file corresponding to your OS (see below). If you don't want to specify the URL in the GUI every time, you can create a shortcut or run this app from command line passing the URL as the first argument.</p>
+<h4 id="windows">Windows<a class="headerlink" href="#windows" title="Permanent link">&para;</a></h4>
+<p>Run <code>projector.exe</code> file.</p>
+<h4 id="linux">Linux<a class="headerlink" href="#linux" title="Permanent link">&para;</a></h4>
+<p>Run <code>projector</code> file.</p>
+<h4 id="mac">Mac<a class="headerlink" href="#mac" title="Permanent link">&para;</a></h4>
+<p>Run <code>projector</code> app (on other OSes it's visible like <code>projector.app</code> dir).</p>
+<p>Mac doesn't allow unsigned apps to be run easily, and will ask you to put the app to Trash Bin. So you need to select <a href="https://stackoverflow.com/a/59899342">"Open Anyway" in System Preferences</a> to allow launching.</p>
                 
               
               
@@ -495,13 +735,13 @@
           </a>
         
         
-          <a href="../../swing_user_guide/todo/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../../swing_user_guide/arbitrary/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                TODO
+                Arbitrary Swing app
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

@@ -261,9 +261,72 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Running remote app – servers
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
     <a href="./" class="md-nav__link md-nav__link--active">
       Running remote app – servers
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mode" class="md-nav__link">
+    Mode
+  </a>
+  
+    <nav class="md-nav" aria-label="Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#differences" class="md-nav__link">
+    Differences
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installer" class="md-nav__link">
+    installer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ide-plugin" class="md-nav__link">
+    IDE Plugin
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -319,8 +382,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../../swing_user_guide/todo/" class="md-nav__link">
-      TODO
+    <a href="../../swing_user_guide/arbitrary/" class="md-nav__link">
+      Arbitrary Swing app
     </a>
   </li>
 
@@ -462,6 +525,52 @@
                 
                 
                 <h1 id="running-remote-app-server">Running remote app (server)<a class="headerlink" href="#running-remote-app-server" title="Permanent link">&para;</a></h1>
+<p>To run an app with Projector, you need to create a server. There are multiple variants available.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Supported platforms</th>
+<th><a href="#mode">Mode</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>installer</td>
+<td>Linux</td>
+<td>Headless</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>Any</td>
+<td>Headless</td>
+</tr>
+<tr>
+<td>IDE Plugin</td>
+<td>Any</td>
+<td>GUI</td>
+</tr>
+</tbody>
+</table>
+<h2 id="mode">Mode<a class="headerlink" href="#mode" title="Permanent link">&para;</a></h2>
+<p>There are two ways of how the server is run:</p>
+<ul>
+<li><strong>GUI</strong> mode – you can see the app where you launch it, and also connect to it remotely at the same time.</li>
+<li><strong>Headless</strong> mode – you can't see the app, you only can connect remotely.</li>
+</ul>
+<h3 id="differences">Differences<a class="headerlink" href="#differences" title="Permanent link">&para;</a></h3>
+<p>You may wonder what to choose. Let's describe some differences that should help you decide.</p>
+<ul>
+<li>Currently, headless mode is available <strong>only on Linux</strong> (or inside Docker). On the other hand, GUI mode is available everywhere.</li>
+<li>Headless mode doesn't require <strong>Desktop Environment</strong> nor <strong>XServer</strong> nor <strong>virtual framebuffer</strong> to be available on the device, while GUI mode in Linux obviously does.</li>
+<li>Headless mode can adapt to the connected client machine better, especially when the client has different screen parameters (DPI, resolution).</li>
+</ul>
+<h2 id="installer">installer<a class="headerlink" href="#installer" title="Permanent link">&para;</a></h2>
+<p>TODO: <a href="https://github.com/JetBrains/projector-installer">https://github.com/JetBrains/projector-installer</a></p>
+<h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h2>
+<p>TODO: <a href="https://github.com/JetBrains/projector-docker">https://github.com/JetBrains/projector-docker</a></p>
+<h2 id="ide-plugin">IDE Plugin<a class="headerlink" href="#ide-plugin" title="Permanent link">&para;</a></h2>
+<p>TODO: <a href="https://github.com/JetBrains/projector-server/tree/master/projector-plugin">https://github.com/JetBrains/projector-server/tree/master/projector-plugin</a></p>
                 
               
               
