@@ -73,7 +73,7 @@ nav:
       - Running remote app – servers: ij_user_guide/running.md
       - Accessing remote app – clients: ij_user_guide/accessing.md
   - User guide – other Swing apps:
-      - TODO: swing_user_guide/todo.md
+      - Arbitrary Swing app: swing_user_guide/arbitrary.md
   - Developer guide:
       - TODO: dev_guide/todo.md
   - About:
