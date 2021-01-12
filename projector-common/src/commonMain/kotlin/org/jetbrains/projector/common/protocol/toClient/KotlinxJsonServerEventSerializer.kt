@@ -31,6 +31,7 @@ object KotlinxJsonServerEventSerializer {
 
   val jsonConfiguration: JsonBuilder.() -> Unit = {
     useArrayPolymorphism = true
+    encodeDefaults = true  // this is needed because our manual json parser can't handle nulls instead of empty lists
   }
   private val json = Json(builderAction = jsonConfiguration)
 
