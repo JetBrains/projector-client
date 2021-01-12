@@ -1,21 +1,13 @@
 # Projector Electron Launcher
-## Downloading
-Please check [releases](https://github.com/JetBrains/projector-client/releases) beginning with the `launcher-` prefix. Download the file for your OS.
 
-## Running
-### Windows
-Run `projector.exe` file.
+## Downloading and running
 
-### Linux
-Run `projector` file.
+Please check out [documentation](https://jetbrains.github.io/projector-client/mkdocs/latest/ij_user_guide/accessing/#client-app-launcher).
 
-### Mac
-Run `projector` app (on other OSes it's visible like `projector.app` dir).
-
-Mac doesn't allow unsigned apps to be run easily, and will ask you to put the app to Trash Bin. So you need to select [Open Anyway in System Preferences](https://stackoverflow.com/a/59899342/6639500) to allow launching.
- 
 ## Using sources
+
 ### Prerequisites
+
 - Install Java: <https://bell-sw.com/pages/downloads>
 - Install Node.js and NPM: <https://nodejs.org/en/download>
     - You have to use 12.16.1 version

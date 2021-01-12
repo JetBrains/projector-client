@@ -7,10 +7,10 @@ Contents:
 * [Notes](#notes) &mdash; tested browsers.
 * [Page parameters](#page-parameters) &mdash; set up the connection.
 * [Shortcuts](#shortcuts) &mdash; currently they are needed for debug purposes.
-* [Known issues](#known-issues) &mdash; the current state of limitations we believe there is no way to handle.
 
 ## Running
-The latest commit in master is built and deployed to GitHub Pages. So the latest commit is available here: <https://jetbrains.github.io/projector-client/index.html?host=HOST&port=PORT> (don't forget to set `HOST` and `PORT` to match your server's).
+The latest commit in master is built and deployed to GitHub Pages. So the latest commit is available
+here: <https://jetbrains.github.io/projector-client/?host=HOST&port=PORT> (don't forget to set `HOST` and `PORT` to match your server's).
 
 The latest version can be downloaded at the [Artifacts page](https://github.com/JetBrains/projector-client/releases).
 
@@ -91,37 +91,3 @@ total (sum) time rate:          134.92 ms per second (21.7 seconds)
 Stats are reset!
 ```
 - `Ctrl + F11` toggles showing repainted areas (if `repaintArea` query param is enabled).
-
-## Known issues
-Due to limitations of web browsers, there are some issues in the Web Client. They can be solved via native implementations of the client.
-
-### Some hotkeys are intercepted by the browser
-For example, `Ctrl+Q` in Windows/Linux or `Cmd+N` in Mac is handled by the browser.
-
-Since some shortcuts close the tab or the window, we implemented a confirmation which is shown when the page is about to close (if `blockClosing` parameter is enabled).
-
-Also, we consider `Ctrl+Q` shortcut as frequently used, so we mapped it to the `F1` button.
-
-It seems that we can't do anything more about that, at least in a normal browser window.
-
-The proposed **workaround** here is to you the feature of browsers called [PWA](https://en.wikipedia.org/wiki/Progressive_web_application). It's a way to install a web page as a separate application. We've tested it in Chrome and in this mode, all the tested shortcuts are handled by Projector, not by the browser. The instructions are as follows: simply create a shortcut by selecting `Menu` | `More Tools` | `Create Shortcut...` and `Open as window`. Instructions with screenshots can be googled, for example, [this one](https://ccm.net/faq/9934-create-a-desktop-shortcut-on-google-chrome). The similar can be achieved in Firefox: for example, [take this](https://www.maketecheasier.com/enable-site-specific-browser-firefox/) instruction.
-
-### Incomplete clipboard synchronization
-There are some limitations with clipboard.
-
-#### To-server
-When your clipboard is changed on the client side, the server needs to apply the change on its side.
-
-We implement it on the client side via setting ["paste" listener](https://developer.mozilla.org/en-US/docs/Web/API/Element/paste_event). So clipboard is updated on the server only if you invoke that listener, for example, by hitting Ctrl+V or Ctrl+Shift+V. **If you have an application on the server side with a "paste" button, a click on it can paste outdated information unless the listener wasn't invoked**.
-
-Unfortunately, we can't just continuously get clipboard data from [`window.navigator.clipboard`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard) and send it to the server because when it's invoked not from user's context, there will be alert from the browser like "the site wants to read clipboard info, do you grant?".
-
-#### To-client
-It's vice versa: when your clipboard is changed on the server side, the client needs to apply the change on its side.
-
-We set the clipboard on the client side via [`window.navigator.clipboard`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard). **This doesn't work in [insecure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts/features_restricted_to_secure_contexts), so the client needs to be opened using HTTPS or on localhost to support this**.
-
-We can't use ["copy" listener](https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event) because when this event is generated, we don't have a message from the server with actual clipboard data yet. Also, this method won't work if you click a "copy" button in your application.
-
-### It's not possible to connect to insecure WebSocket from a secure web page
-This is a limitation of browsers. So for example you can't use GitHub Pages distribution to access an insecure server.
