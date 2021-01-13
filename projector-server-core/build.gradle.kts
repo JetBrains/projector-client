@@ -49,6 +49,7 @@ val javaWebSocketVersion: String by project
 val kotlinVersion: String by project
 val ktorVersion: String by project
 val selenideVersion: String by project
+val slf4jVersion: String by project
 
 val devBuilding = rootProject.file("local.properties").let {
   when (it.canRead()) {
@@ -126,6 +127,7 @@ dependencies {
   implementation(project(":projector-util-logging"))
   implementation("org.javassist:javassist:$javassistVersion")
   api("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
+  implementation("org.slf4j:slf4j-simple:$slf4jVersion")
 
   // todo: remove these dependencies: they should be exported from projector-common but now it seems not working
   testImplementation(kotlin("test", kotlinVersion))
