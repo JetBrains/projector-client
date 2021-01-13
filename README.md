@@ -4,7 +4,7 @@
 
 Common and client-related code for running Swing applications remotely.
 
-For more info, please check out [Projector.md](https://github.com/JetBrains/projector-server/blob/master/docs/Projector.md).
+[Documentation](https://jetbrains.github.io/projector-client/mkdocs/latest/) | [Issue tracker](https://youtrack.jetbrains.com/issues/PRJ)
 
 ## Modules
 To learn more about modules, check out README files inside them:

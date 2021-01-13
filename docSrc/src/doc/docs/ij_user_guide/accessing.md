@@ -1,4 +1,4 @@
-# Accessing remote app (client)
+# Accessing remote app (clients)
 
 To access a remotely run app, you need to use a client. There are multiple variants available.
 

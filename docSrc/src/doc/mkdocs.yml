@@ -75,8 +75,10 @@ nav:
   - User guide – other Swing apps:
       - Arbitrary Swing app: swing_user_guide/arbitrary.md
   - Developer guide:
-      - TODO: dev_guide/todo.md
+      - Ecosystem: dev_guide/ecosystem.md
   - About:
+      - Comparison to other remote access solutions: about/comparison.md
+      - Use cases: about/usecases.md
       - Versions: about/versions.md
       - Contributing: about/contributing.md
       - Code of conduct: about/coc.md

@@ -31,7 +31,7 @@ jobs:
           ref: gh-pages
           path: gh-pages
       - name: Copy distribution to gh-pages
-        run: |
+        run: |  # todo: remove old files before copying the new ones
           cp master/projector-client-web/build/distributions/* gh-pages
           cp -r master/docSrc/build/mkdocs gh-pages
       - name: Commit and push
