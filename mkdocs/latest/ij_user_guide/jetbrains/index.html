@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#jetbrains-ides" class="md-skip">
+        <a href="#use-cases" class="md-skip">
           Skip to content
         </a>
       
@@ -245,8 +245,6 @@
     
     <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
-      
-    
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
         JetBrains IDEs
@@ -260,8 +258,6 @@
       
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
-  
-    
   
   
     <label class="md-nav__title" for="__toc">
@@ -280,6 +276,48 @@
         <li class="md-nav__item">
   <a href="#quick-start" class="md-nav__link">
     Quick start
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#client-side" class="md-nav__link">
+    Client-side
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server-side" class="md-nav__link">
+    Server-side
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vpn-and-ssh-tunnels" class="md-nav__link">
+    VPN and SSH tunnels
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#competitors" class="md-nav__link">
+    Competitors
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#is-it-open-source" class="md-nav__link">
+    Is it Open Source?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-problems" class="md-nav__link">
+    Known problems
   </a>
   
 </li>
@@ -399,8 +437,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../../dev_guide/todo/" class="md-nav__link">
-      TODO
+    <a href="../../dev_guide/ecosystem/" class="md-nav__link">
+      Ecosystem
     </a>
   </li>
 
@@ -435,6 +473,32 @@
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../about/comparison/" class="md-nav__link">
+      Comparison to other remote access solutions
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../about/usecases/" class="md-nav__link">
+      Use cases
+    </a>
+  </li>
+
         
           
           
@@ -497,8 +561,9 @@
                   </a>
                 
                 
-                <h1 id="jetbrains-ides">JetBrains IDEs<a class="headerlink" href="#jetbrains-ides" title="Permanent link">&para;</a></h1>
-<p>Current <a href="https://www.jetbrains.com/products/#type=ide">JetBrains IDEs</a> use Swing to draw <abbr title="Graphical User Interface">GUI</abbr>. The same is true for other IntelliJ-based apps like <a href="https://developer.android.com/studio/">Android Studio</a>. Therefore, Projector that is a technology for rendering Swing <abbr title="Graphical User Interface">GUI</abbr> over the network is a good way to run and access these apps remotely. It should be compatible with all existing JetBrains IDEs. This section of documentation describes how Projector is adapted to IntelliJ-based apps.</p>
+                  <h1>JetBrains IDEs</h1>
+                
+                <p>Current <a href="https://www.jetbrains.com/products/#type=ide">JetBrains IDEs</a> use Swing to draw <abbr title="Graphical User Interface">GUI</abbr>. The same is true for other IntelliJ-based apps like <a href="https://developer.android.com/studio/">Android Studio</a>. Therefore, Projector that is a technology for rendering Swing <abbr title="Graphical User Interface">GUI</abbr> over the network is a good way to run and access these apps remotely. It should be compatible with all existing JetBrains IDEs. This section of documentation describes how Projector is adapted to IntelliJ-based apps.</p>
 <h2 id="use-cases">Use cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
 <p>We believe there are many cases when you may want to use Projector. Let's enumerate some of them to inspire you:</p>
 <ol>
@@ -515,11 +580,44 @@
 <li>VM or Docker images with debug sources and pre-configured IDE.</li>
 <li>Any configuration that requires remote access.</li>
 </ol>
+<p>Don't understand some items? We have a <a href="../../about/usecases/">special list</a> where we describe them more comprehensively.</p>
 <p><img alt="" src="https://hsto.org/webt/bn/rf/rk/bnrfrkzogrdfp5sxs6t5g7hllc4.jpeg" /></p>
 <p><em>IntelliJ IDEA on Android tablet (Huawei MediaPad M5)</em></p>
 <h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<p>You should decide how you run a remote IDE and how you access it. This info is given at <a href="../running/">servers</a> and <a href="../accessing/">clients</a> pages respectively.</p>
-<p>TODO: give tl;dr (docker and bundled client).</p>
+<p>You should decide how you run a remote IDE and how you access it. This info is given comprehensively at <a href="../running/">servers</a> and <a href="../accessing/">clients</a> pages respectively.</p>
+<p>The easiest way to try the project is to use <a href="../running/#docker">Docker Images</a>.</p>
+<p>If you can't use Docker for some reasons (for example, due to any security limitations), try this <a href="../running/#installer">installation script</a>.</p>
+<p>If you can't even use this installation script, you need to dive deeper and understand how it works under the hood. You can check README here: <a href="https://github.com/JetBrains/projector-server">https://github.com/JetBrains/projector-server</a>.</p>
+<p>As for the client-side, just open the URL (something like <a href="https://127.0.0.1:8887">https://127.0.0.1:8887</a>) in the browser, and that’s it.</p>
+<h2 id="client-side">Client-side<a class="headerlink" href="#client-side" title="Permanent link">&para;</a></h2>
+<p>Currently, you can use a web browser to connect to the IDE. The experience is very similar to using any interactive website. You can use a fullscreen mode in your browser to achieve an almost desktop-like experience.</p>
+<p>If there is a demand from users, in the next stages we may build separate native applications.</p>
+<h2 id="server-side">Server-side<a class="headerlink" href="#server-side" title="Permanent link">&para;</a></h2>
+<p>You can use the Projector as a set of Docker images, or as a standalone distribution. A standalone distribution is currently available for GNU/Linux hosts only.</p>
+<p>Dockerfiles are public and Open Source, so you can verify them with your security team.</p>
+<h2 id="vpn-and-ssh-tunnels">VPN and SSH tunnels<a class="headerlink" href="#vpn-and-ssh-tunnels" title="Permanent link">&para;</a></h2>
+<p>The Projector should run on popular VPN solutions like OpenVPN. It uses the HTTP and WebSocket protocols to connect to the browser. You shouldn't have any problems with that.</p>
+<p>Also, you can use the following SSH command to redirect these ports through a plain SSH tunnel :</p>
+<div class="highlight"><pre><span></span><code>ssh -i key.pem -L 8887:127.0.0.1:8887 user@server
+</code></pre></div>
+<p>You can try this on the Amazon cloud.</p>
+<h2 id="competitors">Competitors<a class="headerlink" href="#competitors" title="Permanent link">&para;</a></h2>
+<p>The сlosest competitors to the Projector are X Window System, VNC, and RDP.</p>
+<p>One the one hand, the Projector is much more responsive. Unlike all these alternatives, it uses extended and precise information about applications written in Java (which all JetBrains IDEs are) and sends it over the network. For example, that allows rendering crisp, pixel-perfect vector fonts. And it doesn't matter if your connection is slow or not, your text always is perfect, because the fonts are all in a vector format.</p>
+<p>On the other hand, X11, VNC, and RDP are well-known solutions, and system administrators know exactly how to run them in a corporate environment.</p>
+<p>Also, we have a <a href="../../about/comparison/">special documentation page</a> where we list advantages of Projector.</p>
+<h2 id="is-it-open-source">Is it Open Source?<a class="headerlink" href="#is-it-open-source" title="Permanent link">&para;</a></h2>
+<p>Now, everything is an Open Source or Free Software:</p>
+<ul>
+<li>Dockerfiles (Apache License 2.0): <a href="https://github.com/JetBrains/projector-docker">https://github.com/JetBrains/projector-docker</a>.</li>
+<li>Server (GNU GPL v2.0): <a href="https://github.com/JetBrains/projector-server">https://github.com/JetBrains/projector-server</a>.</li>
+<li>Client (MIT License): <a href="https://github.com/JetBrains/projector-client">https://github.com/JetBrains/projector-client</a>.</li>
+</ul>
+<h2 id="known-problems">Known problems<a class="headerlink" href="#known-problems" title="Permanent link">&para;</a></h2>
+<p>The server side is supported as a Docker Image and as a local distribution for Linux servers. Local installations of the server on Windows and Mac are not a subject for the current stage of the project. However, technically it is quite possible.</p>
+<p>We still have some inconsistencies in shortcuts. For example, a known problem is that we cannot use Ctrl+W to close a source file, because it closes a tab in the browser. The only action Projector can do here is to ask the user if they really want to close that tab. In the future, we can create separate native apps instead of the browser client to fix this.</p>
+<p>There's a known limitation on using plugins with a custom rendering provided by Chromium Embedded Framework because it bypasses the standard rendering pipeline of Java. It's a hard problem, probably we can fix this, but not at this stage. Now we have a smart workaround for the Markdown component: we render Markdown HTML locally on a client. Actually, it even improved the experience of writing markdown a lot.</p>
+<p>We cannot render separate external applications. For example, if you run the Android Emulator by activating a Run/Debug configuration, and expect to see <abbr title="Graphical User Interface">GUI</abbr>, it's impossible to render it with the Projector. In the future, it may be solved by combining with VNC technologies, but it's definitely not a target of the current stage.</p>
                 
               
               

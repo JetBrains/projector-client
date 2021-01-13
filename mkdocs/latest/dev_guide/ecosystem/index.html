@@ -14,7 +14,7 @@
     
     
       
-        <title>Versions - Projector documentation</title>
+        <title>Ecosystem - Projector documentation</title>
       
     
     
@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#versions" class="md-skip">
+        <a href="#tldr" class="md-skip">
           Skip to content
         </a>
       
@@ -93,7 +93,7 @@
         <div class="md-header-nav__topic">
           <span class="md-ellipsis">
             
-              Versions
+              Ecosystem
             
           </span>
         </div>
@@ -324,14 +324,16 @@
       
 
 
+  
+
 
   
     
   
-  <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
     
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" data-md-state="indeterminate" type="checkbox" id="nav-4" checked>
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
     
     <label class="md-nav__link" for="nav-4">
       Developer guide
@@ -350,11 +352,120 @@
           
 
 
+  
 
-  <li class="md-nav__item">
-    <a href="../../dev_guide/ecosystem/" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Ecosystem
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
       Ecosystem
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr" class="md-nav__link">
+    TL;DR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-system" class="md-nav__link">
+    The system
+  </a>
+  
+    <nav class="md-nav" aria-label="The system">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#awt-implementation" class="md-nav__link">
+    AWT implementation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-and-client" class="md-nav__link">
+    Server and client
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-components" class="md-nav__link">
+    Client components
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repositories" class="md-nav__link">
+    Repositories
+  </a>
+  
+    <nav class="md-nav" aria-label="Repositories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#main" class="md-nav__link">
+    Main
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples-and-utils" class="md-nav__link">
+    Examples and utils
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#obsolete" class="md-nav__link">
+    Obsolete
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-use-in-another-project" class="md-nav__link">
+    How to use in another project
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
         
@@ -368,16 +479,14 @@
       
 
 
-  
-
 
   
     
   
-  <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--section md-nav__item--nested">
     
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5" data-md-state="indeterminate" type="checkbox" id="nav-5" checked>
     
     <label class="md-nav__link" for="nav-5">
       About
@@ -398,7 +507,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../comparison/" class="md-nav__link">
+    <a href="../../about/comparison/" class="md-nav__link">
       Comparison to other remote access solutions
     </a>
   </li>
@@ -411,7 +520,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../usecases/" class="md-nav__link">
+    <a href="../../about/usecases/" class="md-nav__link">
       Use cases
     </a>
   </li>
@@ -422,49 +531,11 @@
           
 
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Versions
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-    
-    <a href="./" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../../about/versions/" class="md-nav__link">
       Versions
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#changelogs" class="md-nav__link">
-    Changelogs
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -475,7 +546,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../contributing/" class="md-nav__link">
+    <a href="../../about/contributing/" class="md-nav__link">
       Contributing
     </a>
   </li>
@@ -488,7 +559,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../coc/" class="md-nav__link">
+    <a href="../../about/coc/" class="md-nav__link">
       Code of conduct
     </a>
   </li>
@@ -511,24 +582,62 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/JetBrains/projector-client/edit/master/docSrc/src/doc/docs/about/versions.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/JetBrains/projector-client/edit/master/docSrc/src/doc/docs/dev_guide/ecosystem.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
                 
-                <h1 id="versions">Versions<a class="headerlink" href="#versions" title="Permanent link">&para;</a></h1>
-<p>Projector currently doesn't have consistent versioning. It's yet to decide (<a href="https://youtrack.jetbrains.com/issue/PRJ-34">PRJ-34</a>).</p>
-<p>Currently, each subproject uses its own versions.</p>
-<h2 id="changelogs">Changelogs<a class="headerlink" href="#changelogs" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="https://github.com/JetBrains/projector-server/blob/master/projector-plugin/CHANGELOG.md">projector-plugin</a>.</li>
-<li><a href="https://github.com/JetBrains/projector-server/blob/master/projector-server/CHANGELOG.md">projector-server</a>.</li>
-<li><a href="https://github.com/JetBrains/projector-installer/blob/master/CHANGELOG.md">projector-installer</a>.</li>
-<li><a href="https://github.com/JetBrains/projector-client/blob/master/projector-launcher/CHANGELOG.md">projector-launcher</a>.</li>
-</ul>
-<div class="admonition note">
-<p>If we decide to make the versions the same for all the projects, the changelog will be moved here.</p>
+                  <h1>Ecosystem</h1>
+                
+                <p>This document describes the ecosystem as a whole. If you want to understand how Projector works and maybe even change something, please check this document out.</p>
+<h2 id="tldr">TL;DR<a class="headerlink" href="#tldr" title="Permanent link">&para;</a></h2>
+<p>Projector is a way to run Swing applications without any windowing system and accessing them either locally or remotely.</p>
+<h2 id="the-system">The system<a class="headerlink" href="#the-system" title="Permanent link">&para;</a></h2>
+<p>Here you can find some info on how this works.</p>
+<h3 id="awt-implementation">AWT implementation<a class="headerlink" href="#awt-implementation" title="Permanent link">&para;</a></h3>
+<p>The Foundation stone of Projector is an implementation of AWT. It allows running Swing applications headlessly but without <code>HeadlessException</code>s. Also, it intercepts some AWT calls and remembers them. The most calls are invocations of <code>Graphics2D</code> methods. This module is called <code>projector-awt</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Update is needed</p>
+<p>This documentation is a bit deprecated because it doesn't mention that currently we also can run Swing apps with Projector without custom AWT. This allows running apps with GUI, but simultaneously share them via Projector.</p>
 </div>
+<h3 id="server-and-client">Server and client<a class="headerlink" href="#server-and-client" title="Permanent link">&para;</a></h3>
+<p>To run an application with our AWT and access it, we provide a server and a client.</p>
+<p>The module of the server implementation is called <code>projector-server</code>. It provides a launcher that sets AWT system properties and fields and is compatible with the most of Swing apps.</p>
+<p>Also, it extracts remembered AWT calls from <code>projector-awt</code> and can send them on a client. This implementation uses WebSocket and a serialization protocol which is located in the <code>projector-common</code> module. A client can execute the received calls on its side. The only client implemented now is for Web browsers, it's available in the <code>projector-client-web</code> module.</p>
+<p>Finally, the client can send its events such as mouse clicks or window resizes in the reverse direction. <code>projector-server</code> translates these events to AWT.</p>
+<h3 id="client-components">Client components<a class="headerlink" href="#client-components" title="Permanent link">&para;</a></h3>
+<p>Some Swing apps contain content that can't be easily represented as <code>Graphics2D</code> method calls. For example, it can be an embedded heavyweight component. In such cases, it's sometimes possible to serialize this content another way.</p>
+<p>The only client component implemented now is Markdown Preview in JetBrains IDEs.</p>
+<h2 id="repositories">Repositories<a class="headerlink" href="#repositories" title="Permanent link">&para;</a></h2>
+<p>Here we enumerate repos related to this project and describe their content.</p>
+<h3 id="main">Main<a class="headerlink" href="#main" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://github.com/JetBrains/projector-client">projector-client</a>:<ul>
+<li><code>projector-common</code> &mdash; protocol and other common code for clients and a server.</li>
+<li><code>projector-client-common</code> &mdash; common code for clients.</li>
+<li><code>projector-client-web</code> &mdash; a client implementation for Web browsers.</li>
+</ul>
+</li>
+<li><a href="https://github.com/JetBrains/projector-server">projector-server</a>:<ul>
+<li><code>projector-awt</code> &mdash; AWT implementation.</li>
+<li><code>projector-server</code> &mdash; an application server for running and remote accessing a Swing app.</li>
+</ul>
+</li>
+</ul>
+<h3 id="examples-and-utils">Examples and utils<a class="headerlink" href="#examples-and-utils" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://github.com/JetBrains/projector-demo">projector-demo</a> &mdash; a sample app showing how to run any Swing app with Projector.</li>
+<li><a href="https://github.com/JetBrains/projector-docker">projector-docker</a> &mdash; scripts for building Docker images containing JetBrains IDEs and Projector Server.</li>
+<li><a href="https://github.com/JetBrains/projector-installer">projector-installer</a> &mdash; a utility for installing, configuring, and running JetBrains IDEs with <code>projector-server</code> on Linux or in WSL, available at PyPI.</li>
+</ul>
+<h3 id="obsolete">Obsolete<a class="headerlink" href="#obsolete" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://github.com/JetBrains/projector-markdown-plugin">projector-markdown-plugin</a> &mdash; Markdown Preview for JetBrains IDEs which can be used with Projector. Now we managed to bundle it to projector-server, so you don't need to install it separately anymore.</li>
+</ul>
+<h2 id="how-to-use-in-another-project">How to use in another project<a class="headerlink" href="#how-to-use-in-another-project" title="Permanent link">&para;</a></h2>
+<p>You can find some hints in the corresponding repos.</p>
+<p>You can use <a href="https://jitpack.io/">JitPack</a> to make a dependency on our project. Also, you can clone a project and build it yourself.</p>
+<p>We show these ways in example repos.</p>
                 
               
               
@@ -547,7 +656,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../usecases/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../../swing_user_guide/arbitrary/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -556,19 +665,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Use cases
+                Arbitrary Swing app
               </div>
             </div>
           </a>
         
         
-          <a href="../contributing/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../../about/comparison/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Contributing
+                Comparison to other remote access solutions
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

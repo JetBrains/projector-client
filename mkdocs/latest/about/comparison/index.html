@@ -14,7 +14,7 @@
     
     
       
-        <title>Versions - Projector documentation</title>
+        <title>Comparison to other remote access solutions - Projector documentation</title>
       
     
     
@@ -61,11 +61,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#versions" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -93,7 +88,7 @@
         <div class="md-header-nav__topic">
           <span class="md-ellipsis">
             
-              Versions
+              Comparison to other remote access solutions
             
           </span>
         </div>
@@ -396,11 +391,18 @@
           
 
 
+  
 
-  <li class="md-nav__item">
-    <a href="../comparison/" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
       Comparison to other remote access solutions
     </a>
+    
   </li>
 
         
@@ -422,49 +424,11 @@
           
 
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Versions
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-    
-    <a href="./" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../versions/" class="md-nav__link">
       Versions
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#changelogs" class="md-nav__link">
-    Changelogs
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -511,24 +475,19 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/JetBrains/projector-client/edit/master/docSrc/src/doc/docs/about/versions.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/JetBrains/projector-client/edit/master/docSrc/src/doc/docs/about/comparison.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
                 
-                <h1 id="versions">Versions<a class="headerlink" href="#versions" title="Permanent link">&para;</a></h1>
-<p>Projector currently doesn't have consistent versioning. It's yet to decide (<a href="https://youtrack.jetbrains.com/issue/PRJ-34">PRJ-34</a>).</p>
-<p>Currently, each subproject uses its own versions.</p>
-<h2 id="changelogs">Changelogs<a class="headerlink" href="#changelogs" title="Permanent link">&para;</a></h2>
+                  <h1>Comparison to other remote access solutions</h1>
+                
+                <p>Here we formulate the pros of Projector:</p>
 <ul>
-<li><a href="https://github.com/JetBrains/projector-server/blob/master/projector-plugin/CHANGELOG.md">projector-plugin</a>.</li>
-<li><a href="https://github.com/JetBrains/projector-server/blob/master/projector-server/CHANGELOG.md">projector-server</a>.</li>
-<li><a href="https://github.com/JetBrains/projector-installer/blob/master/CHANGELOG.md">projector-installer</a>.</li>
-<li><a href="https://github.com/JetBrains/projector-client/blob/master/projector-launcher/CHANGELOG.md">projector-launcher</a>.</li>
+<li>Since our goal is to support only AWT apps, Projector is <strong>more compact</strong> than more general remote access software like RDP or VNC. You don't even have to install special apps anywhere: on a server-side, you need only JRE, but there is one because your app is a Java app; on a client-side, you need only a Web browser, and you have it on almost any device.</li>
+<li>Since Projector Server knows about <strong>AWT components</strong>, some of them can be serialized in a special way to be shown on a client <strong>natively</strong>. The example is the Markdown Preview of JetBrains IDEs.</li>
+<li>Projector supports <strong>simultaneous client connections</strong> to the same application instance.</li>
 </ul>
-<div class="admonition note">
-<p>If we decide to make the versions the same for all the projects, the changelog will be moved here.</p>
-</div>
                 
               
               
@@ -547,7 +506,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../usecases/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../../dev_guide/ecosystem/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -556,19 +515,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Use cases
+                Ecosystem
               </div>
             </div>
           </a>
         
         
-          <a href="../contributing/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../usecases/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Contributing
+                Use cases
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

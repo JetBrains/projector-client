@@ -14,7 +14,7 @@
     
     
       
-        <title>Versions - Projector documentation</title>
+        <title>Use cases - Projector documentation</title>
       
     
     
@@ -61,11 +61,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#versions" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -93,7 +88,7 @@
         <div class="md-header-nav__topic">
           <span class="md-ellipsis">
             
-              Versions
+              Use cases
             
           </span>
         </div>
@@ -409,11 +404,18 @@
           
 
 
+  
 
-  <li class="md-nav__item">
-    <a href="../usecases/" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
       Use cases
     </a>
+    
   </li>
 
         
@@ -422,49 +424,11 @@
           
 
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Versions
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-    
-    <a href="./" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../versions/" class="md-nav__link">
       Versions
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#changelogs" class="md-nav__link">
-    Changelogs
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -511,24 +475,27 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/JetBrains/projector-client/edit/master/docSrc/src/doc/docs/about/versions.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/JetBrains/projector-client/edit/master/docSrc/src/doc/docs/about/usecases.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
                 
-                <h1 id="versions">Versions<a class="headerlink" href="#versions" title="Permanent link">&para;</a></h1>
-<p>Projector currently doesn't have consistent versioning. It's yet to decide (<a href="https://youtrack.jetbrains.com/issue/PRJ-34">PRJ-34</a>).</p>
-<p>Currently, each subproject uses its own versions.</p>
-<h2 id="changelogs">Changelogs<a class="headerlink" href="#changelogs" title="Permanent link">&para;</a></h2>
+                  <h1>Use cases</h1>
+                
+                <p>We believe there are many cases when you may want to use Projector. Let's enumerate some of them to inspire you:</p>
 <ul>
-<li><a href="https://github.com/JetBrains/projector-server/blob/master/projector-plugin/CHANGELOG.md">projector-plugin</a>.</li>
-<li><a href="https://github.com/JetBrains/projector-server/blob/master/projector-server/CHANGELOG.md">projector-server</a>.</li>
-<li><a href="https://github.com/JetBrains/projector-installer/blob/master/CHANGELOG.md">projector-installer</a>.</li>
-<li><a href="https://github.com/JetBrains/projector-client/blob/master/projector-launcher/CHANGELOG.md">projector-launcher</a>.</li>
+<li>Not running a Swing IDE on a high-end laptop, but running it on a server and accessing it via a <strong>thin client</strong>:<ul>
+<li>Usually, <strong>high-end laptops cost more</strong> than a server with comparable performance and a thin client.</li>
+<li>A thin client not only has a relatively small price but also it <strong>doesn't contain any valuable data</strong>, so a case of its loss is not a big deal.</li>
+<li>Thin clients are <strong>more mobile</strong>: you aren't restricted to use only x86, you can select ARM and devices that are cooler, more compact, and have longer battery life, for example, you can use iPad and a keyboard instead of MacBook.</li>
 </ul>
-<div class="admonition note">
-<p>If we decide to make the versions the same for all the projects, the changelog will be moved here.</p>
-</div>
+</li>
+<li>Not <strong>remote debugging</strong> in a local Swing IDE, but accessing a remote Swing IDE doing local debugging.</li>
+<li>Not <strong>coding in nano or vim over ssh</strong> but copying a Swing IDE and Projector there and access it.</li>
+<li>Run your Swing IDE in a <strong>Linux environment but on Windows</strong>: you can simply run it via Projector Server in WSL and use a client in Windows. This is easier than other methods such as installing X Server to WSL or using a visual virtual machine.</li>
+<li>Do <strong>pair programming</strong> sessions remotely: multiple clients can simultaneously connect to the same Swing IDE and interact with it in rotation.</li>
+<li>You can <strong>turn your device off</strong> while your app continues work on a server. For example, if your project is so huge that it takes a night to compile it fully, you can leave this task for a server and take your device with you without risk of overheating in your bag.</li>
+</ul>
                 
               
               
@@ -547,7 +514,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../usecases/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../comparison/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -556,19 +523,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Use cases
+                Comparison to other remote access solutions
               </div>
             </div>
           </a>
         
         
-          <a href="../contributing/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../versions/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Contributing
+                Versions
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">
