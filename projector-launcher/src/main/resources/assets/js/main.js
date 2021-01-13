@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019-2020 JetBrains s.r.o.
+ * Copyright (c) 2019-2021 JetBrains s.r.o.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { urlCache, cacheNewUrlValue, populateDataList, projectorLauncherStorageKey, storage } from './modules/urlcache.js';
+import {cacheNewUrlValue, populateDataList, projectorLauncherStorageKey, storage, urlCache} from './modules/urlcache.js';
 
 window.onload = function () {
   document.getElementById("url-text-field").focus();
