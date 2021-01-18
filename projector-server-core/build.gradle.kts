@@ -44,6 +44,7 @@ publishing {
 }
 
 val coroutinesVersion: String by project
+val dnsjavaVersion: String by project
 val javassistVersion: String by project
 val javaWebSocketVersion: String by project
 val kotlinVersion: String by project
@@ -128,6 +129,7 @@ dependencies {
   implementation("org.javassist:javassist:$javassistVersion")
   api("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
   implementation("org.slf4j:slf4j-simple:$slf4jVersion")
+  implementation("dnsjava:dnsjava:$dnsjavaVersion")
 
   // todo: remove these dependencies: they should be exported from projector-common but now it seems not working
   testImplementation(kotlin("test", kotlinVersion))
