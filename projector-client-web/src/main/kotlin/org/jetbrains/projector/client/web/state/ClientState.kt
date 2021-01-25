@@ -81,7 +81,7 @@ sealed class ClientState {
     private fun configureWebPage(url: String): AppLayers {
       document.body!!.apply {
         style.apply {
-          backgroundColor = "#2A2"
+          backgroundColor = ParamsProvider.BACKGROUND_COLOR
           asDynamic().overscrollBehaviorY = "none"
           asDynamic().touchAction = "none"
         }
