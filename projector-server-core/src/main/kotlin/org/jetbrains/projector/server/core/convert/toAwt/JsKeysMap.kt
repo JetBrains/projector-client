@@ -228,6 +228,19 @@ private val jsCodeMap = mapOf(
   "F23" to KeyEvent.VK_F23,
   "F24" to KeyEvent.VK_F24,
   //"BrowserSearch" to KeyEvent.VK_,  // Java does not have this
+  // todo: change protocol from String to enum
+  "VK_UNDEFINED" to KeyEvent.VK_UNDEFINED,
+  "VK_AMPERSAND" to KeyEvent.VK_AMPERSAND,
+  "VK_QUOTEDBL" to KeyEvent.VK_QUOTEDBL,
+  "VK_QUOTE" to KeyEvent.VK_QUOTE,
+  "VK_LEFT_PARENTHESIS" to KeyEvent.VK_LEFT_PARENTHESIS,
+  "VK_MINUS" to KeyEvent.VK_MINUS,
+  "VK_UNDERSCORE" to KeyEvent.VK_UNDERSCORE,
+  "VK_RIGHT_PARENTHESIS" to KeyEvent.VK_RIGHT_PARENTHESIS,
+  "VK_DEAD_CIRCUMFLEX" to KeyEvent.VK_DEAD_CIRCUMFLEX,
+  "VK_DOLLAR" to KeyEvent.VK_DOLLAR,
+  "VK_ASTERISK" to KeyEvent.VK_ASTERISK,
+  "VK_EXCLAMATION_MARK" to KeyEvent.VK_EXCLAMATION_MARK,
 )
 
 // Maps symbol to control character when Ctrl is pressed

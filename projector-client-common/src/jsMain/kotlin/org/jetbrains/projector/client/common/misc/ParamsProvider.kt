@@ -83,6 +83,7 @@ actual object ParamsProvider {
   val REPAINT_INTERVAL_MS: Int
   actual val IMAGE_CACHE_SIZE_CHARS: Int
   val BLOCK_CLOSING: Boolean
+  val LAYOUT_TYPE: LayoutType
   val SCALING_RATIO: Double
     get() = SYSTEM_SCALING_RATIO * USER_SCALING_RATIO
 
@@ -132,6 +133,10 @@ actual object ParamsProvider {
       REPAINT_INTERVAL_MS = searchParams.get("repaintInterval")?.toIntOrNull() ?: DEFAULT_REPAINT_INTERVAL_MS
       IMAGE_CACHE_SIZE_CHARS = searchParams.get("cacheSize")?.toIntOrNull() ?: DEFAULT_IMAGE_CACHE_SIZE_CHARS
       BLOCK_CLOSING = searchParams.get("blockClosing")?.toBoolean() ?: DEFAULT_BLOCK_CLOSING
+      LAYOUT_TYPE = when (searchParams.get("layout")) {
+        "frAzerty" -> LayoutType.FR_AZERTY
+        else -> LayoutType.JS_DEFAULT
+      }
     }
   }
 
@@ -145,5 +150,10 @@ actual object ParamsProvider {
     DISABLED,
     ONLY_BUTTONS,  // controls
     ALL,  // controls + virtual keyboard
+  }
+
+  enum class LayoutType {
+    JS_DEFAULT,
+    FR_AZERTY,
   }
 }

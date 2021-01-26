@@ -47,6 +47,12 @@ class InputController(
   private val windowManager: WindowManager,
 ) {
 
+  private val currentLayoutMap: Map<String, String>
+    get() = when (ParamsProvider.LAYOUT_TYPE) {
+      ParamsProvider.LayoutType.JS_DEFAULT -> emptyMap()
+      ParamsProvider.LayoutType.FR_AZERTY -> frAzertyCodeMap
+    }
+
   val specialKeysState = SpecialKeysState()
 
   private val mouseButtonsDown = mutableSetOf<Short>()
@@ -375,7 +381,7 @@ class InputController(
     val message = ClientKeyEvent(
       timeStamp = event.timeStamp.toInt() - openingTimeStamp,
       key = event.key,
-      code = event.code,
+      code = currentLayoutMap[event.code] ?: event.code,
       location = event.location.toCommonKeyLocation(),
       modifiers = event.modifiers,
       keyEventType = type
@@ -424,10 +430,10 @@ class InputController(
           )))
         }
       }
-      else if (isBrowserKeyStroke && message.code.startsWith("Key") && type == ClientKeyEvent.KeyEventType.DOWN) {
+      else if (isBrowserKeyStroke && message.code !in invisibleCodes && type == ClientKeyEvent.KeyEventType.DOWN) {
         stateMachine.fire(ClientAction.AddEvent(ClientKeyPressEvent(
           timeStamp = message.timeStamp,
-          key = message.code,
+          key = currentLayoutMap[event.code] ?: event.code,
           modifiers = message.modifiers,
         )))
       }
@@ -510,5 +516,48 @@ class InputController(
     private const val LEFT_MOUSE_BUTTON_ID: Short = 0
 
     private const val DOUBLE_CLICK_DELTA_MS = 500
+
+    private val invisibleCodes: Set<String> = setOf(
+      "ShiftLeft", "ShiftRight",
+      "ControlLeft", "ControlRight",
+      "MetaLeft", "MetaRight",
+      "AltLeft", "AltRight",
+      "CapsLock",
+      "Backspace",
+      "Escape",
+      *(1..24).map { "F$it" }.toTypedArray(),
+    )
+
+    private val frAzertyCodeMap = mapOf(
+      // number row:
+      "Backquote" to "VK_UNDEFINED",  // '²'
+      "Digit1" to "VK_AMPERSAND",  // '&'
+      "Digit2" to "VK_UNDEFINED",  // 'é'
+      "Digit3" to "VK_QUOTEDBL",  // '"'
+      "Digit4" to "VK_QUOTE",  // '''
+      "Digit5" to "VK_LEFT_PARENTHESIS",  // '('
+      "Digit6" to "VK_MINUS",  // '-'
+      "Digit7" to "VK_UNDEFINED",  // 'è'
+      "Digit8" to "VK_UNDERSCORE",  // '_'
+      "Digit9" to "VK_UNDEFINED",  // 'ç'
+      "Digit0" to "VK_UNDEFINED",  // 'à'
+      "Minus" to "VK_RIGHT_PARENTHESIS",  // ')'
+      // 1st letter row
+      "KeyQ" to "KeyA",
+      "KeyW" to "KeyZ",
+      "BracketLeft" to "VK_DEAD_CIRCUMFLEX",  // '^'
+      "BracketRight" to "VK_DOLLAR",  // '$'
+      "Backslash" to "VK_ASTERISK",  // '*'
+      // 2nd letter row
+      "KeyA" to "KeyQ",
+      "Semicolon" to "KeyM",
+      "Quote" to "VK_UNDEFINED",  // 'ù'
+      // 3rd letter row
+      "KeyZ" to "KeyW",
+      "KeyM" to "Comma",
+      "Comma" to "Semicolon",
+      "Period" to "Colon",
+      "Slash" to "VK_EXCLAMATION_MARK",
+    )
   }
 }

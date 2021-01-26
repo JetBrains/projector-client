@@ -40,6 +40,7 @@ Name | Type | Default value | Description
 `token` | String? | Not present | Set a password which will be checked by the server on the connection.
 `mobile` | String? | Not present | Enable overlay controls handy for mobile devices. Presented param activates all controls. Provide `onlyButtons` value if you don't use virtual keyboard.
 `ideWindow` | Int? | Not present | Specify the IDE window ID to show. The first ID is `0`. If not presented, all IDE windows are shown.
+`layout` | Enum (String) | `jsDefault` | Specify keyboard layout. Possible values: `jsDefault`, `frAzerty`.
 
 ### Debug/test parameters
 Name | Type | Default value | Description 
