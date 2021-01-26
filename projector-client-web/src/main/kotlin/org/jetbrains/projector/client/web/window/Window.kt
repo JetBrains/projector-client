@@ -199,7 +199,6 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   }
 
   private fun createCanvas() = (document.createElement("canvas") as HTMLCanvasElement).apply {
-    style.background = ParamsProvider.BACKGROUND_COLOR
     style.position = "fixed"
     style.display = isShowing.toDisplayType()
 
