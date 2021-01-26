@@ -156,7 +156,7 @@ private val jsCodeMap = mapOf(
   "ControlRight" to KeyEvent.VK_CONTROL,
   "NumpadDivide" to KeyEvent.VK_DIVIDE,
   "PrintScreen" to KeyEvent.VK_PRINTSCREEN,
-  "AltRight" to KeyEvent.VK_ALT,
+  "AltRight" to KeyEvent.VK_ALT_GRAPH,
   "Home" to KeyEvent.VK_HOME,
   "ArrowUp" to KeyEvent.VK_UP,
   "PageUp" to KeyEvent.VK_PAGE_UP,
