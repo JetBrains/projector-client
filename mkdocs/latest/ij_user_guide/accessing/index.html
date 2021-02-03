@@ -312,8 +312,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#github-pages-client" class="md-nav__link">
-    GitHub Pages client
+  <a href="#latest-client" class="md-nav__link">
+    Latest client
   </a>
   
 </li>
@@ -682,13 +682,17 @@
 <h3 id="bundled-client">Bundled client<a class="headerlink" href="#bundled-client" title="Permanent link">&para;</a></h3>
 <p>Recent versions of servers have bundled client files. So for example if you start a server on port 9999, you can access it via a browser locally opening <a href="http://localhost:9999/">http://localhost:9999/</a> (or <a href="https://...">https://...</a> if your server is secure).</p>
 <p>If your server is located remotely, just use the corresponding host address instead of <code>localhost</code>.</p>
-<h3 id="github-pages-client">GitHub Pages client<a class="headerlink" href="#github-pages-client" title="Permanent link">&para;</a></h3>
-<p>The latest client is always available at GitHub Pages: <a href="https://JetBrains.github.io/projector-client/?host=HOST&amp;port=PORT">https://JetBrains.github.io/projector-client/?host=HOST&amp;port=PORT</a>. So this variant is useful if you want to check out the recent update in the client.</p>
-<p>You should set <code>HOST</code> and <code>PORT</code> matching your server. For the previous example, it will be <a href="https://JetBrains.github.io/projector-client/?host=localhost&amp;port=9999">https://JetBrains.github.io/projector-client/?host=localhost&amp;port=9999</a>.</p>
+<h3 id="latest-client">Latest client<a class="headerlink" href="#latest-client" title="Permanent link">&para;</a></h3>
+<p>The latest client is always available at our site: <a href="https://projector.jetbrains.com/?host=HOST&amp;port=PORT">https://projector.jetbrains.com/?host=HOST&amp;port=PORT</a>. So this variant is useful if you
+want to check out the recent update in the client.</p>
+<p>You should set <code>HOST</code> and <code>PORT</code> matching your server. For the previous example, it will
+be <a href="https://projector.jetbrains.com/?host=localhost&amp;port=9999">https://projector.jetbrains.com/?host=localhost&amp;port=9999</a>.</p>
 <div class="admonition warning">
-<p class="admonition-title">Secure connection is required for GitHub client</p>
-<p>Your server must be secure when using GitHub client because GitHub is secure itself. Before connection, make sure that your browser trusts the certificate you use on your server (in this case, connection via the bundled client should succeed). For more info, read <a href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page">below</a>.</p>
+<p class="admonition-title">Secure connection is required for the latest client</p>
 </div>
+<p>Your server must be secure when using the latest client because our domain is secure itself. Before connection, make sure that your browser
+trusts the certificate you use on your server (in this case, connection via the bundled client should succeed). For more info,
+read <a href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page">below</a>.</p>
 <h3 id="known-issues">Known issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h3>
 <p>Due to limitations of web browsers, there are some issues in the Web Client. They can be solved via native implementations of the client.</p>
 <h4 id="ipad-as-a-client">iPad as a client<a class="headerlink" href="#ipad-as-a-client" title="Permanent link">&para;</a></h4>
@@ -710,7 +714,7 @@
 <p>We set the clipboard on the client side via <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard"><code>window.navigator.clipboard</code></a>. <strong>This doesn't work in <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts/features_restricted_to_secure_contexts">insecure contexts</a>, so the client needs to be opened using HTTPS or on localhost to support this</strong>.</p>
 <p>We can't use <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event">"copy" listener</a> because when this event is generated, we don't have a message from the server with actual clipboard data yet. Also, this method won't work if you click a "copy" button in your application.</p>
 <h4 id="its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page">It's not possible to connect to insecure WebSocket from a secure web page<a class="headerlink" href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page" title="Permanent link">&para;</a></h4>
-<p>This is a limitation of browsers. So for example you can't use GitHub Pages client to access an insecure server.</p>
+<p>This is a limitation of browsers. So for example you can't use client at <a href="https://projector.jetbrains.com">https://projector.jetbrains.com</a> to access an insecure server.</p>
 <h3 id="advanced-options-and-shortcuts">Advanced options and shortcuts<a class="headerlink" href="#advanced-options-and-shortcuts" title="Permanent link">&para;</a></h3>
 <p>The web client has some hidden <a href="https://github.com/JetBrains/projector-client/tree/master/projector-client-web#page-parameters">options</a> and keyboard <a href="https://github.com/JetBrains/projector-client/tree/master/projector-client-web#shortcuts">shortcuts</a>. Please use the links if you want to know more info.</p>
 <p>In the future, welcome screen (<a href="https://youtrack.jetbrains.com/issue/PRJ-126">PRJ-126</a>) and actions panel (<a href="https://youtrack.jetbrains.com/issue/PRJ-248">PRJ-248</a>) will make these features more explicit.</p>
