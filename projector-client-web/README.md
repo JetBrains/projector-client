@@ -9,8 +9,8 @@ Contents:
 * [Shortcuts](#shortcuts) &mdash; currently they are needed for debug purposes.
 
 ## Running
-The latest commit in master is built and deployed to GitHub Pages. So the latest commit is available
-here: <https://jetbrains.github.io/projector-client/?host=HOST&port=PORT> (don't forget to set `HOST` and `PORT` to match your server's).
+The latest commit from master is built and deployed here: <https://projector.jetbrains.com/?host=HOST&port=PORT> (don't forget to set `HOST`
+and `PORT` to match your server's).
 
 The latest version can be downloaded at the [Artifacts page](https://github.com/JetBrains/projector-client/releases).
 
