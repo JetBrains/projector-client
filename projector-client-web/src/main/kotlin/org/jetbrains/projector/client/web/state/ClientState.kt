@@ -39,8 +39,8 @@ import org.jetbrains.projector.client.web.input.InputController
 import org.jetbrains.projector.client.web.input.MobileKeyboardHelperImpl
 import org.jetbrains.projector.client.web.input.NopMobileKeyboardHelper
 import org.jetbrains.projector.client.web.misc.*
-import org.jetbrains.projector.client.web.protocol.KotlinxJsonToClientHandshakeDecoder
-import org.jetbrains.projector.client.web.protocol.KotlinxJsonToServerHandshakeEncoder
+import org.jetbrains.projector.client.common.protocol.KotlinxJsonToClientHandshakeDecoder
+import org.jetbrains.projector.client.common.protocol.KotlinxJsonToServerHandshakeEncoder
 import org.jetbrains.projector.client.web.protocol.SupportedTypesProvider
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.ui.ReconnectionMessage

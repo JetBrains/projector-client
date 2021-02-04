@@ -21,18 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web.protocol
+package org.jetbrains.projector.client.common.protocol
 
+import org.jetbrains.projector.common.protocol.MessageDecoder
+import org.jetbrains.projector.common.protocol.handshake.KotlinxJsonHandshakeEventSerializer
 import org.jetbrains.projector.common.protocol.handshake.ProtocolType
-import org.jetbrains.projector.common.protocol.toServer.KotlinxJsonClientEventSerializer
-import org.jetbrains.projector.common.protocol.toServer.ToServerMessageEncoder
-import org.jetbrains.projector.common.protocol.toServer.ToServerMessageType
-import org.jetbrains.projector.common.protocol.toServer.ToServerTransferableType
+import org.jetbrains.projector.common.protocol.handshake.ToClientHandshakeEvent
 
-object SerializationToServerMessageEncoder : ToServerMessageEncoder {
+object KotlinxJsonToClientHandshakeDecoder : MessageDecoder<ByteArray, ToClientHandshakeEvent> {
+
   override val protocolType = ProtocolType.KOTLINX_JSON
 
-  override fun encode(message: ToServerMessageType): ToServerTransferableType {
-    return KotlinxJsonClientEventSerializer.serializeList(message)
+  @OptIn(ExperimentalStdlibApi::class)
+  override fun decode(message: ByteArray): ToClientHandshakeEvent {
+    val string = message.decodeToString()
+
+    return KotlinxJsonHandshakeEventSerializer.deserializeToClientEvent(string)
   }
 }
