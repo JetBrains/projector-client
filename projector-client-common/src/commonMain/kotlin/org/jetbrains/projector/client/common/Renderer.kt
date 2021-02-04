@@ -345,11 +345,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
     @Suppress("NAME_SHADOWING") val r2 = minOf(r2, h / 2)
     ctx.apply {
       beginPath()
-      moveTo(x + r1, y)
-      arcTo(x + w, y, x + w, y + h, r1)
-      arcTo(x + w, y + h, x, y + h, r2)
-      arcTo(x, y + h, x, y, r1)
-      arcTo(x, y, x + w, y, r2)
+      roundedRect(x, y, w, h, r1, r2)
 
       Do exhaustive when (paintType) {
         PaintType.FILL -> fill()
