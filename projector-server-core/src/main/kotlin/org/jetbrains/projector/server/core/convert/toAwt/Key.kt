@@ -25,6 +25,7 @@ package org.jetbrains.projector.server.core.convert.toAwt
 
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientRawKeyEvent
 import org.jetbrains.projector.common.protocol.toServer.KeyModifier
 import org.jetbrains.projector.util.logging.Logger
 import java.awt.Component
@@ -32,6 +33,18 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 
 private val logger = Logger("KeyKt")
+
+public fun ClientRawKeyEvent.toAwtKeyEvent(connectionMillis: Long, target: Component): KeyEvent {
+  return KeyEvent(
+    target,
+    this.keyEventType.toAwtKeyEventId(),
+    this.timeStamp + connectionMillis,
+    this.modifiers,
+    this.code,
+    this.char,
+    this.location
+  )
+}
 
 public fun ClientKeyPressEvent.toAwtKeyEvent(connectionMillis: Long, target: Component): KeyEvent? {
   @Suppress("MoveVariableDeclarationIntoWhen") val isKeystroke = KeyModifier.CTRL_KEY in this.modifiers
@@ -94,6 +107,12 @@ private fun Set<KeyModifier>.toInt(): Int {
 private fun ClientKeyEvent.KeyEventType.toAwtKeyEventId() = when (this) {
   ClientKeyEvent.KeyEventType.DOWN -> KeyEvent.KEY_PRESSED
   ClientKeyEvent.KeyEventType.UP -> KeyEvent.KEY_RELEASED
+}
+
+private fun ClientRawKeyEvent.RawKeyEventType.toAwtKeyEventId() = when (this) {
+  ClientRawKeyEvent.RawKeyEventType.DOWN -> KeyEvent.KEY_PRESSED
+  ClientRawKeyEvent.RawKeyEventType.UP -> KeyEvent.KEY_RELEASED
+  ClientRawKeyEvent.RawKeyEventType.TYPED -> KeyEvent.KEY_TYPED
 }
 
 private fun ClientKeyEvent.KeyLocation.toJavaLocation() = when (this) {

@@ -134,6 +134,24 @@ data class ClientKeyPressEvent(
 ) : ClientEvent()
 
 @Serializable
+data class ClientRawKeyEvent(
+  /** From connection opening. */
+  val timeStamp: Int,
+  val code: Int,
+  val char: Char,
+  val modifiers: Int,
+  val location: Int,
+  val keyEventType: RawKeyEventType,
+) : ClientEvent() {
+
+  enum class RawKeyEventType {
+    DOWN,
+    UP,
+    TYPED
+  }
+}
+
+@Serializable
 data class ClientResizeEvent(val size: CommonIntSize) : ClientEvent()
 
 @Serializable
