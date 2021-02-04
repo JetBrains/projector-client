@@ -53,8 +53,7 @@ interface Context2d {
   fun moveBySegments(segments: List<PathSegment>)
   fun moveByPoints(points: List<Point>)
   fun lineTo(x: Double, y: Double)
-  fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double)
-  fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double)
+  fun roundedRect(x: Double, y: Double, w: Double, h: Double, r1: Double, r2: Double)
   fun rect(x: Double, y: Double, w: Double, h: Double)
   fun ellipse(
     x: Double,

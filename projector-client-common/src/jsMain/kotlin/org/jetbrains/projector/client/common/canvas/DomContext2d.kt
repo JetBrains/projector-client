@@ -151,11 +151,19 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     myContext2d.lineTo(x, y)
   }
 
-  override fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double) {
+  override fun roundedRect(x: Double, y: Double, w: Double, h: Double, r1: Double, r2: Double) {
+    moveTo(x + r1, y)
+    arcTo(x + w, y, x + w, y + h, r1)
+    arcTo(x + w, y + h, x, y + h, r2)
+    arcTo(x, y + h, x, y, r1)
+    arcTo(x, y, x + w, y, r2)
+  }
+
+  fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double) {
     myContext2d.arcTo(x1, y1, x2, y2, radius)
   }
 
-  override fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double) {
+  fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double) {
     myContext2d.arc(x, y, radius, startAngle, endAngle)
   }
 
