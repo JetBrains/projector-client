@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web.protocol
+package org.jetbrains.projector.client.common.protocol
 
 import org.jetbrains.projector.common.protocol.MessageEncoder
 import org.jetbrains.projector.common.protocol.handshake.KotlinxJsonHandshakeEventSerializer

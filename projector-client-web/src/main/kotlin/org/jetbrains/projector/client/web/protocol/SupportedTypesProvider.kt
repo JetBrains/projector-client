@@ -24,6 +24,8 @@
 package org.jetbrains.projector.client.web.protocol
 
 import org.jetbrains.projector.client.common.misc.ParamsProvider
+import org.jetbrains.projector.client.common.protocol.KotlinxProtoBufToClientMessageDecoder
+import org.jetbrains.projector.client.common.protocol.SerializationToServerMessageEncoder
 import org.jetbrains.projector.common.protocol.compress.MessageCompressor
 import org.jetbrains.projector.common.protocol.compress.MessageDecompressor
 import org.jetbrains.projector.common.protocol.compress.NotCompressor
