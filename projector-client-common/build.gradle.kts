@@ -63,5 +63,12 @@ kotlin {
         api(kotlin("test-js", kotlinVersion))
       }
     }
+
+    val jvmTest by getting {
+      dependencies {
+        api(kotlin("test", kotlinVersion))
+        api(kotlin("test-junit", kotlinVersion))
+      }
+    }
   }
 }
