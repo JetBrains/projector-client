@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019-2021 JetBrains s.r.o.
+ * Copyright (c) 2019-2020 JetBrains s.r.o.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 plugins {
-  kotlin("multiplatform")
-  `maven-publish`
+  kotlin("jvm")
 }
 
-val kotlinVersion: String by project
+val coroutinesVersion: String by project
+val serializationVersion: String by project
+val javaWebSocketVersion: String by project
+
+dependencies {
+  implementation(project(":projector-common"))
+  implementation(project(":projector-client-common"))
+  implementation(project(":projector-util-logging"))
+
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
+  implementation("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
+}
 
 kotlin {
-  js {
-    browser()
-  }
 
-  jvm {
-  }
-
-  sourceSets {
-    val commonMain by getting {
-      dependencies {
-        api(kotlin("reflect", kotlinVersion))
-        implementation(project(":projector-common"))
-        implementation(project(":projector-util-logging"))
-      }
-    }
-
-    val jsMain by getting {
-    }
-
-    val jvmMain by getting {
-    }
-
-    val commonTest by getting {
-      dependencies {
-        api(kotlin("test-common", kotlinVersion))
-        api(kotlin("test-annotations-common", kotlinVersion))
-      }
-    }
-
-    val jsTest by getting {
-      dependencies {
-        api(kotlin("test-js", kotlinVersion))
-      }
-    }
-  }
 }

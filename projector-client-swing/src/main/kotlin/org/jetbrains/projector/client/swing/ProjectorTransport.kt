@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019-2021 JetBrains s.r.o.
+ * Copyright (c) 2019-2020 JetBrains s.r.o.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("multiplatform")
-  `maven-publish`
+package org.jetbrains.projector.client.swing
+
+import kotlinx.coroutines.channels.Channel
+import org.jetbrains.projector.client.common.protocol.SerializationToServerMessageEncoder
+import org.jetbrains.projector.common.protocol.toServer.ClientEvent
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionStage
+
+interface ProjectorTransport {
+  val onOpen: CompletionStage<Unit>
+  val onClosed: CompletionStage<Unit>
+
+  val messages: Channel<ByteArray>
+  val connectionTime: Long
+
+  fun connect()
+
+  fun send(bytes: ByteArray)
+  fun send(string: String)
 }
 
-val kotlinVersion: String by project
-
-kotlin {
-  js {
-    browser()
-  }
-
-  jvm {
-  }
-
-  sourceSets {
-    val commonMain by getting {
-      dependencies {
-        api(kotlin("reflect", kotlinVersion))
-        implementation(project(":projector-common"))
-        implementation(project(":projector-util-logging"))
-      }
-    }
-
-    val jsMain by getting {
-    }
-
-    val jvmMain by getting {
-    }
-
-    val commonTest by getting {
-      dependencies {
-        api(kotlin("test-common", kotlinVersion))
-        api(kotlin("test-annotations-common", kotlinVersion))
-      }
-    }
-
-    val jsTest by getting {
-      dependencies {
-        api(kotlin("test-js", kotlinVersion))
-      }
-    }
-  }
+fun ProjectorTransport.send(event: ClientEvent) {
+  val serialized = SerializationToServerMessageEncoder.encode(listOf(event))
+  send(serialized)
 }

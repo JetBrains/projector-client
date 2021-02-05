@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019-2021 JetBrains s.r.o.
+ * Copyright (c) 2019-2020 JetBrains s.r.o.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("multiplatform")
-  `maven-publish`
+package org.jetbrains.projector.client.common.misc
+
+actual object ParamsProvider {
+  actual val CLIPPING_BORDERS: Boolean
+    get() = JvmParamsProviderImpl.CLIPPING_BORDERS
+  actual val SHOW_TEXT_WIDTH: Boolean
+    get() = JvmParamsProviderImpl.SHOW_TEXT_WIDTH
+  actual val REPAINT_AREA: RepaintAreaSetting
+    get() = JvmParamsProviderImpl.REPAINT_AREA
+  actual val LOG_UNSUPPORTED_EVENTS: Boolean
+    get() = JvmParamsProviderImpl.LOG_UNSUPPORTED_EVENTS
+  actual val IMAGE_TTL: Double
+    get() = JvmParamsProviderImpl.IMAGE_TTL
+  actual val IMAGE_CACHE_SIZE_CHARS: Int
+    get() = JvmParamsProviderImpl.IMAGE_CACHE_SIZE_CHARS
 }
 
-val kotlinVersion: String by project
-
-kotlin {
-  js {
-    browser()
-  }
-
-  jvm {
-  }
-
-  sourceSets {
-    val commonMain by getting {
-      dependencies {
-        api(kotlin("reflect", kotlinVersion))
-        implementation(project(":projector-common"))
-        implementation(project(":projector-util-logging"))
-      }
-    }
-
-    val jsMain by getting {
-    }
-
-    val jvmMain by getting {
-    }
-
-    val commonTest by getting {
-      dependencies {
-        api(kotlin("test-common", kotlinVersion))
-        api(kotlin("test-annotations-common", kotlinVersion))
-      }
-    }
-
-    val jsTest by getting {
-      dependencies {
-        api(kotlin("test-js", kotlinVersion))
-      }
-    }
-  }
+object JvmParamsProviderImpl {
+  var CLIPPING_BORDERS: Boolean = false
+  var SHOW_TEXT_WIDTH: Boolean = false
+  var REPAINT_AREA: RepaintAreaSetting = RepaintAreaSetting.Disabled
+  var LOG_UNSUPPORTED_EVENTS: Boolean = true
+  var IMAGE_TTL: Double = 0.0
+  var IMAGE_CACHE_SIZE_CHARS: Int = 0
 }
