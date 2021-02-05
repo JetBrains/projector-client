@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019-2021 JetBrains s.r.o.
+ * Copyright (c) 2019-2020 JetBrains s.r.o.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("multiplatform")
-  `maven-publish`
-}
+package org.jetbrains.projector.client.common
 
-val kotlinVersion: String by project
+import java.awt.BasicStroke
 
-kotlin {
-  js {
-    browser()
-  }
-
-  jvm {
-  }
-
-  sourceSets {
-    val commonMain by getting {
-      dependencies {
-        api(kotlin("reflect", kotlinVersion))
-        implementation(project(":projector-common"))
-        implementation(project(":projector-util-logging"))
-      }
-    }
-
-    val jsMain by getting {
-    }
-
-    val jvmMain by getting {
-    }
-
-    val commonTest by getting {
-      dependencies {
-        api(kotlin("test-common", kotlinVersion))
-        api(kotlin("test-annotations-common", kotlinVersion))
-      }
-    }
-
-    val jsTest by getting {
-      dependencies {
-        api(kotlin("test-js", kotlinVersion))
-      }
-    }
-  }
+fun BasicStroke.change(
+  width: Float = this.lineWidth,
+  cap: Int = this.endCap,
+  join: Int = this.lineJoin,
+  miter: Float = this.miterLimit,
+  dash: FloatArray? = this.dashArray,
+  dash_phase: Float = this.dashPhase
+): BasicStroke {
+  return BasicStroke(width, cap, join, miter, dash, dash_phase)
 }

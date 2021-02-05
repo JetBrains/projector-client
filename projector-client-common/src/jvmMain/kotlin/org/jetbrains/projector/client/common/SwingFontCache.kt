@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019-2021 JetBrains s.r.o.
+ * Copyright (c) 2019-2020 JetBrains s.r.o.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("multiplatform")
-  `maven-publish`
-}
+package org.jetbrains.projector.client.common
 
-val kotlinVersion: String by project
+import org.jetbrains.projector.util.logging.Logger
+import java.awt.Font
+import java.io.ByteArrayInputStream
 
-kotlin {
-  js {
-    browser()
+object SwingFontCache {
+  private val logger = Logger<SwingFontCache>()
+
+  private val knownFontsByName = HashMap<String, Font>()
+  private val knownFonts = HashMap<String, Font>()
+
+  fun registerServerFont(index: Int, data: ByteArray) {
+    knownFontsByName["serverFont$index"] = Font.createFont(Font.TRUETYPE_FONT, ByteArrayInputStream(data))
   }
 
-  jvm {
-  }
+  fun getFont(name: String): Font {
+    // font names are "12px Arial"
+    // or "12px serverFont0"
 
-  sourceSets {
-    val commonMain by getting {
-      dependencies {
-        api(kotlin("reflect", kotlinVersion))
-        implementation(project(":projector-common"))
-        implementation(project(":projector-util-logging"))
-      }
-    }
-
-    val jsMain by getting {
-    }
-
-    val jvmMain by getting {
-    }
-
-    val commonTest by getting {
-      dependencies {
-        api(kotlin("test-common", kotlinVersion))
-        api(kotlin("test-annotations-common", kotlinVersion))
-      }
-    }
-
-    val jsTest by getting {
-      dependencies {
-        api(kotlin("test-js", kotlinVersion))
-      }
+    return knownFonts.getOrPut(name) {
+      logger.info { "Loading new font for $name" }
+      val split = name.split(' ', limit = 2)
+      knownFontsByName.getOrPut(split[1]) {
+        logger.info { "Loading new font type ${split[1]}" }
+        Font(split[1], 0, 12)
+      }.deriveFont(split[0].removeSuffix("px").toFloat())
     }
   }
 }
