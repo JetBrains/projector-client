@@ -205,6 +205,27 @@ class InputController(
     }
   }
 
+  // Translate a "oncontextmenu" event into a click with the right mouse button.
+  // "onclick" is only called for clicks with the left mouse button.
+  private fun handleContextMenuEvent(event: Event) {
+    require(event is MouseEvent)
+    event.preventDefault()
+
+    val topWindow = windowManager.getTopWindow(event.clientX, event.clientY) ?: return
+    if (topWindow.onMouseClick(event.clientX, event.clientY) == null) {
+      fireMouseEvent(
+        type = ClientMouseEvent.MouseEventType.CLICK,
+        windowId = topWindow.id,
+        eventTimeStamp = event.timeStamp,
+        x = event.clientX,
+        y = event.clientY,
+        button = 2, // 2 is the right mouse button
+        clickCount = event.detail,
+        modifiers = event.modifiers
+      )
+    }
+  }
+
   // This is extremely dangerous method, because it is called when mouse leave ANY canvas inside document!
   private fun handleMouseOutEvent(event: Event) {
     require(event is MouseEvent)
@@ -241,6 +262,7 @@ class InputController(
       "mousedown" to ::handleMouseDownEvent,
       "mouseup" to ::handleMouseUpEvent,
       "click" to ::handleClickEvent,
+      "contextmenu" to ::handleContextMenuEvent,
       "mouseout" to ::handleMouseOutEvent,
       "wheel" to ::fireWheelEvent
     ))
