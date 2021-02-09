@@ -143,7 +143,7 @@ public fun createMouseEvent(
     InputEvent.getMaskForButton(awtEventButton)
   }
 
-  val canTriggerPopup = awtEventButton == MouseEvent.BUTTON3
+  val canTriggerPopup = awtEventButton == MouseEvent.BUTTON3 && id == MouseEvent.MOUSE_PRESSED
 
   return MouseEvent(
     source,
