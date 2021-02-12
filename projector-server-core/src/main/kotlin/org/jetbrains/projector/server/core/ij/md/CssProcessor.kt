@@ -37,7 +37,7 @@ internal object CssProcessor {
     appendLine(inlineCss.orEmpty())
 
     cssFileUrls.forEach {
-      it ?: return@forEach
+      if (it.isNullOrEmpty()) return@forEach
 
       try {
         val connection = URL(it).openConnection() as JarURLConnection
@@ -51,7 +51,7 @@ internal object CssProcessor {
         }
       }
       catch (t: Throwable) {
-        logger.error(t) { "Can't process file, skipping" }
+        logger.error(t) { "Can't process file '$it', skipping" }
       }
     }
   }
