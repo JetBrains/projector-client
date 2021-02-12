@@ -114,6 +114,20 @@ public object MarkdownPanelMaker {
         )
       )
 
+      //added in JetBrains IDEs 2020.3+
+      //@Override
+      //@NotNull String html, int initialScrollOffset
+      addMethod(
+        CtNewMethod.make(
+          """
+            public void setHtml(String html, int initialScrollOffset) {
+              $delegateClass.getDeclaredMethod("setHtml", new Class[] { String.class, int.class }).invoke($delegate, new Object[] { html, Integer.valueOf(initialScrollOffset) });
+            }
+          """.trimIndent(),
+          this,
+        )
+      )
+
       //@Override
       //@Nullable String inlineCss, String... fileUris
       addMethod(
