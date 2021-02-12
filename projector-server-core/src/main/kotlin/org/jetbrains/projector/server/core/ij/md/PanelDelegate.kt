@@ -147,6 +147,12 @@ internal class PanelDelegate {
     }
   }
 
+  // added in JetBrains IDEs, version 2020.3+
+  fun setHtml(html: String, initialScrollOffset: Int) {
+    setHtml(html)
+    scrollToMarkdownSrcOffset(initialScrollOffset)
+  }
+
   fun getComponent(): JComponent {
     return backingComponent
   }
