@@ -104,4 +104,4 @@ Run `projector` file.
 
 Run `projector` app (on other OSes it's visible like `projector.app` dir).
 
-Mac doesn't allow unsigned apps to be run easily, and will ask you to put the app to Trash Bin. So you need to select ["Open Anyway" in System Preferences](https://stackoverflow.com/a/59899342) to allow launching.
+Mac doesn't allow unsigned apps to be run easily, and will ask you to put the app to Trash Bin. So you need to select ["Open Anyway" in System Preferences](https://stackoverflow.com/a/59899342) to allow launching. We are working on signing it: [PRJ-258](https://youtrack.jetbrains.com/issue/PRJ-258).
