@@ -44,6 +44,12 @@ class DomCanvas(private val myCanvas: HTMLCanvasElement) : Canvas {
     set(value) {
       myCanvas.height = value
     }
+
+  override var fontVariantLigatures: String
+    get() = myCanvas.style.fontVariantLigatures
+    set(value) {
+      myCanvas.style.fontVariantLigatures = value
+    }
   override val imageSource: ImageSource = DomImageSource(myCanvas)
 
   override fun takeSnapshot(): Snapshot {

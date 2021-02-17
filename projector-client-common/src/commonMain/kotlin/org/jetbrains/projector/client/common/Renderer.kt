@@ -426,7 +426,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
     requestedState.transform = tx
   }
 
-  fun setFont(fontId: Short?, fontSize: Int) {
+  fun setFont(fontId: Short?, fontSize: Int, ligaturesOn: Boolean) {
     val font = if (fontId == null) {
       logger.debug { "null is used as a font ID. Using Arial..." }
 
@@ -437,6 +437,12 @@ class Renderer(private val renderingSurface: RenderingSurface) {
     }
 
     requestedState.font = font
+    renderingSurface.canvas.fontVariantLigatures = ligaturesOn.toLigatureVariant()
+    renderingSurface.canvas
+  }
+
+  private fun Boolean.toLigatureVariant(): String {
+    return if (this) "normal" else "none"
   }
 
   fun drawImage(image: ImageSource, x: Double, y: Double) {
