@@ -27,8 +27,13 @@ import org.jetbrains.projector.common.protocol.toClient.MainWindow
 import org.jetbrains.projector.common.protocol.toClient.toJson
 import org.jetbrains.projector.server.core.util.GetRequestResult
 import org.jetbrains.projector.server.core.util.HttpWsServer
+import org.jetbrains.projector.server.core.util.getWildcardHostAddress
+import java.net.InetAddress
+import java.net.InetSocketAddress
 
-public abstract class ProjectorHttpWsServer(port: Int) : HttpWsServer(port) {
+public abstract class ProjectorHttpWsServer(host: InetAddress, port: Int) : HttpWsServer(host, port) {
+
+  public constructor(port: Int) : this(getWildcardHostAddress(), port)
 
   private companion object {
 
