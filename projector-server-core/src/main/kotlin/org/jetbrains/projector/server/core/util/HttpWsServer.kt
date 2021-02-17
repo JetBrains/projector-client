@@ -34,6 +34,7 @@ import org.java_websocket.framing.Framedata
 import org.java_websocket.handshake.*
 import org.java_websocket.server.WebSocketServer
 import org.java_websocket.util.Charsetfunctions
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.util.concurrent.locks.ReentrantLock
@@ -49,7 +50,9 @@ public class GetRequestResult(
 
 private val ClientHandshake.isHttp: Boolean get() = this.getFieldValue("Upgrade").isNullOrBlank()
 
-public abstract class HttpWsServer(port: Int) {
+public abstract class HttpWsServer(host: InetAddress, port: Int) {
+
+  public constructor(port: Int) : this(getWildcardHostAddress(), port)
 
   private inner class HttpDraft : Draft() {
 
@@ -122,7 +125,7 @@ public abstract class HttpWsServer(port: Int) {
     }
   }
 
-  private val webSocketServer = object : WebSocketServer(InetSocketAddress(port), listOf(HttpDraft(), Draft_6455())) {
+  private val webSocketServer = object : WebSocketServer(InetSocketAddress(host, port), listOf(HttpDraft(), Draft_6455())) {
 
     @Volatile
     private var wasInitialized: Boolean? = null
