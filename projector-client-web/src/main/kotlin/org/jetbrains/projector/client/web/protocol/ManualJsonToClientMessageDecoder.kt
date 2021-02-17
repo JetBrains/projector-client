@@ -229,7 +229,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
         content["f"] as Int
       )
 
-      "g" -> ServerSetFontEvent(content["a"] as Short, content["b"] as Int)
+      "g" -> ServerSetFontEvent(content["a"] as Short, content["b"] as Int, content["c"] as Boolean)
 
       "h" -> ServerSetClipEvent(content["a"].unsafeCast<Array<Any>?>()?.toCommonShape())
 

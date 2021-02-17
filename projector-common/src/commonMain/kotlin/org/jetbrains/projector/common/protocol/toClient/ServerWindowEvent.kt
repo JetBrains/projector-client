@@ -147,6 +147,8 @@ data class ServerSetFontEvent(
   val fontId: Short? = null,
   @SerialName("b")
   val fontSize: Int,
+  @SerialName("c")
+  val ligaturesOn: Boolean = false,
 ) : ServerWindowStateEvent()
 
 @Serializable

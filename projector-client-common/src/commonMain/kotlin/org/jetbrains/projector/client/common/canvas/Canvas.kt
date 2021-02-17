@@ -50,6 +50,9 @@ interface Canvas {
   val context2d: Context2d
   var width: Int
   var height: Int
+  var fontVariantLigatures: String
+    get() = ""
+    set(value) {}
   val imageSource: ImageSource
 
   fun takeSnapshot(): Snapshot

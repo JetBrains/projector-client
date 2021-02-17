@@ -81,7 +81,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
 
         is ServerSetClipEvent -> renderer.setClip(it.shape)
 
-        is ServerSetFontEvent -> renderer.setFont(it.fontId, it.fontSize)
+        is ServerSetFontEvent -> renderer.setFont(it.fontId, it.fontSize, it.ligaturesOn)
 
         is ServerSetStrokeEvent -> renderer.setStroke(it.strokeData)
 
