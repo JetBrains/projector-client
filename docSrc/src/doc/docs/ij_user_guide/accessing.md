@@ -17,11 +17,11 @@ If your server is located remotely, just use the corresponding host address inst
 
 ### Latest client
 
-The latest client is always available at our site: <https://projector.jetbrains.com/?host=HOST&port=PORT>. So this variant is useful if you
+The latest client is always available at our site: <https://projector.jetbrains.com/client/?host=HOST&port=PORT>. So this variant is useful if you
 want to check out the recent update in the client.
 
 You should set `HOST` and `PORT` matching your server. For the previous example, it will
-be <https://projector.jetbrains.com/?host=localhost&port=9999>.
+be <https://projector.jetbrains.com/client/?host=localhost&port=9999>.
 
 !!! warning "Secure connection is required for the latest client"
 Your server must be secure when using the latest client because our domain is secure itself. Before connection, make sure that your browser
@@ -70,7 +70,7 @@ We can't use ["copy" listener](https://developer.mozilla.org/en-US/docs/Web/API/
 
 #### It's not possible to connect to insecure WebSocket from a secure web page
 
-This is a limitation of browsers. So for example you can't use client at <https://projector.jetbrains.com> to access an insecure server.
+This is a limitation of browsers. So for example you can't use client at <https://projector.jetbrains.com/client/> to access an insecure server.
 
 ### Advanced options and shortcuts
 
