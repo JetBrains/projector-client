@@ -34,9 +34,13 @@ actual object ParamsProvider {
     else -> hostname
   }
 
-  private fun getCurrentPort(): String = when (val port = window.location.port) {
-    "" -> "8887"  // when you open it on site (for example, "http://example.com"), port is empty, so assume default port is preferred
-    else -> port
+  private fun getCurrentPort(): String {
+    val port = window.location.port
+
+    if (port == "")
+      if (window.location.protocol == "https:") return "443" else return "80"
+    else
+      return port
   }
 
   private val DEFAULT_HOST = getCurrentHostname()
