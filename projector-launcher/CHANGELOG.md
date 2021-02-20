@@ -5,6 +5,7 @@ Notable changes to this project are documented in this file.
 ## Added
 - Connect on hitting Enter.
 - History of connections.
+- Signed Mac app.
 
 ## Fixed
 - Shortcuts were intercepted globally.
