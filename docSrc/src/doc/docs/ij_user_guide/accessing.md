@@ -100,7 +100,7 @@ Run `projector.exe` file.
 
 Run `projector` file.
 
-#### Mac
+#### Mac (darwin)
 
 Run `projector` app (on other OSes it's visible like `projector.app` dir).
 
