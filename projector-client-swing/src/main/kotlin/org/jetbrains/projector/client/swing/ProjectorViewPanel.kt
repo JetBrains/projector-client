@@ -25,14 +25,10 @@ package org.jetbrains.projector.client.swing
 
 import org.jetbrains.projector.client.common.canvas.SwingCanvas
 import org.jetbrains.projector.common.protocol.toServer.*
+import java.awt.Component
 import java.awt.Dimension
-import java.awt.FocusTraversalPolicy
 import java.awt.Graphics
 import java.awt.event.*
-import java.lang.Math.max
-import javax.swing.ImageIcon
-import javax.swing.JFrame
-import javax.swing.JLabel
 import javax.swing.JPanel
 
 class ProjectorViewPanel(val canvas: SwingCanvas, val connectionTime: Long) : JPanel() {
@@ -44,7 +40,7 @@ class ProjectorViewPanel(val canvas: SwingCanvas, val connectionTime: Long) : JP
     return Dimension(canvas.width, canvas.height)
   }
 
-  fun addListeners(windowId: Int, frame: JFrame, eventSink: (ClientEvent) -> Unit) {
+  fun addListeners(windowId: Int, frame: Component, eventSink: (ClientEvent) -> Unit) {
     val mouseListener = object: MouseAdapter() {
       fun convertMouseEvent(event: MouseEvent, eventType: ClientMouseEvent.MouseEventType): ClientMouseEvent {
         return ClientMouseEvent((System.currentTimeMillis() - connectionTime).toInt(), windowId, event.xOnScreen, event.yOnScreen, (maxOf(0, event.button - 1)).toShort(), event.clickCount,
