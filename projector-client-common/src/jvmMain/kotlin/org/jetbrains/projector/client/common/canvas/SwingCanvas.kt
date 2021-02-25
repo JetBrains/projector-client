@@ -25,7 +25,8 @@ package org.jetbrains.projector.client.common.canvas
 
 import java.awt.Image
 import java.awt.image.BufferedImage
-import java.lang.Math.min
+import kotlin.math.min
+import kotlin.math.max
 
 class SwingCanvas() : Canvas {
 
@@ -43,8 +44,8 @@ class SwingCanvas() : Canvas {
     set(value) { doResize(width, value) }
 
   private fun doResize(width: Int, height: Int) {
-    val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-    newImage.createGraphics().drawImage(image, 0, 0, min(width, image.width), min(height, image.height), null)
+    val newImage = BufferedImage(max(1, width), max(1, height), BufferedImage.TYPE_INT_ARGB)
+    newImage.createGraphics().drawImage(image, 0, 0, min(max(1, width), image.width), min(max(1, height), image.height), null)
     image = newImage
     context2d = SwingContext2d(image.createGraphics())
   }
