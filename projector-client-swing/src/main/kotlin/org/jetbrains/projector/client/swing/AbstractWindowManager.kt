@@ -36,10 +36,10 @@ abstract class AbstractWindowManager<FrameType> {
   private val currentWindows = HashMap<Int, FrameData>()
   private var lastLoggedWindowCount = 0
 
-  abstract fun newFrame(windowId: Int, canvas: SwingCanvas): FrameType
+  abstract fun newFrame(windowId: Int, canvas: SwingCanvas, windowData: WindowData): FrameType
   abstract fun updateFrameProperties(frameData: FrameData)
   abstract fun deleteFrame(frame: FrameType)
-  abstract fun updateWindow(frame: FrameData)
+  abstract fun redrawWindow(frame: FrameData)
 
   fun windowSetUpdated(event: ServerWindowSetChangedEvent) {
     if (lastLoggedWindowCount != event.windowDataList.size) {
@@ -53,7 +53,7 @@ abstract class AbstractWindowManager<FrameType> {
       val existing = currentWindows.getOrPut(it.id) {
         val canvas = SwingCanvas()
         val surface = DoubleBufferedRenderingSurface(canvas)
-        FrameData(newFrame(it.id, canvas), it, ArrayDeque(), surface, SingleRenderingSurfaceProcessor(surface))
+        FrameData(newFrame(it.id, canvas, it), it, ArrayDeque(), surface, SingleRenderingSurfaceProcessor(surface))
       }
       existing.windowData = it
       existing.surface.setBounds(it.bounds.width.toInt(), it.bounds.height.toInt())
@@ -63,6 +63,12 @@ abstract class AbstractWindowManager<FrameType> {
     windowsToDelete.forEach {
       val oldFrame = currentWindows.remove(it) ?: return@forEach
       deleteFrame(oldFrame.frame)
+    }
+  }
+
+  fun reapplyWindowProperties() {
+    for (it in currentWindows) {
+      updateFrameProperties(it.value)
     }
   }
 
@@ -79,7 +85,7 @@ abstract class AbstractWindowManager<FrameType> {
 
     window.surface.flush()
 
-    updateWindow(window)
+    redrawWindow(window)
   }
 
   inner class FrameData(
