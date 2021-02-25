@@ -38,6 +38,7 @@ import org.jetbrains.projector.common.protocol.data.CommonIntSize
 import org.jetbrains.projector.common.protocol.handshake.*
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
+import java.awt.Toolkit
 import java.util.*
 import javax.swing.SwingUtilities
 import javax.swing.Timer
@@ -89,11 +90,14 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
 
     transport.onOpen.await()
 
+    // todo: use full multi-screen size
+    val screenDimension = Toolkit.getDefaultToolkit().screenSize
+
     val handshake = ToServerHandshakeEvent(
       commonVersion = COMMON_VERSION,
       commonVersionId = commonVersionList.indexOf(COMMON_VERSION),
 
-      initialSize = CommonIntSize(1024, 968),
+      initialSize = CommonIntSize(screenDimension.width, screenDimension.height),
       supportedToClientCompressions = listOf(CompressionType.NONE),
       supportedToClientProtocols = listOf(ProtocolType.KOTLINX_PROTOBUF),
       supportedToServerCompressions = listOf(CompressionType.NONE),
