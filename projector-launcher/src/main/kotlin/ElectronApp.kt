@@ -81,6 +81,13 @@ class ElectronApp(val url: String) {
     var preloadPath = path.normalize(path.join(__dirname, "../assets/js/preload.js"))
     this.mainWindow = BrowserWindow(js(windowOptions)(workAreaSize.width, workAreaSize.height, preloadPath))
 
+    if (process.platform.unsafeCast<String>().toLowerCase() !in setOf("win32", "darwin")) {
+      // change icon for Linux and other systems:
+      val iconPath = path.normalize(path.join(__dirname, "assets/img/electron-icon.png")).unsafeCast<String>()
+      val iconImage = NativeImage.createFromPath(iconPath)
+      this.mainWindow.setIcon(iconImage)
+    }
+
     this.mainWindow.webContents.on("did-navigate-in-page")
     {
       _: Event,

@@ -24,3 +24,7 @@
 
 // todo: remove after https://youtrack.jetbrains.com/issue/KT-35327 is fixed
 config.target = 'electron-renderer';
+// fix root dir: https://webconfiguration.wordpress.com/2017/12/04/__dirname-resolving-to-root-of-disk/
+config.node = config.node || {};
+config.node.__dirname = false;
+config.node.__filename = false;

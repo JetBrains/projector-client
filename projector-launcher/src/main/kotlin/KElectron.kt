@@ -1474,6 +1474,7 @@ external interface MouseWheelInputEvent : MouseInputEvent {
     set(value) = definedExternally
 }
 
+@JsName("nativeImage")
 open external class NativeImage {
   open fun addRepresentation(options: AddRepresentationOptions)
   open fun crop(rect: Rectangle): NativeImage
@@ -5472,8 +5473,6 @@ external var inAppPurchase: InAppPurchase
 external var ipcMain: IpcMain
 
 external var ipcRenderer: IpcRenderer
-
-external var nativeImage: Any
 
 external var nativeTheme: NativeTheme
 
