@@ -28,6 +28,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientWheelEvent
 import org.jetbrains.projector.common.protocol.toServer.MouseModifier
 import org.jetbrains.projector.server.core.ReadyClientSettings.TouchState
 import org.jetbrains.projector.server.core.convert.toClient.roundToInfinity
+import org.jetbrains.projector.server.core.util.getProperty
 import java.awt.Component
 import java.awt.event.InputEvent
 import java.awt.event.MouseEvent
@@ -39,10 +40,13 @@ private const val DEFAULT_SCROLL_AMOUNT = 1
 // todo: 100 is just a random but reasonable number;
 //       need to calculate this number from the context,
 //       maybe use the client's scaling ratio
-private const val PIXEL_PER_UNIT = 100
+private const val DEFAULT_PIXEL_PER_UNIT = 100
+
+public const val PIXEL_PER_UNIT_ENV_NAME: String = "ORG_JETBRAINS_PROJECTOR_SERVER_PIXEL_PER_UNIT"
+private val PIXEL_PER_UNIT = getProperty(PIXEL_PER_UNIT_ENV_NAME)?.toInt() ?: DEFAULT_PIXEL_PER_UNIT
 
 // todo: 3 is a wild guess (scaling factor of mobile devices), need to get this number from the context
-private const val TOUCH_PIXEL_PER_UNIT = 3 * PIXEL_PER_UNIT
+private val TOUCH_PIXEL_PER_UNIT = 3 * PIXEL_PER_UNIT
 private const val PIXEL_DELTA_ENOUGH_FOR_SCROLLING = 10
 
 public fun calculateNewTouchState(
