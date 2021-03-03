@@ -55,9 +55,11 @@ import kotlin.test.assertNotNull
 
 object ConnectionUtil {
 
+  const val DEFAULT_PORT = 8887
+
   private val clientFile = File("../projector-client-web/build/distributions/index.html")
 
-  val clientUrl = "file://${clientFile.absolutePath}"
+  val clientUrl = "file://${clientFile.absolutePath}?port=$DEFAULT_PORT"
 
   private fun getFontHolderData(): FontDataHolder {
     val data = File("src/intTest/resources/fonts/intTestFont.ttf").readBytes()
@@ -140,7 +142,7 @@ object ConnectionUtil {
   }
 
   fun startServerAndDoHandshake(
-    port: Int = 8887,  // todo: take from constant "default server port"
+    port: Int = DEFAULT_PORT,
     handlePing: Boolean = true,
     beforeHandshake: suspend () -> Unit = {},
     afterHandshake: suspend DefaultWebSocketServerSession.(senderReceiver: SenderReceiver) -> Unit,

@@ -104,7 +104,7 @@ class IdeWindowParameterTest {
     }
     server.start()
 
-    open("$clientUrl?ideWindow=0")
+    open("$clientUrl&ideWindow=0")
 
     runBlocking {
       clientLoadNotifier.receive()
@@ -129,7 +129,7 @@ class IdeWindowParameterTest {
     }
     server.start()
 
-    open("$clientUrl?ideWindow=1")
+    open("$clientUrl&ideWindow=1")
 
     runBlocking {
       clientLoadNotifier.receive()
@@ -154,7 +154,7 @@ class IdeWindowParameterTest {
     }
     server.start()
 
-    open("$clientUrl?ideWindow=2")
+    open("$clientUrl&ideWindow=2")
 
     runBlocking {
       clientLoadNotifier.receive()

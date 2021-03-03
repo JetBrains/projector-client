@@ -49,7 +49,7 @@ class NoMessagesFromServerTest {
     private const val TIMEOUT = 10 * PING_INTERVAL
 
     private fun openClient() {
-      open("$clientUrl?pingInterval=$PING_INTERVAL")
+      open("$clientUrl&pingInterval=$PING_INTERVAL")
     }
   }
 
