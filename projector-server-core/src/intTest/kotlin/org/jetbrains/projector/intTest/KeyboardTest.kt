@@ -38,6 +38,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
 import org.jetbrains.projector.server.core.convert.toAwt.toAwtKeyEvent
+import org.jetbrains.projector.util.logging.loggerFactory
 import org.openqa.selenium.Keys
 import java.awt.event.KeyEvent
 import javax.swing.JLabel
@@ -54,17 +55,19 @@ class KeyboardTest {
         checks(events)
       }
       catch (e: AssertionError) {
-        throw AssertionError("exception when checking the following events (see cause): $events", e)
+        val eventsString = events.joinToString(separator = "\n", prefix = "[\n", postfix = "\n]")
+        throw AssertionError("exception when checking the following events (see cause): $eventsString", e)
       }
     }
 
-    private fun checkEvent(actual: KeyEvent?, id: Int, keyCode: Int, keyChar: Char, keyLocation: Int, modifiersEx: Int) {
+    private fun checkEvent(actual: KeyEvent?, id: Int, keyCode: Int, keyChar: Char, keyLocation: Int?, modifiersEx: Int) {
       assertNotNull(actual)
       assertEquals(id, actual.id)
       assertEquals(keyCode, actual.keyCode)
       // keyText is generated from keyCode so no need to compare it
       assertEquals(keyChar, actual.keyChar, "expected int: ${keyChar.toInt()} but was int: ${actual.keyChar.toInt()}")
-      assertEquals(keyLocation, actual.keyLocation)
+      keyLocation?.let { assertEquals(it, actual.keyLocation) }
+      ?: loggerFactory("checkEvent").info { "Skipping keyLocation check for $actual" }
       if (modifiersEx >= 0) {
         assertEquals(modifiersEx, actual.modifiersEx)
       }
@@ -280,5 +283,35 @@ class KeyboardTest {
     assertEquals(2, it.size)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 39, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_RELEASED, 39, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
+  }
+
+  @Test
+  fun testNumpadWithNumLock() = test(Keys.NUMPAD5) {
+    // expected (tested NUMPAD5+numlock (5) press on virtual keyboard in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=101,keyText=NumPad-5,keyChar='5',modifiers=Button1,extModifiers=Button1,keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    //java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='5',modifiers=Button1,extModifiers=Button1,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    //java.awt.event.KeyEvent[KEY_RELEASED,keyCode=101,keyText=NumPad-5,keyChar='5',keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+
+    // todo: change key location from null to KeyEvent.KEY_LOCATION_NUMPAD when there is a chance to run this test on a pc with numpad.
+    //       On a laptop without numpad, the browser sends standard location. If it sends the same even with numpad, we need to fix it
+    //       on the client-side.
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 101, '5', null, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '5', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 101, '5', null, 0)
+  }
+
+  @Test
+  fun testNumpadWithoutNumLock() = test("\uE057") {  // Numpad Home code point: https://www.w3.org/TR/webdriver
+    // expected (tested NUMPAD7-numlock (home) press on virtual keyboard in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=36,keyText=Home,keyChar=Undefined keyChar,modifiers=Button1,extModifiers=Button1,keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=36,keyText=Home,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+
+    // todo: change key location from null to KeyEvent.KEY_LOCATION_NUMPAD when there is a chance to run this test on a pc with numpad.
+    //       On a laptop without numpad, the browser sends standard location. If it sends the same even with numpad, we need to fix it
+    //       on the client-side.
+    assertEquals(2, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 36, KeyEvent.CHAR_UNDEFINED, null, 0)
+    checkEvent(it[1], KeyEvent.KEY_RELEASED, 36, KeyEvent.CHAR_UNDEFINED, null, 0)
   }
 }
