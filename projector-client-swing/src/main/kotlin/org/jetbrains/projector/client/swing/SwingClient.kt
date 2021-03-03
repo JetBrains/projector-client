@@ -34,11 +34,10 @@ import org.jetbrains.projector.client.common.protocol.KotlinxJsonToServerHandsha
 import org.jetbrains.projector.client.common.protocol.KotlinxProtoBufToClientMessageDecoder
 import org.jetbrains.projector.client.common.protocol.SerializationToServerMessageEncoder
 import org.jetbrains.projector.common.misc.Do
-import org.jetbrains.projector.common.protocol.data.CommonIntSize
 import org.jetbrains.projector.common.protocol.handshake.*
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
-import java.awt.Toolkit
+import java.awt.GraphicsEnvironment
 import java.util.*
 import javax.swing.SwingUtilities
 import javax.swing.Timer
@@ -90,14 +89,18 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
 
     transport.onOpen.await()
 
-    // todo: use full multi-screen size
-    val screenDimension = Toolkit.getDefaultToolkit().screenSize
+    val allScreens = GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices.map {
+      with(it.defaultConfiguration.bounds) {
+        DisplayDescription(x, y, width, height, it.defaultConfiguration.defaultTransform.scaleX)
+      }
+    }
 
     val handshake = ToServerHandshakeEvent(
       commonVersion = COMMON_VERSION,
       commonVersionId = commonVersionList.indexOf(COMMON_VERSION),
 
-      initialSize = CommonIntSize(screenDimension.width, screenDimension.height),
+      clientDoesWindowManagement = true,
+      displays = allScreens,
       supportedToClientCompressions = listOf(CompressionType.NONE),
       supportedToClientProtocols = listOf(ProtocolType.KOTLINX_PROTOBUF),
       supportedToServerCompressions = listOf(CompressionType.NONE),
