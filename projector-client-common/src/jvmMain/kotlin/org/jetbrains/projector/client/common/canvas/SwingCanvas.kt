@@ -23,8 +23,10 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
+import java.awt.Graphics2D
 import java.awt.Image
 import java.awt.image.BufferedImage
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 import kotlin.math.max
 
@@ -47,7 +49,9 @@ class SwingCanvas() : Canvas {
     val newImage = BufferedImage(max(1, width), max(1, height), BufferedImage.TYPE_INT_ARGB)
     newImage.createGraphics().drawImage(image, 0, 0, min(max(1, width), image.width), min(max(1, height), image.height), null)
     image = newImage
-    context2d = SwingContext2d(image.createGraphics())
+    val graphics = image.createGraphics()
+    graphicsCreateListener.forEach { it.key(graphics) }
+    context2d = SwingContext2d(graphics)
   }
 
   override val imageSource: Canvas.ImageSource
@@ -64,6 +68,17 @@ class SwingCanvas() : Canvas {
 
     override fun isEmpty(): Boolean {
       return image.getWidth(null) == 1 && image.getHeight(null) == 1
+    }
+  }
+
+  companion object {
+    private val graphicsCreateListener = ConcurrentHashMap<(Graphics2D) -> Unit, Unit>()
+    fun addGraphicsCreationListener(listener: (Graphics2D) -> Unit) {
+      graphicsCreateListener[listener] = Unit
+    }
+
+    fun removeGraphicsCreationListener(listener: (Graphics2D) -> Unit) {
+      graphicsCreateListener.remove(listener)
     }
   }
 }
