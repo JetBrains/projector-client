@@ -24,16 +24,19 @@
 package org.jetbrains.projector.common.protocol.handshake
 
 import kotlinx.serialization.Serializable
-import org.jetbrains.projector.common.protocol.data.CommonIntSize
 
 @Serializable
 data class ToServerHandshakeEvent(
   val commonVersion: Int,
   val commonVersionId: Int,
   val token: String? = null,
-  val initialSize: CommonIntSize,
+  val clientDoesWindowManagement: Boolean,
+  val displays: List<DisplayDescription>,
   val supportedToClientCompressions: List<CompressionType>,
   val supportedToClientProtocols: List<ProtocolType>,
   val supportedToServerCompressions: List<CompressionType>,
   val supportedToServerProtocols: List<ProtocolType>,
 )
+
+@Serializable
+data class DisplayDescription(val x: Int, val y: Int, val width: Int, val height: Int, val scaleFactor: Double)

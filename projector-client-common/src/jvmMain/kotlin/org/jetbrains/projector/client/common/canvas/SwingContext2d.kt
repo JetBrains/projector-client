@@ -171,7 +171,7 @@ class SwingContext2d(graphics: Graphics2D) : Context2d {
   }
 
   override fun setGlobalAlpha(alpha: Double) {
-    graphics.composite = AlphaComposite.getInstance((graphics.composite as AlphaComposite).rule, alpha.toFloat())
+    graphics.composite = (graphics.composite as AlphaComposite).derive(alpha.toFloat())
   }
 
   override fun setGlobalCompositeOperation(type: Context2d.CompositeOperationType) {
