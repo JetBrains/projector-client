@@ -33,3 +33,15 @@ data class CommonIntSize(
   @SerialName("b")
   val height: Int,
 )
+
+@Serializable
+data class CommonIntRectangle(
+  @SerialName("a")
+  val x: Int,
+  @SerialName("b")
+  val y:Int,
+  @SerialName("c")
+  val width: Int,
+  @SerialName("d")
+  val height: Int,
+)
