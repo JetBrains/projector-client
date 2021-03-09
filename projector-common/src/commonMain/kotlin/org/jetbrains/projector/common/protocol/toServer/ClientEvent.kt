@@ -24,10 +24,7 @@
 package org.jetbrains.projector.common.protocol.toServer
 
 import kotlinx.serialization.Serializable
-import org.jetbrains.projector.common.protocol.data.CommonIntSize
-import org.jetbrains.projector.common.protocol.data.ImageId
-import org.jetbrains.projector.common.protocol.data.UserKeymap
-import org.jetbrains.projector.common.protocol.data.VK
+import org.jetbrains.projector.common.protocol.data.*
 
 enum class ResizeDirection {
   NW,
@@ -193,6 +190,12 @@ data class ClientWindowResizeEvent(
   val deltaX: Int,
   val deltaY: Int,
   val direction: ResizeDirection,
+) : ClientEvent()
+
+@Serializable
+data class ClientWindowSetBoundsEvent(
+  val windowId: Int,
+  val bounds: CommonIntRectangle
 ) : ClientEvent()
 
 @Serializable
