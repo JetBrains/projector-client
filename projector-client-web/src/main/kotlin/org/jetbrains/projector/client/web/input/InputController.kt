@@ -24,16 +24,22 @@
 package org.jetbrains.projector.client.web.input
 
 import kotlinx.browser.document
-import kotlinx.browser.window
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.RepaintAreaSetting
 import org.jetbrains.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.web.input.layout.FrAzerty
+import org.jetbrains.projector.client.web.input.layout.KeyboardApiLayout
+import org.jetbrains.projector.client.web.input.layout.UsQwerty
 import org.jetbrains.projector.client.web.misc.ClientStats
 import org.jetbrains.projector.client.web.misc.toScrollingMode
 import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.window.DragEventsInterceptor
 import org.jetbrains.projector.client.web.window.WindowManager
+import org.jetbrains.projector.common.protocol.data.VK
 import org.jetbrains.projector.common.protocol.toServer.*
 import org.w3c.dom.TouchEvent
 import org.w3c.dom.clipboard.ClipboardEvent
@@ -46,12 +52,6 @@ class InputController(
   private val stateMachine: ClientStateMachine,
   private val windowManager: WindowManager,
 ) {
-
-  private val currentLayoutMap: Map<String, String>
-    get() = when (ParamsProvider.LAYOUT_TYPE) {
-      ParamsProvider.LayoutType.JS_DEFAULT -> emptyMap()
-      ParamsProvider.LayoutType.FR_AZERTY -> frAzertyCodeMap
-    }
 
   val specialKeysState = SpecialKeysState()
 
@@ -235,12 +235,16 @@ class InputController(
 
   private fun handleKeyDownEvent(event: Event) {
     require(event is KeyboardEvent)
-    fireKeyEvent(ClientKeyEvent.KeyEventType.DOWN, event)
+    GlobalScope.launch {
+      fireKeyEvent(ClientKeyEvent.KeyEventType.DOWN, event)
+    }
   }
 
   private fun handleKeyUpEvent(event: Event) {
     require(event is KeyboardEvent)
-    fireKeyEvent(ClientKeyEvent.KeyEventType.UP, event)
+    GlobalScope.launch {
+      fireKeyEvent(ClientKeyEvent.KeyEventType.UP, event)
+    }
   }
 
   private fun handleClipboardChange(event: Event) {
@@ -271,7 +275,6 @@ class InputController(
       putAll(mapOf(
         "keydown" to ::handleKeyDownEvent,
         "keyup" to ::handleKeyUpEvent,
-        "keypress" to ::fireKeyPressEvent
       ))
     }
   }
@@ -285,37 +288,6 @@ class InputController(
   fun removeListeners() {
     documentActionListeners.forEach { (type, handler) ->
       document.removeEventListener(type, handler)
-    }
-  }
-
-  private fun fireKeyPressEvent(event: Event) {
-    require(event is KeyboardEvent)
-
-    val key = if (specialKeysState.isShiftEnabled) {
-      event.key.toUpperCase()
-    }
-    else {
-      event.key
-    }
-
-    val message = ClientKeyPressEvent(
-      timeStamp = event.timeStamp.toInt() - openingTimeStamp,
-      key = key,
-      modifiers = event.modifiers
-    )
-
-    if (
-      message.key.toLowerCase() == "v" &&
-      (KeyModifier.CTRL_KEY in message.modifiers || KeyModifier.META_KEY in message.modifiers)
-    ) {
-      // let "paste" event go to server and only after it send the keystroke
-      window.setTimeout(
-        handler = { stateMachine.fire(ClientAction.AddEvent(message)) },
-        timeout = 5 * (ParamsProvider.FLUSH_DELAY ?: 10)
-      )
-    }
-    else {
-      stateMachine.fire(ClientAction.AddEvent(message))
     }
   }
 
@@ -388,77 +360,64 @@ class InputController(
   }
 
   private fun ClientKeyEvent.orCtrlQ(): ClientKeyEvent {
-    if (this@orCtrlQ.code != "F1") {
+    if (this@orCtrlQ.code != VK.F1) {
       return this@orCtrlQ
     }
 
     return this@orCtrlQ.copy(
-      key = "q",
-      code = "KeyQ",
+      char = 'q',
+      code = VK.Q,
       modifiers = setOf(KeyModifier.CTRL_KEY),
     )
   }
 
-  private fun fireKeyEvent(type: ClientKeyEvent.KeyEventType, event: KeyboardEvent) {
+  private suspend fun fireKeyEvent(type: ClientKeyEvent.KeyEventType, event: KeyboardEvent) {
+    val vk = codeToVk(event.code)
+    val char = keyToChar(JsKey(event.key), vk)
+
     val message = ClientKeyEvent(
       timeStamp = event.timeStamp.toInt() - openingTimeStamp,
-      key = event.key,
-      code = currentLayoutMap[event.code] ?: event.code,
-      location = event.location.toCommonKeyLocation(),
+      char = char,
+      code = vk,
+      location = toCommonKeyLocation(event.location, event.code),
       modifiers = event.modifiers,
       keyEventType = type
     ).orCtrlQ()
 
-    val isBrowserSpecialKey = message.key.length > 1  // like Tab
     val isKeystroke = KeyModifier.CTRL_KEY in message.modifiers ||  // like Ctrl+S
                       KeyModifier.META_KEY in message.modifiers  // like Cmd+N
-    val isBrowserKeyStroke = isKeystroke && (message.code != "KeyV")  // don't block paste keystroke
+    val isPasteKeystroke = isKeystroke && (message.code == VK.V)
 
-    if (type == ClientKeyEvent.KeyEventType.DOWN && event.key == "F10" && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
+    if (type == ClientKeyEvent.KeyEventType.DOWN && vk == VK.F10 && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
       ClientStats.printStats()
     }
 
-    if (type == ClientKeyEvent.KeyEventType.DOWN && event.key == "F11" && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
+    if (type == ClientKeyEvent.KeyEventType.DOWN && vk == VK.F11 && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
       (ParamsProvider.REPAINT_AREA as? RepaintAreaSetting.Enabled)?.let {
         it.show = !it.show
       }
     }
 
-    if (isBrowserSpecialKey || isBrowserKeyStroke) {  // can't prevent all defaults because PRESS events won't be generated
-      event.preventDefault()
+    if (!isPasteKeystroke) {  // don't block paste keystroke
+      event.preventDefault()  // prevent all defaults (because of this we need to generate PRESS events ourselves)
     }
 
-    if (isKeystroke && message.code == "KeyV") {
-      // let "paste" event go to server and only after it send the keystroke
-      window.setTimeout(
-        handler = { stateMachine.fire(ClientAction.AddEvent(message)) },
-        timeout = 5 * (ParamsProvider.FLUSH_DELAY ?: 10)
-      )
+    if (isPasteKeystroke) {
+      // let "paste" event be generated by the browser, be caught by us, and go to server and only after it send the keystroke
+      delay(5L * (ParamsProvider.FLUSH_DELAY ?: 10))
     }
-    else {
-      stateMachine.fire(ClientAction.AddEvent(message))
 
-      if (isBrowserSpecialKey && type == ClientKeyEvent.KeyEventType.DOWN) {
-        // we've blocked special keys like Tab to stop the browser react
-        // but we also disabled generation of PRESS events
-        // so need to send them manually
-        // (if somebody knows a way to stop browser reactions without blocking generation, please share!):
+    stateMachine.fire(ClientAction.AddEvent(message))
 
-        when (message.key) {
-          "Tab", "Enter", "Backspace" -> stateMachine.fire(ClientAction.AddEvent(ClientKeyPressEvent(
-            timeStamp = message.timeStamp,
-            key = message.key,
-            modifiers = message.modifiers,
-          )))
-        }
-      }
-      else if (isBrowserKeyStroke && message.code !in invisibleCodes && type == ClientKeyEvent.KeyEventType.DOWN) {
-        stateMachine.fire(ClientAction.AddEvent(ClientKeyPressEvent(
-          timeStamp = message.timeStamp,
-          key = currentLayoutMap[event.code] ?: event.code,
-          modifiers = message.modifiers,
-        )))
-      }
+    if (type == ClientKeyEvent.KeyEventType.DOWN && message.code !in invisibleCodes) {
+      // we've blocked special keys like Tab to stop the browser react
+      // but we also disabled generation of PRESS events
+      // so need to send them manually
+      stateMachine.fire(ClientAction.AddEvent(ClientKeyPressEvent(
+        timeStamp = message.timeStamp,
+        char = message.char,
+        modifiers = message.modifiers,
+      )))
     }
   }
 
@@ -527,7 +486,18 @@ class InputController(
 
   companion object {
 
-    private fun Int.toCommonKeyLocation() = when (this) {
+    private val jsCodeLocation = mapOf(
+      "ControlLeft" to ClientKeyEvent.KeyLocation.LEFT,
+      "MetaLeft" to ClientKeyEvent.KeyLocation.LEFT,
+      "ShiftLeft" to ClientKeyEvent.KeyLocation.LEFT,
+      "AltLeft" to ClientKeyEvent.KeyLocation.LEFT,
+      "ControlRight" to ClientKeyEvent.KeyLocation.RIGHT,
+      "MetaRight" to ClientKeyEvent.KeyLocation.RIGHT,
+      "ShiftRight" to ClientKeyEvent.KeyLocation.RIGHT,
+      "AltRight" to ClientKeyEvent.KeyLocation.RIGHT,
+    )
+
+    private fun toCommonKeyLocation(location: Int, code: String) = jsCodeLocation[code] ?: when (location) {
       KeyboardEvent.DOM_KEY_LOCATION_STANDARD -> ClientKeyEvent.KeyLocation.STANDARD
       KeyboardEvent.DOM_KEY_LOCATION_LEFT -> ClientKeyEvent.KeyLocation.LEFT
       KeyboardEvent.DOM_KEY_LOCATION_RIGHT -> ClientKeyEvent.KeyLocation.RIGHT
@@ -535,51 +505,53 @@ class InputController(
       else -> throw IllegalArgumentException("Bad key location: $this")
     }
 
+    fun keyToChar(key: JsKey, code: VK): Char {
+      key.key.singleOrNull()?.let { return it }
+
+      return code.typedSymbols.singleOrNull() ?: CHAR_UNDEFINED
+    }
+
+    private const val CHAR_UNDEFINED: Char = 0xFFFF.toChar()
+
     private const val LEFT_MOUSE_BUTTON_ID: Short = 0
 
     private const val DOUBLE_CLICK_DELTA_MS = 500
 
-    private val invisibleCodes: Set<String> = setOf(
-      "ShiftLeft", "ShiftRight",
-      "ControlLeft", "ControlRight",
-      "MetaLeft", "MetaRight",
-      "AltLeft", "AltRight",
-      "CapsLock",
-      "Backspace",
-      "Escape",
-      *(1..24).map { "F$it" }.toTypedArray(),
-    )
+    private suspend fun codeToVk(code: String): VK {
+      KeyboardApiLayout.getVirtualKey(code)?.let {
+        return it
+      }
 
-    private val frAzertyCodeMap = mapOf(
-      // number row:
-      "Backquote" to "VK_UNDEFINED",  // '²'
-      "Digit1" to "VK_AMPERSAND",  // '&'
-      "Digit2" to "VK_UNDEFINED",  // 'é'
-      "Digit3" to "VK_QUOTEDBL",  // '"'
-      "Digit4" to "VK_QUOTE",  // '''
-      "Digit5" to "VK_LEFT_PARENTHESIS",  // '('
-      "Digit6" to "VK_MINUS",  // '-'
-      "Digit7" to "VK_UNDEFINED",  // 'è'
-      "Digit8" to "VK_UNDERSCORE",  // '_'
-      "Digit9" to "VK_UNDEFINED",  // 'ç'
-      "Digit0" to "VK_UNDEFINED",  // 'à'
-      "Minus" to "VK_RIGHT_PARENTHESIS",  // ')'
-      // 1st letter row
-      "KeyQ" to "KeyA",
-      "KeyW" to "KeyZ",
-      "BracketLeft" to "VK_DEAD_CIRCUMFLEX",  // '^'
-      "BracketRight" to "VK_DOLLAR",  // '$'
-      "Backslash" to "VK_ASTERISK",  // '*'
-      // 2nd letter row
-      "KeyA" to "KeyQ",
-      "Semicolon" to "KeyM",
-      "Quote" to "VK_UNDEFINED",  // 'ù'
-      // 3rd letter row
-      "KeyZ" to "KeyW",
-      "KeyM" to "Comma",
-      "Comma" to "Semicolon",
-      "Period" to "Colon",
-      "Slash" to "VK_EXCLAMATION_MARK",
+      when (ParamsProvider.LAYOUT_TYPE) {
+        ParamsProvider.LayoutType.JS_DEFAULT -> UsQwerty
+        ParamsProvider.LayoutType.FR_AZERTY -> FrAzerty
+      }.getVirtualKey(code)?.let { return it }
+
+      return VK.UNDEFINED
+    }
+
+    // todo: try to move to VK field, rename to canBeTyped
+    private val invisibleCodes: Set<VK> = setOf(
+      VK.SHIFT,
+      VK.CONTROL,
+      VK.META,
+      VK.ALT,
+      VK.ALT_GRAPH,
+      VK.CAPS_LOCK,
+      VK.ESCAPE,
+      VK.LEFT,
+      VK.HOME,
+      VK.END,
+      VK.PAGE_UP,
+      VK.PAGE_DOWN,
+      VK.RIGHT,
+      VK.UP,
+      VK.DOWN,
+      VK.KP_LEFT,
+      VK.KP_RIGHT,
+      VK.KP_UP,
+      VK.KP_DOWN,
+      *(1..24).map { "F$it" }.map { VK.valueOf(it) }.toTypedArray(),
     )
   }
 }

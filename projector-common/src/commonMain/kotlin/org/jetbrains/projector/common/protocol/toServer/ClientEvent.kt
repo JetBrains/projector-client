@@ -27,6 +27,7 @@ import kotlinx.serialization.Serializable
 import org.jetbrains.projector.common.protocol.data.CommonIntSize
 import org.jetbrains.projector.common.protocol.data.ImageId
 import org.jetbrains.projector.common.protocol.data.UserKeymap
+import org.jetbrains.projector.common.protocol.data.VK
 
 enum class ResizeDirection {
   NW,
@@ -105,8 +106,8 @@ data class ClientWheelEvent(
 data class ClientKeyEvent(
   /** From connection opening. */
   val timeStamp: Int,
-  val key: String,
-  val code: String,
+  val char: Char,
+  val code: VK,
   val location: KeyLocation,
   val modifiers: Set<KeyModifier>,
   val keyEventType: KeyEventType,
@@ -129,7 +130,7 @@ data class ClientKeyEvent(
 data class ClientKeyPressEvent(
   /** From connection opening. */
   val timeStamp: Int,
-  val key: String,
+  val char: Char,
   val modifiers: Set<KeyModifier>,
 ) : ClientEvent()
 

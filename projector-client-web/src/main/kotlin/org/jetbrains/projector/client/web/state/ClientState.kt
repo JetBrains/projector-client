@@ -29,6 +29,8 @@ import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.common.protocol.KotlinxJsonToClientHandshakeDecoder
+import org.jetbrains.projector.client.common.protocol.KotlinxJsonToServerHandshakeEncoder
 import org.jetbrains.projector.client.web.ServerEventsProcessor
 import org.jetbrains.projector.client.web.WindowSizeController
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
@@ -39,8 +41,6 @@ import org.jetbrains.projector.client.web.input.InputController
 import org.jetbrains.projector.client.web.input.MobileKeyboardHelperImpl
 import org.jetbrains.projector.client.web.input.NopMobileKeyboardHelper
 import org.jetbrains.projector.client.web.misc.*
-import org.jetbrains.projector.client.common.protocol.KotlinxJsonToClientHandshakeDecoder
-import org.jetbrains.projector.client.common.protocol.KotlinxJsonToServerHandshakeEncoder
 import org.jetbrains.projector.client.web.protocol.SupportedTypesProvider
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.ui.ReconnectionMessage
@@ -491,7 +491,7 @@ sealed class ClientState {
         val event = action.event
 
         if (event is ClientKeyPressEvent) {
-          event.key.singleOrNull()?.let(typing::addChar)
+          typing.addChar(event.char)
         }
 
         eventsToSend.add(event)

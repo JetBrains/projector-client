@@ -21,25 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.common.protocol.handshake
+package org.jetbrains.projector.client.web.input.layout
 
-import kotlinx.serialization.builtins.ListSerializer
-import org.jetbrains.projector.common.misc.compatibilityHash
-import org.jetbrains.projector.common.protocol.toClient.ServerEvent
-import org.jetbrains.projector.common.protocol.toServer.ClientEvent
+import kotlinx.browser.window
+import kotlinx.coroutines.await
+import org.jetbrains.projector.client.web.externalDeclarartion.keyboard
+import org.jetbrains.projector.common.protocol.data.VK
 
-val COMMON_VERSION = listOf(ServerEvent.serializer(), ClientEvent.serializer())
-  .map { ListSerializer(it).descriptor.compatibilityHash }
-  .reduce(Int::xor)
+object KeyboardApiLayout {
 
-// Don't change order here: it's used to obtain readable "human id"
-val commonVersionList = listOf(
-  -1663032476,
-  615706807,
-  891030124,
-  -1205505588,
-  581264379,
-  -625612891,
-  -560999684,
-  471600343,
-)
+  suspend fun getVirtualKey(code: String): VK? {
+    val keyboard = window.navigator.keyboard ?: return null
+    val currentLayout = keyboard.getLayoutMap().await()
+    val currentSymbolOnKeyboard = currentLayout.get(code)?.single()
+
+    return VK.codeMap[currentSymbolOnKeyboard]
+  }
+}

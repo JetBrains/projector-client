@@ -27,12 +27,9 @@ import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientRawKeyEvent
 import org.jetbrains.projector.common.protocol.toServer.KeyModifier
-import org.jetbrains.projector.util.logging.Logger
 import java.awt.Component
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
-
-private val logger = Logger("KeyKt")
 
 public fun ClientRawKeyEvent.toAwtKeyEvent(connectionMillis: Long, target: Component): KeyEvent {
   return KeyEvent(
@@ -46,15 +43,15 @@ public fun ClientRawKeyEvent.toAwtKeyEvent(connectionMillis: Long, target: Compo
   )
 }
 
-public fun ClientKeyPressEvent.toAwtKeyEvent(connectionMillis: Long, target: Component): KeyEvent? {
-  @Suppress("MoveVariableDeclarationIntoWhen") val isKeystroke = KeyModifier.CTRL_KEY in this.modifiers
-  val keyChar = when (isKeystroke) {
-                  true -> this.key.toJavaCodeOrNull()?.toJavaControlCharOrNull()
-                  false -> this.key.toJavaCharOrNull()
-                } ?: run {
-    logger.error { "$this.toAwtKeyEvent(...): unknown key, skipping" }
-    return null
+private fun createAwtChar(char: Char, modifiers: Set<KeyModifier>): Char {
+  return when (KeyModifier.CTRL_KEY in modifiers) {
+    true -> controlCharMap[char.toUpperCase().toInt()] ?: KeyEvent.CHAR_UNDEFINED
+    false -> char
   }
+}
+
+public fun ClientKeyPressEvent.toAwtKeyEvent(connectionMillis: Long, target: Component): KeyEvent {
+  val char = createAwtChar(this.char, this.modifiers)
 
   return KeyEvent(
     target,
@@ -62,33 +59,22 @@ public fun ClientKeyPressEvent.toAwtKeyEvent(connectionMillis: Long, target: Com
     this.timeStamp + connectionMillis,
     this.modifiers.toInt(),
     KeyEvent.VK_UNDEFINED,
-    keyChar,
+    char,
     KeyEvent.KEY_LOCATION_UNKNOWN,
   )
 }
 
-public fun ClientKeyEvent.toAwtKeyEvent(connectionMillis: Long, target: Component): KeyEvent? {
-  val keyEventType = this.keyEventType.toAwtKeyEventId()
-
-  val code = this.code.toJavaCodeOrNull() ?: run {
-    logger.error { "$this.toAwtKeyEvent(...): unknown code, skipping" }
-    return null
-  }
-
-  @Suppress("MoveVariableDeclarationIntoWhen") val isKeystroke = KeyModifier.CTRL_KEY in this.modifiers
-  val key = when (isKeystroke) {
-              true -> code.toJavaControlCharOrNull()
-              false -> this.key.toJavaCharOrNull()
-            } ?: KeyEvent.CHAR_UNDEFINED
+public fun ClientKeyEvent.toAwtKeyEvent(connectionMillis: Long, target: Component): KeyEvent {
+  val char = createAwtChar(this.char, this.modifiers)
 
   return KeyEvent(
     target,
-    keyEventType,
+    this.keyEventType.toAwtKeyEventId(),
     this.timeStamp + connectionMillis,
     this.modifiers.toInt(),
-    code,
-    key,
-    (this.code.extractLocationOrNull() ?: this.location).toJavaLocation(),
+    codesMap.getValue(this.code),
+    char,
+    this.location.toJavaLocation(),
   )
 }
 
