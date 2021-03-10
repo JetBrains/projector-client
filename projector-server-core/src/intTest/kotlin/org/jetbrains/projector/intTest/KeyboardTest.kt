@@ -113,16 +113,19 @@ class KeyboardTest {
       val server = createServerAndReceiveKeyEvents(keyEvents)
       server.start()
 
-      open(clientUrl)
-      element(".window").should(appear)
+      try {
+        open(clientUrl)
+        element(".window").should(appear)
 
-      element("body").sendKeys(*keysToSend)
+        element("body").sendKeys(*keysToSend)
 
-      val events = runBlocking { keyEvents.receive() }
+        val events = runBlocking { keyEvents.receive() }
 
-      withReadableException(events, tester)
-
-      server.stop(500, 1000)
+        withReadableException(events, tester)
+      }
+      finally {
+        server.stop(500, 1000)
+      }
     }
   }
 
