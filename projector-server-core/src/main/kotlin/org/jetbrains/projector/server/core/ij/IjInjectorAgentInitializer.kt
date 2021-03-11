@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.server.core.ij.md
+package org.jetbrains.projector.server.core.ij
 
-import org.jetbrains.projector.server.core.ij.invokeWhenIdeaIsInitialized
+import org.jetbrains.projector.server.core.ij.md.MarkdownPanelMaker
 import org.jetbrains.projector.util.agent.copyAgentToTempJarAndAttach
 import java.lang.ref.WeakReference
 
@@ -37,7 +37,7 @@ public object IjInjectorAgentInitializer {
   }
 
   @OptIn(ExperimentalStdlibApi::class)
-  public fun init() {
+  public fun init(isAgent: Boolean) {
     invokeWhenIdeaIsInitialized("attach IJ injector agent") { ideClassLoader ->
       this.ijClassLoader = WeakReference(ideClassLoader)
 
@@ -47,6 +47,7 @@ public object IjInjectorAgentInitializer {
       val mdPanelMakerMethod = MarkdownPanelMaker::createMarkdownHtmlPanel.name
 
       val args = buildList {
+        add(isAgent)
         add(ijClProviderClass)
         add(ijClProviderMethod)
         add(mdPanelMakerClass)
