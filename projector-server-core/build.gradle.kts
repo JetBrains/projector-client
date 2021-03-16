@@ -74,10 +74,10 @@ val downloadIntTestFont = task("downloadIntTestFont") {
       project.file(fontPath.substringBeforeLast('/')).mkdirs()
 
       val tempFile = File.createTempFile("defaultIntTestFonts", "zip")
-      URL(defaultDownloadLink).openStream().transferTo(tempFile.outputStream())
+      URL(defaultDownloadLink).openStream().copyTo(tempFile.outputStream())
 
       ZipFile(tempFile).let {
-        it.getInputStream(it.getEntry("ubuntu-font-family-0.83/Ubuntu-R.ttf")).transferTo(destFile.outputStream())
+        it.getInputStream(it.getEntry("ubuntu-font-family-0.83/Ubuntu-R.ttf")).copyTo(destFile.outputStream())
       }
 
       tempFile.delete()
