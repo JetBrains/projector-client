@@ -31,13 +31,13 @@ import java.awt.Graphics
 import java.awt.event.*
 import javax.swing.JPanel
 
-class ProjectorViewPanel(val canvas: SwingCanvas, val connectionTime: Long) : JPanel() {
+open class ProjectorViewPanel(val canvas: SwingCanvas, val connectionTime: Long, var appliedCanvasScale: Double = 1.0) : JPanel() {
   override fun paintComponent(g: Graphics) {
-    g.drawImage(canvas.image, 0, 0, this)
+    g.drawImage(canvas.image, 0, 0, (canvas.image.width * appliedCanvasScale).toInt(), (canvas.image.height * appliedCanvasScale).toInt(), this)
   }
 
   override fun preferredSize(): Dimension {
-    return Dimension(canvas.width, canvas.height)
+    return Dimension((canvas.image.width * appliedCanvasScale).toInt(), (canvas.image.height * appliedCanvasScale).toInt())
   }
 
   fun addListeners(windowId: Int, frame: Component, eventSink: (ClientEvent) -> Unit) {

@@ -36,9 +36,19 @@ abstract class AbstractWindowManager<FrameType> {
   private val currentWindows = HashMap<Int, FrameData>()
 
   abstract fun newFrame(windowId: Int, canvas: SwingCanvas, windowData: WindowData): FrameType
-  abstract fun updateFrameProperties(frameData: FrameData)
   abstract fun deleteFrame(frame: FrameType)
   abstract fun redrawWindow(frame: FrameData)
+
+  open fun getScalingForWindow(frame: FrameData): Double = 1.0
+  open fun updateFrameProperties(frameData: FrameData) {
+    val it = frameData.windowData
+
+    frameData.surfaceSizeScale = getScalingForWindow(frameData)
+    frameData.surface.setBounds((it.bounds.width * frameData.surfaceSizeScale).toInt(), (it.bounds.height * frameData.surfaceSizeScale).toInt())
+    frameData.surface.scalingRatio = frameData.surfaceSizeScale
+  }
+
+  fun getFrameData(windowId: Int) = currentWindows[windowId]
 
   fun windowSetUpdated(event: ServerWindowSetChangedEvent) {
     logger.info { "Updating window set with ${event.windowDataList.size} windows" }
@@ -49,10 +59,9 @@ abstract class AbstractWindowManager<FrameType> {
       val existing = currentWindows.getOrPut(it.id) {
         val canvas = SwingCanvas()
         val surface = DoubleBufferedRenderingSurface(canvas)
-        FrameData(newFrame(it.id, canvas, it), it, ArrayDeque(), surface, SingleRenderingSurfaceProcessor(surface))
+        FrameData(newFrame(it.id, canvas, it), it, ArrayDeque(), surface, SingleRenderingSurfaceProcessor(surface), 1.0)
       }
       existing.windowData = it
-      existing.surface.setBounds(it.bounds.width.toInt(), it.bounds.height.toInt())
       updateFrameProperties(existing)
     }
 
@@ -75,13 +84,13 @@ abstract class AbstractWindowManager<FrameType> {
       return
     }
 
-    window.drawEvents.addAll(drawEvents.shrinkByPaintEvents())
-
-    window.processor.process(window.drawEvents)
-
-    window.surface.flush()
-
-    redrawWindow(window)
+    val newDrawEvents = drawEvents.shrinkByPaintEvents()
+    if (newDrawEvents.isNotEmpty()) {
+      window.drawEvents.addAll(newDrawEvents)
+      window.processor.process(window.drawEvents)
+      window.surface.flush()
+      redrawWindow(window)
+    }
   }
 
   inner class FrameData(
@@ -90,5 +99,6 @@ abstract class AbstractWindowManager<FrameType> {
     val drawEvents: ArrayDeque<DrawEvent>,
     val surface: DoubleBufferedRenderingSurface,
     val processor: SingleRenderingSurfaceProcessor,
+    var surfaceSizeScale: Double
   )
 }
