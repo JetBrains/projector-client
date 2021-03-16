@@ -34,6 +34,7 @@ import org.jetbrains.projector.util.logging.Logger
 abstract class AbstractWindowManager<FrameType> {
   private val logger = Logger<AbstractWindowManager<FrameType>>()
   private val currentWindows = HashMap<Int, FrameData>()
+  private var lastLoggedWindowCount = 0
 
   abstract fun newFrame(windowId: Int, canvas: SwingCanvas): FrameType
   abstract fun updateFrameProperties(frameData: FrameData)
@@ -41,7 +42,10 @@ abstract class AbstractWindowManager<FrameType> {
   abstract fun updateWindow(frame: FrameData)
 
   fun windowSetUpdated(event: ServerWindowSetChangedEvent) {
-    logger.info { "Updating window set with ${event.windowDataList.size} windows" }
+    if (lastLoggedWindowCount != event.windowDataList.size) {
+      lastLoggedWindowCount = event.windowDataList.size
+      logger.debug { "Updating window set with $lastLoggedWindowCount windows" }
+    }
     val windowsToDelete = currentWindows.keys.toHashSet()
     event.windowDataList.forEach {
       windowsToDelete.remove(it.id)
