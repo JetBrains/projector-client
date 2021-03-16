@@ -165,6 +165,8 @@ class Renderer(private val renderingSurface: RenderingSurface) {
       applyFillStyle(fillStyle)
       applyStroke(strokeData)
       applyFont(font)
+      applyRule(rule)
+      applyAlpha(alpha)
     }
   }
 
