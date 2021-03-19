@@ -21,6 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+const electron = require('electron');
+
 function domReady(fn) {
   if (document.readyState === "complete" || document.readyState === "interactive") {
     setTimeout(fn, 1);
@@ -29,6 +31,11 @@ function domReady(fn) {
     document.addEventListener("DOMContentLoaded", fn);
   }
 }
+
+electron.contextBridge.exposeInMainWorld('ipcRenderer', {
+  send: (name,param) => electron.ipcRenderer.send(name, param),
+  on: (name,callback) => electron.ipcRenderer.on(name,callback)
+})
 
 domReady(function () {
   console.log("DOM loaded")

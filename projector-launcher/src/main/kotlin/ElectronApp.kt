@@ -24,6 +24,7 @@
 @file:Suppress("JSCODE_ARGUMENT_SHOULD_BE_CONSTANT")
 
 import Electron.*
+import kotlinext.js.jsObject
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
@@ -77,9 +78,18 @@ class ElectronApp(val url: String) {
                 }
             }
         """
-
-    var preloadPath = path.normalize(path.join(__dirname, "../assets/js/preload.js"))
-    this.mainWindow = BrowserWindow(js(windowOptions)(workAreaSize.width, workAreaSize.height, preloadPath))
+    //js(windowOptions)(workAreaSize.width, workAreaSize.height, preloadPath)
+    val preloadPath: String = path.normalize(path.join(__dirname, "../app/assets/js/preload.js"))
+    this.mainWindow = BrowserWindow( jsObject {
+      width = workAreaSize.width
+      height = workAreaSize.height
+      webPreferences = jsObject {
+        contextIsolation = true
+        webSecurity = false
+        worldSafeExecuteJavaScript = true
+        preload = preloadPath
+      }
+    })
 
     if (process.platform.unsafeCast<String>().toLowerCase() !in setOf("win32", "darwin")) {
       // change icon for Linux and other systems:
@@ -167,9 +177,61 @@ class ElectronApp(val url: String) {
   }
 
   fun registerApplicationLevelEvents() {
+    Menu.setApplicationMenu(Menu.buildFromTemplate(
+      arrayOf(
+        jsObject<MenuItemConstructorOptions>{
+          label = app.name
+          submenu = arrayOf(
+            jsObject<MenuItemConstructorOptions> {
+              role = "about"
+            },
+            jsObject<MenuItemConstructorOptions> {
+              role = "quit"
+            }
+          )
+        },
+        jsObject<MenuItemConstructorOptions> {
+          label = "Edit"
+          submenu = arrayOf(
+            jsObject<MenuItemConstructorOptions> {
+              role = "cut"
+            },
+            jsObject<MenuItemConstructorOptions> {
+              role = "copy"
+            },
+            jsObject<MenuItemConstructorOptions> {
+              role = "paste"
+            },
+            jsObject<MenuItemConstructorOptions> {
+              role = "undo"
+            },
+            jsObject<MenuItemConstructorOptions> {
+              role = "redo"
+            }
+          )
+
+        },
+        jsObject<MenuItemConstructorOptions>{
+          label = "View"
+          submenu = arrayOf(
+            jsObject<MenuItemConstructorOptions> {
+              role = "forceReload"
+            }
+          )
+        },
+        jsObject<MenuItemConstructorOptions> {
+          label = "Developer"
+          submenu = arrayOf(
+            jsObject<MenuItemConstructorOptions> {
+              role = "toggleDevTools"
+            }
+          )
+        }
+      )
+    ))
     app.whenReady().then {
       this.createWindow()
-      ElectronUtil.disableAllStandardShortcuts()
+      //ElectronUtil.disableAllStandardShortcuts()
 
       if (GlobalSettings.DEVELOPER_TOOLS_ENABLED) {
         this.mainWindow.webContents.openDevTools()
@@ -181,8 +243,6 @@ class ElectronApp(val url: String) {
     }
 
     ipcMain.on("projector-dom-ready") { event, _ ->
-      ElectronUtil.disableAllStandardShortcuts()
-
       var defaultUrl = this.configData.defaultUrl
       if (null != defaultUrl) {
         event.sender.send("projector-set-url", defaultUrl)

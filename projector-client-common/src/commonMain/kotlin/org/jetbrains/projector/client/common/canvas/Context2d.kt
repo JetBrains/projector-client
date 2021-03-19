@@ -89,7 +89,7 @@ interface Context2d {
   fun setTextBaseline(baseline: TextBaseline)
   fun setTextAlign(align: TextAlign)
   fun setTransform(m11: Double, m12: Double, m21: Double, m22: Double, dx: Double, dy: Double)
-  fun setLineDash(lineDash: DoubleArray)
+  fun setLineDash(lineDash: List<Number>)
   fun setLineDashOffset(offset: Double)
   fun measureText(str: String): Point
 

@@ -37,6 +37,7 @@ subprojects {
   version = "1.0-SNAPSHOT"
 
   repositories {
+    mavenLocal()
     jcenter()
   }
 

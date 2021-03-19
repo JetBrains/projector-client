@@ -78,7 +78,7 @@ object Extensions {
         setLineCap(strokeData.endCap.toCanvasLineCap())
         setLineJoin(strokeData.lineJoin.toCanvasLineJoin())
         setMiterLimit(strokeData.miterLimit.toDouble())
-        setLineDash(strokeData.dashArray?.map(Float::toDouble)?.toDoubleArray() ?: DoubleArray(0))
+        setLineDash(strokeData.dashArray ?: listOf())
         setLineDashOffset(strokeData.dashPhase.toDouble())
       }
     }
@@ -127,9 +127,8 @@ object Extensions {
     val b = colorValue and 0xFF
     val g = (colorValue ushr 8) and 0xFF
     val r = (colorValue ushr 16) and 0xFF
-    val a = ((colorValue ushr 24) and 0xFF) / 255.0
-
-    return "rgba($r,$g,$b,$a)"
+    val a = ((colorValue ushr 24) and 0xFF)
+    return "#" + ((r shl 24) or (g shl 16) or (b shl 8) or a).toString(16)
   }
 }
 

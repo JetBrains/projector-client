@@ -265,7 +265,7 @@ class SwingContext2d(graphics: Graphics2D) : Context2d {
     graphics.transform = AffineTransform(m11, m12, m21, m22, dx, dy)
   }
 
-  override fun setLineDash(lineDash: DoubleArray) {
+  override fun setLineDash(lineDash: List<Number>) {
     myCurrentStroke = myCurrentStroke.change(dash = if(lineDash.isEmpty()) null else FloatArray(lineDash.size) { lineDash[it].toFloat() })
   }
 

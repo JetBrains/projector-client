@@ -53,7 +53,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   val id = windowData.id
 
   @OptIn(ExperimentalStdlibApi::class)
-  val drawEvents = ArrayDeque<DrawEvent>()
+  var drawEvents = listOf<DrawEvent>()
 
   var title: String? = null
     set(value) {
@@ -256,7 +256,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   @OptIn(ExperimentalStdlibApi::class)
   fun drawBufferedEvents() {
-    commandProcessor.process(drawEvents)
+    drawEvents = commandProcessor.process(drawEvents)
     renderingSurface.flush()
     header?.draw()
   }

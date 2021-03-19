@@ -276,8 +276,8 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     myContext2d.setTransform(m11, m12, m21, m22, dx, dy)
   }
 
-  override fun setLineDash(lineDash: DoubleArray) {
-    myContext2d.setLineDash(lineDash.toTypedArray())
+  override fun setLineDash(lineDash: List<Number>) {
+    myContext2d.setLineDash(lineDash as Array<Double>)
   }
 
   override fun setLineDashOffset(offset: Double) {

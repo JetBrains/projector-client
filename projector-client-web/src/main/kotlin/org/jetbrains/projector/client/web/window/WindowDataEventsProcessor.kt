@@ -24,6 +24,7 @@
 package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.concat
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
@@ -137,7 +138,7 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
       val newEvents = commands.shrinkByPaintEvents()
 
       if (newEvents.isNotEmpty()) {
-        window.drawEvents.addAll(newEvents)
+        window.drawEvents = window.drawEvents.concat(newEvents)
         window.drawBufferedEvents()
       }
     }

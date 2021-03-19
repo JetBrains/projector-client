@@ -98,9 +98,9 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           val offscreenProcessor = ImageCacher.getOffscreenProcessor(target)
 
           // todo: don't create this deque every time
-          val drawEvents = ArrayDeque<DrawEvent>().apply { addAll(event.drawEvents.shrinkByPaintEvents()) }
+          //val drawEvents = ArrayDeque<DrawEvent>().apply { addAll() }
 
-          offscreenProcessor.process(drawEvents)
+          offscreenProcessor.process(event.drawEvents.shrinkByPaintEvents())
 
           windowDataEventsProcessor.redrawWindows()
         }
