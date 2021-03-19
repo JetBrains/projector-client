@@ -17,7 +17,7 @@ Please check out [documentation](https://jetbrains.github.io/projector-client/mk
 - If your OS is not Windows you must install Wine:
     - Mac: 
         - `brew cask install xquartz`
-        - `brew cask install wine-stable`
+        - `brew install --cask --no-quarantine wine-stable`
     - Ubuntu, Debian: `apt install wine-stable`
     - ArchLinux: `pacman -S wine`
     - Fedora:
