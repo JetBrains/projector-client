@@ -35,12 +35,14 @@ public object IjInjectorAgent {
     logger.debug { "IjInjectorAgent agentmain start, args=$args" }
 
     val (
+      isAgent,
       ijClProviderClass, ijClProviderMethod,
       mdPanelMakerClass, mdPanelMakerMethod,
     ) = args.split(';')
 
     IjInjector.agentmain(
       instrumentation,
+      isAgent = isAgent == "true",
       ijClProviderClass = ijClProviderClass, ijClProviderMethod = ijClProviderMethod,
       mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod,
     )

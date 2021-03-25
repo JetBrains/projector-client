@@ -51,10 +51,16 @@ internal object IjInjector {
 
   fun agentmain(
     instrumentation: Instrumentation,
+    isAgent: Boolean,
     ijClProviderClass: String, ijClProviderMethod: String,
     mdPanelMakerClass: String, mdPanelMakerMethod: String,
   ) {
     val utils = createUtils(instrumentation, ijClProviderClass = ijClProviderClass, ijClProviderMethod = ijClProviderMethod)
-    IjMdTransformer.agentmain(utils, mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod)
+
+    IjLigaturesDisablerTransformer.agentmain(utils)
+
+    if (!isAgent) {  // todo: support variant for agent too
+      IjMdTransformer.agentmain(utils, mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod)
+    }
   }
 }
