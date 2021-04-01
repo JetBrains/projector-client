@@ -31,7 +31,7 @@ fun main() {
   val argv = commandLineArguments()
   var url = argv.last()
 
-  if (url.endsWith("projector.exe")) {
+  if (url == null || !(url.startsWith("http") || url.startsWith("ws"))) {
     url = ""
   }
 

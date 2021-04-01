@@ -23,46 +23,48 @@
  */
 import {cacheNewUrlValue, populateDataList, projectorLauncherStorageKey, storage, urlCache} from './modules/urlcache.js';
 
-window.onload = function () {
-  document.getElementById("url-text-field").focus();
-};
+(function () {
 
-if (storage.getItem(projectorLauncherStorageKey)) {
-  let parse = JSON.parse(storage.getItem(projectorLauncherStorageKey));
-  parse.forEach(url => urlCache.set(url, url));
-  populateDataList();
-}
 
-document.querySelector('#connect-button').addEventListener('click', function () {
-  connect()
-});
 
-document.querySelector('#url-text-field').addEventListener('keypress', function (e) {
-  if (e.key === 'Enter') {
+
+  window.onload = function () {
+    document.getElementById("url-text-field").focus();
+  };
+
+  if (storage.getItem(projectorLauncherStorageKey)) {
+    let parse = JSON.parse(storage.getItem(projectorLauncherStorageKey));
+    parse.forEach(url => urlCache.set(url, url));
+    populateDataList();
+  }
+
+  document.querySelector('#connect-button').addEventListener('click', function () {
     connect()
+  });
+
+  document.querySelector('#url-text-field').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      connect()
+    }
+  });
+
+  function connect() {
+    let url = document.getElementById("url-text-field").value;
+    if (isEmpty(url)) {
+      return;
+    }
+
+    window.ipcRenderer.send("projector-connect", url);
+
+    cacheNewUrlValue(url);
   }
-});
 
-function connect() {
-  let url = document.getElementById("url-text-field").value;
-  if (isEmpty(url)) {
-    return;
+  window.ipcRenderer.on('projector-set-url', (event, arg) => {
+    console.log("New URL: " + arg);
+    document.getElementById("url-text-field").value = arg
+  })
+
+  function isEmpty(str) {
+    return (!str || 0 === str.length);
   }
-
-  const {ipcRenderer} = require('electron')
-  ipcRenderer.send("projector-connect", url);
-
-  cacheNewUrlValue(url);
-}
-
-//$( document ).ready(function() {
-const {ipcRenderer} = require('electron')
-ipcRenderer.on('projector-set-url', (event, arg) => {
-  console.log("New URL: " + arg);
-  document.getElementById("url-text-field").value = arg
-})
-//});
-
-function isEmpty(str) {
-  return (!str || 0 === str.length);
-}
+})();
