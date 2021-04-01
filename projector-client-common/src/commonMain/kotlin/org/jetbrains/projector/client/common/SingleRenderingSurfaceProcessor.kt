@@ -23,8 +23,6 @@
  */
 package org.jetbrains.projector.client.common
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.Renderer.Companion.RequestedRenderingState
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
@@ -36,7 +34,7 @@ import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
 
-class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface): RenderingSurfaceProcessor {
+class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) : RenderingSurfaceProcessor {
 
   private val renderer = Renderer(renderingSurface)
 
@@ -54,9 +52,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface): Rende
       val drawIsSuccessful = handleDrawEvent(drawEvent)
 
       if (!drawIsSuccessful && removing) {
-        GlobalScope.launch {
-          stateSaver.save()
-        }
+        stateSaver.save()
         removing = false
       }
     }
@@ -216,7 +212,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface): Rende
 
     private var lastSuccessfulState: LastSuccessfulState? = null
 
-    suspend fun save() {
+    fun save() {
       lastSuccessfulState = LastSuccessfulState(
         renderingState = renderer.requestedState.copy(),
         image = renderingSurface.canvas.takeSnapshot()

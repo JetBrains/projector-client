@@ -70,7 +70,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   var isShowing: Boolean = false
     set(value) {
       header?.visible = value
-      border?.visible = value
+      border.visible = value
 
       if (field == value) {
         return
@@ -88,7 +88,6 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   private var headerHeight: Double = 0.0
 
   private val border = WindowBorder(windowData.resizable)
-  //private val border: WindowBorder? = null
 
   private var isDirty: Boolean = true
 
@@ -235,7 +234,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
       )
     }
 
-    border?.bounds = CommonRectangle(
+    border.bounds = CommonRectangle(
       clientBounds.x,
       (bounds.y - headerVerticalPosition) * userScalingRatio,
       clientBounds.width,
@@ -260,7 +259,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   fun dispose() {
     canvas.remove()
-    border?.dispose()
+    border.dispose()
     header?.dispose()
   }
 

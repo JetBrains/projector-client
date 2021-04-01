@@ -192,7 +192,7 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     myContext2d.restore()
   }
 
-  @Suppress("UNUSED_PARAMETER")
+  @Suppress("UNUSED_VARIABLE")
   override fun setFillStyle(color: PaintColor?) {
     if( color != null) {
       val ctx = myContext2d
@@ -211,7 +211,7 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     }
   }
 
-  @Suppress("UNUSED_PARAMETER")
+  @Suppress("UNUSED_VARIABLE")
   override fun setStrokeStyle(color: PaintColor?) {
     if( color != null) {
       val ctx = myContext2d

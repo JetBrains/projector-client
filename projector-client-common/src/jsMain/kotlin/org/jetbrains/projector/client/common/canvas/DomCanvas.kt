@@ -23,15 +23,9 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-import kotlinx.browser.document
-import kotlinx.browser.window
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
 import org.jetbrains.projector.client.common.canvas.Canvas.ImageSource
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.*
-import kotlin.js.Promise
 
 class DomCanvas(private val myCanvas: HTMLCanvasElement) : Canvas {
 
@@ -85,7 +79,7 @@ class DomCanvas(private val myCanvas: HTMLCanvasElement) : Canvas {
 
     val copy = OffscreenCanvas(myCanvas.width,myCanvas.height)
 
-    val context = copy.getContext("2d") as OffscreenCanvasRenderingContext2D
+    val context = copy.getContext("2d",js("{ alpha: false }")) as OffscreenCanvasRenderingContext2D
 
     context.drawImage(myCanvas,0.0,0.0)
 

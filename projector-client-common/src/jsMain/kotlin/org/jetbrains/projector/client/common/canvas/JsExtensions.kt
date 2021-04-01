@@ -39,6 +39,7 @@ object JsExtensions {
   /**
    * ARGB -> RGBA
    */
+  @Suppress("UNUSED_VARIABLE")
   fun Int.argbIntToRgbaString(): String {
     val argb = this
     return js(" '#' + ( ((argb >>> 24 & 0xff) | (argb <<8>>>0))>>>0 ).toString(16).padStart(6,'0') ")

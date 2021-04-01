@@ -23,7 +23,6 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-import kotlinx.coroutines.awaitAll
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.AlphaCompositeRule
 import org.jetbrains.projector.common.protocol.data.CommonPath

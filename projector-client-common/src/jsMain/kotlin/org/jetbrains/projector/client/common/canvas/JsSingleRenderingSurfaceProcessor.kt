@@ -23,13 +23,9 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.jetbrains.projector.client.common.DrawEvent
 import org.jetbrains.projector.client.common.Renderer
 import org.jetbrains.projector.client.common.Renderer.Companion.RequestedRenderingState
 import org.jetbrains.projector.client.common.RenderingSurfaceProcessor
-import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
