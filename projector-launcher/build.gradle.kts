@@ -109,7 +109,8 @@ val generateDistPackageJson by tasks.creating(Task::class) {
       "license" to "MIT",
       "name" to "projector-launcher",
       "description" to "Desktop launcher for Projector, written in Kotlin, Electron and Node",
-      "version" to project.version.toString()
+      "version" to project.version.toString(),
+      "v8Flags" to "--max-semi-space-size=4096 --min-semi-space-size=256 --max-old-space-size=4096 --initial-old-space-size=64"
     )
 
     project.file("$distDir/package.json").writeText(packageJson.toJsonString())
