@@ -25,10 +25,63 @@ package org.jetbrains.projector.common.protocol.toClient
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.jetbrains.projector.common.protocol.data.*
 
 @Serializable
-sealed class ServerWindowEvent
+sealed class ServerWindowEvent {
+  abstract val tpe: EventType
+}
+
+enum class EventType {
+  ServerPaintSrcEvent,
+  ServerWindowEvent,
+  ServerWindowPaintEvent,
+  ServerWindowToDoPaintEvent,
+  ServerWindowStateEvent,
+  ServerWindowToDoStateEvent,
+  ServerPaintArcEvent,
+  ServerPaintOvalEvent,
+  ServerPaintRoundRectEvent,
+  ServerPaintRectEvent,
+  ServerDrawLineEvent,
+  ServerCopyAreaEvent,
+  ServerSetFontEvent,
+  ServerSetClipEvent,
+  ServerSetStrokeEvent,
+  ServerDrawRenderedImageEvent,
+  ServerDrawRenderableImageEvent,
+  ServerDrawImageEvent,
+  ServerDrawStringEvent,
+  ServerPaintPolygonEvent,
+  ServerDrawPolylineEvent,
+  ServerSetTransformEvent,
+  ServerPaintPathEvent,
+  ServerSetCompositeEvent,
+  ServerSetPaintEvent,
+  ServerSetUnknownStrokeEvent;
+
+  fun isDrawEvent():Boolean {
+    return when(this.ordinal){
+      ServerDrawRenderedImageEvent.ordinal ,
+      ServerDrawRenderableImageEvent.ordinal ,
+      ServerDrawImageEvent.ordinal ,
+      ServerDrawStringEvent.ordinal ,
+      ServerDrawLineEvent.ordinal ,
+      ServerDrawPolylineEvent.ordinal ,
+      ServerPaintSrcEvent.ordinal ,
+      ServerPaintArcEvent.ordinal ,
+      ServerPaintOvalEvent.ordinal ,
+      ServerPaintRoundRectEvent.ordinal ,
+      ServerPaintRectEvent.ordinal ,
+      ServerPaintPolygonEvent.ordinal ,
+      ServerPaintPathEvent.ordinal ,
+      ServerCopyAreaEvent.ordinal
+        -> true
+      else -> false
+    }
+  }
+}
 
 @Serializable
 sealed class ServerWindowPaintEvent : ServerWindowEvent()
@@ -59,7 +112,10 @@ data class ServerPaintArcEvent(
   val startAngle: Int,
   @SerialName("g")
   val arcAngle: Int,
-) : ServerWindowToDoPaintEvent()
+) : ServerWindowToDoPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerPaintArcEvent
+}
 
 @Serializable
 @SerialName("b")
@@ -74,7 +130,10 @@ data class ServerPaintOvalEvent(
   val width: Int,
   @SerialName("e")
   val height: Int,
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerPaintOvalEvent
+}
 
 @Serializable
 @SerialName("c")
@@ -93,7 +152,10 @@ data class ServerPaintRoundRectEvent(
   val arcWidth: Int,
   @SerialName("g")
   val arcHeight: Int,
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerPaintRoundRectEvent
+}
 
 @Serializable
 @SerialName("d")
@@ -108,7 +170,10 @@ data class ServerPaintRectEvent(
   val width: Double,
   @SerialName("e")
   val height: Double,
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerPaintRectEvent
+}
 
 @Serializable
 @SerialName("e")
@@ -121,7 +186,10 @@ data class ServerDrawLineEvent(
   val x2: Int,
   @SerialName("d")
   val y2: Int,
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerDrawLineEvent
+}
 
 @Serializable
 @SerialName("f")
@@ -138,7 +206,10 @@ data class ServerCopyAreaEvent(
   val dx: Int,
   @SerialName("f")
   val dy: Int,
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerCopyAreaEvent
+}
 
 @Serializable
 @SerialName("g")
@@ -149,29 +220,44 @@ data class ServerSetFontEvent(
   val fontSize: Int,
   @SerialName("c")
   val ligaturesOn: Boolean = false,
-) : ServerWindowStateEvent()
+) : ServerWindowStateEvent() {
+  @Transient
+  override val tpe = EventType.ServerSetFontEvent
+}
 
 @Serializable
 @SerialName("h")
 data class ServerSetClipEvent(
   @SerialName("a")
   val shape: CommonShape? = null,
-) : ServerWindowStateEvent()
+) : ServerWindowStateEvent() {
+  @Transient
+  override val tpe = EventType.ServerSetClipEvent
+}
 
 @Serializable
 @SerialName("i")
 data class ServerSetStrokeEvent(
   @SerialName("a")
   val strokeData: StrokeData,
-) : ServerWindowStateEvent()
+) : ServerWindowStateEvent() {
+  @Transient
+  override val tpe = EventType.ServerSetStrokeEvent
+}
 
 @Serializable
 @SerialName("j")
-object ServerDrawRenderedImageEvent : ServerWindowToDoPaintEvent()
+object ServerDrawRenderedImageEvent : ServerWindowToDoPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerDrawRenderedImageEvent
+}
 
 @Serializable
 @SerialName("k")
-object ServerDrawRenderableImageEvent : ServerWindowToDoPaintEvent()
+object ServerDrawRenderableImageEvent : ServerWindowToDoPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerDrawRenderableImageEvent
+}
 
 @Serializable
 @SerialName("l")
@@ -180,7 +266,10 @@ data class ServerDrawImageEvent(
   val imageId: ImageId,
   @SerialName("b")
   val imageEventInfo: ImageEventInfo,
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerDrawImageEvent
+}
 
 @Serializable
 @SerialName("m")
@@ -193,7 +282,10 @@ data class ServerDrawStringEvent(
   val y: Double,
   @SerialName("d")
   val desiredWidth: Double,
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerDrawStringEvent
+}
 
 @Serializable
 @SerialName("n")
@@ -202,21 +294,30 @@ data class ServerPaintPolygonEvent(
   val paintType: PaintType,
   @SerialName("b")
   val points: List<Point> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerPaintPolygonEvent
+}
 
 @Serializable
 @SerialName("o")
 data class ServerDrawPolylineEvent(
   @SerialName("a")
   val points: List<Point> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerDrawPolylineEvent
+}
 
 @Serializable
 @SerialName("p")
 data class ServerSetTransformEvent(
   @SerialName("a")
   val tx: List<Double> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
-) : ServerWindowStateEvent()
+) : ServerWindowStateEvent() {
+  @Transient
+  override val tpe = EventType.ServerSetTransformEvent
+}
 
 @Serializable
 @SerialName("q")
@@ -225,25 +326,37 @@ data class ServerPaintPathEvent(
   val paintType: PaintType,
   @SerialName("b")
   val path: CommonPath,
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+  @Transient
+  override val tpe = EventType.ServerPaintPathEvent
+}
 
 @Serializable
 @SerialName("r")
 data class ServerSetCompositeEvent(
   @SerialName("a")
   val composite: CommonComposite,
-) : ServerWindowStateEvent()
+) : ServerWindowStateEvent() {
+  @Transient
+  override val tpe = EventType.ServerSetCompositeEvent
+}
 
 @Serializable
 @SerialName("s")
 data class ServerSetPaintEvent(
   @SerialName("a")
   val paint: PaintValue,
-) : ServerWindowStateEvent()
+) : ServerWindowStateEvent() {
+  @Transient
+  override val tpe = EventType.ServerSetPaintEvent
+}
 
 @Serializable
 @SerialName("t")
 data class ServerSetUnknownStrokeEvent(
   @SerialName("a")
   val className: String,
-) : ServerWindowToDoStateEvent()
+) : ServerWindowToDoStateEvent() {
+  @Transient
+  override val tpe = EventType.ServerSetUnknownStrokeEvent
+}

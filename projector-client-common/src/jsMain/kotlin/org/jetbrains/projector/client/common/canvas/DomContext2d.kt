@@ -25,7 +25,7 @@ package org.jetbrains.projector.client.common.canvas
 
 import org.jetbrains.projector.client.common.canvas.Canvas.ImageSource
 import org.jetbrains.projector.client.common.canvas.Context2d.*
-import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
+import org.jetbrains.projector.client.common.canvas.JsExtensions.argbIntToRgbaString
 import org.jetbrains.projector.client.common.canvas.PaintColor.Gradient
 import org.jetbrains.projector.client.common.canvas.PaintColor.SolidColor
 import org.jetbrains.projector.common.misc.Do
@@ -192,12 +192,42 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     myContext2d.restore()
   }
 
+  @Suppress("UNUSED_PARAMETER")
   override fun setFillStyle(color: PaintColor?) {
-    myContext2d.fillStyle = color?.extract()
+    if( color != null) {
+      val ctx = myContext2d
+      val strCache = JsExtensions.rgbStrCache
+      js("""
+      if(color.argb){
+        var a = (color.argb >>> 24) & 0xff
+        var r = (color.argb >>> 16) & 0xff
+        var g = (color.argb >>> 8) & 0xff
+        var b = color.argb & 0xff
+        ctx.fillStyle = "#" + strCache[r] + strCache[g] + strCache[b] + strCache[a];
+      }else{
+        ctx.fillStyle = color.canvasGradient;
+      }
+    """)
+    }
   }
 
+  @Suppress("UNUSED_PARAMETER")
   override fun setStrokeStyle(color: PaintColor?) {
-    myContext2d.strokeStyle = color?.extract()
+    if( color != null) {
+      val ctx = myContext2d
+      val strCache = JsExtensions.rgbStrCache
+      js("""
+        if(color.argb){
+          var a = (color.argb >>> 24) & 0xff
+          var r = (color.argb >>> 16) & 0xff
+          var g = (color.argb >>> 8) & 0xff
+          var b = color.argb & 0xff
+          ctx.strokeStyle = "#" + strCache[r] + strCache[g] + strCache[b] + strCache[a];
+        }else{
+          ctx.strokeStyle = color.canvasGradient
+        }
+    """)
+    }
   }
 
   override fun setGlobalAlpha(alpha: Double) {
@@ -276,8 +306,8 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     myContext2d.setTransform(m11, m12, m21, m22, dx, dy)
   }
 
-  override fun setLineDash(lineDash: DoubleArray) {
-    myContext2d.setLineDash(lineDash.toTypedArray())
+  override fun setLineDash(lineDash: Array<Double>) {
+    myContext2d.setLineDash(lineDash)
   }
 
   override fun setLineDashOffset(offset: Double) {

@@ -56,10 +56,14 @@ dependencies {
 kotlin {
   js {
     browser {
+      webpackTask{
+
+      }
       @OptIn(ExperimentalDceDsl::class)
       dceTask {
         keep.add("projector-client-projector-client-web.org.jetbrains.projector.client.web.onLoad")
       }
+
     }
   }
 }

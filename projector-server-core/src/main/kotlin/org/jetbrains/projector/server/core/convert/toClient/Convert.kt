@@ -105,7 +105,7 @@ public fun StrokeData.toStroke(): Stroke {
         cap,
         join,
         miterLimit,
-        dashArray?.toFloatArray(),
+        dashArray?.map { double -> double.toFloat() }?.toFloatArray(),
         dashPhase
       )
     }
@@ -135,7 +135,7 @@ public fun BasicStroke.toBasicStrokeData(): StrokeData.Basic {
     endCap = cap,
     miterLimit = miterLimit,
     dashPhase = dashPhase,
-    dashArray = dashArray?.toList()
+    dashArray = dashArray?.map { float -> float.toDouble() }?.toTypedArray()
   )
 }
 

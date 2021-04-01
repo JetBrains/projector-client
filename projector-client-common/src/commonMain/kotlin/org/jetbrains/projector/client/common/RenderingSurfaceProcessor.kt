@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.common.canvas
+package org.jetbrains.projector.client.common
 
-expect object CanvasFactory {
-  fun create(): Canvas
-  fun create(offscreen: Boolean): Canvas
-  fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit)
-  fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit)
+import org.jetbrains.projector.common.protocol.toClient.ServerWindowEvent
+
+interface RenderingSurfaceProcessor {
+
+  fun process(events: List<ServerWindowEvent>): List<ServerWindowEvent>?
 }

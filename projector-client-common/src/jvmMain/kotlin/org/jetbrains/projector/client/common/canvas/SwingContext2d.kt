@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.projector.client.common.SwingFontCache
 import org.jetbrains.projector.client.common.change
 import org.jetbrains.projector.common.misc.Do
@@ -265,7 +266,7 @@ class SwingContext2d(graphics: Graphics2D) : Context2d {
     graphics.transform = AffineTransform(m11, m12, m21, m22, dx, dy)
   }
 
-  override fun setLineDash(lineDash: DoubleArray) {
+  override fun setLineDash(lineDash: Array<Double>) {
     myCurrentStroke = myCurrentStroke.change(dash = if(lineDash.isEmpty()) null else FloatArray(lineDash.size) { lineDash[it].toFloat() })
   }
 

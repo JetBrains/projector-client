@@ -23,9 +23,39 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-expect object CanvasFactory {
-  fun create(): Canvas
-  fun create(offscreen: Boolean): Canvas
-  fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit)
-  fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit)
+import org.w3c.dom.CanvasImageSource
+import org.w3c.dom.CanvasRenderingContext2D
+import org.w3c.dom.ImageBitmapRenderingContext
+import org.w3c.dom.RenderingContext
+
+class DomOffscreenCanvas(private val offscreenCanvas: OffscreenCanvas) : Canvas {
+
+  var _context2d : Context2d? = null
+
+  var _bitmapContext: ContextBitmapRenderer? = null
+
+  override fun context2d(): Context2d {
+    if( _context2d == null){
+      _context2d = DomContext2d(offscreenCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D)
+    }
+    return _context2d!!
+  }
+
+  override fun bitmapContext(): ContextBitmapRenderer {
+    TODO("Not yet implemented")
+  }
+
+  override var width: Int
+    get() = offscreenCanvas.width
+    set(value) { offscreenCanvas.width = value }
+  override var height: Int
+    get() = offscreenCanvas.height
+    set(value) { offscreenCanvas.height = value}
+
+  override val imageSource: Canvas.ImageSource
+    get() = DomCanvas.DomImageSource(offscreenCanvas)
+
+  override fun takeSnapshot(): Canvas.ImageSource {
+    return DomCanvas.DomImageSource(offscreenCanvas)
+  }
 }

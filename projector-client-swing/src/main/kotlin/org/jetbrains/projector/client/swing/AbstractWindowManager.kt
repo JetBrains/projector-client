@@ -23,6 +23,8 @@
  */
 package org.jetbrains.projector.client.swing
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.DrawEvent
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
@@ -52,7 +54,9 @@ abstract class AbstractWindowManager<FrameType> {
         FrameData(newFrame(it.id, canvas), it, ArrayDeque(), surface, SingleRenderingSurfaceProcessor(surface))
       }
       existing.windowData = it
-      existing.surface.setBounds(it.bounds.width.toInt(), it.bounds.height.toInt())
+      GlobalScope.launch {
+        existing.surface.setBounds(it.bounds.width.toInt(), it.bounds.height.toInt())
+      }
       updateFrameProperties(existing)
     }
 
@@ -71,7 +75,7 @@ abstract class AbstractWindowManager<FrameType> {
 
     window.drawEvents.addAll(drawEvents.shrinkByPaintEvents())
 
-    window.processor.process(window.drawEvents)
+    //window.processor.process(window.drawEvents)
 
     window.surface.flush()
 

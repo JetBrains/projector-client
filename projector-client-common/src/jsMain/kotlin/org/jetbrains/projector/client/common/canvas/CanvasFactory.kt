@@ -28,10 +28,19 @@ import org.w3c.dom.CanvasImageSource
 import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.Image
+import org.w3c.xhr.XMLHttpRequest
 
 actual object CanvasFactory {
   actual fun create(): Canvas {
-    return DomCanvas(document.createElement("canvas") as HTMLCanvasElement)
+    return create(false)
+  }
+
+  actual fun create(offscreen: Boolean): Canvas {
+    return if(offscreen){
+      DomOffscreenCanvas(OffscreenCanvas(0,0))
+    }else{
+      DomCanvas(document.createElement("canvas") as HTMLCanvasElement)
+    }
   }
 
   actual fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit) {

@@ -47,7 +47,7 @@ import kotlin.random.Random
 
 class Renderer(private val renderingSurface: RenderingSurface) {
   private val ctx: Context2d
-    get() = renderingSurface.canvas.context2d
+    get() = renderingSurface.canvas.context2d()
 
   private val canvasState = CanvasRenderingState()
   val requestedState = RequestedRenderingState()
@@ -113,11 +113,17 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureTransform() {
-    requestedState.transform.let { requestedTransform ->
-      canvasState.transform.let { currentTransform ->
-        if (currentTransform != requestedTransform) {
-          applyTransform(requestedTransform)
-        }
+    if (requestedState.transform != null) {
+      if (canvasState.transform == null || !(
+          requestedState.transform[0] == canvasState.transform[0] &&
+            requestedState.transform[1] == canvasState.transform[1] &&
+            requestedState.transform[2] == canvasState.transform[2] &&
+            requestedState.transform[3] == canvasState.transform[3] &&
+            requestedState.transform[4] == canvasState.transform[4] &&
+            requestedState.transform[5] == canvasState.transform[5]
+          )
+      ) {
+        applyTransform(requestedState.transform)
       }
     }
   }
@@ -169,11 +175,9 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureClip() {
-    requestedState.identitySpaceClip.let { requestedClip ->
-      canvasState.identitySpaceClip.let { currentClip ->
-        if (currentClip != requestedClip) {
-          applyClip(requestedClip)
-        }
+    if (requestedState.identitySpaceClip != null) {
+      if (canvasState.identitySpaceClip != null || requestedState.identitySpaceClip.hashCode() != canvasState.identitySpaceClip.hashCode()) {
+        applyClip(requestedState.identitySpaceClip)
       }
     }
   }
@@ -184,11 +188,9 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureStroke() {
-    requestedState.strokeData.let { requestedStroke ->
-      canvasState.strokeData.let { currentStroke ->
-        if (currentStroke != requestedStroke) {
-          applyStroke(requestedStroke)
-        }
+    if (requestedState.strokeData != null) {
+      if (canvasState.strokeData == null || canvasState.strokeData.hashCode() != requestedState.strokeData.hashCode()) {
+        applyStroke(requestedState.strokeData)
       }
     }
   }
@@ -210,12 +212,8 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureFont() {
-    requestedState.font.let { requestedFont ->
-      canvasState.font.let { currentFont ->
-        if (currentFont != requestedFont) {
-          applyFont(requestedFont)
-        }
-      }
+    if(requestedState.font != null && requestedState.font != canvasState.font ){
+      applyFont(requestedState.font)
     }
   }
 
@@ -225,12 +223,8 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureRule() {
-    requestedState.rule.let { requestedRule ->
-      canvasState.rule.let { currentRule ->
-        if (currentRule != requestedRule) {
-          applyRule(requestedRule)
-        }
-      }
+    if(canvasState.rule != requestedState.rule){
+      applyRule(requestedState.rule)
     }
   }
 
@@ -240,12 +234,8 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureAlpha() {
-    requestedState.alpha.let { requestedAlpha ->
-      canvasState.alpha.let { currentAlpha ->
-        if (currentAlpha != requestedAlpha) {
-          applyAlpha(requestedAlpha)
-        }
-      }
+    if (canvasState.alpha != requestedState.alpha) {
+      applyAlpha(requestedState.alpha)
     }
   }
 
@@ -431,8 +421,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
       logger.debug { "null is used as a font ID. Using Arial..." }
 
       "${fontSize}px Arial"
-    }
-    else {
+    } else {
       "${fontSize}px ${fontId.toFontFaceName()}"
     }
 

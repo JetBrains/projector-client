@@ -24,7 +24,8 @@
 package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
-import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.common.misc.firstNotNullOrNull
@@ -37,7 +38,6 @@ import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLLinkElement
-import kotlin.collections.isNotEmpty
 
 class WindowDataEventsProcessor(private val windowManager: WindowManager) {
 
@@ -46,7 +46,7 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
   @OptIn(ExperimentalStdlibApi::class)
   fun redrawWindows() {
     synchronized(windowManager) {
-      windowManager.forEach(Window::drawBufferedEvents)
+      windowManager.forEach(Window::redraw)
     }
   }
 
@@ -134,11 +134,9 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
         return
       }
 
-      val newEvents = commands.shrinkByPaintEvents()
 
-      if (newEvents.isNotEmpty()) {
-        window.drawEvents.addAll(newEvents)
-        window.drawBufferedEvents()
+      if (commands.isNotEmpty()) {
+        window.drawBufferedEvents(commands)
       }
     }
   }
@@ -153,7 +151,17 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
 
   fun onResized() {
     synchronized(windowManager) {
-      windowManager.forEach(Window::applyBounds)
+      windowManager.forEach{ window ->
+        window.applyBounds()
+      }
+    }
+  }
+
+  fun flush() {
+    windowManager.forEach { window ->
+      if (window.isShowing) {
+        window.flush()
+      }
     }
   }
 

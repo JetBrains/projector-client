@@ -23,9 +23,26 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-expect object CanvasFactory {
-  fun create(): Canvas
-  fun create(offscreen: Boolean): Canvas
-  fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit)
-  fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit)
+import org.w3c.dom.HTMLCanvasElement
+
+object JsExtensions {
+
+  fun Long.argbIntToRgbaString(): String {
+    val argb = this.toInt()
+    return argb.argbIntToRgbaString();
+  }
+
+  val rgbStrCache = IntRange(0,255)
+    .map { i -> if(i < 0x10) "0" + i.toString(16) else i.toString(16)  }
+    .toTypedArray()
+
+  /**
+   * ARGB -> RGBA
+   */
+  fun Int.argbIntToRgbaString(): String {
+    val argb = this
+    return js(" '#' + ( ((argb >>> 24 & 0xff) | (argb <<8>>>0))>>>0 ).toString(16).padStart(6,'0') ")
+  }
+
+
 }

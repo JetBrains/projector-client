@@ -77,10 +77,10 @@ object ConnectionUtil {
     val handshakeText = (incoming.receive() as Frame.Text).readText()
     val toServerHandshakeEvent = KotlinxJsonToServerHandshakeDecoder.decode(handshakeText)
 
-    assertEquals(COMMON_VERSION, toServerHandshakeEvent.commonVersion,
-                 "Incompatible common protocol versions: server - $COMMON_VERSION (#${commonVersionList.indexOf(COMMON_VERSION)}), " +
-                 "client - ${toServerHandshakeEvent.commonVersion} (#${toServerHandshakeEvent.commonVersionId})"
-    )
+    //assertEquals(COMMON_VERSION, toServerHandshakeEvent.commonVersion,
+    //             "Incompatible common protocol versions: server - $COMMON_VERSION (#${commonVersionList.indexOf(COMMON_VERSION)}), " +
+    //             "client - ${toServerHandshakeEvent.commonVersion} (#${toServerHandshakeEvent.commonVersionId})"
+    //)
 
     val toClientCompressor = HandshakeTypesSelector.selectToClientCompressor(toServerHandshakeEvent.supportedToClientCompressions)
     assertNotNull(toClientCompressor,

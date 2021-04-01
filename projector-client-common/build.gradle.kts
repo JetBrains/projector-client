@@ -27,6 +27,7 @@ plugins {
 }
 
 val kotlinVersion: String by project
+val coroutinesVersion: String by project
 
 kotlin {
   js {
@@ -42,6 +43,7 @@ kotlin {
         api(kotlin("reflect", kotlinVersion))
         implementation(project(":projector-common"))
         implementation(project(":projector-util-logging"))
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
       }
     }
 

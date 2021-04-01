@@ -50,6 +50,7 @@ class ClientStateMachine {
           currentState = currentState.consume(action)
         }
         catch (t: Throwable) {
+          t.printStackTrace()
           logger.error(t) { "Error consuming action, skipping the action" }
         }
       }

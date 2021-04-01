@@ -32,8 +32,13 @@ class SwingCanvas() : Canvas {
   var image = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
     private set
 
-  override var context2d: Context2d = SwingContext2d(image.createGraphics())
-    private set
+  var _context2d: Context2d = SwingContext2d(image.createGraphics())
+
+  override fun context2d(): Context2d  = _context2d
+  override fun bitmapContext(): ContextBitmapRenderer {
+    TODO("Not yet implemented")
+  }
+
 
   override var width: Int
     get() = image.width
@@ -46,16 +51,16 @@ class SwingCanvas() : Canvas {
     val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
     newImage.createGraphics().drawImage(image, 0, 0, min(width, image.width), min(height, image.height), null)
     image = newImage
-    context2d = SwingContext2d(image.createGraphics())
+    _context2d = SwingContext2d(image.createGraphics())
   }
 
   override val imageSource: Canvas.ImageSource
     get() = SwingImageSource(image)
 
-  override fun takeSnapshot(): Canvas.Snapshot {
+  override fun takeSnapshot(): Canvas.ImageSource {
     val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
     newImage.createGraphics().drawImage(image, 0, 0, null)
-    return object : SwingImageSource(newImage), Canvas.Snapshot {}
+    return SwingImageSource(newImage)
   }
 
   open class SwingImageSource(val image: Image) : Canvas.ImageSource {

@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
+import kotlinx.coroutines.awaitAll
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.AlphaCompositeRule
 import org.jetbrains.projector.common.protocol.data.CommonPath
@@ -39,7 +40,7 @@ object Extensions {
       return  // prevents clearing canvas
     }
 
-    if (this.width == 0 || this.width == 0) {
+    if (this.width == 0 || this.height == 0) {
       this.width = width
       this.height = height
 
@@ -53,7 +54,7 @@ object Extensions {
     this.height = height
 
     if (scalingChanged) {
-      this.context2d.drawImage(
+      this.context2d().drawImage(
         snapshot,
         0.0,
         0.0,
@@ -62,7 +63,7 @@ object Extensions {
       )  // save previous image with scaling
     }
     else {
-      this.context2d.drawImage(snapshot, 0.0, 0.0)  // save previous image with the same size to avoid stretching
+      this.context2d().drawImage(snapshot, 0.0, 0.0)  // save previous image with the same size to avoid stretching
     }
   }
 
@@ -78,7 +79,8 @@ object Extensions {
         setLineCap(strokeData.endCap.toCanvasLineCap())
         setLineJoin(strokeData.lineJoin.toCanvasLineJoin())
         setMiterLimit(strokeData.miterLimit.toDouble())
-        setLineDash(strokeData.dashArray?.map(Float::toDouble)?.toDoubleArray() ?: DoubleArray(0))
+        strokeData.dashArray?.let{
+        }
         setLineDashOffset(strokeData.dashPhase.toDouble())
       }
     }
@@ -120,16 +122,5 @@ object Extensions {
 
   fun Short.toFontFaceName(): String = "serverFont$this"
 
-  /* Creates an rgba(...) string (JS-like) by an ARGB number (Java-like). */
-  fun Number.argbIntToRgbaString(): String {
-    val colorValue = this.toLong()
-
-    val b = colorValue and 0xFF
-    val g = (colorValue ushr 8) and 0xFF
-    val r = (colorValue ushr 16) and 0xFF
-    val a = ((colorValue ushr 24) and 0xFF) / 255.0
-
-    return "rgba($r,$g,$b,$a)"
-  }
 }
 

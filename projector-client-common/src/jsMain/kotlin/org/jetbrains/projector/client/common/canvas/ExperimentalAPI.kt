@@ -23,9 +23,27 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-expect object CanvasFactory {
-  fun create(): Canvas
-  fun create(offscreen: Boolean): Canvas
-  fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit)
-  fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit)
+import org.w3c.dom.CanvasImageSource
+import org.w3c.dom.CanvasRenderingContext2D
+import org.w3c.dom.ImageBitmap
+import org.w3c.dom.RenderingContext
+
+object ExperimentalAPI {
 }
+
+public open external class OffscreenCanvas : CanvasImageSource {
+
+
+
+  open var width: Int
+  open var height: Int
+
+  constructor(width: Int, height: Int) { definedExternally }
+
+  fun getContext(contextId: String, vararg arguments: Any?): RenderingContext?
+
+  fun transferToImageBitmap(): ImageBitmap
+
+}
+
+public  external abstract class OffscreenCanvasRenderingContext2D: CanvasRenderingContext2D

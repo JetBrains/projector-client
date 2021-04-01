@@ -26,6 +26,7 @@ package org.jetbrains.projector.client.swing
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.SwingFontCache
 import org.jetbrains.projector.client.common.misc.ImageCacher
@@ -72,9 +73,8 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
         Do exhaustive when(target) {
           is ServerDrawCommandsEvent.Target.Onscreen -> windowManager.doWindowDraw(target.windowId, serverEvent.drawEvents)
           is ServerDrawCommandsEvent.Target.Offscreen -> {
-            val processor = ImageCacher.getOffscreenProcessor(target)
-            val deque = ArrayDeque(serverEvent.drawEvents.shrinkByPaintEvents())
-            processor.process(deque)
+            val processor = ImageCacher.getOffscreenProcessor(target,::SingleRenderingSurfaceProcessor)
+            processor.process(serverEvent.drawEvents)
           }
         }
       }

@@ -28,6 +28,7 @@ import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.util.logging.Logger
+import org.w3c.dom.*
 import kotlin.js.Json
 import kotlin.js.Promise
 import kotlin.js.json
@@ -42,15 +43,15 @@ external class PermissionStatus
 
 class Application {
 
-  private val stateMachine = ClientStateMachine()
-  private val windowSizeController = WindowSizeController(stateMachine)
-
   fun start() {
     val url = when (ParamsProvider.ENABLE_WSS) {
       false -> "ws://${ParamsProvider.HOST}:${ParamsProvider.PORT}"
 
       true -> "wss://${ParamsProvider.HOST}:${ParamsProvider.PORT}"
     }
+
+    val stateMachine = ClientStateMachine()
+    val windowSizeController = WindowSizeController(stateMachine)
 
     try {
       setClipboardPermissions()

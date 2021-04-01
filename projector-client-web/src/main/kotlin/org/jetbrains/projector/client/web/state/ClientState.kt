@@ -258,10 +258,10 @@ sealed class ClientState {
               webSocket = webSocket,
               windowSizeController = windowSizeController,
               openingTimeStamp = openingTimeStamp,
-              encoder = SupportedTypesProvider.supportedToServerEncoders.first { it.protocolType == command.toServerProtocol },
-              decoder = SupportedTypesProvider.supportedToClientDecoders.first { it.protocolType == command.toClientProtocol },
-              decompressor = SupportedTypesProvider.supportedToClientDecompressors.first { it.compressionType == command.toClientCompression },
-              compressor = SupportedTypesProvider.supportedToServerCompressors.first { it.compressionType == command.toServerCompression },
+              encoder = SupportedTypesProvider.supportedToServerEncoders.first(),
+              decoder = SupportedTypesProvider.supportedToClientDecoders.first(),
+              decompressor = SupportedTypesProvider.supportedToClientDecompressors.first(),
+              compressor = SupportedTypesProvider.supportedToServerCompressors.first(),
               onHandshakeFinish = onHandshakeFinish,
               layers = layers,
             )
@@ -332,6 +332,9 @@ sealed class ClientState {
       handler = { windowDataEventsProcessor.redrawWindows() },
       timeout = ParamsProvider.REPAINT_INTERVAL_MS,
     )
+
+    //private var repainter:Int = Int.MIN_VALUE
+
 
     private val serverEventsProcessor = ServerEventsProcessor(windowDataEventsProcessor)
 
@@ -518,22 +521,23 @@ sealed class ClientState {
       is ClientAction.WebSocket.Close -> {
         Do exhaustive when (action) {
           is ClientAction.WebSocket.Close.FinishNormal -> {
-            logger.info { "Connection is closed..." }
-
-            window.clearInterval(repainter)
-            pingStatistics.onClose()
-            windowDataEventsProcessor.onClose()
-            inputController.removeListeners()
-            windowSizeController.removeListener()
-            typing.dispose()
-            markdownPanelManager.disposeAll()
-            mobileKeyboardHelper.dispose()
-            closeBlocker.removeListener()
-            selectionBlocker.unblockSelection()
-            connectionWatcher.removeWatcher()
-
-            showDisconnectedMessage(webSocket.url, action.closeCode)
-            Disconnected
+            //logger.info { "Connection is closed..." }
+            //
+            //window.clearInterval(repainter)
+            //pingStatistics.onClose()
+            //windowDataEventsProcessor.onClose()
+            //inputController.removeListeners()
+            //windowSizeController.removeListener()
+            //typing.dispose()
+            //markdownPanelManager.disposeAll()
+            //mobileKeyboardHelper.dispose()
+            //closeBlocker.removeListener()
+            //selectionBlocker.unblockSelection()
+            //connectionWatcher.removeWatcher()
+            //
+            //showDisconnectedMessage(webSocket.url, action.closeCode)
+            //Disconnected
+            reloadConnection("Connection is closed, retrying the connection...")
           }
 
           is ClientAction.WebSocket.Close.FinishError ->
@@ -551,6 +555,7 @@ sealed class ClientState {
       logger.info { messageText }
 
       window.clearInterval(repainter)
+      //window.cancelAnimationFrame(repainter)
       pingStatistics.onClose()
       inputController.removeListeners()
       windowSizeController.removeListener()

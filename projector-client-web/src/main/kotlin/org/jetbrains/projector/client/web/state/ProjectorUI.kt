@@ -23,7 +23,7 @@
  */
 package org.jetbrains.projector.client.web.state
 
-import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
+import org.jetbrains.projector.client.common.canvas.JsExtensions.argbIntToRgbaString
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowColorsEvent
 
 interface LafListener {

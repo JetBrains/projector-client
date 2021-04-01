@@ -23,9 +23,8 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-expect object CanvasFactory {
-  fun create(): Canvas
-  fun create(offscreen: Boolean): Canvas
-  fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit)
-  fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit)
+interface ContextBitmapRenderer {
+
+  fun transferFromImageBitmap(bitmap: Canvas.ImageSource)
+
 }

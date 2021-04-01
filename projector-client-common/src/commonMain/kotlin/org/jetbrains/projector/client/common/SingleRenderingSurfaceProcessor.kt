@@ -23,6 +23,8 @@
  */
 package org.jetbrains.projector.client.common
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.Renderer.Companion.RequestedRenderingState
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
@@ -34,29 +36,31 @@ import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
 
-class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
+class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface): RenderingSurfaceProcessor {
 
   private val renderer = Renderer(renderingSurface)
 
   private val stateSaver = StateSaver(renderer, renderingSurface)
 
   @OptIn(ExperimentalStdlibApi::class)
-  fun process(drawEvents: ArrayDeque<DrawEvent>) {
+  override fun process(drawEvents: List<ServerWindowEvent>): List<ServerWindowEvent>? {
     stateSaver.restoreIfNeeded()
 
     var removing = true
 
-    drawEvents.removeAll { drawEvent ->
+    val commands = drawEvents.shrinkByPaintEvents()
+
+    commands.forEach { drawEvent ->
       val drawIsSuccessful = handleDrawEvent(drawEvent)
 
       if (!drawIsSuccessful && removing) {
-        stateSaver.save()
-
+        GlobalScope.launch {
+          stateSaver.save()
+        }
         removing = false
       }
-
-      removing
     }
+    return null
   }
 
   private fun handleDrawEvent(command: DrawEvent): Boolean {
@@ -212,7 +216,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
 
     private var lastSuccessfulState: LastSuccessfulState? = null
 
-    fun save() {
+    suspend fun save() {
       lastSuccessfulState = LastSuccessfulState(
         renderingState = renderer.requestedState.copy(),
         image = renderingSurface.canvas.takeSnapshot()
@@ -237,7 +241,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
       }
     }
 
-    private class LastSuccessfulState(val renderingState: RequestedRenderingState, val image: Canvas.Snapshot)
+    private class LastSuccessfulState(val renderingState: RequestedRenderingState, val image: Canvas.ImageSource)
   }
 
   companion object {

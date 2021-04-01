@@ -24,6 +24,8 @@
 package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.canvas.Context2d
 import org.jetbrains.projector.client.common.canvas.DomCanvas
 import org.jetbrains.projector.client.common.canvas.PaintColor
@@ -63,27 +65,28 @@ class WindowHeader(var title: String? = null) : DragEventsInterceptor, LafListen
   private var clientCloseBounds: CommonRectangle = CommonRectangle(0.0, 0.0, 0.0, 0.0)
   var bounds: CommonRectangle = CommonRectangle(0.0, 0.0, 0.0, 0.0)
     set(value) {
+      GlobalScope.launch {
 
-      val scalingRatio = ParamsProvider.SCALING_RATIO / ParamsProvider.USER_SCALING_RATIO
-      headerRenderingSurface.scalingRatio = ParamsProvider.SCALING_RATIO
+        val scalingRatio = ParamsProvider.SCALING_RATIO / ParamsProvider.USER_SCALING_RATIO
+        headerRenderingSurface.scalingRatio = ParamsProvider.SCALING_RATIO
 
-      headerRenderingSurface.setBounds(
-        width = (value.width * scalingRatio).roundToInt(),
-        height = (value.height * scalingRatio).roundToInt()
-      )
+        headerRenderingSurface.setBounds(
+          width = (value.width * scalingRatio).roundToInt(),
+          height = (value.height * scalingRatio).roundToInt()
+        )
 
-      if (field == value) {
-        return
+        if (field != value) {
+
+          field = value
+
+          clientCloseBounds = CommonRectangle(value.x + value.width - value.height, value.y, value.height, value.height)
+
+          style.left = "${value.x}px"
+          style.top = "${value.y}px"
+          style.width = "${value.width}px"
+          style.height = "${value.height}px"
+        }
       }
-
-      field = value
-
-      clientCloseBounds = CommonRectangle(value.x + value.width - value.height, value.y, value.height, value.height)
-
-      style.left = "${value.x}px"
-      style.top = "${value.y}px"
-      style.width = "${value.width}px"
-      style.height = "${value.height}px"
     }
 
   var zIndex: Int = 0
@@ -176,7 +179,7 @@ class WindowHeader(var title: String? = null) : DragEventsInterceptor, LafListen
 
   fun draw() {
 
-    val context = headerRenderingSurface.canvas.context2d
+    val context = headerRenderingSurface.canvas.context2d()
     val offset = ProjectorUI.crossOffset * headerRenderingSurface.scalingRatio
 
     // Fill header background.

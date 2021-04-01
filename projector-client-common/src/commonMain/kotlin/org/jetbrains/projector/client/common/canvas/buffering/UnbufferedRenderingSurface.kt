@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.common.canvas.buffering
 
+import kotlinx.coroutines.GlobalScope
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.Extensions.resizeSavingImage
 

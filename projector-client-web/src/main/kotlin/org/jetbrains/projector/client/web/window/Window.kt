@@ -24,10 +24,12 @@
 package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.dom.addClass
-import org.jetbrains.projector.client.common.DrawEvent
-import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.DomCanvas
+import org.jetbrains.projector.client.common.canvas.JsSingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.buffering.DoubleBufferedRenderingSurface
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
 import org.jetbrains.projector.client.common.misc.ParamsProvider
@@ -39,6 +41,7 @@ import org.jetbrains.projector.client.web.state.LafListener
 import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.jetbrains.projector.common.protocol.data.CursorType
+import org.jetbrains.projector.common.protocol.toClient.ServerWindowEvent
 import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowCloseEvent
@@ -52,8 +55,9 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   val id = windowData.id
 
-  @OptIn(ExperimentalStdlibApi::class)
-  val drawEvents = ArrayDeque<DrawEvent>()
+  //@OptIn(ExperimentalStdlibApi::class)
+  //val drawEvents = mutableListOf<ServerWindowEvent>()
+  var pendingEvents: List<ServerWindowEvent>? = null
 
   var title: String? = null
     set(value) {
@@ -66,7 +70,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   var isShowing: Boolean = false
     set(value) {
       header?.visible = value
-      border.visible = value
+      border?.visible = value
 
       if (field == value) {
         return
@@ -82,9 +86,13 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   private var header: WindowHeader? = null
   private var headerVerticalPosition: Double = 0.0
   private var headerHeight: Double = 0.0
-  private val border = WindowBorder(windowData.resizable)
 
-  private val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface)
+  private val border = WindowBorder(windowData.resizable)
+  //private val border: WindowBorder? = null
+
+  private var isDirty: Boolean = true
+
+  private val commandProcessor = JsSingleRenderingSurfaceProcessor(renderingSurface)
 
   var bounds: CommonRectangle = CommonRectangle(0.0, 0.0, 0.0, 0.0)
     set(value) {
@@ -114,49 +122,49 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     }
 
   init {
-    applyBounds()
+      applyBounds()
 
-    if (windowData.windowType == WindowType.IDEA_WINDOW || windowData.windowType == WindowType.POPUP) {
-      canvas.style.border = "none"
-    }
-    else if (windowData.windowType == WindowType.WINDOW) {
-      if (windowData.undecorated) {
-        canvas.style.border = ProjectorUI.borderStyle
+      if (windowData.windowType == WindowType.IDEA_WINDOW || windowData.windowType == WindowType.POPUP) {
+        canvas.style.border = "none"
       }
-      else {
-        // If the window has a header on the host, its sizes are included in the window bounds.
-        // The client header is drawn above the window, outside its bounds. At the same time,
-        // the coordinates of the contents of the window come taking into account the size
-        // of the header. As a result, on client an empty space is obtained between header
-        // and the contents of the window. To get rid of this, we transfer the height of the system
-        // window header and if it > 0, we draw the heading not over the window but inside
-        // the window's bounds, filling in the empty space.
-
-        header = WindowHeader(windowData.title)
-        header!!.undecorated = windowData.undecorated
-        header!!.onMove = ::onMove
-        header!!.onClose = ::onClose
-
-        headerVerticalPosition = when (windowData.headerHeight) {
-          0, null -> ProjectorUI.headerHeight
-          else -> 0.0
+      else if (windowData.windowType == WindowType.WINDOW) {
+        if (windowData.undecorated) {
+          canvas.style.border = ProjectorUI.borderStyle
         }
+        else {
+          // If the window has a header on the host, its sizes are included in the window bounds.
+          // The client header is drawn above the window, outside its bounds. At the same time,
+          // the coordinates of the contents of the window come taking into account the size
+          // of the header. As a result, on client an empty space is obtained between header
+          // and the contents of the window. To get rid of this, we transfer the height of the system
+          // window header and if it > 0, we draw the heading not over the window but inside
+          // the window's bounds, filling in the empty space.
 
-        headerHeight = when (windowData.headerHeight) {
-          0, null -> ProjectorUI.headerHeight
-          else -> windowData.headerHeight!!.toDouble()
+          header = WindowHeader(windowData.title)
+          header!!.undecorated = windowData.undecorated
+          header!!.onMove = ::onMove
+          header!!.onClose = ::onClose
+
+          headerVerticalPosition = when (windowData.headerHeight) {
+            0, null -> ProjectorUI.headerHeight
+            else -> 0.0
+          }
+
+          headerHeight = when (windowData.headerHeight) {
+            0, null -> ProjectorUI.headerHeight
+            else -> windowData.headerHeight!!.toDouble()
+          }
+
+          canvas.style.borderBottom = ProjectorUI.borderStyle
+          canvas.style.borderLeft = ProjectorUI.borderStyle
+          canvas.style.borderRight = ProjectorUI.borderStyle
+          canvas.style.borderRadius = "0 0 ${ProjectorUI.borderRadius}px ${ProjectorUI.borderRadius}px"
         }
-
-        canvas.style.borderBottom = ProjectorUI.borderStyle
-        canvas.style.borderLeft = ProjectorUI.borderStyle
-        canvas.style.borderRight = ProjectorUI.borderStyle
-        canvas.style.borderRadius = "0 0 ${ProjectorUI.borderRadius}px ${ProjectorUI.borderRadius}px"
       }
-    }
 
-    if (windowData.resizable) {
-      border.onResize = ::onResize
-    }
+      if (windowData.resizable) {
+        border.onResize = ::onResize
+      }
   }
 
   override fun lookAndFeelChanged() {
@@ -227,7 +235,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
       )
     }
 
-    border.bounds = CommonRectangle(
+    border?.bounds = CommonRectangle(
       clientBounds.x,
       (bounds.y - headerVerticalPosition) * userScalingRatio,
       clientBounds.width,
@@ -242,6 +250,8 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     }
 
     renderingSurface.scalingRatio = scalingRatio
+
+
     renderingSurface.setBounds(
       width = (bounds.width * scalingRatio).roundToInt(),
       height = (bounds.height * scalingRatio).roundToInt()
@@ -250,15 +260,44 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   fun dispose() {
     canvas.remove()
-    border.dispose()
+    border?.dispose()
     header?.dispose()
   }
 
+  fun redraw() {
+    if (pendingEvents != null) {
+      drawBufferedEvents(emptyList())
+    }
+  }
+
   @OptIn(ExperimentalStdlibApi::class)
-  fun drawBufferedEvents() {
-    commandProcessor.process(drawEvents)
-    renderingSurface.flush()
-    header?.draw()
+  fun drawBufferedEvents(events: List<ServerWindowEvent>) {
+    if (events.isNotEmpty() || pendingEvents != null) {
+      if (pendingEvents == null && events.isNotEmpty()) {
+        pendingEvents = commandProcessor.process(events)
+      }
+      else if (events.isNotEmpty()) {
+        pendingEvents = commandProcessor.process(pendingEvents!! + events)
+      }
+      else if (pendingEvents?.isNotEmpty() == true) {
+        pendingEvents = commandProcessor.process(pendingEvents!!)
+      }
+      else {
+        return
+      }
+      isDirty = true
+      renderingSurface.flush()
+      header?.draw()
+    }
+
+  }
+
+  fun flush() {
+    if (isDirty) {
+      renderingSurface.flush()
+      header?.draw()
+      isDirty = false
+    }
   }
 
   companion object {

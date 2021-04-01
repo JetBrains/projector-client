@@ -28,7 +28,7 @@ import org.jetbrains.projector.client.common.canvas.PaintColor.Gradient
 import org.jetbrains.projector.common.protocol.data.PathSegment
 import org.jetbrains.projector.common.protocol.data.Point
 
-interface Context2d {
+interface Context2d{
   fun clearRect(x: Double, y: Double, w: Double, h: Double)
   fun drawImage(imageSource: ImageSource, x: Double, y: Double)
   fun drawImage(imageSource: ImageSource, x: Double, y: Double, dw: Double, dh: Double)
@@ -89,7 +89,7 @@ interface Context2d {
   fun setTextBaseline(baseline: TextBaseline)
   fun setTextAlign(align: TextAlign)
   fun setTransform(m11: Double, m12: Double, m21: Double, m22: Double, dx: Double, dy: Double)
-  fun setLineDash(lineDash: DoubleArray)
+  fun setLineDash(lineDash: Array<Double>)
   fun setLineDashOffset(offset: Double)
   fun measureText(str: String): Point
 
