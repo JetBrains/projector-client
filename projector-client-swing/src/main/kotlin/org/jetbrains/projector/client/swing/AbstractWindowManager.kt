@@ -69,9 +69,8 @@ abstract class AbstractWindowManager<FrameType> {
       return
     }
 
-    window.drawEvents.addAll(drawEvents.shrinkByPaintEvents())
 
-    window.processor.process(window.drawEvents)
+    window.processor.process(drawEvents)
 
     window.surface.flush()
 

@@ -32,6 +32,10 @@ actual object CanvasFactory {
     return SwingCanvas()
   }
 
+  actual fun create(offscreen: Boolean): Canvas {
+    TODO("Not yet implemented")
+  }
+
   actual fun createImageSource(
     pngBase64: String,
     onLoad: (Canvas.ImageSource) -> Unit,

@@ -23,7 +23,6 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.projector.client.common.SwingFontCache
 import org.jetbrains.projector.client.common.change
 import org.jetbrains.projector.common.misc.Do
@@ -31,10 +30,8 @@ import org.jetbrains.projector.common.protocol.data.PathSegment
 import org.jetbrains.projector.common.protocol.data.Point
 import java.awt.*
 import java.awt.geom.AffineTransform
-import java.awt.geom.Arc2D
 import java.awt.geom.Path2D
 import java.awt.geom.RoundRectangle2D
-import java.io.File
 
 class SwingContext2d(graphics: Graphics2D) : Context2d {
   private var savedGraphics: Graphics2D = graphics.create() as Graphics2D
