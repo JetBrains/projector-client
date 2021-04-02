@@ -31,6 +31,7 @@ import org.jetbrains.projector.common.protocol.data.VK
 object KeyboardApiLayout {
 
   suspend fun getVirtualKey(code: String): VK? {
+    if (window != window.parent) return null
     val keyboard = window.navigator.keyboard ?: return null
     val currentLayout = keyboard.getLayoutMap().await()
     val currentSymbolOnKeyboard = currentLayout.get(code)?.single()
