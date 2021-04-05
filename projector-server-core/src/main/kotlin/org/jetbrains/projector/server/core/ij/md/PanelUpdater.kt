@@ -25,8 +25,10 @@ package org.jetbrains.projector.server.core.ij.md
 
 import org.jetbrains.projector.util.logging.Logger
 import java.awt.Component
+import java.awt.Desktop
 import java.awt.Dimension
 import java.awt.Point
+import java.net.URI
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
@@ -43,11 +45,9 @@ public object PanelUpdater {
   public var setHtmlCallback: ((id: Int, lastChangedHtml: String) -> Unit)? = null
   public var setCssCallback: ((id: Int, lastCssString: String) -> Unit)? = null
   public var scrollCallback: ((id: Int, lastScrollOffset: Int) -> Unit)? = null
-  public var browseUriCallback: ((link: String) -> Unit)? = null  // todo: was used in safe opener, move somewhere else (maybe to Desktop?)
 
   public fun openInExternalBrowser(link: String) {
-    logger.info { "opening link is not implemented... Tried to open: $link" }
-    //SafeOpener.openInExternalBrowser(link)  // todo: fix link opening, for 202 we can do MarkdownAccessor.getSafeOpenerAccessor.openLink(link) via reflection
+    Desktop.getDesktop().browse(URI(link))
   }
 
   private val idToPanelLock = ReentrantReadWriteLock()

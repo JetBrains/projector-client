@@ -205,6 +205,7 @@ sealed class ServerMarkdownEvent : ServerEvent() {
     val scrollOffset: Int,
   ) : ServerMarkdownEvent()
 
+  // todo: move out of MD events: it's used not just in MD now
   @Serializable
   @SerialName("o")
   data class ServerMarkdownBrowseUriEvent(
