@@ -28,6 +28,7 @@ import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.web.misc.toDisplayType
+import org.jetbrains.projector.common.misc.isUpperCase
 import org.jetbrains.projector.common.protocol.data.VK
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
@@ -83,6 +84,7 @@ class MobileKeyboardHelperImpl(
       SimpleButton(
         text = "F$it",
         parent = this,
+        elementId = "pressF$it",
         onClick = {
           fireDownUp(jsKey, code)
         }
@@ -122,7 +124,7 @@ class MobileKeyboardHelperImpl(
       if (it.key == "Tab") {  // don't use `it.code == "Tab"` here because `it.code` is empty on mobile devices
         it.preventDefault()
         it.stopPropagation()
-        fireDownUp(JsKey("Tab"), VK.TAB)
+        fireDownPressUp('\t', VK.TAB)
       }
     }
 
@@ -131,17 +133,23 @@ class MobileKeyboardHelperImpl(
 
       when (val inputType = event.asDynamic().inputType) {
         "insertText", "insertCompositionText" -> event.data.forEach { char ->
-          val jsKey = JsKey(char.toString())
           val code = VK.codeMap[char] ?: VK.UNDEFINED  // todo: firing VK.UNDEFINED is not correct for example for cyrillic letters
 
-          fireKeyEvent(key = jsKey, code = code, location = STANDARD, keyEventType = DOWN)
-          fireKeyPressEvent(char = char)
-          fireKeyEvent(key = jsKey, code = code, location = STANDARD, keyEventType = UP)
+          val shiftWasAlreadyEnabled = specialKeysState.isShiftEnabled
+          if (!shiftWasAlreadyEnabled && char.isUpperCase()) {
+            specialKeysState.isShiftEnabled = true
+            fireKeyEvent(key = JsKey("ShiftLeft"), code = VK.SHIFT, location = LEFT, keyEventType = DOWN)
+          }
+          fireDownPressUp(char, code)
+          if (!shiftWasAlreadyEnabled && char.isUpperCase()) {
+            specialKeysState.isShiftEnabled = false
+            fireKeyEvent(key = JsKey("ShiftLeft"), code = VK.SHIFT, location = LEFT, keyEventType = UP)
+          }
         }
 
-        "deleteContentBackward" -> fireDownUp(JsKey("Backspace"), VK.BACK_SPACE)
+        "deleteContentBackward" -> fireDownPressUp('\b', VK.BACK_SPACE)
         "deleteContentForward" -> fireDownUp(JsKey("Delete"), VK.DELETE)
-        "insertLineBreak" -> fireDownUp(JsKey("Enter"), VK.ENTER)
+        "insertLineBreak" -> fireDownPressUp('\n', VK.ENTER)
 
         else -> {
           logger.info { "Unknown inputType=$inputType" }
@@ -181,9 +189,11 @@ class MobileKeyboardHelperImpl(
       if (TimeStamp.current - lastSelectionResetTimeStamp > MINIMUM_MS_BETWEEN_INPUT_AND_SELECTION_CHANGE) {
         when (virtualKeyboardInput.selectionStart) {
           0 -> fireDownUp(JsKey("ArrowUp"), VK.UP)
-          1 -> fireDownUp(JsKey("ArrowLeft"), VK.LEFT)
-          3 -> fireDownUp(JsKey("ArrowRight"), VK.RIGHT)
-          4 -> fireDownUp(JsKey("ArrowDown"), VK.DOWN)
+          1 -> fireDownUp(JsKey("Home"), VK.HOME)
+          2 -> fireDownUp(JsKey("ArrowLeft"), VK.LEFT)
+          4 -> fireDownUp(JsKey("ArrowRight"), VK.RIGHT)
+          5 -> fireDownUp(JsKey("End"), VK.END)
+          6 -> fireDownUp(JsKey("ArrowDown"), VK.DOWN)
           else -> Unit
         }
       }
@@ -191,6 +201,13 @@ class MobileKeyboardHelperImpl(
       virtualKeyboardInput.selectionStart = TEXTAREA_VALUE.length / 2
       virtualKeyboardInput.selectionEnd = TEXTAREA_VALUE.length / 2
     }
+  }
+
+  private fun fireDownPressUp(char: Char, code: VK) {
+    val jsKey = JsKey(char.toString())
+    fireKeyEvent(key = jsKey, code = code, location = STANDARD, keyEventType = DOWN)
+    fireKeyPressEvent(char = char)
+    fireKeyEvent(key = jsKey, code = code, location = STANDARD, keyEventType = UP)
   }
 
   private fun fireDownUp(key: JsKey, code: VK) {
@@ -232,6 +249,7 @@ class MobileKeyboardHelperImpl(
     SimpleButton(
       text = "Esc",
       parent = panel,
+      elementId = "pressEsc",
       onClick = {
         fireDownUp(JsKey("Escape"), VK.ESCAPE)
       }
@@ -245,6 +263,7 @@ class MobileKeyboardHelperImpl(
     ToggleButton(
       text = "Alt",
       parent = panel,
+      elementId = "toggleAlt",
       onStateChange = { newState ->
         specialKeysState.isAltEnabled = newState
 
@@ -259,6 +278,7 @@ class MobileKeyboardHelperImpl(
     ToggleButton(
       text = "Ctrl",
       parent = panel,
+      elementId = "toggleCtrl",
       onStateChange = { newState ->
         specialKeysState.isCtrlEnabled = newState
 
@@ -273,6 +293,7 @@ class MobileKeyboardHelperImpl(
     ToggleButton(
       text = "Shift",
       parent = panel,
+      elementId = "toggleShift",
       onStateChange = { newState ->
         specialKeysState.isShiftEnabled = newState
 
@@ -287,6 +308,7 @@ class MobileKeyboardHelperImpl(
     ToggleButton(
       text = "F*",
       parent = panel,
+      elementId = "toggleFunctionalKeys",
       onStateChange = { newState ->
         functionalButtonsPanel.style.display = newState.toDisplayType()
       }
@@ -296,6 +318,7 @@ class MobileKeyboardHelperImpl(
       ToggleButton(
         text = "⌨",  // Keyboard symbol
         parent = panel,
+        elementId = "toggleInput",
         onStateChange = { newState ->
           when (newState) {
             true -> {
@@ -327,6 +350,7 @@ class MobileKeyboardHelperImpl(
   private class ToggleButton(
     text: String,
     parent: Node,
+    elementId: String,
     private val onStateChange: (newState: Boolean) -> Unit,
   ) {
 
@@ -341,6 +365,8 @@ class MobileKeyboardHelperImpl(
         borderRadius = "3px"
         asDynamic().userSelect = "none"
       }
+
+      id = elementId
 
       innerText = text
 
@@ -383,6 +409,7 @@ class MobileKeyboardHelperImpl(
   private class SimpleButton(
     text: String,
     parent: Node,
+    elementId: String,
     private val onClick: () -> Unit,
   ) {
 
@@ -395,6 +422,8 @@ class MobileKeyboardHelperImpl(
         borderRadius = "3px"
         asDynamic().userSelect = "none"
       }
+
+      id = elementId
 
       innerText = text
 
@@ -438,7 +467,7 @@ class MobileKeyboardHelperImpl(
     private const val DISABLED_COLOR = "#ACA"
     private const val ENABLED_COLOR = "#8F8"
 
-    private const val TEXTAREA_VALUE = "\n--\n"
+    private const val TEXTAREA_VALUE = "\n----\n"
 
     private const val MINIMUM_MS_BETWEEN_INPUT_AND_SELECTION_CHANGE = 100
 

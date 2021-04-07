@@ -33,3 +33,6 @@ fun <T, R : Any> Iterable<T>.firstNotNullOrNull(selector: (T) -> R?): R? = mapNo
 
 // https://youtrack.jetbrains.com/issue/KT-9374
 expect fun Double.toString(fractionDigitsToLeave: Int): String
+
+// https://youtrack.jetbrains.com/issue/KT-39906
+fun Char.isUpperCase(): Boolean = this.toLowerCase() != this
