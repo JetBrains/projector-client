@@ -39,7 +39,7 @@ object Extensions {
       return  // prevents clearing canvas
     }
 
-    if (this.width == 0 || this.width == 0) {
+    if (this.width == 0 || this.height == 0) {
       this.width = width
       this.height = height
 
