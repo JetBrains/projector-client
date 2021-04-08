@@ -89,6 +89,7 @@ interface Context2d{
   fun setTextBaseline(baseline: TextBaseline)
   fun setTextAlign(align: TextAlign)
   fun setTransform(m11: Double, m12: Double, m21: Double, m22: Double, dx: Double, dy: Double)
+  fun setTransform(matrix: Matrix)
   fun setLineDash(lineDash: Array<Double>)
   fun setLineDashOffset(offset: Double)
   fun measureText(str: String): Point
@@ -145,12 +146,12 @@ interface Context2d{
    *   f Vertical translation (moving).
    */
   class Matrix(val a: Double, val b: Double, val c: Double, val d: Double, val e: Double, val f: Double) {
-    constructor(list: List<Double>) : this(list[0], list[1], list[2], list[3], list[4], list[5])
+    constructor(list: DoubleArray) : this(list[0], list[1], list[2], list[3], list[4], list[5])
 
     companion object {
       private val IDENTITY = Matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
 
-      val IDENTITY_LIST = with(IDENTITY) { listOf(a, b, c, d, e, f) }
+      val IDENTITY_LIST = with(IDENTITY) { doubleArrayOf(a,b,c,d,e,f) }
     }
   }
 }

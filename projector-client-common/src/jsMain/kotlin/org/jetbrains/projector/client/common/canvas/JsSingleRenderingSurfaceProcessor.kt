@@ -57,7 +57,7 @@ class JsSingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface): Ren
             if (pendingEvents == null) {
               pendingEvents = mutableListOf()
             }
-            pendingEvents?.addAll(drawEvents.subList(start, curr))
+            pendingEvents.addAll(drawEvents.subList(start, curr))
           }
         }
         start = curr
@@ -65,6 +65,81 @@ class JsSingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface): Ren
     }
 
     return pendingEvents
+  }
+
+  private fun handleDrawEventsDebug(events: List<ServerWindowEvent>): Boolean {
+    events.forEach {
+      when(it.tpe.ordinal){
+        EventType.ServerSetCompositeEvent.ordinal -> renderer.setComposite(it.unsafeCast<ServerSetCompositeEvent>().composite)
+
+        EventType.ServerSetPaintEvent.ordinal -> (it.unsafeCast<ServerSetPaintEvent>()).paint.let { paintValue ->
+          when (paintValue) {
+            is PaintValue.Color -> renderer.setColor(paintValue.argb)
+
+            is PaintValue.Gradient -> renderer.setGradientPaint(
+              p1 = paintValue.p1,
+              p2 = paintValue.p2,
+              color1 = paintValue.argb1,
+              color2 = paintValue.argb2
+            )
+
+            is PaintValue.Unknown -> logUnsupportedCommand(it)
+          }
+        }
+
+        EventType.ServerSetClipEvent.ordinal -> renderer.setClip((it.unsafeCast<ServerSetClipEvent>()).shape)
+
+        EventType.ServerSetFontEvent.ordinal -> (it.unsafeCast<ServerSetFontEvent>()).apply{ renderer.setFont(fontId.unsafeCast<Int>(),fontSize, ligaturesOn) }
+
+        EventType.ServerSetStrokeEvent.ordinal -> renderer.setStroke((it.unsafeCast<ServerSetStrokeEvent>()).strokeData)
+
+        EventType.ServerSetTransformEvent.ordinal -> renderer.setTransform((it.unsafeCast<ServerSetTransformEvent>()).tx)
+
+        EventType.ServerDrawStringEvent.ordinal -> (it.unsafeCast<ServerDrawStringEvent>()).apply {
+          renderer.drawString(
+            string = str,
+            x = x,
+            y = y,
+            desiredWidth = desiredWidth
+          )
+        }
+
+        EventType.ServerDrawLineEvent.ordinal -> (it.unsafeCast<ServerDrawLineEvent>()).apply {
+          renderer.drawLine(
+            x1 = x1.unsafeCast<Double>(),
+            y1 = y1.unsafeCast<Double>(),
+            x2 = x2.unsafeCast<Double>(),
+            y2 = y2.unsafeCast<Double>()
+          )
+        }
+
+        EventType.ServerPaintRectEvent.ordinal -> (it.unsafeCast<ServerPaintRectEvent>()).apply {
+          renderer.paintRect(
+            paintType = paintType,
+            x = x,
+            y = y,
+            width = width,
+            height = height
+          )
+        }
+
+        EventType.ServerPaintRoundRectEvent.ordinal -> (it.unsafeCast<ServerPaintRoundRectEvent>() ).apply {
+          renderer.paintRoundRect(
+            paintType = paintType,
+            x = x.unsafeCast<Double>(),
+            y = y.unsafeCast<Double>(),
+            w = width.unsafeCast<Double>(),
+            h = height.unsafeCast<Double>(),
+            r1 = arcWidth.unsafeCast<Double>(),
+            r2 = arcHeight.unsafeCast<Double>()
+          )
+
+        }
+
+      }
+    }
+
+    return true
   }
 
   private fun handleDrawEvents(events: List<ServerWindowEvent>): Boolean {
@@ -90,7 +165,7 @@ class JsSingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface): Ren
 
         EventType.ServerSetClipEvent.ordinal -> renderer.setClip((it.unsafeCast<ServerSetClipEvent>()).shape)
 
-        EventType.ServerSetFontEvent.ordinal -> (it.unsafeCast<ServerSetFontEvent>()).apply{ renderer.setFont(fontId,fontSize, ligaturesOn) }
+        EventType.ServerSetFontEvent.ordinal -> (it.unsafeCast<ServerSetFontEvent>()).apply{ renderer.setFont(fontId.unsafeCast<Int>(),fontSize, ligaturesOn) }
 
         EventType.ServerSetStrokeEvent.ordinal -> renderer.setStroke((it.unsafeCast<ServerSetStrokeEvent>()).strokeData)
 

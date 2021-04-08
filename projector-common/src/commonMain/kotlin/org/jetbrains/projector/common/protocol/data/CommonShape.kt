@@ -27,7 +27,16 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class CommonShape
+sealed class CommonShape {
+
+  abstract val tpe: CommonShapeType
+
+}
+
+enum class CommonShapeType {
+  CommonRectangle,
+  CommonPath;
+}
 
 @Serializable
 @SerialName("a")
@@ -45,6 +54,8 @@ data class CommonRectangle(
   fun contains(x: Int, y: Int) = this.x <= x && x < this.x + this.width && this.y <= y && y < this.y + this.height
 
   fun createExtended(extend: Double) = CommonRectangle(x - extend, y - extend, width + extend * 2, height + extend * 2)
+  override val tpe: CommonShapeType
+    get() = CommonShapeType.CommonRectangle
 }
 
 @Serializable
@@ -65,4 +76,7 @@ data class CommonPath(
     @SerialName("b")
     NON_ZERO,
   }
+
+  override val tpe: CommonShapeType
+    get() = CommonShapeType.CommonPath
 }

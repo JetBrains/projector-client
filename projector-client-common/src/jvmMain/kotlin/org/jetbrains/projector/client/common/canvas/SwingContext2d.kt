@@ -263,6 +263,10 @@ class SwingContext2d(graphics: Graphics2D) : Context2d {
     graphics.transform = AffineTransform(m11, m12, m21, m22, dx, dy)
   }
 
+  override fun setTransform(matrix: Context2d.Matrix) {
+    TODO("Not yet implemented")
+  }
+
   override fun setLineDash(lineDash: Array<Double>) {
     myCurrentStroke = myCurrentStroke.change(dash = if(lineDash.isEmpty()) null else FloatArray(lineDash.size) { lineDash[it].toFloat() })
   }
@@ -304,6 +308,9 @@ class SwingContext2d(graphics: Graphics2D) : Context2d {
     override fun addColorStop(offset: Double, argb: Int) {
       points.add(offset to argb)
     }
+
+    override val argb: Int
+      get() = 0
 
     fun getPaint() : Paint {
       return when(points.size) {

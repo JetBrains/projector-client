@@ -82,6 +82,6 @@ sealed class ImageEventInfo {
   @SerialName("d")
   data class Transformed(
     @SerialName("a")
-    val tx: List<Double> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
+    val tx: DoubleArray = doubleArrayOf(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
   ) : ImageEventInfo()
 }

@@ -248,7 +248,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
 
       "o" -> ServerDrawPolylineEvent(content["a"].unsafeCast<Array<Json>>().map { it.toPoint() })
 
-      "p" -> ServerSetTransformEvent(content["a"].unsafeCast<Array<Double>>().toList())
+      "p" -> ServerSetTransformEvent(content["a"].unsafeCast<DoubleArray>())
 
       "q" -> ServerPaintPathEvent((content["a"].unsafeCast<String>()).toPaintType(), content["b"].unsafeCast<Json>().toCommonPath())
 
@@ -342,7 +342,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
         content["h"].unsafeCast<Int>(),
         content["i"]?.unsafeCast<Int>()
       )
-      "d" -> ImageEventInfo.Transformed(content["a"].unsafeCast<Array<Double>>().toList())
+      "d" -> ImageEventInfo.Transformed(content["a"].unsafeCast<DoubleArray>())
       else -> throw IllegalArgumentException("Unsupported image info type: ${JSON.stringify(this)}")
     }
   }

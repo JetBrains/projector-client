@@ -39,7 +39,7 @@ public fun <E> extractData(iterable: MutableIterable<E>): List<E> {
 
 private fun Rectangle2D.isVisible(clip: ServerSetClipEvent, tx: ServerSetTransformEvent): Boolean {
   val clipRect = clip.shape as? CommonRectangle ?: return true  // can't tell
-  val identityTransformStrBounds = AffineTransform(tx.tx.toDoubleArray()).createTransformedShape(this)
+  val identityTransformStrBounds = AffineTransform(tx.tx).createTransformedShape(this)
 
   return identityTransformStrBounds.intersects(clipRect.x, clipRect.y, clipRect.width, clipRect.height)
 }

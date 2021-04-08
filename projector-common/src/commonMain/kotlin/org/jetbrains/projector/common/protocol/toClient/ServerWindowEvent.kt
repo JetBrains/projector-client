@@ -30,9 +30,13 @@ import org.jetbrains.projector.common.protocol.data.*
 
 @Serializable
 sealed class ServerWindowEvent {
+  //TODO: hacking to avoid `isType` in `when` pattern match
   abstract val tpe: EventType
 }
 
+/*
+ * hacking to avoid `isType` in `when` pattern match
+ */
 enum class EventType {
   ServerPaintSrcEvent,
   ServerWindowEvent,
@@ -313,7 +317,7 @@ data class ServerDrawPolylineEvent(
 @SerialName("p")
 data class ServerSetTransformEvent(
   @SerialName("a")
-  val tx: List<Double> = emptyList(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
+  val tx: DoubleArray = doubleArrayOf(),  // todo: remove default after https://github.com/Kotlin/kotlinx.serialization/issues/806
 ) : ServerWindowStateEvent() {
   @Transient
   override val tpe = EventType.ServerSetTransformEvent

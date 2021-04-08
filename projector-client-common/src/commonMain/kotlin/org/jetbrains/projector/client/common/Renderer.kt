@@ -23,21 +23,17 @@
  */
 package org.jetbrains.projector.client.common
 
+import org.jetbrains.projector.client.common.canvas.*
 import org.jetbrains.projector.client.common.canvas.Canvas.ImageSource
-import org.jetbrains.projector.client.common.canvas.Context2d
 import org.jetbrains.projector.client.common.canvas.Context2d.FillRule
-import org.jetbrains.projector.client.common.canvas.Context2d.Matrix
 import org.jetbrains.projector.client.common.canvas.Context2d.Matrix.Companion.IDENTITY_LIST
 import org.jetbrains.projector.client.common.canvas.Extensions.applyStrokeData
 import org.jetbrains.projector.client.common.canvas.Extensions.toContext2dRule
 import org.jetbrains.projector.client.common.canvas.Extensions.toFillRule
-import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
-import org.jetbrains.projector.client.common.canvas.PaintColor
 import org.jetbrains.projector.client.common.canvas.PaintColor.SolidColor
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.ParamsProvider.REPAINT_AREA
-import org.jetbrains.projector.client.common.misc.RepaintAreaSetting
 import org.jetbrains.projector.common.misc.Defaults
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.*
@@ -52,28 +48,33 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   private val canvasState = CanvasRenderingState()
   val requestedState = RequestedRenderingState()
 
+  private val textScaleCache = HashMap<Int, Double>()
+
   private fun applyFillStyle(newFillStyle: PaintColor?) {
     ctx.setFillStyle(newFillStyle)
     canvasState.fillStyle = newFillStyle
   }
 
   private fun ensureFillStyle() {
-    fun realEnsureFillStyle() {
+    if (REPAINT_AREA.not()) {
       requestedState.paint?.let { requestedPaint ->
-        canvasState.fillStyle.let { currentPaint ->
-          if (currentPaint != requestedPaint) {
-            applyFillStyle(requestedPaint)
+        if( canvasState.fillStyle == null ){
+          applyFillStyle(requestedPaint)
+        }else{
+          val fillStyle = canvasState.fillStyle?: SolidColor(0xFFFFFF)
+          if( fillStyle.tpe.ordinal == requestedPaint.tpe.ordinal ){
+            when(fillStyle.tpe.ordinal){
+              PaintColorType.SolidColor.ordinal -> if(fillStyle.argb  != requestedPaint.argb){
+                applyFillStyle(requestedPaint)
+              }
+              PaintColorType.Gradient.ordinal -> applyFillStyle(requestedPaint)
+            }
           }
         }
       }
     }
-
-    Do exhaustive when (val repaintArea = REPAINT_AREA) {
-      is RepaintAreaSetting.Disabled -> realEnsureFillStyle()
-      is RepaintAreaSetting.Enabled -> Do exhaustive when (repaintArea.show) {
-        false -> realEnsureFillStyle()
-        true -> applyFillStyle(createNextRandomColor())
-      }
+    else {
+      applyFillStyle(createNextRandomColor())
     }
   }
 
@@ -83,65 +84,80 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureStrokeStyle() {
-    fun realEnsureStrokeStyle() {
+
+    if (REPAINT_AREA) {
+      applyStrokeStyle(createNextRandomColor())
+    }
+    else {
       requestedState.paint?.let { requestedPaint ->
-        canvasState.strokeStyle.let { currentPaint ->
-          if (currentPaint != requestedPaint) {
-            applyStrokeStyle(requestedPaint)
+        if( canvasState.strokeStyle == null){
+          applyStrokeStyle(requestedPaint)
+        }else{
+          val strokeStyle = canvasState.strokeStyle ?: SolidColor(0xFFFFFF)
+          if( strokeStyle.tpe.ordinal == requestedPaint.tpe.ordinal ){
+            when(strokeStyle.tpe.ordinal){
+              PaintColorType.SolidColor.ordinal -> if(strokeStyle.argb  != requestedPaint.argb){
+                applyStrokeStyle(requestedPaint)
+              }
+              PaintColorType.Gradient.ordinal -> applyStrokeStyle(requestedPaint)
+            }
           }
         }
       }
     }
-
-    Do exhaustive when (val repaintArea = REPAINT_AREA) {
-      is RepaintAreaSetting.Disabled -> realEnsureStrokeStyle()
-      is RepaintAreaSetting.Enabled -> Do exhaustive when (repaintArea.show) {
-        false -> realEnsureStrokeStyle()
-        true -> applyStrokeStyle(createNextRandomColor())
-      }
-    }
   }
 
-  private fun applyTransform(newTransform: List<Double>) {
+  private fun applyTransform(newTransform: DoubleArray) {
     renderingSurface.scalingRatio.let {
-      ctx.setTransform(it, 0.0, 0.0, it, 0.0, 0.0)
+      with(newTransform) {
+        ctx.setTransform(it,.0,.0,it,.0,.0)
+        ctx.transform(get(0),get(1), get(2), get(3), get(4), get(5))
+      }
     }
-
-    with(Matrix(newTransform)) { ctx.transform(a, b, c, d, e, f) }
-
     canvasState.transform = newTransform
   }
 
   private fun ensureTransform() {
-    if (requestedState.transform != null) {
+    if (requestedState.transform != null && requestedState.transform.size >= 6) {
       if (canvasState.transform == null || !(
           requestedState.transform[0] == canvasState.transform[0] &&
-            requestedState.transform[1] == canvasState.transform[1] &&
-            requestedState.transform[2] == canvasState.transform[2] &&
-            requestedState.transform[3] == canvasState.transform[3] &&
-            requestedState.transform[4] == canvasState.transform[4] &&
-            requestedState.transform[5] == canvasState.transform[5]
-          )
+          requestedState.transform[1] == canvasState.transform[1] &&
+          requestedState.transform[2] == canvasState.transform[2] &&
+          requestedState.transform[3] == canvasState.transform[3] &&
+          requestedState.transform[4] == canvasState.transform[4] &&
+          requestedState.transform[5] == canvasState.transform[5]
+                                            )
       ) {
         applyTransform(requestedState.transform)
       }
     }
   }
 
-  private fun applyClip(newIdentitySpaceClip: CommonShape?) {
-    ctx.restore()
-    ctx.save()
-
-    renderingSurface.scalingRatio.let {
-      ctx.setTransform(it, 0.0, 0.0, it, 0.0, 0.0)
+  private fun doClip(){
+    canvasState.identitySpaceClip?.apply {
+      when(this.tpe.ordinal){
+        CommonShapeType.CommonRectangle.ordinal -> ctx.clip()
+        CommonShapeType.CommonPath.ordinal -> ctx.clip(this.asUnsafe<CommonPath>().winding.toFillRule())
+      }
     }
+  }
 
+  private fun applyClip(newIdentitySpaceClip: CommonShape?) {
     newIdentitySpaceClip?.apply {
       ctx.beginPath()
 
-      Do exhaustive when (this) {
-        is CommonRectangle -> ctx.rect(x, y, width, height)
-        is CommonPath -> ctx.moveBySegments(segments)
+      renderingSurface.scalingRatio.let {
+        ctx.setTransform(it, 0.0, 0.0, it, 0.0, 0.0)
+      }
+
+      when(this.tpe.ordinal){
+        CommonShapeType.CommonRectangle.ordinal -> with(this.asUnsafe<CommonRectangle>()){
+            ctx.rect(x,y,width,height)
+          }
+
+        CommonShapeType.CommonPath.ordinal -> with(this.asUnsafe<CommonPath>()){
+          ctx.moveBySegments(segments)
+        }
       }
 
       if (ParamsProvider.CLIPPING_BORDERS) {
@@ -157,28 +173,16 @@ class Renderer(private val renderingSurface: RenderingSurface) {
         ctx.restore()
       }
 
-      Do exhaustive when (this) {
-        is CommonRectangle -> ctx.clip()
-        is CommonPath -> ctx.clip(winding.toFillRule())
-      }
     }
-
+    canvasState.transform = IDENTITY_LIST
     canvasState.identitySpaceClip = newIdentitySpaceClip
-
-    with(canvasState) {
-      applyTransform(transform)
-      applyStrokeStyle(strokeStyle)
-      applyFillStyle(fillStyle)
-      applyStroke(strokeData)
-      applyFont(font)
-    }
   }
 
-  private fun ensureClip() {
-    if (requestedState.identitySpaceClip != null) {
-      if (canvasState.identitySpaceClip != null || requestedState.identitySpaceClip.hashCode() != canvasState.identitySpaceClip.hashCode()) {
-        applyClip(requestedState.identitySpaceClip)
-      }
+  private fun drawClipRegion() {
+    if(requestedState.identitySpaceClip == null){
+      applyClip(canvasState.identitySpaceClip)
+    }else{
+      applyClip(requestedState.identitySpaceClip)
     }
   }
 
@@ -188,9 +192,17 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureStroke() {
-    if (requestedState.strokeData != null) {
-      if (canvasState.strokeData == null || canvasState.strokeData.hashCode() != requestedState.strokeData.hashCode()) {
-        applyStroke(requestedState.strokeData)
+    requestedState.strokeData?.asUnsafe<StrokeData.Basic>().let {
+      val curr = canvasState.strokeData.asUnsafe<StrokeData.Basic>()
+      if(!(
+          it.dashPhase == curr.dashPhase &&
+          it.lineWidth == curr.lineWidth &&
+          it.miterLimit == curr.miterLimit &&
+          it.endCap.ordinal == curr.endCap.ordinal &&
+          it.lineJoin.ordinal == curr.lineJoin.ordinal &&
+          it.dashArray?.size == curr.dashArray?.size )
+      ){
+        applyStroke(it)
       }
     }
   }
@@ -206,14 +218,15 @@ class Renderer(private val renderingSurface: RenderingSurface) {
     }
   }
 
-  private fun applyFont(newFont: String) {
-    ctx.setFont(newFont)
-    canvasState.font = newFont
+  private fun applyFont(fontSize: Int, fontName: String) {
+    ctx.setFont(Extensions.fontSizeStrCache[fontSize] + fontName)
+    canvasState.fontSize = fontSize
+    canvasState.fontName = fontName
   }
 
   private fun ensureFont() {
-    if(requestedState.font != null && requestedState.font != canvasState.font ){
-      applyFont(requestedState.font)
+    if (requestedState.fontSize != canvasState.fontSize || requestedState.fontName.hashCode() != canvasState.fontName.hashCode()) {
+      applyFont(requestedState.fontSize, requestedState.fontName)
     }
   }
 
@@ -223,7 +236,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureRule() {
-    if(canvasState.rule != requestedState.rule){
+    if (canvasState.rule != requestedState.rule) {
       applyRule(requestedState.rule)
     }
   }
@@ -274,7 +287,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   fun drawString(string: String, x: Double, y: Double, desiredWidth: Double) {
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensureFillStyle()
     ensureFont()
@@ -284,74 +297,91 @@ class Renderer(private val renderingSurface: RenderingSurface) {
     }
 
     ctx.apply {
-      val textDimensions = measureText(string)
-
       save()
+      doClip()
 
-      val width = textDimensions.x
-      translate(x, y)
-      scale(desiredWidth / width, 1.0)
-      fillText(string, 0.0, 0.0)
+      val textRescale = if (!textScaleCache.containsKey(canvasState.fontSize)) {
+        val dimension = ctx.measureText(string)
+        val scale = desiredWidth / dimension.x
+        textScaleCache.put(canvasState.fontSize, scale)
+        scale
+      }
+      else {
+        textScaleCache.get(canvasState.fontSize) ?: 1.0
+      }
 
-      restore()
+
+      //
+      //
+
+
+      if (textRescale < 1 - 1e-4 || textRescale > 1 + 1e-4) {
+        translate(x, y)
+        scale(textRescale, 1.0)
+        fillText(string, 0.0, 0.0)
+      } else {
+        fillText(string, x, y)
+      }
+
 
       if (ParamsProvider.SHOW_TEXT_WIDTH) {
         beginPath()
         moveTo(x, y)
         lineTo(x + desiredWidth, y)
         stroke()
-
-        val height = textDimensions.y
-        beginPath()
-        moveTo(x, y - height)
-        lineTo(x + width, y - height)
-        stroke()
       }
+      restore()
     }
   }
 
   fun drawLine(x1: Double, y1: Double, x2: Double, y2: Double) {
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensureStrokeStyle()
     ensureStroke()
     ensureComposite()
-
-    ctx.apply {
+    with(ctx) {
+      save()
+      doClip()
       beginPath()
       moveTo(x1, y1)
       lineTo(x2, y2)
       stroke()
+      restore()
     }
   }
 
   fun paintRoundRect(paintType: PaintType, x: Double, y: Double, w: Double, h: Double, r1: Double, r2: Double) {
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensurePaint(paintType)
     ensureComposite()
 
     @Suppress("NAME_SHADOWING") val r1 = minOf(r1, w / 2)
     @Suppress("NAME_SHADOWING") val r2 = minOf(r2, h / 2)
-    ctx.apply {
+    with(ctx) {
+      save()
+      doClip()
       beginPath()
       roundedRect(x, y, w, h, r1, r2)
+      when (paintType.ordinal) {
+        PaintType.FILL.ordinal -> fill()
 
-      Do exhaustive when (paintType) {
-        PaintType.FILL -> fill()
-
-        PaintType.DRAW -> stroke()
+        PaintType.DRAW.ordinal -> stroke()
       }
+      restore()
     }
   }
 
   fun paintPath(paintType: PaintType, path: CommonPath) {
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensurePaint(paintType)
     ensureComposite()
 
-    ctx.apply {
+    with(ctx) {
+      save()
+      doClip()
       beginPath()
       moveBySegments(path.segments)
 
@@ -360,29 +390,41 @@ class Renderer(private val renderingSurface: RenderingSurface) {
 
         PaintType.DRAW -> stroke()
       }
+      restore()
     }
   }
 
   fun paintRect(paintType: PaintType, x: Double, y: Double, width: Double, height: Double) {
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensurePaint(paintType)
     ensureComposite()
 
-    Do exhaustive when (paintType) {
-      PaintType.FILL -> ctx.fillRect(x, y, width, height)
+    with(ctx) {
+      save()
+      doClip()
+      //TODO: hacks, kotlin's `when` pattern matching with type casting is expensive.
+      /*
+        using a type enum signature to avoid type checking in JS runtime which is expensive.
+       */
+      when (paintType.ordinal) {
+        PaintType.FILL.ordinal -> fillRect(x, y, width, height)
 
-      PaintType.DRAW -> ctx.strokeRect(x, y, width, height)
+        PaintType.DRAW.ordinal -> strokeRect(x, y, width, height)
+      }
+      restore()
     }
   }
 
   fun paintPolygon(paintType: PaintType, points: List<Point>) {
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensurePaint(paintType)
     ensureComposite()
 
     ctx.apply {
+      save()
+      doClip()
       beginPath()
       moveByPoints(points)
 
@@ -391,16 +433,11 @@ class Renderer(private val renderingSurface: RenderingSurface) {
 
         PaintType.DRAW -> stroke()
       }
+      restore()
     }
   }
 
   fun drawPolyline(points: List<Point>) {
-    ensureClip()
-    ensureTransform()
-    ensureStrokeStyle()
-    ensureStroke()
-    ensureComposite()
-
     points
       .windowed(2)
       .forEach { (p1, p2) ->
@@ -412,20 +449,13 @@ class Renderer(private val renderingSurface: RenderingSurface) {
     requestedState.identitySpaceClip = identitySpaceClip
   }
 
-  fun setTransform(tx: List<Double>) {
+  fun setTransform(tx: DoubleArray) {
     requestedState.transform = tx
   }
 
-  fun setFont(fontId: Short?, fontSize: Int, ligaturesOn: Boolean) {
-    val font = if (fontId == null) {
-      logger.debug { "null is used as a font ID. Using Arial..." }
-
-      "${fontSize}px Arial"
-    } else {
-      "${fontSize}px ${fontId.toFontFaceName()}"
-    }
-
-    requestedState.font = font
+  fun setFont(fontId: Int?, fontSize: Int, ligaturesOn: Boolean) {
+    requestedState.fontSize = fontSize
+    requestedState.fontName = fontId?.let { Extensions.serverFontNameCache[fontId] } ?: "Arial"
     renderingSurface.canvas.fontVariantLigatures = ligaturesOn.toLigatureVariant()
     renderingSurface.canvas
   }
@@ -437,46 +467,55 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   fun drawImage(image: ImageSource, x: Double, y: Double) {
     if (image.isEmpty()) return
 
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensureComposite()
+    ctx.save()
+    doClip()
     ctx.drawImage(image, x, y)
+    ctx.restore()
   }
 
   fun drawImage(image: ImageSource, x: Double, y: Double, width: Double, height: Double) {
     if (image.isEmpty()) return
 
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensureComposite()
 
+    ctx.save()
+    doClip()
     ctx.drawImage(image, x, y, width, height)
+    ctx.restore()
   }
 
   fun drawImage(image: ImageSource, sx: Double, sy: Double, sw: Double, sh: Double, dx: Double, dy: Double, dw: Double, dh: Double) {
     if (image.isEmpty()) return
 
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensureComposite()
 
+    ctx.save()
+    doClip()
     ctx.drawImage(
       image,
       sx = sx, sy = sy, sw = sw, sh = sh,
       dx = dx, dy = dy, dw = dw, dh = dh
     )
+    ctx.restore()
   }
 
-  fun drawImage(image: ImageSource, tx: List<Double>) {
+  fun drawImage(image: ImageSource, tx: DoubleArray) {
     if (image.isEmpty()) return
 
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensureComposite()
 
     ctx.apply {
       save()
-
+      doClip()
       transform(tx[0], tx[1], tx[2], tx[3], tx[4], tx[5])
       ctx.drawImage(image, 0.0, 0.0)
 
@@ -499,12 +538,14 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   fun paintOval(paintType: PaintType, x: Double, y: Double, width: Double, height: Double) {
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensurePaint(paintType)
     ensureComposite()
 
     ctx.apply {
+      save()
+      doClip()
       beginPath()
       ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0.0, 0.0, 2 * PI)
       when (paintType) {
@@ -512,11 +553,12 @@ class Renderer(private val renderingSurface: RenderingSurface) {
 
         PaintType.FILL -> fill()
       }
+      restore()
     }
   }
 
   fun copyArea(x: Double, y: Double, width: Double, height: Double, dx: Double, dy: Double) {
-    ensureClip()
+    drawClipRegion()
     ensureTransform()
     ensureComposite()
 
@@ -534,6 +576,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
       // Finally, we paint the image.
 
       save()
+      doClip()
 
       // 1:
       beginPath()
@@ -570,9 +613,10 @@ class Renderer(private val renderingSurface: RenderingSurface) {
 
     private data class CanvasRenderingState(
       var identitySpaceClip: CommonShape? = DEFAULT_IDENTITY_SPACE_CLIP,
-      var transform: List<Double> = DEFAULT_TRANSFORM,
+      var transform: DoubleArray = DEFAULT_TRANSFORM,
       var strokeData: StrokeData = DEFAULT_STROKE_DATA,
-      var font: String = DEFAULT_FONT,
+      var fontSize: Int = Defaults.FONT_SIZE,
+      var fontName: String = Defaults.FONT_NAME,
       var rule: AlphaCompositeRule = DEFAULT_RULE,
       var alpha: Double = DEFAULT_ALPHA,
       var fillStyle: PaintColor? = DEFAULT_FILL_STYLE,
@@ -583,19 +627,50 @@ class Renderer(private val renderingSurface: RenderingSurface) {
         identitySpaceClip = DEFAULT_IDENTITY_SPACE_CLIP
         transform = DEFAULT_TRANSFORM
         strokeData = DEFAULT_STROKE_DATA
-        font = DEFAULT_FONT
-        rule = DEFAULT_RULE
+        fontSize = Defaults.FONT_SIZE
+        fontName = Defaults.FONT_NAME
         alpha = DEFAULT_ALPHA
         fillStyle = DEFAULT_FILL_STYLE
         strokeStyle = DEFAULT_STROKE_STYLE
       }
 
+      override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as CanvasRenderingState
+
+        if (identitySpaceClip != other.identitySpaceClip) return false
+        if (!transform.contentEquals(other.transform)) return false
+        if (strokeData != other.strokeData) return false
+        if (fontSize != other.fontSize) return false
+        if (fontName != other.fontName) return false
+        if (rule != other.rule) return false
+        if (alpha != other.alpha) return false
+        if (fillStyle != other.fillStyle) return false
+        if (strokeStyle != other.strokeStyle) return false
+
+        return true
+      }
+
+      override fun hashCode(): Int {
+        var result = identitySpaceClip?.hashCode() ?: 0
+        result = 31 * result + transform.contentHashCode()
+        result = 31 * result + strokeData.hashCode()
+        result = 31 * result + fontSize
+        result = 31 * result + fontName.hashCode()
+        result = 31 * result + rule.hashCode()
+        result = 31 * result + alpha.hashCode()
+        result = 31 * result + (fillStyle?.hashCode() ?: 0)
+        result = 31 * result + (strokeStyle?.hashCode() ?: 0)
+        return result
+      }
+
       companion object {
 
-        private val DEFAULT_IDENTITY_SPACE_CLIP: CommonShape? = null
-        private val DEFAULT_TRANSFORM: List<Double> = IDENTITY_LIST
+        private val DEFAULT_IDENTITY_SPACE_CLIP: CommonShape? = CommonRectangle(0.0,0.0,0.0,0.0)
+        private val DEFAULT_TRANSFORM: DoubleArray = IDENTITY_LIST
         private val DEFAULT_STROKE_DATA: StrokeData = Defaults.STROKE
-        private var DEFAULT_FONT: String = "${Defaults.FONT_SIZE}px Arial"
         private val DEFAULT_RULE: AlphaCompositeRule = AlphaCompositeRule.SRC_OVER
         private const val DEFAULT_ALPHA: Double = 1.0
         private val DEFAULT_FILL_STYLE: PaintColor? = null
@@ -605,12 +680,14 @@ class Renderer(private val renderingSurface: RenderingSurface) {
 
     data class RequestedRenderingState(
       var identitySpaceClip: CommonShape? = null,
-      var transform: List<Double> = IDENTITY_LIST,
+      var transform: DoubleArray = IDENTITY_LIST,
       var strokeData: StrokeData = Defaults.STROKE,
       var font: String = "${Defaults.FONT_SIZE}px Arial",
       var rule: AlphaCompositeRule = AlphaCompositeRule.SRC_OVER,
       var alpha: Double = 1.0,
       var paint: PaintColor? = SolidColor(Defaults.FOREGROUND_COLOR_ARGB),
+      var fontSize: Int = Defaults.FONT_SIZE,
+      var fontName: String = "Arial",
     )
   }
 }

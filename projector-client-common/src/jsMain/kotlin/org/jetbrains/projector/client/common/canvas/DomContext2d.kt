@@ -197,6 +197,7 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     if( color != null) {
       val ctx = myContext2d
       val strCache = JsExtensions.rgbStrCache
+      //TODO: hacking to avoid expensive Kotlin binary operator and string concat
       js("""
       if(color.argb){
         var a = (color.argb >>> 24) & 0xff
@@ -211,11 +212,13 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     }
   }
 
+
   @Suppress("UNUSED_VARIABLE")
   override fun setStrokeStyle(color: PaintColor?) {
     if( color != null) {
       val ctx = myContext2d
       val strCache = JsExtensions.rgbStrCache
+      //TODO: hacking to avoid expensive Kotlin binary operator and string concat
       js("""
         if(color.argb){
           var a = (color.argb >>> 24) & 0xff
@@ -329,6 +332,12 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     return DOMGradient(myContext2d.createLinearGradient(x0, y0, x1, y1))
   }
 
+  override fun setTransform(matrix: Matrix) {
+    with(matrix){
+      myContext2d.setTransform(a,b,c,d,e,f)
+    }
+  }
+
   override fun getTransform(): Matrix {
     return with(myContext2d.getTransform()) {
       Matrix(a, b, c, d, e, f)
@@ -353,6 +362,9 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     override fun addColorStop(offset: Double, argb: Int) {
       canvasGradient.addColorStop(offset, argb.argbIntToRgbaString())
     }
+
+    override val argb: Int
+      get() = 0
   }
 
   companion object {
