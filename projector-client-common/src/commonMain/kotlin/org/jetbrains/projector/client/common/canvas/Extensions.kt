@@ -120,9 +120,6 @@ object Extensions {
 
   val serverFontNameCache = IntRange(0,255).map { "serverFont$it" }.toTypedArray()
   val fontSizeStrCache = IntRange(0,255).map { "${it}px " }.toTypedArray()
-  fun Int.argbIntToRgbaString(): String {
-    val colorValue = this
-
   val fontSizeScalingFactorCache = HashMap<Int,Double>()
 
 }
