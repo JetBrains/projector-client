@@ -37,7 +37,7 @@ enum class VK(vararg typedSymbols: Char = charArrayOf()) {
   PAUSE,
   CAPS_LOCK,
   ESCAPE,
-  SPACE,
+  SPACE(' '),
   PAGE_UP,
   PAGE_DOWN,
   END,

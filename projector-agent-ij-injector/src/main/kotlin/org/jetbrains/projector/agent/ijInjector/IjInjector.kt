@@ -61,6 +61,7 @@ internal object IjInjector {
 
     if (!isAgent) {  // todo: support variant for agent too
       IjMdTransformer.agentmain(utils, mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod)
+      IjBrowserUtilTransformer.agentmain(utils)
     }
   }
 }
