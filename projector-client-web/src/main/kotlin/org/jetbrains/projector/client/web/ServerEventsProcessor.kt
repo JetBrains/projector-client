@@ -97,10 +97,9 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           val offscreenProcessor = ImageCacher.getOffscreenProcessor(target,::JsSingleRenderingSurfaceProcessor)
 
           // todo: don't create this deque every time
-          ////val drawEvents = ArrayDeque<DrawEvent>().apply { addAll(event.drawEvents.shrinkByPaintEvents()) }
-          //
+
           offscreenProcessor.process(event.drawEvents)
-          //
+         
           windowDataEventsProcessor.redrawWindows()
         }
       }

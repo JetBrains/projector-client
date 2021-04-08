@@ -44,19 +44,19 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) : Rend
   override fun process(drawEvents: List<ServerWindowEvent>): List<ServerWindowEvent>? {
     stateSaver.restoreIfNeeded()
 
-    var removing = true
+    var failed = false
 
     val commands = drawEvents.shrinkByPaintEvents()
 
-    commands.forEach { drawEvent ->
-      val drawIsSuccessful = handleDrawEvent(drawEvent)
-
-      if (!drawIsSuccessful && removing) {
-        stateSaver.save()
-        removing = false
+    return drawEvents.filter { drawEvent ->
+      if (failed) {
+        if (!handleDrawEvent(drawEvent)) {
+          stateSaver.save()
+          failed = true;
+        }
       }
+      failed
     }
-    return null
   }
 
   private fun handleDrawEvent(command: DrawEvent): Boolean {
@@ -88,6 +88,9 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) : Rend
         is ServerSetTransformEvent -> renderer.setTransform(it.tx)
 
         is ServerWindowToDoStateEvent -> logUnsupportedCommand(it)
+
+        else ->
+          logger.error { "Unexpected prerequisites [${it.toString()}] of ${command.paintEvent.toString()}" }
       }
     }
 
@@ -250,24 +253,35 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) : Rend
       }
     }
 
+    fun List<DrawEvent>.concat(other: List<DrawEvent>): List<DrawEvent> {
+      if(this.isEmpty()){
+        return other
+      }else{
+        return this + other
+      }
+    }
+
     fun List<ServerWindowEvent>.shrinkByPaintEvents(): List<DrawEvent> {
-      val result = mutableListOf<DrawEvent>()
-
-      var prerequisites = mutableListOf<ServerWindowStateEvent>()
-
-      this.forEach {
-        Do exhaustive when (it) {
-          is ServerWindowStateEvent -> prerequisites.add(it)
-
-          is ServerWindowPaintEvent -> {
-            result.add(DrawEvent(prerequisites, it))
-            prerequisites = mutableListOf()
-          }
-        }
+      if(this.isEmpty()){
+        return listOf()
       }
 
-      if (prerequisites.isNotEmpty()) {
-        logger.error { "Bad commands received from server: ${prerequisites.size} state events are at the end" }
+      val result = mutableListOf<DrawEvent>()
+      var lastIndex = 0;
+      var curr = 0;
+      while(curr < this.size){
+        if(this[curr] is ServerWindowPaintEvent){
+          result.add(DrawEvent(
+            if(curr - lastIndex > 0){
+              this.subList(lastIndex,curr).toList()
+            }else{
+              listOf()
+            },
+            this[curr] as ServerWindowPaintEvent
+          ))
+          lastIndex = curr
+        }
+        curr ++
       }
 
       return result

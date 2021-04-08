@@ -55,8 +55,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   val id = windowData.id
 
-  //@OptIn(ExperimentalStdlibApi::class)
-  //val drawEvents = mutableListOf<ServerWindowEvent>()
+  
   var pendingEvents: List<ServerWindowEvent>? = null
 
   var title: String? = null

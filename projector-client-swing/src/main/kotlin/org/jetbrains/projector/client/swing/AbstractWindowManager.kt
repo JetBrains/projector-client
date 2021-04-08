@@ -80,7 +80,7 @@ abstract class AbstractWindowManager<FrameType> {
   inner class FrameData(
     val frame: FrameType,
     var windowData: WindowData,
-    val drawEvents: ArrayDeque<DrawEvent>,
+    var drawEvents: List<DrawEvent>,
     val surface: DoubleBufferedRenderingSurface,
     val processor: SingleRenderingSurfaceProcessor,
   )

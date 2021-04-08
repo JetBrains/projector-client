@@ -24,8 +24,8 @@
 package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.concat
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.common.misc.firstNotNullOrNull

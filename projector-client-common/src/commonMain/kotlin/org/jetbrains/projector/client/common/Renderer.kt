@@ -118,17 +118,17 @@ class Renderer(private val renderingSurface: RenderingSurface) {
   }
 
   private fun ensureTransform() {
-    if (requestedState.transform != null && requestedState.transform.size >= 6) {
-      if (canvasState.transform == null || !(
-          requestedState.transform[0] == canvasState.transform[0] &&
-          requestedState.transform[1] == canvasState.transform[1] &&
-          requestedState.transform[2] == canvasState.transform[2] &&
-          requestedState.transform[3] == canvasState.transform[3] &&
-          requestedState.transform[4] == canvasState.transform[4] &&
-          requestedState.transform[5] == canvasState.transform[5]
-                                            )
-      ) {
-        applyTransform(requestedState.transform)
+    requestedState.transform.let { requestedTransform ->
+      canvasState.transform.let { currentTransform ->
+        if (!(requestedTransform[0] == currentTransform[0] &&
+              requestedTransform[1] == currentTransform[1] &&
+              requestedTransform[2] == currentTransform[2] &&
+              requestedTransform[3] == currentTransform[3] &&
+              requestedTransform[4] == currentTransform[4] &&
+              requestedTransform[5] == currentTransform[5]
+             )) {
+          applyTransform(requestedTransform)
+        }
       }
     }
   }
