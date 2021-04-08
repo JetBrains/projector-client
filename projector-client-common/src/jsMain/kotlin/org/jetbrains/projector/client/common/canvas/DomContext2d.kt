@@ -194,42 +194,26 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
 
   @Suppress("UNUSED_VARIABLE")
   override fun setFillStyle(color: PaintColor?) {
-    if( color != null) {
-      val ctx = myContext2d
-      val strCache = JsExtensions.rgbStrCache
-      //TODO: hacking to avoid expensive Kotlin binary operator and string concat
-      js("""
-      if(color.argb){
-        var a = (color.argb >>> 24) & 0xff
-        var r = (color.argb >>> 16) & 0xff
-        var g = (color.argb >>> 8) & 0xff
-        var b = color.argb & 0xff
-        ctx.fillStyle = "#" + strCache[r] + strCache[g] + strCache[b] + strCache[a];
-      }else{
-        ctx.fillStyle = color.canvasGradient;
+    color?.let { paintColor ->
+      when(paintColor.tpe.ordinal) {
+        PaintColorType.SolidColor.ordinal ->
+          myContext2d.fillStyle = paintColor.argb.argbIntToRgbaString()
+        PaintColorType.Gradient.ordinal ->
+          myContext2d.fillStyle = paintColor.unsafeCast<DOMGradient>().canvasGradient
       }
-    """)
     }
   }
 
 
   @Suppress("UNUSED_VARIABLE")
   override fun setStrokeStyle(color: PaintColor?) {
-    if( color != null) {
-      val ctx = myContext2d
-      val strCache = JsExtensions.rgbStrCache
-      //TODO: hacking to avoid expensive Kotlin binary operator and string concat
-      js("""
-        if(color.argb){
-          var a = (color.argb >>> 24) & 0xff
-          var r = (color.argb >>> 16) & 0xff
-          var g = (color.argb >>> 8) & 0xff
-          var b = color.argb & 0xff
-          ctx.strokeStyle = "#" + strCache[r] + strCache[g] + strCache[b] + strCache[a];
-        }else{
-          ctx.strokeStyle = color.canvasGradient
-        }
-    """)
+    color?.let { paintColor ->
+      when(paintColor.tpe.ordinal) {
+        PaintColorType.SolidColor.ordinal ->
+          myContext2d.strokeStyle = paintColor.argb.argbIntToRgbaString()
+        PaintColorType.Gradient.ordinal ->
+          myContext2d.strokeStyle = paintColor.unsafeCast<DOMGradient>().canvasGradient
+      }
     }
   }
 

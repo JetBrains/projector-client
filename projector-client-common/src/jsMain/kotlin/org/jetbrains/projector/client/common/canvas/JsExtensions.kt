@@ -25,6 +25,7 @@ package org.jetbrains.projector.client.common.canvas
 
 import org.w3c.dom.HTMLCanvasElement
 
+
 object JsExtensions {
 
   fun Long.argbIntToRgbaString(): String {
@@ -42,7 +43,10 @@ object JsExtensions {
   @Suppress("UNUSED_VARIABLE")
   fun Int.argbIntToRgbaString(): String {
     val argb = this
-    return js(" '#' + ( ((argb >>> 24 & 0xff) | (argb <<8>>>0))>>>0 ).toString(16).padStart(6,'0') ")
+    val strCache = rgbStrCache
+    return js("""
+        "#" + strCache[(argb >>> 16) & 0xff] + strCache[(argb >>> 8) & 0xff] + strCache[argb & 0xff] + strCache[(argb >>> 24) & 0xff];
+      """).unsafeCast<String>()
   }
 
 

@@ -28,7 +28,7 @@ actual object ParamsProvider {
     get() = JvmParamsProviderImpl.CLIPPING_BORDERS
   actual val SHOW_TEXT_WIDTH: Boolean
     get() = JvmParamsProviderImpl.SHOW_TEXT_WIDTH
-  actual val REPAINT_AREA: RepaintAreaSetting
+  actual val REPAINT_AREA: Boolean
     get() = JvmParamsProviderImpl.REPAINT_AREA
   actual val LOG_UNSUPPORTED_EVENTS: Boolean
     get() = JvmParamsProviderImpl.LOG_UNSUPPORTED_EVENTS
@@ -41,7 +41,7 @@ actual object ParamsProvider {
 object JvmParamsProviderImpl {
   var CLIPPING_BORDERS: Boolean = false
   var SHOW_TEXT_WIDTH: Boolean = false
-  var REPAINT_AREA: RepaintAreaSetting = RepaintAreaSetting.Disabled
+  var REPAINT_AREA: Boolean = false
   var LOG_UNSUPPORTED_EVENTS: Boolean = true
   var IMAGE_TTL: Double = 0.0
   var IMAGE_CACHE_SIZE_CHARS: Int = 0

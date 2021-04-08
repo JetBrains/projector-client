@@ -24,12 +24,9 @@
 package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.dom.addClass
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.DomCanvas
-import org.jetbrains.projector.client.common.canvas.JsSingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.buffering.DoubleBufferedRenderingSurface
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
 import org.jetbrains.projector.client.common.misc.ParamsProvider
@@ -90,7 +87,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   private var isDirty: Boolean = true
 
-  private val commandProcessor = JsSingleRenderingSurfaceProcessor(renderingSurface)
+  private val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface)
 
   var bounds: CommonRectangle = CommonRectangle(0.0, 0.0, 0.0, 0.0)
     set(value) {

@@ -27,7 +27,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
-import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.SwingFontCache
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.protocol.KotlinxJsonToClientHandshakeDecoder
@@ -42,7 +41,6 @@ import org.jetbrains.projector.util.logging.Logger
 import java.util.*
 import javax.swing.SwingUtilities
 import javax.swing.Timer
-import kotlin.collections.ArrayDeque
 
 class SwingClient(val transport: ProjectorTransport, val windowManager: AbstractWindowManager<*>) {
   val logger = Logger<SwingClient>()
@@ -76,11 +74,14 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
             val processor = ImageCacher.getOffscreenProcessor(target,::SingleRenderingSurfaceProcessor)
             processor.process(serverEvent.drawEvents)
           }
+          else ->
+            logger.error { "Unknown target for ServerDrawCommandsEvent : ${serverEvent}" }
         }
       }
       is ServerCaretInfoChangedEvent -> logger.debug { "Received and discarded caret info event: $serverEvent" }
       is ServerMarkdownEvent -> logger.debug { "Received and discarded markdown event: $serverEvent" }
       is ServerWindowColorsEvent -> logger.debug { "Received and discarded color event: $serverEvent" }
+      else -> logger.error { "Unknown event : ${serverEvent}" }
     }
   }
 
@@ -117,6 +118,7 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
         }
       }
       is ToClientHandshakeFailureEvent -> error("Handshake failed: ${serverHandshake.reason}")
+      else -> error("unknown message: ${serverHandshake}")
     }
 
     transport.send("Unused string meaning fonts loading is done")

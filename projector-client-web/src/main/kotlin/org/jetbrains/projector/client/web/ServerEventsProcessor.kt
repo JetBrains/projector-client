@@ -24,7 +24,7 @@
 package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
-import org.jetbrains.projector.client.common.canvas.JsSingleRenderingSurfaceProcessor
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.misc.PingStatistics
@@ -94,7 +94,7 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
         is ServerDrawCommandsEvent.Target.Onscreen -> windowDataEventsProcessor.draw(target.windowId, event.drawEvents)
 
         is ServerDrawCommandsEvent.Target.Offscreen -> {
-          val offscreenProcessor = ImageCacher.getOffscreenProcessor(target,::JsSingleRenderingSurfaceProcessor)
+          val offscreenProcessor = ImageCacher.getOffscreenProcessor(target,::SingleRenderingSurfaceProcessor)
 
           // todo: don't create this deque every time
 

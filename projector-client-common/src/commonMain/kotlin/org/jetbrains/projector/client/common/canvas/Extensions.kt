@@ -78,7 +78,7 @@ object Extensions {
         setLineCap(strokeData.endCap.toCanvasLineCap())
         setLineJoin(strokeData.lineJoin.toCanvasLineJoin())
         setMiterLimit(strokeData.miterLimit.toDouble())
-        setLineDash(strokeData.dashArray ?: listOf())
+        strokeData.dashArray?.let(::setLineDash)
         setLineDashOffset(strokeData.dashPhase.toDouble())
       }
     }
