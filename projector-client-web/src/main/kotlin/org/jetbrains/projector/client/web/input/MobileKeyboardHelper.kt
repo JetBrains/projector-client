@@ -124,7 +124,7 @@ class MobileKeyboardHelperImpl(
       if (it.key == "Tab") {  // don't use `it.code == "Tab"` here because `it.code` is empty on mobile devices
         it.preventDefault()
         it.stopPropagation()
-        fireDownPressUp('\t', VK.TAB)
+        fireDownPressUp(VK.TAB.typedSymbols.single(), VK.TAB)
       }
     }
 
@@ -147,9 +147,9 @@ class MobileKeyboardHelperImpl(
           }
         }
 
-        "deleteContentBackward" -> fireDownPressUp('\b', VK.BACK_SPACE)
-        "deleteContentForward" -> fireDownUp(JsKey("Delete"), VK.DELETE)
-        "insertLineBreak" -> fireDownPressUp('\n', VK.ENTER)
+        "deleteContentBackward" -> fireDownPressUp(VK.BACK_SPACE.typedSymbols.single(), VK.BACK_SPACE)
+        "deleteContentForward" -> fireDownPressUp(VK.DELETE.typedSymbols.single(), VK.DELETE)
+        "insertLineBreak" -> fireDownPressUp(VK.ENTER.typedSymbols.single(), VK.ENTER)
 
         else -> {
           logger.info { "Unknown inputType=$inputType" }
@@ -251,7 +251,7 @@ class MobileKeyboardHelperImpl(
       parent = panel,
       elementId = "pressEsc",
       onClick = {
-        fireDownUp(JsKey("Escape"), VK.ESCAPE)
+        fireDownPressUp(VK.ESCAPE.typedSymbols.single(), VK.ESCAPE)
       }
     )
 

@@ -536,7 +536,6 @@ class InputController(
       VK.ALT,
       VK.ALT_GRAPH,
       VK.CAPS_LOCK,
-      VK.ESCAPE,
       VK.LEFT,
       VK.HOME,
       VK.END,

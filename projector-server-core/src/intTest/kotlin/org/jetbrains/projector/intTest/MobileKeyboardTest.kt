@@ -115,6 +115,7 @@ class MobileKeyboardTest {
       shift: Boolean = false,
       expectedEvents: Int? = null,
       f: Keys? = null,
+      esc: Boolean = false,
       tester: (events: List<KeyEvent?>) -> Unit,
     ) {
       val keyEvents = Channel<List<KeyEvent>>()
@@ -134,6 +135,9 @@ class MobileKeyboardTest {
           element("#toggleShift").click()
         }
 
+        if (esc) {
+          element("#pressEsc").click()
+        }
         if (keysToSend.isNotEmpty()) {
           element("body").sendKeys(*keysToSend)
         }
@@ -265,6 +269,32 @@ class MobileKeyboardTest {
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 32, ' ', KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_TYPED, 0, ' ', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
     checkEvent(it[2], KeyEvent.KEY_RELEASED, 32, ' ', KeyEvent.KEY_LOCATION_STANDARD, 0)
+  }
+
+  @Test
+  fun testEscape() = test(esc = true) {
+    // expected (tested Space press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=27,keyText=Escape,keyChar=Escape,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Escape,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=27,keyText=Escape,keyChar=Escape,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 27, '\u001b', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\u001b', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 27, '\u001b', KeyEvent.KEY_LOCATION_STANDARD, 0)
+  }
+
+  @Test
+  fun testDelete() = test(Keys.DELETE) {
+    // expected (tested Space press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=127,keyText=Delete,keyChar=Delete,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Delete,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=127,keyText=Delete,keyChar=Delete,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 127, '\u007f', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\u007f', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 127, '\u007f', KeyEvent.KEY_LOCATION_STANDARD, 0)
   }
 
   @Test
