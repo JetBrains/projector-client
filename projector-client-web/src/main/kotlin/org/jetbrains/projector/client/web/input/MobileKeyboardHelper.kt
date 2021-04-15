@@ -124,7 +124,7 @@ class MobileKeyboardHelperImpl(
       if (it.key == "Tab") {  // don't use `it.code == "Tab"` here because `it.code` is empty on mobile devices
         it.preventDefault()
         it.stopPropagation()
-        fireDownPressUp(VK.TAB.typedSymbols.single(), VK.TAB)
+        fireDownPressUp(VK.TAB)
       }
     }
 
@@ -140,16 +140,16 @@ class MobileKeyboardHelperImpl(
             specialKeysState.isShiftEnabled = true
             fireKeyEvent(key = JsKey("ShiftLeft"), code = VK.SHIFT, location = LEFT, keyEventType = DOWN)
           }
-          fireDownPressUp(char, code)
+          fireDownPressUp(code, char)
           if (!shiftWasAlreadyEnabled && char.isUpperCase()) {
             specialKeysState.isShiftEnabled = false
             fireKeyEvent(key = JsKey("ShiftLeft"), code = VK.SHIFT, location = LEFT, keyEventType = UP)
           }
         }
 
-        "deleteContentBackward" -> fireDownPressUp(VK.BACK_SPACE.typedSymbols.single(), VK.BACK_SPACE)
-        "deleteContentForward" -> fireDownPressUp(VK.DELETE.typedSymbols.single(), VK.DELETE)
-        "insertLineBreak" -> fireDownPressUp(VK.ENTER.typedSymbols.single(), VK.ENTER)
+        "deleteContentBackward" -> fireDownPressUp(VK.BACK_SPACE)
+        "deleteContentForward" -> fireDownPressUp(VK.DELETE)
+        "insertLineBreak" -> fireDownPressUp(VK.ENTER)
 
         else -> {
           logger.info { "Unknown inputType=$inputType" }
@@ -203,7 +203,7 @@ class MobileKeyboardHelperImpl(
     }
   }
 
-  private fun fireDownPressUp(char: Char, code: VK) {
+  private fun fireDownPressUp(code: VK, char: Char = code.typedSymbols.single()) {
     val jsKey = JsKey(char.toString())
     fireKeyEvent(key = jsKey, code = code, location = STANDARD, keyEventType = DOWN)
     fireKeyPressEvent(char = char)
@@ -251,7 +251,7 @@ class MobileKeyboardHelperImpl(
       parent = panel,
       elementId = "pressEsc",
       onClick = {
-        fireDownPressUp(VK.ESCAPE.typedSymbols.single(), VK.ESCAPE)
+        fireDownPressUp(VK.ESCAPE)
       }
     )
 
