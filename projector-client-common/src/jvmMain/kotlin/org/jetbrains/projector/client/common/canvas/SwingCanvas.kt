@@ -27,7 +27,6 @@ import java.awt.Graphics2D
 import java.awt.Image
 import java.awt.image.BufferedImage
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.math.min
 import kotlin.math.max
 
 class SwingCanvas() : Canvas {
@@ -47,10 +46,10 @@ class SwingCanvas() : Canvas {
 
   private fun doResize(width: Int, height: Int) {
     val newImage = BufferedImage(max(1, width), max(1, height), BufferedImage.TYPE_INT_ARGB)
-    newImage.createGraphics().drawImage(image, 0, 0, min(max(1, width), image.width), min(max(1, height), image.height), null)
+    newImage.createGraphics().drawImage(image, 0, 0, width.coerceIn(1, image.width), height.coerceIn(1, image.height), null)
     image = newImage
     val graphics = image.createGraphics()
-    graphicsCreateListener.forEach { it.key(graphics) }
+    graphicsCreateListeners.forEach { it.key(graphics) }
     context2d = SwingContext2d(graphics)
   }
 
@@ -72,13 +71,13 @@ class SwingCanvas() : Canvas {
   }
 
   companion object {
-    private val graphicsCreateListener = ConcurrentHashMap<(Graphics2D) -> Unit, Unit>()
+    private val graphicsCreateListeners = ConcurrentHashMap<(Graphics2D) -> Unit, Unit>()
     fun addGraphicsCreationListener(listener: (Graphics2D) -> Unit) {
-      graphicsCreateListener[listener] = Unit
+      graphicsCreateListeners[listener] = Unit
     }
 
     fun removeGraphicsCreationListener(listener: (Graphics2D) -> Unit) {
-      graphicsCreateListener.remove(listener)
+      graphicsCreateListeners.remove(listener)
     }
   }
 }
