@@ -148,7 +148,7 @@ internal class IjMdTransformer private constructor(
           utils.instrumentation.retransformClasses(Class.forName(clazz, false, mdClassloader))
         }
         catch (t: Throwable) {
-          logger.error(t) { "Class retransform error" }
+          logger.info(t) { "Class retransform error" }
         }
       }
 
