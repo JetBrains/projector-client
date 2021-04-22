@@ -28,7 +28,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.misc.ParamsProvider
-import org.jetbrains.projector.client.common.misc.RepaintAreaSetting
 import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.web.input.layout.FrAzerty
 import org.jetbrains.projector.client.web.input.layout.KeyboardApiLayout
@@ -398,11 +397,6 @@ class InputController(
         ClientStats.printStats()
       }
 
-      if (type == ClientKeyEvent.KeyEventType.DOWN && vk == VK.F11 && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
-        (ParamsProvider.REPAINT_AREA as? RepaintAreaSetting.Enabled)?.let {
-          it.show = !it.show
-        }
-      }
 
       stateMachine.fire(ClientAction.AddEvent(message))
 

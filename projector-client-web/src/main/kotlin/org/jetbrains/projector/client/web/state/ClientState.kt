@@ -236,7 +236,7 @@ sealed class ClientState {
             )
 
             command.fontDataHolders.forEach { fontDataHolder ->
-              FontFaceAppender.appendFontFaceToPage(fontDataHolder.fontId, fontDataHolder.fontData) { loadedFontCount ->
+              FontFaceAppender.appendFontFaceToPage(fontDataHolder.fontId.unsafeCast<Int>(), fontDataHolder.fontData) { loadedFontCount ->
                 if (loadedFontCount == command.fontDataHolders.size) {
                   logger.info { "${command.fontDataHolders.size} font(s) loaded" }
                   OnScreenMessenger.hide()
@@ -332,6 +332,9 @@ sealed class ClientState {
       handler = { windowDataEventsProcessor.redrawWindows() },
       timeout = ParamsProvider.REPAINT_INTERVAL_MS,
     )
+
+    //private var repainter:Int = Int.MIN_VALUE
+
 
     private val serverEventsProcessor = ServerEventsProcessor(windowDataEventsProcessor)
 
@@ -518,22 +521,23 @@ sealed class ClientState {
       is ClientAction.WebSocket.Close -> {
         Do exhaustive when (action) {
           is ClientAction.WebSocket.Close.FinishNormal -> {
-            logger.info { "Connection is closed..." }
-
-            window.clearInterval(repainter)
-            pingStatistics.onClose()
-            windowDataEventsProcessor.onClose()
-            inputController.removeListeners()
-            windowSizeController.removeListener()
-            typing.dispose()
-            markdownPanelManager.disposeAll()
-            mobileKeyboardHelper.dispose()
-            closeBlocker.removeListener()
-            selectionBlocker.unblockSelection()
-            connectionWatcher.removeWatcher()
-
-            showDisconnectedMessage(webSocket.url, action.closeCode)
-            Disconnected
+            //logger.info { "Connection is closed..." }
+            //
+            //window.clearInterval(repainter)
+            //pingStatistics.onClose()
+            //windowDataEventsProcessor.onClose()
+            //inputController.removeListeners()
+            //windowSizeController.removeListener()
+            //typing.dispose()
+            //markdownPanelManager.disposeAll()
+            //mobileKeyboardHelper.dispose()
+            //closeBlocker.removeListener()
+            //selectionBlocker.unblockSelection()
+            //connectionWatcher.removeWatcher()
+            //
+            //showDisconnectedMessage(webSocket.url, action.closeCode)
+            //Disconnected
+            reloadConnection("Connection is closed, retrying the connection...")
           }
 
           is ClientAction.WebSocket.Close.FinishError ->
@@ -551,6 +555,7 @@ sealed class ClientState {
       logger.info { messageText }
 
       window.clearInterval(repainter)
+      //window.cancelAnimationFrame(repainter)
       pingStatistics.onClose()
       inputController.removeListeners()
       windowSizeController.removeListener()

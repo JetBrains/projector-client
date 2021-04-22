@@ -47,7 +47,9 @@ package org.jetbrains.projector.client.common.canvas
  */
 
 interface Canvas {
-  val context2d: Context2d
+  fun context2d(): Context2d
+  fun bitmapContext(): ContextBitmapRenderer
+
   var width: Int
   var height: Int
   var fontVariantLigatures: String
@@ -55,12 +57,10 @@ interface Canvas {
     set(value) {}
   val imageSource: ImageSource
 
-  fun takeSnapshot(): Snapshot
+  fun takeSnapshot(): ImageSource
 
   interface ImageSource {
     fun isEmpty(): Boolean
   }
 
-  // Unchangeable copy of canvas data
-  interface Snapshot : ImageSource
 }

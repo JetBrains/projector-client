@@ -23,15 +23,29 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Canvas.ImageSource
-import org.jetbrains.projector.client.common.canvas.Canvas.Snapshot
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.*
 
 class DomCanvas(private val myCanvas: HTMLCanvasElement) : Canvas {
 
-  override val context2d: Context2d = DomContext2d(myCanvas.getContext("2d") as CanvasRenderingContext2D)
+  var _context2d : Context2d? = null
+
+  var _bitmapContext: ContextBitmapRenderer? = null
+
+  override fun context2d(): Context2d {
+    if( _context2d == null){
+      _context2d = DomContext2d(myCanvas.getContext("2d",js("{ desynchronized: true }")) as CanvasRenderingContext2D)
+    }
+    return _context2d!!
+  }
+
+  override fun bitmapContext(): ContextBitmapRenderer {
+    if( _bitmapContext == null){
+      _bitmapContext = DomContextBitmapRenderer(myCanvas.getContext("bitmaprenderer") as ImageBitmapRenderingContext)
+    }
+    return _bitmapContext!!
+  }
 
   override var width: Int
     get() = myCanvas.width
@@ -52,18 +66,24 @@ class DomCanvas(private val myCanvas: HTMLCanvasElement) : Canvas {
     }
   override val imageSource: ImageSource = DomImageSource(myCanvas)
 
-  override fun takeSnapshot(): Snapshot {
-    val copy = document.createElement("canvas") as HTMLCanvasElement
+  override fun takeSnapshot(): ImageSource {
+    //val copy = document.createElement("canvas") as HTMLCanvasElement
+    //
+    //copy.apply {
+    //  width = myCanvas.width
+    //  height = myCanvas.height
+    //  if (myCanvas.width != 0 && myCanvas.height != 0) {
+    //    (getContext("2d") as CanvasRenderingContext2D).drawImage(myCanvas, 0.0, 0.0)
+    //  }
+    //}
 
-    copy.apply {
-      width = myCanvas.width
-      height = myCanvas.height
-      if (myCanvas.width != 0 && myCanvas.height != 0) {
-        (getContext("2d") as CanvasRenderingContext2D).drawImage(myCanvas, 0.0, 0.0)
-      }
-    }
+    val copy = OffscreenCanvas(myCanvas.width,myCanvas.height)
 
-    return object : DomImageSource(copy), Snapshot {}
+    val context = copy.getContext("2d",js("{ alpha: false }")) as OffscreenCanvasRenderingContext2D
+
+    context.drawImage(myCanvas,0.0,0.0)
+
+    return DomImageSource(copy)
   }
 
   open class DomImageSource(val canvasElement: CanvasImageSource) : ImageSource {
@@ -83,6 +103,7 @@ class DomCanvas(private val myCanvas: HTMLCanvasElement) : Canvas {
         is HTMLVideoElement -> width == 0 || height == 0
         is ImageBitmap -> width == 0 || height == 0
         is ImageData -> width == 0 || height == 0
+        is OffscreenCanvas -> width == 0 || height == 0
         else -> {
           logger.error { "Unknown type ${this::class}" }
           false

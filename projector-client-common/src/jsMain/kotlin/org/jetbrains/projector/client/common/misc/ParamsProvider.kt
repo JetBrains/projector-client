@@ -77,7 +77,7 @@ actual object ParamsProvider {
   val PING_AVERAGE_COUNT: Int?
   val PING_INTERVAL: Int
   val SHOW_PROCESSING_TIME: Boolean
-  actual val REPAINT_AREA: RepaintAreaSetting
+  actual val REPAINT_AREA: Boolean
   val SPECULATIVE_TYPING: Boolean
   val ENABLE_WSS: Boolean
   val HANDSHAKE_TOKEN: String?
@@ -118,10 +118,7 @@ actual object ParamsProvider {
       USER_SCALING_RATIO = searchParams.get("userScalingRatio")?.toDoubleOrNull() ?: DEFAULT_USER_SCALING_RATIO
       PING_INTERVAL = searchParams.get("pingInterval")?.toIntOrNull() ?: DEFAULT_PING_INTERVAL
       SHOW_PROCESSING_TIME = searchParams.has("showProcessingTime")
-      REPAINT_AREA = when (searchParams.has("repaintArea")) {
-        false -> RepaintAreaSetting.Disabled
-        true -> RepaintAreaSetting.Enabled(show = false)
-      }
+      REPAINT_AREA = searchParams.has("repaintArea")
       SPECULATIVE_TYPING = searchParams.has("speculativeTyping")
       ENABLE_WSS = searchParams.has("wss") || window.location.protocol == "https:"
       HANDSHAKE_TOKEN = searchParams.get("token")

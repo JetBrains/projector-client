@@ -43,29 +43,29 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   }
 
   private fun Array<Any>.toEvent(): ServerEvent {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
       "a" -> ServerImageDataReplyEvent(content["a"].unsafeCast<Array<Any>>().toImageId(),
                                        content["b"].unsafeCast<Array<Any>>().toImageData())
-      "b" -> ServerPingReplyEvent(content["a"] as Int, content["b"] as Int)
-      "c" -> ServerClipboardEvent(content["a"] as String)
+      "b" -> ServerPingReplyEvent(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<Int>())
+      "c" -> ServerClipboardEvent(content["a"].unsafeCast<String>())
       "d" -> ServerWindowSetChangedEvent(content["a"].unsafeCast<Array<Json>>().map { it.toWindowData() })
       "e" -> ServerDrawCommandsEvent(
         content["a"].unsafeCast<Array<Any>>().toTarget(),
         content["b"].unsafeCast<Array<Array<Any>>>().map { it.toWindowEvent() }
       )
       "f" -> ServerCaretInfoChangedEvent(content["a"].unsafeCast<Array<Any>>().toCaretInfoChange())
-      "g" -> ServerMarkdownEvent.ServerMarkdownShowEvent(content["a"] as Int, content["b"] as Boolean)
-      "h" -> ServerMarkdownEvent.ServerMarkdownResizeEvent(content["a"] as Int, content["b"].unsafeCast<Json>().toCommonIntSize())
-      "i" -> ServerMarkdownEvent.ServerMarkdownMoveEvent(content["a"] as Int, content["b"].unsafeCast<Json>().toPoint())
-      "j" -> ServerMarkdownEvent.ServerMarkdownDisposeEvent(content["a"] as Int)
-      "k" -> ServerMarkdownEvent.ServerMarkdownPlaceToWindowEvent(content["a"] as Int, content["b"] as Int)
-      "l" -> ServerMarkdownEvent.ServerMarkdownSetHtmlEvent(content["a"] as Int, content["b"] as String)
-      "m" -> ServerMarkdownEvent.ServerMarkdownSetCssEvent(content["a"] as Int, content["b"] as String)
-      "n" -> ServerMarkdownEvent.ServerMarkdownScrollEvent(content["a"] as Int, content["b"] as Int)
-      "o" -> ServerMarkdownEvent.ServerMarkdownBrowseUriEvent(content["a"] as String)
+      "g" -> ServerMarkdownEvent.ServerMarkdownShowEvent(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<Boolean>())
+      "h" -> ServerMarkdownEvent.ServerMarkdownResizeEvent(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<Json>().toCommonIntSize())
+      "i" -> ServerMarkdownEvent.ServerMarkdownMoveEvent(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<Json>().toPoint())
+      "j" -> ServerMarkdownEvent.ServerMarkdownDisposeEvent(content["a"].unsafeCast<Int>())
+      "k" -> ServerMarkdownEvent.ServerMarkdownPlaceToWindowEvent(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<Int>())
+      "l" -> ServerMarkdownEvent.ServerMarkdownSetHtmlEvent(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<String>())
+      "m" -> ServerMarkdownEvent.ServerMarkdownSetCssEvent(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<String>())
+      "n" -> ServerMarkdownEvent.ServerMarkdownScrollEvent(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<Int>())
+      "o" -> ServerMarkdownEvent.ServerMarkdownBrowseUriEvent(content["a"].unsafeCast<String>())
       "p" -> ServerWindowColorsEvent(content["a"].unsafeCast<Json>().toColorsStorage())
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }
@@ -83,18 +83,18 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   }
 
   private fun Array<Any>.toCaretInfoChange(): ServerCaretInfoChangedEvent.CaretInfoChange {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
       "a" -> ServerCaretInfoChangedEvent.CaretInfoChange.NoCarets
       "b" -> ServerCaretInfoChangedEvent.CaretInfoChange.Carets(
         content["a"].unsafeCast<Array<Json>>().map { it.toCaretInfo() },
-        content["b"] as Short?,
-        content["c"] as Int,
-        content["d"] as Int,
-        content["e"] as Float,
-        content["f"] as Int,
+        content["b"]?.unsafeCast<Short>(),
+        content["c"].unsafeCast<Int>(),
+        content["d"].unsafeCast<Int>(),
+        content["e"].unsafeCast<Float>(),
+        content["f"].unsafeCast<Int>(),
         content["g"].unsafeCast<Json>().toCommonRectangle()
       )
       else -> throw IllegalArgumentException("Unsupported caret info type: ${JSON.stringify(this)}")
@@ -106,35 +106,35 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   }
 
   private fun Array<Any>.toTarget(): ServerDrawCommandsEvent.Target {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
-      "a" -> ServerDrawCommandsEvent.Target.Onscreen(content["a"] as Int)
-      "b" -> ServerDrawCommandsEvent.Target.Offscreen((content["a"] as Double).roundToLong(), content["b"] as Int,
-                                                      content["c"] as Int)  // todo: is it a correct way of decoding Long?
+      "a" -> ServerDrawCommandsEvent.Target.Onscreen(content["a"].unsafeCast<Int>())
+      "b" -> ServerDrawCommandsEvent.Target.Offscreen((content["a"].unsafeCast<Double>()).roundToLong(), content["b"].unsafeCast<Int>(),
+                                                      content["c"].unsafeCast<Int>())  // todo: is it a correct way of decoding Long?
       else -> throw IllegalArgumentException("Unsupported target type: ${JSON.stringify(this)}")
     }
   }
 
   private fun Json.toCommonIntSize(): CommonIntSize {
-    return CommonIntSize(this["a"] as Int, this["b"] as Int)
+    return CommonIntSize(this["a"].unsafeCast<Int>(), this["b"].unsafeCast<Int>())
   }
 
   private fun Json.toWindowData(): WindowData {
     return WindowData(
-      this["a"] as Int,
-      this["b"] as String?,
+      this["a"].unsafeCast<Int>(),
+      this["b"]?.unsafeCast<String>(),
       this["c"].unsafeCast<Array<Array<Any>>?>()?.map { it.toImageId() },
-      this["d"] as Boolean,
-      this["e"] as Int,
+      this["d"].unsafeCast<Boolean>(),
+      this["e"].unsafeCast<Int>(),
       this["f"].unsafeCast<Json>().toCommonRectangle(),
-      (this["g"] as String?)?.toCursorType(),
-      this["h"] as Boolean,
-      this["i"] as Boolean,
-      this["j"] as Boolean,
-      (this["k"] as String).toWindowType(),
-      this["l"] as Int?
+      (this["g"]?.unsafeCast<String>())?.toCursorType(),
+      this["h"].unsafeCast<Boolean>(),
+      this["i"].unsafeCast<Boolean>(),
+      this["j"].unsafeCast<Boolean>(),
+      (this["k"].unsafeCast<String>()).toWindowType(),
+      this["l"]?.unsafeCast<Int>()
     )
   }
 
@@ -169,67 +169,67 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   }
 
   private fun Json.toCommonRectangle(): CommonRectangle {
-    return CommonRectangle(this["a"] as Double, this["b"] as Double, this["c"] as Double, this["d"] as Double)
+    return CommonRectangle(this["a"].unsafeCast<Double>(), this["b"].unsafeCast<Double>(), this["c"].unsafeCast<Double>(), this["d"].unsafeCast<Double>())
   }
 
   private fun Array<Any>.toWindowEvent(): ServerWindowEvent {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
       "a" -> ServerPaintArcEvent(
-        (content["a"] as String).toPaintType(),
-        content["b"] as Int,
-        content["c"] as Int,
-        content["d"] as Int,
-        content["e"] as Int,
-        content["f"] as Int,
-        content["g"] as Int
+        (content["a"].unsafeCast<String>()).toPaintType(),
+        content["b"].unsafeCast<Int>(),
+        content["c"].unsafeCast<Int>(),
+        content["d"].unsafeCast<Int>(),
+        content["e"].unsafeCast<Int>(),
+        content["f"].unsafeCast<Int>(),
+        content["g"].unsafeCast<Int>()
       )
 
       "b" -> ServerPaintOvalEvent(
-        (content["a"] as String).toPaintType(),
-        content["b"] as Int,
-        content["c"] as Int,
-        content["d"] as Int,
-        content["e"] as Int
+        (content["a"].unsafeCast<String>()).toPaintType(),
+        content["b"].unsafeCast<Int>(),
+        content["c"].unsafeCast<Int>(),
+        content["d"].unsafeCast<Int>(),
+        content["e"].unsafeCast<Int>()
       )
 
       "c" -> ServerPaintRoundRectEvent(
-        (content["a"] as String).toPaintType(),
-        content["b"] as Int,
-        content["c"] as Int,
-        content["d"] as Int,
-        content["e"] as Int,
-        content["f"] as Int,
-        content["g"] as Int
+        (content["a"].unsafeCast<String>()).toPaintType(),
+        content["b"].unsafeCast<Int>(),
+        content["c"].unsafeCast<Int>(),
+        content["d"].unsafeCast<Int>(),
+        content["e"].unsafeCast<Int>(),
+        content["f"].unsafeCast<Int>(),
+        content["g"].unsafeCast<Int>()
       )
 
       "d" -> ServerPaintRectEvent(
-        (content["a"] as String).toPaintType(),
-        content["b"] as Double,
-        content["c"] as Double,
-        content["d"] as Double,
-        content["e"] as Double
+        (content["a"].unsafeCast<String>()).toPaintType(),
+        content["b"].unsafeCast<Double>(),
+        content["c"].unsafeCast<Double>(),
+        content["d"].unsafeCast<Double>(),
+        content["e"].unsafeCast<Double>()
       )
 
       "e" -> ServerDrawLineEvent(
-        content["a"] as Int,
-        content["b"] as Int,
-        content["c"] as Int,
-        content["d"] as Int
+        content["a"].unsafeCast<Int>(),
+        content["b"].unsafeCast<Int>(),
+        content["c"].unsafeCast<Int>(),
+        content["d"].unsafeCast<Int>()
       )
 
       "f" -> ServerCopyAreaEvent(
-        content["a"] as Int,
-        content["b"] as Int,
-        content["c"] as Int,
-        content["d"] as Int,
-        content["e"] as Int,
-        content["f"] as Int
+        content["a"].unsafeCast<Int>(),
+        content["b"].unsafeCast<Int>(),
+        content["c"].unsafeCast<Int>(),
+        content["d"].unsafeCast<Int>(),
+        content["e"].unsafeCast<Int>(),
+        content["f"].unsafeCast<Int>()
       )
 
-      "g" -> ServerSetFontEvent(content["a"] as Short, content["b"] as Int, content["c"] as Boolean)
+      "g" -> ServerSetFontEvent(content["a"].unsafeCast<Short>(), content["b"].unsafeCast<Int>(), content["c"].unsafeCast<Boolean>())
 
       "h" -> ServerSetClipEvent(content["a"].unsafeCast<Array<Any>?>()?.toCommonShape())
 
@@ -242,21 +242,21 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "l" -> ServerDrawImageEvent(content["a"].unsafeCast<Array<Any>>().toImageId(),
                                   content["b"].unsafeCast<Array<Any>>().toImageEventInfo())
 
-      "m" -> ServerDrawStringEvent(content["a"] as String, content["b"] as Double, content["c"] as Double, content["d"] as Double)
+      "m" -> ServerDrawStringEvent(content["a"].unsafeCast<String>(), content["b"].unsafeCast<Double>(), content["c"].unsafeCast<Double>(), content["d"].unsafeCast<Double>())
 
-      "n" -> ServerPaintPolygonEvent((content["a"] as String).toPaintType(), content["b"].unsafeCast<Array<Json>>().map { it.toPoint() })
+      "n" -> ServerPaintPolygonEvent((content["a"].unsafeCast<String>()).toPaintType(), content["b"].unsafeCast<Array<Json>>().map { it.toPoint() })
 
       "o" -> ServerDrawPolylineEvent(content["a"].unsafeCast<Array<Json>>().map { it.toPoint() })
 
-      "p" -> ServerSetTransformEvent(content["a"].unsafeCast<Array<Double>>().toList())
+      "p" -> ServerSetTransformEvent(content["a"].unsafeCast<DoubleArray>())
 
-      "q" -> ServerPaintPathEvent((content["a"] as String).toPaintType(), content["b"].unsafeCast<Json>().toCommonPath())
+      "q" -> ServerPaintPathEvent((content["a"].unsafeCast<String>()).toPaintType(), content["b"].unsafeCast<Json>().toCommonPath())
 
       "r" -> ServerSetCompositeEvent(content["a"].unsafeCast<Array<Any>>().toCommonComposite())
 
       "s" -> ServerSetPaintEvent(content["a"].unsafeCast<Array<Any>>().toPaintValue())
 
-      "t" -> ServerSetUnknownStrokeEvent(content["a"] as String)
+      "t" -> ServerSetUnknownStrokeEvent(content["a"].unsafeCast<String>())
 
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }
@@ -278,15 +278,15 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   )
 
   private fun Array<Any>.toCommonComposite(): CommonComposite {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
       "a" -> CommonAlphaComposite(
-        alphaCompositeRuleMap[content["a"] as String] ?: throw IllegalArgumentException("Unsupported rule: ${content["a"]}"),
-        content["b"] as Float
+        alphaCompositeRuleMap[content["a"].unsafeCast<String>()] ?: throw IllegalArgumentException("Unsupported rule: ${content["a"]}"),
+        content["b"].unsafeCast<Float>()
       )
-      "b" -> UnknownComposite(content["a"] as String)
+      "b" -> UnknownComposite(content["a"].unsafeCast<String>())
       else -> throw IllegalArgumentException("Unsupported common composite type: ${JSON.stringify(this)}")
     }
   }
@@ -300,75 +300,75 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   }
 
   private fun Json.toColor(): PaintValue.Color {
-    return PaintValue.Color(this["a"] as Int)
+    return PaintValue.Color(this["a"].unsafeCast<Int>())
   }
 
   private fun Array<Any>.toPaintValue(): PaintValue {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
       "a" -> content.toColor()
       "b" -> PaintValue.Gradient(
         content["a"].unsafeCast<Json>().toPoint(), content["b"].unsafeCast<Json>().toPoint(),
-        content["c"] as Int, content["d"] as Int
+        content["c"].unsafeCast<Int>(), content["d"].unsafeCast<Int>()
       )
-      "c" -> PaintValue.Unknown(content["a"] as String)
+      "c" -> PaintValue.Unknown(content["a"].unsafeCast<String>())
       else -> throw IllegalArgumentException("Unsupported paint value type: ${JSON.stringify(this)}")
     }
   }
 
   private fun Array<Any>.toImageEventInfo(): ImageEventInfo {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
-      "a" -> ImageEventInfo.Xy(content["a"] as Int, content["b"] as Int, content["c"] as Int?)
+      "a" -> ImageEventInfo.Xy(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<Int>(), content["c"]?.unsafeCast<Int>())
       "b" -> ImageEventInfo.XyWh(
-        content["a"] as Int,
-        content["b"] as Int,
-        content["c"] as Int,
-        content["d"] as Int,
-        content["e"] as Int?
+        content["a"].unsafeCast<Int>(),
+        content["b"].unsafeCast<Int>(),
+        content["c"].unsafeCast<Int>(),
+        content["d"].unsafeCast<Int>(),
+        content["e"]?.unsafeCast<Int>()
       )
       "c" -> ImageEventInfo.Ds(
-        content["a"] as Int,
-        content["b"] as Int,
-        content["c"] as Int,
-        content["d"] as Int,
-        content["e"] as Int,
-        content["f"] as Int,
-        content["g"] as Int,
-        content["h"] as Int,
-        content["i"] as Int?
+        content["a"].unsafeCast<Int>(),
+        content["b"].unsafeCast<Int>(),
+        content["c"].unsafeCast<Int>(),
+        content["d"].unsafeCast<Int>(),
+        content["e"].unsafeCast<Int>(),
+        content["f"].unsafeCast<Int>(),
+        content["g"].unsafeCast<Int>(),
+        content["h"].unsafeCast<Int>(),
+        content["i"]?.unsafeCast<Int>()
       )
-      "d" -> ImageEventInfo.Transformed(content["a"].unsafeCast<Array<Double>>().toList())
+      "d" -> ImageEventInfo.Transformed(content["a"].unsafeCast<DoubleArray>())
       else -> throw IllegalArgumentException("Unsupported image info type: ${JSON.stringify(this)}")
     }
   }
 
   private fun Array<Any>.toStrokeData(): StrokeData {
-    val thisType = this[0] as String
+    val thisType = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (thisType) {
       "a" -> StrokeData.Basic(
-        content["a"] as Float,
-        when (val type = content["b"] as String) {
+        content["a"].unsafeCast<Float>(),
+        when (val type = content["b"].unsafeCast<String>()) {
           "a" -> StrokeData.Basic.JoinType.MITER
           "b" -> StrokeData.Basic.JoinType.ROUND
           "c" -> StrokeData.Basic.JoinType.BEVEL
           else -> throw IllegalArgumentException("Unsupported join type: $type")
         },
-        when (val type = content["c"] as String) {
+        when (val type = content["c"].unsafeCast<String>()) {
           "a" -> StrokeData.Basic.CapType.BUTT
           "b" -> StrokeData.Basic.CapType.ROUND
           "c" -> StrokeData.Basic.CapType.SQUARE
           else -> throw IllegalArgumentException("Unsupported cap type: $type")
         },
-        content["d"] as Float,
-        content["e"] as Float,
-        content["f"].unsafeCast<Array<Float>?>()?.toList()
+        content["d"].unsafeCast<Float>(),
+        content["e"].unsafeCast<Float>(),
+        content["f"].unsafeCast<Array<Double>?>()
       )
 
       else -> throw IllegalArgumentException("Unsupported stroke type: ${JSON.stringify(this)}")
@@ -376,30 +376,30 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   }
 
   private fun Array<Any>.toImageId(): ImageId {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
-      "a" -> ImageId.BufferedImageId(content["a"] as Int, content["b"] as Int)
-      "b" -> ImageId.PVolatileImageId((content["a"] as Double).roundToLong())  // todo: is it a correct way?
-      "c" -> ImageId.Unknown(content["a"] as String)
+      "a" -> ImageId.BufferedImageId(content["a"].unsafeCast<Int>(), content["b"].unsafeCast<Int>())
+      "b" -> ImageId.PVolatileImageId((content["a"].unsafeCast<Double>()).roundToLong())  // todo: is it a correct way?
+      "c" -> ImageId.Unknown(content["a"].unsafeCast<String>())
       else -> throw IllegalArgumentException("Invalid image id type: ${JSON.stringify(this)}")
     }
   }
 
   private fun Array<Any>.toImageData(): ImageData {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
-      "a" -> ImageData.PngBase64(content["a"] as String)
+      "a" -> ImageData.PngBase64(content["a"].unsafeCast<String>())
       "b" -> ImageData.Empty
       else -> throw IllegalArgumentException("Invalid image data type: $${JSON.stringify(this)}")
     }
   }
 
   private fun Array<Any>.toCommonShape(): CommonShape {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
@@ -411,7 +411,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
 
   private fun Json.toCommonPath(): CommonPath {
     val segments = this["a"].unsafeCast<Array<Array<Any>>>().map { it.toPathSegment() }
-    val winding = when (val type = this["b"] as String) {
+    val winding = when (val type = this["b"].unsafeCast<String>()) {
       "a" -> CommonPath.WindingType.EVEN_ODD
       "b" -> CommonPath.WindingType.NON_ZERO
       else -> throw IllegalArgumentException("Invalid winding type: $type")
@@ -421,7 +421,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   }
 
   private fun Array<Any>.toPathSegment(): PathSegment {
-    val type = this[0] as String
+    val type = this[0].unsafeCast<String>()
     val content = this[1].unsafeCast<Json>()
 
     return when (type) {
@@ -439,6 +439,6 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   }
 
   private fun Json.toPoint(): Point {
-    return Point(this["a"] as Double, this["b"] as Double)
+    return Point(this["a"].unsafeCast<Double>(), this["b"].unsafeCast<Double>())
   }
 }

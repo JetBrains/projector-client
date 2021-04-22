@@ -21,49 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
+package org.jetbrains.projector.client.common.canvas
 
-plugins {
-  kotlin("multiplatform") apply false
-  `maven-publish`
-}
+import org.w3c.dom.HTMLCanvasElement
 
-val kotlinVersion: String by project
-val targetJvm: String by project
 
-subprojects {
-  group = "org.jetbrains"
-  version = "1.0-SNAPSHOT"
+object JsExtensions {
 
-  repositories {
-    mavenLocal()
-    jcenter()
+  fun Long.argbIntToRgbaString(): String {
+    val argb = this.toInt()
+    return argb.argbIntToRgbaString();
   }
 
-  tasks.withType<JavaCompile> {
-    sourceCompatibility = targetJvm
+  val rgbStrCache = IntRange(0,255)
+    .map { i -> if(i < 0x10) "0" + i.toString(16) else i.toString(16)  }
+    .toTypedArray()
+
+  /**
+   * ARGB -> RGBA
+   */
+  @Suppress("UNUSED_VARIABLE")
+  fun Int.argbIntToRgbaString(): String {
+    val argb = this
+    val strCache = rgbStrCache
+    return js("""
+        "#" + strCache[(argb >>> 16) & 0xff] + strCache[(argb >>> 8) & 0xff] + strCache[argb & 0xff] + strCache[(argb >>> 24) & 0xff];
+      """).unsafeCast<String>()
   }
 
-  tasks.withType<KotlinCompile<*>> {
-    kotlinOptions {
-      freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
-      //allWarningsAsErrors = true  // todo: resolve "different Kotlin JARs in runtime classpath" and "bundled Kotlin runtime"
-    }
-  }
 
-  tasks.withType<KotlinJvmCompile> {
-    kotlinOptions {
-      jvmTarget = targetJvm
-    }
-  }
-}
-
-if (System.getenv("CHROME_BIN") == null) {
-  gradle.taskGraph.beforeTask {
-    if (name in setOf("jsTest", "jsBrowserTest")) {
-      actions.clear()
-      System.err.println("Skipping task as no CHROME_BIN env is set")
-    }
-  }
 }

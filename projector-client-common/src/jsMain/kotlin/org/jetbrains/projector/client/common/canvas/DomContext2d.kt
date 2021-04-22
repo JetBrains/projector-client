@@ -25,7 +25,7 @@ package org.jetbrains.projector.client.common.canvas
 
 import org.jetbrains.projector.client.common.canvas.Canvas.ImageSource
 import org.jetbrains.projector.client.common.canvas.Context2d.*
-import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
+import org.jetbrains.projector.client.common.canvas.JsExtensions.argbIntToRgbaString
 import org.jetbrains.projector.client.common.canvas.PaintColor.Gradient
 import org.jetbrains.projector.client.common.canvas.PaintColor.SolidColor
 import org.jetbrains.projector.common.misc.Do
@@ -192,12 +192,29 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     myContext2d.restore()
   }
 
+  @Suppress("UNUSED_VARIABLE")
   override fun setFillStyle(color: PaintColor?) {
-    myContext2d.fillStyle = color?.extract()
+    color?.let { paintColor ->
+      when(paintColor.tpe.ordinal) {
+        PaintColorType.SolidColor.ordinal ->
+          myContext2d.fillStyle = paintColor.argb.argbIntToRgbaString()
+        PaintColorType.Gradient.ordinal ->
+          myContext2d.fillStyle = paintColor.unsafeCast<DOMGradient>().canvasGradient
+      }
+    }
   }
 
+
+  @Suppress("UNUSED_VARIABLE")
   override fun setStrokeStyle(color: PaintColor?) {
-    myContext2d.strokeStyle = color?.extract()
+    color?.let { paintColor ->
+      when(paintColor.tpe.ordinal) {
+        PaintColorType.SolidColor.ordinal ->
+          myContext2d.strokeStyle = paintColor.argb.argbIntToRgbaString()
+        PaintColorType.Gradient.ordinal ->
+          myContext2d.strokeStyle = paintColor.unsafeCast<DOMGradient>().canvasGradient
+      }
+    }
   }
 
   override fun setGlobalAlpha(alpha: Double) {
@@ -276,8 +293,8 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     myContext2d.setTransform(m11, m12, m21, m22, dx, dy)
   }
 
-  override fun setLineDash(lineDash: DoubleArray) {
-    myContext2d.setLineDash(lineDash.toTypedArray())
+  override fun setLineDash(lineDash: Array<Double>) {
+    myContext2d.setLineDash(lineDash)
   }
 
   override fun setLineDashOffset(offset: Double) {
@@ -297,6 +314,12 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
 
   override fun createLinearGradient(x0: Double, y0: Double, x1: Double, y1: Double): Gradient {
     return DOMGradient(myContext2d.createLinearGradient(x0, y0, x1, y1))
+  }
+
+  override fun setTransform(matrix: Matrix) {
+    with(matrix){
+      myContext2d.setTransform(a,b,c,d,e,f)
+    }
   }
 
   override fun getTransform(): Matrix {
@@ -323,6 +346,9 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
     override fun addColorStop(offset: Double, argb: Int) {
       canvasGradient.addColorStop(offset, argb.argbIntToRgbaString())
     }
+
+    override val argb: Int
+      get() = 0
   }
 
   companion object {

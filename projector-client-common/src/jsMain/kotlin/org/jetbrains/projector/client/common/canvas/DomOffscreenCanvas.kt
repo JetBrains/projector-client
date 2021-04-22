@@ -21,49 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
+package org.jetbrains.projector.client.common.canvas
 
-plugins {
-  kotlin("multiplatform") apply false
-  `maven-publish`
-}
+import org.w3c.dom.CanvasImageSource
+import org.w3c.dom.CanvasRenderingContext2D
+import org.w3c.dom.ImageBitmapRenderingContext
+import org.w3c.dom.RenderingContext
 
-val kotlinVersion: String by project
-val targetJvm: String by project
+class DomOffscreenCanvas(private val offscreenCanvas: OffscreenCanvas) : Canvas {
 
-subprojects {
-  group = "org.jetbrains"
-  version = "1.0-SNAPSHOT"
+  var _context2d : Context2d? = null
 
-  repositories {
-    mavenLocal()
-    jcenter()
-  }
+  var _bitmapContext: ContextBitmapRenderer? = null
 
-  tasks.withType<JavaCompile> {
-    sourceCompatibility = targetJvm
-  }
-
-  tasks.withType<KotlinCompile<*>> {
-    kotlinOptions {
-      freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
-      //allWarningsAsErrors = true  // todo: resolve "different Kotlin JARs in runtime classpath" and "bundled Kotlin runtime"
+  override fun context2d(): Context2d {
+    if( _context2d == null){
+      _context2d = DomContext2d(offscreenCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D)
     }
+    return _context2d!!
   }
 
-  tasks.withType<KotlinJvmCompile> {
-    kotlinOptions {
-      jvmTarget = targetJvm
-    }
+  override fun bitmapContext(): ContextBitmapRenderer {
+    TODO("Not yet implemented")
   }
-}
 
-if (System.getenv("CHROME_BIN") == null) {
-  gradle.taskGraph.beforeTask {
-    if (name in setOf("jsTest", "jsBrowserTest")) {
-      actions.clear()
-      System.err.println("Skipping task as no CHROME_BIN env is set")
-    }
+  override var width: Int
+    get() = offscreenCanvas.width
+    set(value) { offscreenCanvas.width = value }
+  override var height: Int
+    get() = offscreenCanvas.height
+    set(value) { offscreenCanvas.height = value}
+
+  override val imageSource: Canvas.ImageSource
+    get() = DomCanvas.DomImageSource(offscreenCanvas)
+
+  override fun takeSnapshot(): Canvas.ImageSource {
+    return DomCanvas.DomImageSource(offscreenCanvas)
   }
 }

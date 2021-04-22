@@ -29,12 +29,16 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class PaintValue {
 
+  abstract val tpe: PaintValueType
+
   @Serializable
   @SerialName("a")
   data class Color(
     @SerialName("a")
     val argb: Int,
-  ) : PaintValue()
+  ) : PaintValue() {
+    override val tpe: PaintValueType = PaintValueType.Color
+  }
 
   @Serializable
   @SerialName("b")
@@ -47,12 +51,20 @@ sealed class PaintValue {
     val argb1: Int,
     @SerialName("d")
     val argb2: Int,
-  ) : PaintValue()
+  ) : PaintValue() {
+    override val tpe: PaintValueType = PaintValueType.Gradient
+  }
 
   @Serializable
   @SerialName("c")
   data class Unknown(
     @SerialName("a")
     val info: String,
-  ) : PaintValue()
+  ) : PaintValue() {
+    override val tpe: PaintValueType = PaintValueType.Unknown
+  }
+}
+
+enum class PaintValueType {
+  Color,Gradient,Unknown
 }

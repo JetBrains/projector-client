@@ -21,49 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
+package org.jetbrains.projector.client.common.canvas
 
-plugins {
-  kotlin("multiplatform") apply false
-  `maven-publish`
-}
-
-val kotlinVersion: String by project
-val targetJvm: String by project
-
-subprojects {
-  group = "org.jetbrains"
-  version = "1.0-SNAPSHOT"
-
-  repositories {
-    mavenLocal()
-    jcenter()
-  }
-
-  tasks.withType<JavaCompile> {
-    sourceCompatibility = targetJvm
-  }
-
-  tasks.withType<KotlinCompile<*>> {
-    kotlinOptions {
-      freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
-      //allWarningsAsErrors = true  // todo: resolve "different Kotlin JARs in runtime classpath" and "bundled Kotlin runtime"
-    }
-  }
-
-  tasks.withType<KotlinJvmCompile> {
-    kotlinOptions {
-      jvmTarget = targetJvm
-    }
-  }
-}
-
-if (System.getenv("CHROME_BIN") == null) {
-  gradle.taskGraph.beforeTask {
-    if (name in setOf("jsTest", "jsBrowserTest")) {
-      actions.clear()
-      System.err.println("Skipping task as no CHROME_BIN env is set")
-    }
-  }
+interface RenderingContext {
 }

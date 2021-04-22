@@ -24,11 +24,27 @@
 package org.jetbrains.projector.client.common.canvas
 
 sealed class PaintColor {
-  data class SolidColor(val argb: Int) : PaintColor() {
+
+  abstract val tpe: PaintColorType
+  abstract val argb: Int
+
+  data class SolidColor(override val argb: Int) : PaintColor() {
+    override val tpe: PaintColorType
+      get() = PaintColorType.SolidColor
+
     constructor(argb: Long) : this(argb.toInt())
   }
 
   abstract class Gradient : PaintColor() {
+
+    override val tpe: PaintColorType
+      get() = PaintColorType.Gradient
+
     abstract fun addColorStop(offset: Double, argb: Int)
   }
+}
+
+enum class PaintColorType {
+  SolidColor,
+  Gradient
 }

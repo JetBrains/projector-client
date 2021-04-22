@@ -28,6 +28,7 @@ import org.jetbrains.projector.common.protocol.data.StrokeData
 object Defaults {
 
   const val FONT_SIZE = 12
+  const val FONT_NAME = "Arial"
 
   const val FOREGROUND_COLOR_ARGB = 0xFF_00_00_00.toInt()
   const val BACKGROUND_COLOR_ARGB = 0xFF_FF_FF_FF.toInt()

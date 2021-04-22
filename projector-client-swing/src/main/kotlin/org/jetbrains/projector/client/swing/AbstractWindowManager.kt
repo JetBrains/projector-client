@@ -25,10 +25,11 @@ package org.jetbrains.projector.client.swing
 
 import org.jetbrains.projector.client.common.DrawEvent
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
-import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.canvas.SwingCanvas
 import org.jetbrains.projector.client.common.canvas.buffering.DoubleBufferedRenderingSurface
-import org.jetbrains.projector.common.protocol.toClient.*
+import org.jetbrains.projector.common.protocol.toClient.ServerWindowEvent
+import org.jetbrains.projector.common.protocol.toClient.ServerWindowSetChangedEvent
+import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.util.logging.Logger
 
 abstract class AbstractWindowManager<FrameType> {
@@ -69,9 +70,8 @@ abstract class AbstractWindowManager<FrameType> {
       return
     }
 
-    window.drawEvents.addAll(drawEvents.shrinkByPaintEvents())
 
-    window.processor.process(window.drawEvents)
+    window.processor.process(drawEvents)
 
     window.surface.flush()
 
@@ -81,7 +81,7 @@ abstract class AbstractWindowManager<FrameType> {
   inner class FrameData(
     val frame: FrameType,
     var windowData: WindowData,
-    val drawEvents: ArrayDeque<DrawEvent>,
+    var drawEvents: List<DrawEvent>,
     val surface: DoubleBufferedRenderingSurface,
     val processor: SingleRenderingSurfaceProcessor,
   )

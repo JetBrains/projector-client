@@ -23,9 +23,11 @@
  */
 package org.jetbrains.projector.client.common.misc
 
+import org.jetbrains.projector.client.common.RenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.CanvasFactory
+import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.ImageData
@@ -41,8 +43,8 @@ object ImageCacher {
   private data class OffscreenImage(
     val width: Int,
     val height: Int,
-    val singleRenderingSurfaceProcessor: SingleRenderingSurfaceProcessor,
-    val offscreenCanvas: Canvas.ImageSource,
+    val processor: RenderingSurfaceProcessor,
+    val offscreenCanvas: Canvas,
   )
 
   private var currentSize = 0
@@ -69,7 +71,7 @@ object ImageCacher {
   }
 
   fun getImageData(imageId: ImageId): Canvas.ImageSource? = when (imageId) {
-    is ImageId.PVolatileImageId -> offscreenImages[imageId.id]?.offscreenCanvas
+    is ImageId.PVolatileImageId -> offscreenImages[imageId.id]?.offscreenCanvas?.imageSource
 
     is ImageId.BufferedImageId -> {
       val imageData = cache[imageId]?.apply { lastUsageTimestamp = TimeStamp.current }?.data
@@ -79,7 +81,6 @@ object ImageCacher {
           imagesToRequest.add(imageId)
           requestedImages[imageId] = LivingEntity(TimeStamp.current, 0, null)
         }
-
         null
       }
       else {
@@ -94,29 +95,29 @@ object ImageCacher {
     }
   }
 
-  fun getOffscreenProcessor(offscreenTarget: ServerDrawCommandsEvent.Target.Offscreen): SingleRenderingSurfaceProcessor {
+  fun getOffscreenProcessor(offscreenTarget: ServerDrawCommandsEvent.Target.Offscreen, processorFactory: (RenderingSurface) -> RenderingSurfaceProcessor): RenderingSurfaceProcessor {
     val image = offscreenImages[offscreenTarget.pVolatileImageId]
 
     if (image == null || image.width != offscreenTarget.width || image.height != offscreenTarget.height) {
-      val offScreenCanvas = CanvasFactory.create().apply {
+      val offScreenCanvas = CanvasFactory.create(true).apply {
         width = offscreenTarget.width
         height = offscreenTarget.height
       }
       val offScreenRenderingSurface = UnbufferedRenderingSurface(offScreenCanvas)
 
-      val offScreenCommandProcessor = SingleRenderingSurfaceProcessor(offScreenRenderingSurface)
+      val offScreenCommandProcessor = processorFactory(offScreenRenderingSurface)
 
       offscreenImages[offscreenTarget.pVolatileImageId] = OffscreenImage(
         width = offscreenTarget.width,
         height = offscreenTarget.height,
-        singleRenderingSurfaceProcessor = offScreenCommandProcessor,
-        offscreenCanvas = offScreenCanvas.imageSource
+        processor = offScreenCommandProcessor,
+        offscreenCanvas = offScreenCanvas
       )
 
       return offScreenCommandProcessor
     }
 
-    return image.singleRenderingSurfaceProcessor
+    return image.processor
   }
 
   fun extractImagesToRequest(): List<ClientRequestImageDataEvent> {

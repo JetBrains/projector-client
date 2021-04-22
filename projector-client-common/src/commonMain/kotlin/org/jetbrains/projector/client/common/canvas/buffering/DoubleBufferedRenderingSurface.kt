@@ -25,7 +25,6 @@ package org.jetbrains.projector.client.common.canvas.buffering
 
 import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.CanvasFactory
-import org.jetbrains.projector.client.common.canvas.Extensions.resizeSavingImage
 
 class DoubleBufferedRenderingSurface(private val target: Canvas) : RenderingSurface {
 
@@ -37,21 +36,34 @@ class DoubleBufferedRenderingSurface(private val target: Canvas) : RenderingSurf
     get() = buffer
 
   override fun setBounds(width: Int, height: Int) {
-    buffer.resizeSavingImage(width, height)
-    target.resizeSavingImage(width, height)
+    //buffer.resizeSavingImage(width, height)
+    buffer.width = width
+    buffer.height = height
+    if( width != target.width ){
+      target.width = width
+    }
+    if( height != target.height){
+      target.height = height
+    }
   }
 
   override fun flush() {
     if (buffer.width == 0 || buffer.height == 0) return
-
-    target.context2d.drawImage(buffer.imageSource, 0.0, 0.0)
+    //target.bitmapContext().transferFromImageBitmap(snapshot)
+    target.context2d().drawImage(buffer.imageSource,0.0,0.0)
   }
 
   private fun createBuffer(): Canvas {
-    return CanvasFactory.create()
+    return CanvasFactory.create(true)
       .apply {
         width = target.width
         height = target.height
       }
+  }
+
+  init {
+    //target.bitmapContext()
+    target.context2d()
+    buffer.context2d()
   }
 }

@@ -24,7 +24,7 @@
 package org.jetbrains.projector.client.web.speculative
 
 import kotlinx.browser.document
-import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
+import org.jetbrains.projector.client.common.canvas.Extensions
 import org.jetbrains.projector.client.common.misc.ParamsProvider.SCALING_RATIO
 import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.w3c.dom.CanvasRenderingContext2D
@@ -141,7 +141,7 @@ sealed class Typing {
 
         putImageData(imageData, firstCaretLocation.x + currentCarets.plainSpaceWidth, firstCaretLocation.y)
 
-        val fontFace = currentCarets.fontId?.toFontFaceName() ?: "Arial"
+        val fontFace = Extensions.serverFontNameCache[currentCarets.fontId?.unsafeCast<Int>()?: 0]
         val fontSize = "${currentCarets.fontSize}px"
 
         font = "$fontSize $fontFace"  // todo: use a proper font style

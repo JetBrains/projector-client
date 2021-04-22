@@ -24,7 +24,7 @@
 package org.jetbrains.projector.client.web.misc
 
 import kotlinx.browser.document
-import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
+import org.jetbrains.projector.client.common.canvas.Extensions
 import org.jetbrains.projector.common.protocol.data.TtfFontData
 import kotlin.js.Promise
 
@@ -37,8 +37,8 @@ object FontFaceAppender {
 
   private var loadedFonts = 0
 
-  fun appendFontFaceToPage(fontId: Short, fontData: TtfFontData, onLoad: (Int) -> Unit) {
-    val fontFaceName = fontId.toFontFaceName()
+  fun appendFontFaceToPage(fontId: Int, fontData: TtfFontData, onLoad: (Int) -> Unit) {
+    val fontFaceName = Extensions.serverFontNameCache[fontId]
 
     // todo: try to use the ByteArray variant:
     val fontFace = FontFace(fontFaceName, "url(data:font/truetype;base64,${fontData.ttfBase64}) format('truetype')")

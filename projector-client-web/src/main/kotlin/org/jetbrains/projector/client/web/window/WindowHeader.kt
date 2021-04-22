@@ -176,7 +176,7 @@ class WindowHeader(var title: String? = null) : DragEventsInterceptor, LafListen
 
   fun draw() {
 
-    val context = headerRenderingSurface.canvas.context2d
+    val context = headerRenderingSurface.canvas.context2d()
     val offset = ProjectorUI.crossOffset * headerRenderingSurface.scalingRatio
 
     // Fill header background.
