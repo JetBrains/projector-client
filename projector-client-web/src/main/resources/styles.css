@@ -26,3 +26,7 @@
   -webkit-user-select: none;
   user-select: none;
 }
+
+html, body {
+  overscroll-behavior-x: none;
+}
