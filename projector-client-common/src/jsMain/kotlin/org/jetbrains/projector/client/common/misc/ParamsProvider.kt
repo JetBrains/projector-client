@@ -64,6 +64,8 @@ actual object ParamsProvider {
   actual val CLIPPING_BORDERS: Boolean
   val HOST: String
   val PORT: String
+  val SERVER_ID: String?
+  val ENABLE_RELAY: Boolean
   actual val LOG_UNSUPPORTED_EVENTS: Boolean
   val DOUBLE_BUFFERING: Boolean
   val ENABLE_COMPRESSION: Boolean
@@ -96,6 +98,8 @@ actual object ParamsProvider {
       CLIPPING_BORDERS = searchParams.has("clipping")
       HOST = searchParams.get("host") ?: DEFAULT_HOST
       PORT = searchParams.get("port") ?: DEFAULT_PORT
+      SERVER_ID = searchParams.get("serverId")
+      ENABLE_RELAY = searchParams.has("enableRelay")
       LOG_UNSUPPORTED_EVENTS = searchParams.has("logUnsupportedEvents")
       DOUBLE_BUFFERING = searchParams.has("doubleBuffering")
       ENABLE_COMPRESSION = searchParams.has("enableCompression")

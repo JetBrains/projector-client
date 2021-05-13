@@ -25,11 +25,10 @@ package org.jetbrains.projector.server.core
 
 import org.jetbrains.projector.common.protocol.toClient.MainWindow
 import org.jetbrains.projector.common.protocol.toClient.toJson
-import org.jetbrains.projector.server.core.util.GetRequestResult
-import org.jetbrains.projector.server.core.util.HttpWsServer
+import org.jetbrains.projector.server.core.websocket.GetRequestResult
+import org.jetbrains.projector.server.core.websocket.HttpWsServer
 import org.jetbrains.projector.server.core.util.getWildcardHostAddress
 import java.net.InetAddress
-import java.net.InetSocketAddress
 
 public abstract class ProjectorHttpWsServer(host: InetAddress, port: Int) : HttpWsServer(host, port) {
 

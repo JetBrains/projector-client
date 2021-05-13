@@ -1,27 +1,27 @@
 /*
- * MIT License
+ * Copyright (c) 2019-2021, JetBrains s.r.o. and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * Copyright (c) 2019-2021 JetBrains s.r.o.
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation. JetBrains designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
+ * if you need additional information or have any questions.
  */
-package org.jetbrains.projector.server.core.util
+package org.jetbrains.projector.server.core.websocket
 
 import org.java_websocket.WebSocket
 import org.java_websocket.WebSocketImpl
@@ -34,6 +34,8 @@ import org.java_websocket.framing.Framedata
 import org.java_websocket.handshake.*
 import org.java_websocket.server.WebSocketServer
 import org.java_websocket.util.Charsetfunctions
+import org.jetbrains.projector.server.core.util.getWildcardHostAddress
+import org.jetbrains.projector.util.logging.Logger
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
@@ -50,7 +52,7 @@ public class GetRequestResult(
 
 private val ClientHandshake.isHttp: Boolean get() = this.getFieldValue("Upgrade").isNullOrBlank()
 
-public abstract class HttpWsServer(host: InetAddress, port: Int) {
+public abstract class HttpWsServer(host: InetAddress, port: Int) : HttpWsTransport {
 
   public constructor(port: Int) : this(getWildcardHostAddress(), port)
 
@@ -110,6 +112,7 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) {
   }
 
   private companion object {
+    private val logger = Logger<HttpWsServer>()
 
     private const val PATH_FIELD = "X-My-Path"  // for draft
 
@@ -188,6 +191,7 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) {
     }
 
     override fun onStart() {
+      logger.info { "Server started on host $host and port $port" }
       this@HttpWsServer.onStart()
 
       lock.withLock {
@@ -197,30 +201,21 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) {
     }
   }
 
-  public val wasStarted: Boolean by webSocketServer::wasStarted
+  public override val wasStarted: Boolean by webSocketServer::wasStarted
 
-  public fun start() {
+  public override fun start() {
     webSocketServer.start()
   }
 
-  @JvmOverloads
-  public fun stop(timeout: Int = 0) {
+  public override fun stop(timeout: Int) {
     webSocketServer.stop(timeout)
   }
 
-  public fun forEachOpenedConnection(action: (client: WebSocket) -> Unit) {
+  public override fun forEachOpenedConnection(action: (client: WebSocket) -> Unit) {
     webSocketServer.connections.filter(WebSocket::isOpen).forEach(action)
   }
 
   public fun setWebSocketFactory(factory: WebSocketServerFactory) {
     webSocketServer.setWebSocketFactory(factory)
   }
-
-  public abstract fun onStart()
-  public abstract fun onError(connection: WebSocket?, e: Exception)
-  public abstract fun onWsOpen(connection: WebSocket)
-  public abstract fun onWsClose(connection: WebSocket)
-  public abstract fun onWsMessage(connection: WebSocket, message: String)
-  public abstract fun onWsMessage(connection: WebSocket, message: ByteBuffer)
-  public abstract fun onGetRequest(path: String): GetRequestResult
 }

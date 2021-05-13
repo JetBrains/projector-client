@@ -23,17 +23,24 @@
  */
 package org.jetbrains.projector.common.protocol.toServer
 
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-object KotlinxJsonClientEventSerializer {
+@Serializable
+sealed class RelayControlEvent
 
-  private val json = Json {}
+@Serializable
+@SerialName("greeting")
+object GreetingControlEvent : RelayControlEvent()
 
-  private val serializer = ListSerializer(ClientEvent.serializer())
+@Serializable
+@SerialName("client-in")
+data class ClientInControlEvent(
+  val id: String
+): RelayControlEvent()
 
-  fun serializeList(msg: List<ClientEvent>): String = json.encodeToString(serializer, msg)
-  fun deserializeList(data: String): List<ClientEvent> = json.decodeFromString(serializer, data)
-
-  fun deserializeFromRelay(data: String): RelayControlEvent = json.decodeFromString(RelayControlEvent.serializer(), data)
-}
+@Serializable
+@SerialName("client-out")
+data class ClientOutControlEvent(
+  val id: String
+): RelayControlEvent()
