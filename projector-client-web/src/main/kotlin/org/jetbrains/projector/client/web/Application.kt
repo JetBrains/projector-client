@@ -31,6 +31,7 @@ import org.jetbrains.projector.util.logging.Logger
 import kotlin.js.Json
 import kotlin.js.Promise
 import kotlin.js.json
+import kotlin.random.Random
 
 // todo: remove after https://youtrack.jetbrains.com/issue/KT-36037 is resolved
 external class Permissions {
@@ -46,11 +47,18 @@ class Application {
   private val windowSizeController = WindowSizeController(stateMachine)
 
   fun start() {
-    val url = when (ParamsProvider.ENABLE_WSS) {
-      false -> "ws://${ParamsProvider.HOST}:${ParamsProvider.PORT}"
-
-      true -> "wss://${ParamsProvider.HOST}:${ParamsProvider.PORT}"
+    val security = when (ParamsProvider.ENABLE_WSS) {
+      false -> "ws://"
+      true -> "wss://"
     }
+    val host = ParamsProvider.HOST
+    val port = if (ParamsProvider.PORT.isEmpty()) "" else ":${ParamsProvider.PORT}"
+    val path = when (ParamsProvider.ENABLE_RELAY) {
+      true -> "/connect/${ParamsProvider.SERVER_ID}/${generateKey()}"
+      false -> ""
+    }
+
+    val url = "$security$host$port$path"
 
     try {
       setClipboardPermissions()
@@ -88,5 +96,13 @@ class Application {
   companion object {
 
     private val logger = Logger<Application>()
+
+    private val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+
+    private fun generateKey(): String =
+      (1 .. 20)
+        .map { Random.nextInt(0, charPool.size) }
+        .map(charPool::get)
+        .joinToString("")
   }
 }
