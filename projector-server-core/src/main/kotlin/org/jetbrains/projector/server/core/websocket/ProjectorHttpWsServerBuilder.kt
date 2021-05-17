@@ -26,13 +26,15 @@ package org.jetbrains.projector.server.core.websocket
 import org.java_websocket.WebSocket
 import org.jetbrains.projector.common.protocol.toClient.MainWindow
 import org.jetbrains.projector.server.core.ProjectorHttpWsServer
+import org.jetbrains.projector.server.core.util.setSsl
+import org.jetbrains.projector.util.logging.Logger
 import java.net.InetAddress
 import java.nio.ByteBuffer
 
 public class ProjectorHttpWsServerBuilder(private val host: InetAddress, private val port: Int): TransportBuilder() {
 
   public override fun build(): ProjectorHttpWsServer {
-    return object : ProjectorHttpWsServer(host, port) {
+    val wsServer =  object : ProjectorHttpWsServer(host, port) {
       override fun getMainWindows(): List<MainWindow> {
         return this@ProjectorHttpWsServerBuilder.getMainWindow()
       }
@@ -61,5 +63,15 @@ public class ProjectorHttpWsServerBuilder(private val host: InetAddress, private
         this@ProjectorHttpWsServerBuilder.onWsMessageByteBuffer(connection, message)
       }
     }
+
+    val message = when (val hint = setSsl((wsServer)::setWebSocketFactory)) {
+      null -> "WebSocket SSL is disabled"
+      else -> "WebSocket SSL is enabled: $hint"
+    }
+
+    val logger = Logger<ProjectorHttpWsServerBuilder>()
+    logger.info { message }
+
+    return wsServer
   }
 }
