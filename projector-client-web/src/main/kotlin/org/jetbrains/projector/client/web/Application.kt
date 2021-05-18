@@ -47,18 +47,18 @@ class Application {
   private val windowSizeController = WindowSizeController(stateMachine)
 
   fun start() {
-    val security = when (ParamsProvider.ENABLE_WSS) {
+    val scheme = when (ParamsProvider.ENABLE_WSS) {
       false -> "ws://"
       true -> "wss://"
     }
     val host = ParamsProvider.HOST
-    val port = if (ParamsProvider.PORT.isEmpty()) "" else ":${ParamsProvider.PORT}"
+    val port = ":${ParamsProvider.PORT}"
     val path = when (ParamsProvider.ENABLE_RELAY) {
       true -> "/connect/${ParamsProvider.SERVER_ID}/${generateKey()}"
       false -> ""
     }
 
-    val url = "$security$host$port$path"
+    val url = "$scheme$host$port$path"
 
     try {
       setClipboardPermissions()
