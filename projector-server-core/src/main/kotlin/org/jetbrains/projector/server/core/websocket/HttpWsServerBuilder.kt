@@ -25,42 +25,43 @@ package org.jetbrains.projector.server.core.websocket
 
 import org.java_websocket.WebSocket
 import org.jetbrains.projector.common.protocol.toClient.MainWindow
-import org.jetbrains.projector.server.core.ProjectorHttpWsServer
 import org.jetbrains.projector.server.core.util.setSsl
 import org.jetbrains.projector.util.logging.Logger
 import java.net.InetAddress
 import java.nio.ByteBuffer
 
-public class ProjectorHttpWsServerBuilder(private val host: InetAddress, private val port: Int): TransportBuilder() {
+public class HttpWsServerBuilder(private val host: InetAddress, private val port: Int): TransportBuilder() {
 
-  public override fun build(): ProjectorHttpWsServer {
-    val wsServer =  object : ProjectorHttpWsServer(host, port) {
+  public lateinit var getMainWindow: () -> List<MainWindow>
+
+  override fun build(): HttpWsServer {
+    val wsServer =  object : HttpWsServer(host, port) {
       override fun getMainWindows(): List<MainWindow> {
-        return this@ProjectorHttpWsServerBuilder.getMainWindow()
+        return this@HttpWsServerBuilder.getMainWindow()
       }
 
       override fun onStart() {
-        this@ProjectorHttpWsServerBuilder.onStart()
+        this@HttpWsServerBuilder.onStart()
       }
 
       override fun onError(connection: WebSocket?, e: Exception) {
-        this@ProjectorHttpWsServerBuilder.onError(connection, e)
+        this@HttpWsServerBuilder.onError(connection, e)
       }
 
       override fun onWsOpen(connection: WebSocket) {
-        this@ProjectorHttpWsServerBuilder.onWsOpen(connection)
+        this@HttpWsServerBuilder.onWsOpen(connection)
       }
 
       override fun onWsClose(connection: WebSocket) {
-        this@ProjectorHttpWsServerBuilder.onWsClose(connection)
+        this@HttpWsServerBuilder.onWsClose(connection)
       }
 
       override fun onWsMessage(connection: WebSocket, message: String) {
-        this@ProjectorHttpWsServerBuilder.onWsMessageString(connection, message)
+        this@HttpWsServerBuilder.onWsMessageString(connection, message)
       }
 
       override fun onWsMessage(connection: WebSocket, message: ByteBuffer) {
-        this@ProjectorHttpWsServerBuilder.onWsMessageByteBuffer(connection, message)
+        this@HttpWsServerBuilder.onWsMessageByteBuffer(connection, message)
       }
     }
 
@@ -69,7 +70,7 @@ public class ProjectorHttpWsServerBuilder(private val host: InetAddress, private
       else -> "WebSocket SSL is enabled: $hint"
     }
 
-    val logger = Logger<ProjectorHttpWsServerBuilder>()
+    val logger = Logger<HttpWsServerBuilder>()
     logger.info { message }
 
     return wsServer
