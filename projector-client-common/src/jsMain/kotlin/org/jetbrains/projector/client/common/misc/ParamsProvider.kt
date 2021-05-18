@@ -126,7 +126,7 @@ actual object ParamsProvider {
       ENABLE_WSS = searchParams.has("wss") || window.location.protocol == "https:"
       HANDSHAKE_TOKEN = searchParams.get("token")
       INPUT_METHOD_TYPE = when (searchParams.get("inputMethod")) {
-        "default" -> InputMethodType.DEFAULT
+        "legacy" -> InputMethodType.LEGACY
         "mobileOnlyButtons" -> InputMethodType.OVERLAY_BUTTONS
         "mobile" -> InputMethodType.OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD
         "ime" -> InputMethodType.IME
@@ -135,7 +135,7 @@ actual object ParamsProvider {
             "onlyButtons" -> InputMethodType.OVERLAY_BUTTONS
             else -> InputMethodType.OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD
           }
-          false -> InputMethodType.DEFAULT
+          false -> InputMethodType.IME
         }
       }
       IDE_WINDOW_ID = searchParams.get("ideWindow")?.toIntOrNull()
@@ -157,7 +157,7 @@ actual object ParamsProvider {
   }
 
   enum class InputMethodType {
-    DEFAULT,  // todo: if IME is stable enough, we can try dropping default and switching to IME
+    LEGACY,
     OVERLAY_BUTTONS,
     OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD,
     IME,

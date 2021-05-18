@@ -39,7 +39,7 @@ Name | Type | Default value | Description
 `wss` | Presence | Protocol of the web page | Enable security of WebSocket connection.
 `notSecureWarning` | Boolean | `true` | Enable warning saying that the context is not [secure](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
 `token` | String? | Not present | Set a password which will be checked by the server on the connection.
-`mobile` | String? | Not present | Enable overlay controls handy for mobile devices. Presented param activates all controls. Provide `onlyButtons` value if you don't use virtual keyboard.
+`inputMethod` | String? | `ime` | Default `ime` supports Input Methods. `mobileOnlyButtons` – enable overlay controls handy for mobile devices. `mobile` – enable overlay controls and a virtual keyboard toggle handy for mobile devices. `legacy` doesn't support input methods.
 `ideWindow` | Int? | Not present | Specify the IDE window ID to show. The first ID is `0`. If not presented, all IDE windows are shown.
 `layout` | Enum (String) | `jsDefault` | Specify keyboard layout. Possible values: `jsDefault`, `frAzerty`.
 

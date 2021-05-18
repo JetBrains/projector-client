@@ -46,7 +46,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class KeyboardTest {
+class LegacyKeyboardTest {
 
   private companion object {
 
@@ -114,7 +114,7 @@ class KeyboardTest {
       server.start()
 
       try {
-        open(clientUrl)
+        open("$clientUrl&inputMethod=legacy")
         element(".window").should(appear)
 
         element("body").sendKeys(*keysToSend)
