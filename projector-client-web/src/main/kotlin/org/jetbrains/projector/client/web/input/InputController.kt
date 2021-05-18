@@ -267,7 +267,12 @@ class InputController(
       "wheel" to ::fireWheelEvent
     ))
 
-    if (ParamsProvider.MOBILE_SETTING != ParamsProvider.MobileSetting.ALL) {
+    if (ParamsProvider.INPUT_METHOD_TYPE in
+      setOf(
+        ParamsProvider.InputMethodType.DEFAULT,
+        ParamsProvider.InputMethodType.OVERLAY_BUTTONS,
+      )
+    ) {
       putAll(mapOf(
         "keydown" to ::handleKeyDownEvent,
         "keyup" to ::handleKeyUpEvent,
@@ -353,18 +358,6 @@ class InputController(
     )
 
     stateMachine.fire(ClientAction.AddEvent(message))
-  }
-
-  private fun ClientKeyEvent.orCtrlQ(): ClientKeyEvent {
-    if (this@orCtrlQ.code != VK.F1) {
-      return this@orCtrlQ
-    }
-
-    return this@orCtrlQ.copy(
-      char = 'q',
-      code = VK.Q,
-      modifiers = setOf(KeyModifier.CTRL_KEY),
-    )
   }
 
   private fun fireKeyEvent(type: ClientKeyEvent.KeyEventType, event: KeyboardEvent) {
@@ -495,7 +488,7 @@ class InputController(
       "AltRight" to ClientKeyEvent.KeyLocation.RIGHT,
     )
 
-    private fun toCommonKeyLocation(location: Int, code: String) = jsCodeLocation[code] ?: when (location) {
+    fun toCommonKeyLocation(location: Int, code: String) = jsCodeLocation[code] ?: when (location) {
       KeyboardEvent.DOM_KEY_LOCATION_STANDARD -> ClientKeyEvent.KeyLocation.STANDARD
       KeyboardEvent.DOM_KEY_LOCATION_LEFT -> ClientKeyEvent.KeyLocation.LEFT
       KeyboardEvent.DOM_KEY_LOCATION_RIGHT -> ClientKeyEvent.KeyLocation.RIGHT
@@ -515,7 +508,19 @@ class InputController(
 
     private const val DOUBLE_CLICK_DELTA_MS = 500
 
-    private suspend fun codeToVk(code: String): VK {
+    fun ClientKeyEvent.orCtrlQ(): ClientKeyEvent {
+      if (this@orCtrlQ.code != VK.F1) {
+        return this@orCtrlQ
+      }
+
+      return this@orCtrlQ.copy(
+        char = 'q',
+        code = VK.Q,
+        modifiers = setOf(KeyModifier.CTRL_KEY),
+      )
+    }
+
+    suspend fun codeToVk(code: String): VK {
       KeyboardApiLayout.getVirtualKey(code)?.let {
         return it
       }

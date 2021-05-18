@@ -81,7 +81,7 @@ actual object ParamsProvider {
   val SPECULATIVE_TYPING: Boolean
   val ENABLE_WSS: Boolean
   val HANDSHAKE_TOKEN: String?
-  val MOBILE_SETTING: MobileSetting
+  val INPUT_METHOD_TYPE: InputMethodType
   val IDE_WINDOW_ID: Int?
   val SHOW_NOT_SECURE_WARNING: Boolean
   val REPAINT_INTERVAL_MS: Int
@@ -125,12 +125,18 @@ actual object ParamsProvider {
       SPECULATIVE_TYPING = searchParams.has("speculativeTyping")
       ENABLE_WSS = searchParams.has("wss") || window.location.protocol == "https:"
       HANDSHAKE_TOKEN = searchParams.get("token")
-      MOBILE_SETTING = when (searchParams.has("mobile")) {
-        true -> when (searchParams.get("mobile")) {
-          "onlyButtons" -> MobileSetting.ONLY_BUTTONS
-          else -> MobileSetting.ALL
+      INPUT_METHOD_TYPE = when (searchParams.get("inputMethod")) {
+        "default" -> InputMethodType.DEFAULT
+        "mobileOnlyButtons" -> InputMethodType.OVERLAY_BUTTONS
+        "mobile" -> InputMethodType.OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD
+        "ime" -> InputMethodType.IME
+        else -> when (searchParams.has("mobile")) {  // save support for legacy params for now
+          true -> when (searchParams.get("mobile")) {
+            "onlyButtons" -> InputMethodType.OVERLAY_BUTTONS
+            else -> InputMethodType.OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD
+          }
+          false -> InputMethodType.DEFAULT
         }
-        false -> MobileSetting.DISABLED
       }
       IDE_WINDOW_ID = searchParams.get("ideWindow")?.toIntOrNull()
       SHOW_NOT_SECURE_WARNING = (searchParams.get("notSecureWarning") ?: DEFAULT_SHOW_NOT_SECURE_WARNING).toBoolean()
@@ -150,10 +156,11 @@ actual object ParamsProvider {
     KOTLINX_PROTOBUF,
   }
 
-  enum class MobileSetting {
-    DISABLED,
-    ONLY_BUTTONS,  // controls
-    ALL,  // controls + virtual keyboard
+  enum class InputMethodType {
+    DEFAULT,  // todo: if IME is stable enough, we can try dropping default and switching to IME
+    OVERLAY_BUTTONS,
+    OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD,
+    IME,
   }
 
   enum class LayoutType {

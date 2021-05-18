@@ -25,8 +25,17 @@ package org.jetbrains.projector.client.web.input
 
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.misc.ParamsProvider
+import org.jetbrains.projector.client.common.misc.RepaintAreaSetting
 import org.jetbrains.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.web.input.InputController.Companion.codeToVk
+import org.jetbrains.projector.client.web.input.InputController.Companion.keyToChar
+import org.jetbrains.projector.client.web.input.InputController.Companion.orCtrlQ
+import org.jetbrains.projector.client.web.input.InputController.Companion.toCommonKeyLocation
+import org.jetbrains.projector.client.web.misc.ClientStats
 import org.jetbrains.projector.client.web.misc.toDisplayType
 import org.jetbrains.projector.common.misc.isUpperCase
 import org.jetbrains.projector.common.protocol.data.VK
@@ -37,28 +46,27 @@ import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.LEFT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.STANDARD
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
+import org.jetbrains.projector.common.protocol.toServer.KeyModifier
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.*
-import org.w3c.dom.events.Event
-import org.w3c.dom.events.InputEvent
-import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.events.*
 import kotlin.math.roundToInt
 
-interface MobileKeyboardHelper {
+interface InputMethodHelper {
 
   fun dispose()
 }
 
-object NopMobileKeyboardHelper : MobileKeyboardHelper {
+object NopInputMethodHelper : InputMethodHelper {
 
   override fun dispose() {}
 }
 
-class MobileKeyboardHelperImpl(
+class MobileKeyboardHelper(
   private val openingTimeStamp: Int,
   private val specialKeysState: SpecialKeysState,
   private val clientEventConsumer: (ClientEvent) -> Unit,
-) : MobileKeyboardHelper {
+) : InputMethodHelper {
 
   private val panel = (document.createElement("div") as HTMLDivElement).apply {
     style.apply {
@@ -314,7 +322,7 @@ class MobileKeyboardHelperImpl(
       }
     )
 
-    if (ParamsProvider.MOBILE_SETTING == ParamsProvider.MobileSetting.ALL) {
+    if (ParamsProvider.INPUT_METHOD_TYPE == ParamsProvider.InputMethodType.OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD) {
       ToggleButton(
         text = "⌨",  // Keyboard symbol
         parent = panel,
@@ -342,7 +350,7 @@ class MobileKeyboardHelperImpl(
     panel.remove()
     virtualKeyboardInput.remove()
 
-    if (ParamsProvider.MOBILE_SETTING == ParamsProvider.MobileSetting.ALL) {
+    if (ParamsProvider.INPUT_METHOD_TYPE == ParamsProvider.InputMethodType.OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD) {
       document.removeEventListener("selectionchange", this::handleVirtualKeyboardSelection)
     }
   }
@@ -471,6 +479,198 @@ class MobileKeyboardHelperImpl(
 
     private const val MINIMUM_MS_BETWEEN_INPUT_AND_SELECTION_CHANGE = 100
 
-    private val logger = Logger<MobileKeyboardHelperImpl>()
+    private val logger = Logger<MobileKeyboardHelper>()
+  }
+}
+
+class ImeHelper(
+  private val openingTimeStamp: Int,
+  private val clientEventConsumer: (ClientEvent) -> Unit,
+) : InputMethodHelper {
+
+  private val inputField = (document.createElement("textarea") as HTMLTextAreaElement).apply {
+    style.apply {
+      position = "fixed"
+      bottom = "-30%"
+      left = "50%"
+    }
+
+    autocomplete = "off"
+    asDynamic().autocapitalize = "none"
+
+    onblur = {
+      this.focus()
+      this.click()
+    }
+
+    fun fireKeyPress(char: Char) {
+      GlobalScope.launch {
+        val message = ClientKeyPressEvent(
+          timeStamp = TimeStamp.current.roundToInt() - openingTimeStamp,
+          char = char,
+          modifiers = if (char.isUpperCase()) setOf(KeyModifier.SHIFT_KEY) else setOf(),  // todo: use modifiers of the last KEY_UP
+        )
+        clientEventConsumer(message)
+      }
+    }
+
+    var composing = false
+
+    addEventListener("compositionstart", { composing = true })
+
+    addEventListener(
+      "compositionend",
+      { event: Event ->
+        clearInputField()
+        composing = false
+
+        event as CompositionEvent
+        event.data.forEach { char ->
+          fireKeyPress(char)
+        }
+      }
+    )
+
+    val invisibleCodes: Set<VK> = setOf(
+      VK.SHIFT,
+      VK.CONTROL,
+      VK.META,
+      VK.ALT,
+      VK.ALT_GRAPH,
+      VK.CAPS_LOCK,
+      VK.LEFT,
+      VK.HOME,
+      VK.END,
+      VK.PAGE_UP,
+      VK.PAGE_DOWN,
+      VK.RIGHT,
+      VK.UP,
+      VK.DOWN,
+      VK.KP_LEFT,
+      VK.KP_RIGHT,
+      VK.KP_UP,
+      VK.KP_DOWN,
+      *(1..24).map { "F$it" }.map { VK.valueOf(it) }.toTypedArray(),
+    )
+
+    fun fireKeyEvent(type: ClientKeyEvent.KeyEventType, event: KeyboardEvent) {
+      if (event.key == "Process") {
+        return
+      }
+
+      val isKeystroke = event.ctrlKey ||  // like Ctrl+S
+                        event.metaKey  // like Cmd+N
+      val isPasteKeystroke = isKeystroke && (event.code == "KeyV")
+
+      if (!isPasteKeystroke) {  // don't block paste keystroke
+        event.preventDefault()  // prevent all defaults (because of this we need to generate PRESS events ourselves)
+      }
+
+      GlobalScope.launch {
+        if (isPasteKeystroke) {
+          // let "paste" event be generated by the browser, be caught by us, and go to server and only after it send the keystroke
+          delay(5L * (ParamsProvider.FLUSH_DELAY ?: 10))
+        }
+
+        val vk = codeToVk(event.code)
+        val char = keyToChar(JsKey(event.key), vk)
+
+        val message = ClientKeyEvent(
+          timeStamp = event.timeStamp.toInt() - openingTimeStamp,
+          char = char,
+          code = vk,
+          location = toCommonKeyLocation(event.location, event.code),
+          modifiers = event.modifiers,
+          keyEventType = type
+        ).orCtrlQ()
+
+        if (type == ClientKeyEvent.KeyEventType.DOWN && vk == VK.F10 && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
+          ClientStats.printStats()
+        }
+
+        if (type == ClientKeyEvent.KeyEventType.DOWN && vk == VK.F11 && KeyModifier.CTRL_KEY in message.modifiers) {  // todo: move to client state
+          (ParamsProvider.REPAINT_AREA as? RepaintAreaSetting.Enabled)?.let {
+            it.show = !it.show
+          }
+        }
+
+        clientEventConsumer(message)
+
+        if (type == ClientKeyEvent.KeyEventType.DOWN && message.code !in invisibleCodes) {
+          // we've blocked special keys like Tab to stop the browser react
+          // but we also disabled generation of PRESS events
+          // so need to send them manually
+          clientEventConsumer(ClientKeyPressEvent(
+            timeStamp = message.timeStamp,
+            char = message.char,
+            modifiers = message.modifiers,
+          ))
+        }
+      }
+    }
+
+    // Ctrl+* – prevent default (todo: Ctrl+V – don't prevent default, but ignore further input to the field)
+    // Tab – prevent default
+    // others – don't prevent default
+    onkeydown = {
+      fireKeyEvent(DOWN, it)
+    }
+
+    onkeyup = {
+      fireKeyEvent(UP, it)
+    }
+
+    oninput = fun(event: InputEvent) {
+      if (!composing) {
+        clearInputField()
+      }
+    }
+
+    document.body!!.appendChild(this)
+  }
+
+  init {
+    clearInputField()
+  }
+
+  private fun clearInputField() {
+    inputField.value = ""
+  }
+
+  init {
+    inputField.focus()
+    inputField.click()
+  }
+
+  override fun dispose() {
+    inputField.remove()
+  }
+
+  companion object {
+
+    private val KeyboardEvent.modifiers: Set<KeyModifier>
+      get() {
+        val modifiers = mutableSetOf<KeyModifier>()
+
+        if (shiftKey) {
+          modifiers.add(KeyModifier.SHIFT_KEY)
+        }
+        if (ctrlKey) {
+          modifiers.add(KeyModifier.CTRL_KEY)
+        }
+        if (altKey) {
+          modifiers.add(KeyModifier.ALT_KEY)
+        }
+        if (metaKey) {
+          modifiers.add(KeyModifier.META_KEY)
+        }
+        if (repeat) {
+          modifiers.add(KeyModifier.REPEAT)
+        }
+
+        return modifiers
+      }
+
+    private val logger = Logger<ImeHelper>()
   }
 }

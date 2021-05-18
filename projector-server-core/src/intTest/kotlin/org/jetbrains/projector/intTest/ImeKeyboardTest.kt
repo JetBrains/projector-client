@@ -42,12 +42,11 @@ import org.jetbrains.projector.util.logging.loggerFactory
 import org.openqa.selenium.Keys
 import java.awt.event.KeyEvent
 import javax.swing.JLabel
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class MobileKeyboardTest {
+class ImeKeyboardTest {
 
   private companion object {
 
@@ -74,7 +73,7 @@ class MobileKeyboardTest {
       }
     }
 
-    private fun createServerAndReceiveKeyEvents(keyEvents: Channel<List<KeyEvent>>): ApplicationEngine {
+    private fun createServerAndReceiveKeyEvents(keyEvents: Channel<List<KeyEvent?>>): ApplicationEngine {
       return startServerAndDoHandshake { (sender, receiver) ->
         val window = WindowData(
           id = 1,
@@ -90,7 +89,7 @@ class MobileKeyboardTest {
         sender(listOf(ServerWindowSetChangedEvent(listOf(window))))
 
         while (true) {
-          val list = mutableListOf<KeyEvent>()
+          val list = mutableListOf<KeyEvent?>()
 
           val events = receiver()
           events.forEach {
@@ -108,59 +107,19 @@ class MobileKeyboardTest {
       }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
-    private fun test(
-      vararg keysToSend: CharSequence,
-      ctrl: Boolean = false,
-      shift: Boolean = false,
-      expectedEvents: Int? = null,
-      f: Keys? = null,
-      esc: Boolean = false,
-      tester: (events: List<KeyEvent?>) -> Unit,
-    ) {
-      val keyEvents = Channel<List<KeyEvent>>()
+    private fun test(vararg keysToSend: CharSequence, tester: (events: List<KeyEvent?>) -> Unit) {
+      val keyEvents = Channel<List<KeyEvent?>>()
 
       val server = createServerAndReceiveKeyEvents(keyEvents)
       server.start()
 
       try {
-        open("$clientUrl&inputMethod=mobile")
+        open("$clientUrl&inputMethod=ime")
         element(".window").should(appear)
 
-        element("#toggleInput").click()
-        if (ctrl) {
-          element("#toggleCtrl").click()
-        }
-        if (shift) {
-          element("#toggleShift").click()
-        }
+        element("body").sendKeys(*keysToSend)
 
-        if (esc) {
-          element("#pressEsc").click()
-        }
-        if (keysToSend.isNotEmpty()) {
-          element("body").sendKeys(*keysToSend)
-        }
-
-        if (f != null) {
-          val fId = f.ordinal - Keys.F1.ordinal + 1
-          element("#toggleFunctionalKeys").click()
-          element("#pressF$fId").click()
-        }
-
-        if (shift) {
-          element("#toggleShift").click()
-        }
-        if (ctrl) {
-          element("#toggleCtrl").click()
-        }
-
-        val events = buildList {
-          do {
-            addAll(runBlocking { keyEvents.receive() })
-          }
-          while (expectedEvents?.let { it > this@buildList.size } == true)
-        }
+        val events = runBlocking { keyEvents.receive() }
 
         withReadableException(events, tester)
       }
@@ -184,25 +143,7 @@ class MobileKeyboardTest {
   }
 
   @Test
-  fun testShiftedSimpleSymbol() = test("h", shift = true, expectedEvents = 5) {
-    // expected (tested "H" press in a headful app):
-    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
-    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
-    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
-    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
-    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
-
-    assertEquals(5, it.size)
-    checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT,
-               -64)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
-    checkEvent(it[1], KeyEvent.KEY_PRESSED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
-    checkEvent(it[2], KeyEvent.KEY_TYPED, 0, 'H', KeyEvent.KEY_LOCATION_UNKNOWN, 64)
-    checkEvent(it[3], KeyEvent.KEY_RELEASED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
-    checkEvent(it[4], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
-  }
-
-  @Test
-  fun testAlreadyShiftedSimpleSymbol() = test("H") {
+  fun testShiftedSimpleSymbol() = test("H") {
     // expected (tested "H" press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
@@ -272,33 +213,7 @@ class MobileKeyboardTest {
   }
 
   @Test
-  fun testEscape() = test(esc = true) {
-    // expected (tested Space press in a headful app):
-    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=27,keyText=Escape,keyChar=Escape,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
-    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Escape,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
-    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=27,keyText=Escape,keyChar=Escape,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
-
-    assertEquals(3, it.size)
-    checkEvent(it[0], KeyEvent.KEY_PRESSED, 27, '\u001b', KeyEvent.KEY_LOCATION_STANDARD, 0)
-    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\u001b', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
-    checkEvent(it[2], KeyEvent.KEY_RELEASED, 27, '\u001b', KeyEvent.KEY_LOCATION_STANDARD, 0)
-  }
-
-  @Test
-  fun testDelete() = test(Keys.DELETE) {
-    // expected (tested Space press in a headful app):
-    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=127,keyText=Delete,keyChar=Delete,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
-    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Delete,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
-    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=127,keyText=Delete,keyChar=Delete,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
-
-    assertEquals(3, it.size)
-    checkEvent(it[0], KeyEvent.KEY_PRESSED, 127, '\u007f', KeyEvent.KEY_LOCATION_STANDARD, 0)
-    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\u007f', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
-    checkEvent(it[2], KeyEvent.KEY_RELEASED, 127, '\u007f', KeyEvent.KEY_LOCATION_STANDARD, 0)
-  }
-
-  @Test
-  fun testCtrlLetter() = test("z", ctrl = true, expectedEvents = 5) {
+  fun testCtrlLetter() = test(Keys.chord(Keys.CONTROL, "z")) {
     // expected (tested Ctrl+Z press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
     //java.awt.event.KeyEvent[KEY_PRESSED,keyCode=90,keyText=Z,keyChar='',modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
@@ -315,7 +230,7 @@ class MobileKeyboardTest {
   }
 
   @Test
-  fun testFunctionalKey() = test(f = Keys.F6) {
+  fun testFunctionalKey() = test(Keys.F6) {
     // expected (tested F6 press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
@@ -326,7 +241,7 @@ class MobileKeyboardTest {
   }
 
   @Test
-  fun testShiftedFunctionalKey() = test(f = Keys.F6, shift = true, expectedEvents = 4) {
+  fun testShiftedFunctionalKey() = test(Keys.chord(Keys.SHIFT, Keys.F6)) {
     // expected (tested Shift+F6 press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
@@ -341,7 +256,7 @@ class MobileKeyboardTest {
   }
 
   @Test
-  fun testCtrlShiftedLetter() = test("k", ctrl = true, shift = true, expectedEvents = 7) {
+  fun testCtrlShiftedLetter() = test(Keys.chord(Keys.CONTROL, Keys.SHIFT, "k")) {
     // expected (tested Ctrl+Shift+K press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Ctrl+Shift,extModifiers=Ctrl+Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 192
@@ -374,7 +289,6 @@ class MobileKeyboardTest {
   }
 
   @Test
-  @Ignore("need to somehow determine on the client that exactly numpad5 is sent, not plain5")
   fun testNumpadWithNumLock() = test(Keys.NUMPAD5) {
     // expected (tested NUMPAD5+numlock (5) press on virtual keyboard in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=101,keyText=NumPad-5,keyChar='5',modifiers=Button1,extModifiers=Button1,keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0

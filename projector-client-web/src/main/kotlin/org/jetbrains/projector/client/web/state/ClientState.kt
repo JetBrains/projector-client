@@ -40,9 +40,10 @@ import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.debug.DivSentReceivedBadgeShower
 import org.jetbrains.projector.client.web.debug.NoSentReceivedBadgeShower
 import org.jetbrains.projector.client.web.debug.SentReceivedBadgeShower
+import org.jetbrains.projector.client.web.input.ImeHelper
 import org.jetbrains.projector.client.web.input.InputController
-import org.jetbrains.projector.client.web.input.MobileKeyboardHelperImpl
-import org.jetbrains.projector.client.web.input.NopMobileKeyboardHelper
+import org.jetbrains.projector.client.web.input.MobileKeyboardHelper
+import org.jetbrains.projector.client.web.input.NopInputMethodHelper
 import org.jetbrains.projector.client.web.misc.*
 import org.jetbrains.projector.client.web.protocol.SupportedTypesProvider
 import org.jetbrains.projector.client.web.speculative.Typing
@@ -393,9 +394,13 @@ sealed class ClientState {
       stateMachine.fire(ClientAction.AddEvent(ClientOpenLinkEvent(link)))
     }
 
-    private val mobileKeyboardHelper = when (ParamsProvider.MOBILE_SETTING) {
-      ParamsProvider.MobileSetting.DISABLED -> NopMobileKeyboardHelper
-      else -> MobileKeyboardHelperImpl(openingTimeStamp, inputController.specialKeysState) { stateMachine.fire(ClientAction.AddEvent(it)) }
+    // todo: move inputMethodHelper to inputController
+    private val inputMethodHelper = when (ParamsProvider.INPUT_METHOD_TYPE) {
+      ParamsProvider.InputMethodType.DEFAULT -> NopInputMethodHelper
+      ParamsProvider.InputMethodType.IME -> ImeHelper(openingTimeStamp) {
+        stateMachine.fire(ClientAction.AddEvent(it))
+      }
+      else -> MobileKeyboardHelper(openingTimeStamp, inputController.specialKeysState) { stateMachine.fire(ClientAction.AddEvent(it)) }
     }
 
     private val closeBlocker = when (ParamsProvider.BLOCK_CLOSING) {
@@ -533,7 +538,7 @@ sealed class ClientState {
             windowSizeController.removeListener()
             typing.dispose()
             markdownPanelManager.disposeAll()
-            mobileKeyboardHelper.dispose()
+            inputMethodHelper.dispose()
             closeBlocker.removeListener()
             selectionBlocker.unblockSelection()
             connectionWatcher.removeWatcher()
@@ -561,7 +566,7 @@ sealed class ClientState {
       inputController.removeListeners()
       windowSizeController.removeListener()
       typing.dispose()
-      mobileKeyboardHelper.dispose()
+      inputMethodHelper.dispose()
       connectionWatcher.removeWatcher()
 
       layers.reconnectionMessageUpdater(messageText)
