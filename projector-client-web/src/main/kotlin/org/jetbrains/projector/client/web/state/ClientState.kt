@@ -26,6 +26,9 @@ package org.jetbrains.projector.client.web.state
 import kotlinext.js.jsObject
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
@@ -328,10 +331,13 @@ sealed class ClientState {
 
     private val windowDataEventsProcessor = WindowDataEventsProcessor(windowManager)
 
-    private val repainter = window.setInterval(
-      handler = { windowDataEventsProcessor.redrawWindows() },
-      timeout = ParamsProvider.REPAINT_INTERVAL_MS,
-    )
+    private var redrawWindows = GlobalScope.launch {
+      // redraw windows in case any missing images are loaded now
+      while (true) {
+        windowDataEventsProcessor.redrawWindows()
+        delay(ParamsProvider.REPAINT_INTERVAL_MS.toLong())
+      }
+    }
 
     private val serverEventsProcessor = ServerEventsProcessor(windowDataEventsProcessor)
 
@@ -520,7 +526,7 @@ sealed class ClientState {
           is ClientAction.WebSocket.Close.FinishNormal -> {
             logger.info { "Connection is closed..." }
 
-            window.clearInterval(repainter)
+            redrawWindows.cancel()
             pingStatistics.onClose()
             windowDataEventsProcessor.onClose()
             inputController.removeListeners()
@@ -550,7 +556,7 @@ sealed class ClientState {
     private fun reloadConnection(messageText: String): ClientState {
       logger.info { messageText }
 
-      window.clearInterval(repainter)
+      redrawWindows.cancel()
       pingStatistics.onClose()
       inputController.removeListeners()
       windowSizeController.removeListener()
