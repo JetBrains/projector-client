@@ -38,7 +38,7 @@ import kotlinx.coroutines.runBlocking
 import org.java_websocket.WebSocket
 import org.jetbrains.projector.common.protocol.toClient.MainWindow
 import org.jetbrains.projector.common.protocol.toClient.toMainWindowList
-import org.jetbrains.projector.server.core.ProjectorHttpWsServer
+import org.jetbrains.projector.server.core.websocket.HttpWsServer
 import java.io.File
 import java.nio.ByteBuffer
 import kotlin.test.Test
@@ -56,7 +56,7 @@ class ProjectorHttpWsServerTest {
 
     private fun prj(path: String) = "http://localhost:$PORT$path"
 
-    private fun createServer() = object : ProjectorHttpWsServer(PORT) {
+    private fun createServer() = object : HttpWsServer(PORT) {
 
       override fun onStart() {}
 

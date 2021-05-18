@@ -24,7 +24,6 @@
 package org.jetbrains.projector.server.core.websocket
 
 import org.java_websocket.WebSocket
-import org.jetbrains.projector.common.protocol.toClient.MainWindow
 import java.nio.ByteBuffer
 
 public abstract class TransportBuilder {
@@ -34,8 +33,6 @@ public abstract class TransportBuilder {
   public lateinit var onWsClose: (connection: WebSocket) -> Unit
   public lateinit var onWsMessageString: (connection: WebSocket, message: String) -> Unit
   public lateinit var onWsMessageByteBuffer: (connection: WebSocket, message: ByteBuffer) -> Unit
-  public lateinit var onGetRequest: (path: String) -> GetRequestResult
-  public lateinit var getMainWindow: () -> List<MainWindow>
 
-  public abstract  fun build(): HttpWsTransport
+  public abstract fun build(): HttpWsTransport
 }

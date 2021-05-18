@@ -26,9 +26,9 @@ package org.jetbrains.projector.server.core.websocket
 import org.java_websocket.WebSocket
 import java.nio.ByteBuffer
 
-public class HttpWsClientBuilder(private val relayUrl: String, private val serverId: String): TransportBuilder() {
+public class HttpWsClientBuilder(private val relayUrl: String, private val serverId: String) : TransportBuilder() {
 
-  public override fun build(): HttpWsClient {
+  override fun build(): HttpWsClient {
     return object : HttpWsClient(relayUrl, serverId) {
       override fun onStart() {
         this@HttpWsClientBuilder.onStart()
@@ -52,10 +52,6 @@ public class HttpWsClientBuilder(private val relayUrl: String, private val serve
 
       override fun onWsMessage(connection: WebSocket, message: ByteBuffer) {
         this@HttpWsClientBuilder.onWsMessageByteBuffer(connection, message)
-      }
-
-      override fun onGetRequest(path: String): GetRequestResult {
-        return this@HttpWsClientBuilder.onGetRequest(path)
       }
     }
   }

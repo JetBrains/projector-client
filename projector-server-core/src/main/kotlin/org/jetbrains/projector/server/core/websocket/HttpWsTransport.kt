@@ -38,5 +38,4 @@ public interface HttpWsTransport {
   public fun onWsClose(connection: WebSocket)
   public fun onWsMessage(connection: WebSocket, message: String)
   public fun onWsMessage(connection: WebSocket, message: ByteBuffer)
-  public fun onGetRequest(path: String): GetRequestResult
 }
