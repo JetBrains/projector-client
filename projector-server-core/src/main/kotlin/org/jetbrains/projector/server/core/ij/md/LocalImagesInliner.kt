@@ -23,60 +23,32 @@
  */
 package org.jetbrains.projector.server.core.ij.md
 
-import java.io.ByteArrayInputStream
-import java.io.StringWriter
+import org.jsoup.Jsoup
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.transform.OutputKeys
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
 
 internal object LocalImagesInliner {
 
-  private val docFactory = DocumentBuilderFactory.newInstance()
-  private val docBuilder = docFactory.newDocumentBuilder()
-
-  private val transformerFactory = TransformerFactory.newInstance()
-  private val transformer = transformerFactory.newTransformer().apply {
-    setOutputProperty(OutputKeys.INDENT, "no")  // this is mandatory because extra indents spoil blocks of code
-    setOutputProperty(OutputKeys.METHOD, "xml")  // previous line won't work without this one
-    setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")  // previous line will add header so we have o disable it explicitly
-  }
-
   fun inlineLocalImages(html: String): String {
-    val input = ByteArrayInputStream(html.toByteArray())
+    val doc = Jsoup.parse(html)
+    val images = doc.getElementsByTag("img")
 
-    val doc = docBuilder.parse(input)
-    val images = doc.getElementsByTagName("img")
+    images.forEach {
+      val src = it.attr("src")
 
-    for (imageId in 0 until images.length) {
-      val image = images.item(imageId)
+      if (src.startsWith("file:")) {
+        val extension = src.substringAfterLast('.', missingDelimiterValue = "")
+        val path = Path.of(URI(src.substringBefore('?')))
 
-      val srcAttribute = image.attributes.getNamedItem("src") ?: continue
+        val inlinedImage = inlineImage(path, extension)
 
-      val src = srcAttribute.textContent
-
-      if (!src.startsWith("file:")) {
-        continue
+        it.attr("src", inlinedImage)
       }
-
-      val extension = src.substringAfterLast('.', missingDelimiterValue = "")
-      val path = Path.of(URI(src))
-
-      val inlinedImage = inlineImage(path, extension)
-
-      srcAttribute.textContent = inlinedImage
     }
 
-    val source = DOMSource(doc)
-    val stringWriter = StringWriter(html.length)
-    transformer.transform(source, StreamResult(stringWriter))
-
-    return stringWriter.toString()
+    return doc.toString()
   }
 
   private fun inlineImage(localPath: Path, extension: String): String {
