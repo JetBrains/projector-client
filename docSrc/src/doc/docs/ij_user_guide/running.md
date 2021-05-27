@@ -19,7 +19,7 @@ There are two ways of how the server is run:
 
 You may wonder what to choose. Let's describe some differences that should help you decide.
 
-- Currently, headless mode is available **only on Linux** (or inside Docker). On the other hand, GUI mode is available everywhere.
+- Currently, headless mode is available **only on Linux** (or inside Docker) – we have a request to fix it: [PRJ-75](https://youtrack.jetbrains.com/issue/PRJ-75). On the other hand, GUI mode is available everywhere.
 - Headless mode doesn't require **Desktop Environment** nor **XServer** nor **virtual framebuffer** to be available on the device, while GUI mode in Linux obviously does. This makes Projector be able to run on headless machines such as servers in clouds.
 - Headless mode can adapt to the connected client machine better, especially when the client has different screen parameters (DPI, resolution).
 
