@@ -1,6 +1,6 @@
 Thank you for reading this: we welcome any contributions.
 
-All Projector-related projects have the same contributing guidelines. This is the place where they are described.
+All Projector-related projects have the same contributing guidelines. This is the place where they are described: here we talk about creating tickets in our issue tracker, proposing changes by GitHub Pull Requests, and writing about Projector.
 
 ## Creating an issue
 
@@ -58,3 +58,7 @@ If you want to resolve an **issue submitted in the issue tracker** or propose a 
 * Cleanup
 
 **Commits naming**. If there are issues that you address, please mention them in the prefix of commit messages. Usually, a commit name starts with a verb. Example: `PRJ-68 Make clipboard owners lose ownership when clipboard is changed by a client`.
+
+## Spread Projector
+
+We are glad when people talk about our technology. Feel free to tell your friends and colleagues about Projector. If you have written something publicly, a guide or just a short review, or maybe even used Projector in another project, you can always share it on Twitter mentioning [@ProjectorJB](https://twitter.com/ProjectorJB), we often answer and retweet.
