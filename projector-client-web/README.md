@@ -57,7 +57,7 @@ Name | Type | Default value | Description
 `showSentReceived` | Presence | Not present | Show blinking indicators in the corner of the screen when events were sent or received.
 `showPing` | Presence | Not present | Show some info of simple ping to and from server.
 `pingAverageCount` | Int? | Not present | Activate displaying average ping of this number of iterations.
-`backgroundColor` | String | `2A2` (green) | Set color of area where there are no windows.
+`backgroundColor` | String | `#282` (green) | Set color of area where there are no windows.
 `userScalingRatio` | Double | `1.0` | Set scaling ratio.
 `pingInterval` | Int | `1000` | Set interval of pinging in ms.
 `showProcessingTime` | Presence | Not present | Log processing time of server messages to browser console.
