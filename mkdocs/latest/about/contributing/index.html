@@ -468,11 +468,45 @@
     Creating an issue
   </a>
   
+    <nav class="md-nav" aria-label="Creating an issue">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ticket-fields" class="md-nav__link">
+    Ticket fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ticket-states" class="md-nav__link">
+    Ticket states
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ticket-activity-settings" class="md-nav__link">
+    Ticket activity settings
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
   <a href="#submitting-changes" class="md-nav__link">
     Submitting changes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spread-projector" class="md-nav__link">
+    Spread Projector
   </a>
   
 </li>
@@ -522,12 +556,36 @@
                   <h1>Contributing</h1>
                 
                 <p>Thank you for reading this: we welcome any contributions.</p>
-<p>All Projector-related projects have the same contributing guidelines. This is the place where they are described.</p>
+<p>All Projector-related projects have the same contributing guidelines. This is the place where they are described: here we talk about creating tickets in our issue tracker, proposing changes by GitHub Pull Requests, and writing about Projector.</p>
 <h2 id="creating-an-issue">Creating an issue<a class="headerlink" href="#creating-an-issue" title="Permanent link">&para;</a></h2>
 <p>You can create issues in our <a href="https://youtrack.jetbrains.com/issues/PRJ">issue tracker</a>.</p>
-<p>If you <strong>report a bug</strong>, please either describe reproduction steps or mention that you don't know how to reproduce it stably. You can also <strong>suggest a feature</strong>.</p>
-<p>Please don't forget to specify fields of the ticket (in the top right corner): type (bug/feature/usability problem), subsystem (if you not sure, we have a special item), affected versions.</p>
-<p>If you've found the same ticket, please avoid creating a duplicate. Better vote (and comment with more info) for the existing!</p>
+<p>If you <strong>report a bug</strong>, please either <em>describe reproduction steps</em> or <em>mention that you don't know how to reproduce it stably</em>. You can also <strong>suggest a feature</strong>.</p>
+<p>Please don't forget to specify fields of the ticket (in the top right corner):
+* Type (Bug/Feature/Usability Problem and so on),
+* Subsystem (if you are <em>not sure</em>, we have a corresponding item),
+* Affected versions (we use the following formats: <code>server-vX.Y.Z</code> for plain Projector server and client, <code>installer-vX.Y.Z</code> for projector-installer, <code>agent-vX.Y.Z</code> for projector-plugin, <code>launcher-vX.Y.Z</code> for Projector Electron App; if multiple items are affected, they can be enumerated separated by a comma with a space).</p>
+<p>If you've found the same ticket, please avoid creating a duplicate. Better vote (and comment with more info) for the existing! Some tickets have a workaround, so maybe you will get a temporary solution right away.</p>
+<p>There are some explanations on how we work with YouTrack to make you a bit more comfortable.</p>
+<h3 id="ticket-fields">Ticket fields<a class="headerlink" href="#ticket-fields" title="Permanent link">&para;</a></h3>
+<p>Fields is a table in the top right corner of a ticket screen. Projector project has the following ones:</p>
+<ul>
+<li>Project – obviously <code>Projector</code> (can be referenced by <code>PRJ</code> code).</li>
+<li>Priority – how we see the severity of the issue. We usually take the severity into account why deciding what to resolve next.</li>
+<li>Type.</li>
+<li>Subsystem – which part of Projector is affected (Server/Web client/Plugin and so on).</li>
+<li>State – more on this below in a special section.</li>
+<li>Affected versions – which Projector versions have the issue.</li>
+<li>Fix versions – in which Projector versions the issue is resolved.</li>
+<li>Assignee – who is working/has worked on the issue.</li>
+</ul>
+<p>Sometimes the fields are not applicable, so we leave them with a default value.</p>
+<h3 id="ticket-states">Ticket states<a class="headerlink" href="#ticket-states" title="Permanent link">&para;</a></h3>
+<p>Please don't change the state field of a ticket. When we see triage the ticket, we will change its state from <code>submitted</code> to <code>open</code>.</p>
+<p>When we are looking for an answer from a reporter, we will change the state to <code>wait for reply</code>.</p>
+<p>Sometimes we place tickets to <code>backlog</code> meaning that the task will be solved without the priority queue, hopefully soon.</p>
+<p>When a ticket is marked as gray and stroked, it means it's closed.</p>
+<h3 id="ticket-activity-settings">Ticket activity settings<a class="headerlink" href="#ticket-activity-settings" title="Permanent link">&para;</a></h3>
+<p>By default, YouTrack shows only comments under the description of a ticket. You can also enable <em>Issue history</em> to see changes in the description and fields and <em>VCS changes</em> to see the commits and pull requests related to the issue. You can find the corresponding switcher buttons <a href="https://www.jetbrains.com/help/youtrack/standalone/VCS-Changes.html">just under the description of a ticket</a>.</p>
 <h2 id="submitting-changes">Submitting changes<a class="headerlink" href="#submitting-changes" title="Permanent link">&para;</a></h2>
 <p>If you want to resolve an <strong>issue submitted in the issue tracker</strong> or propose a <strong>minor edit</strong>, open a Pull Request. Better don't include multiple changes in a single PR, create separate.</p>
 <p><strong>Pre-commit actions</strong>. Before committing, please ensure that code style is correct. If you use IntelliJ IDEA, you can just select the following checkboxes of "Before Commit" actions:</p>
@@ -538,6 +596,8 @@
 <li>Cleanup</li>
 </ul>
 <p><strong>Commits naming</strong>. If there are issues that you address, please mention them in the prefix of commit messages. Usually, a commit name starts with a verb. Example: <code>PRJ-68 Make clipboard owners lose ownership when clipboard is changed by a client</code>.</p>
+<h2 id="spread-projector">Spread Projector<a class="headerlink" href="#spread-projector" title="Permanent link">&para;</a></h2>
+<p>We are glad when people talk about our technology. Feel free to tell your friends and colleagues about Projector. If you have written something publicly, a guide or just a short review, or maybe even used Projector in another project, you can always share it on Twitter mentioning <a href="https://twitter.com/ProjectorJB">@ProjectorJB</a>, we often answer and retweet.</p>
                 
               
               
