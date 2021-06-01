@@ -83,6 +83,7 @@ sealed class ClientState {
       document.body!!.apply {
         style.apply {
           backgroundColor = ParamsProvider.BACKGROUND_COLOR
+          asDynamic().overscrollBehaviorX = "none"
           asDynamic().overscrollBehaviorY = "none"
           asDynamic().touchAction = "none"
         }
