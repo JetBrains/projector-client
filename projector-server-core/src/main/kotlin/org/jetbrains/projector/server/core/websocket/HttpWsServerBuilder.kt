@@ -65,7 +65,7 @@ public class HttpWsServerBuilder(private val host: InetAddress, private val port
       }
     }
 
-    val message = when (val hint = setSsl((wsServer)::setWebSocketFactory)) {
+    val message = when (val hint = setSsl(wsServer::setWebSocketFactory)) {
       null -> "WebSocket SSL is disabled"
       else -> "WebSocket SSL is enabled: $hint"
     }
