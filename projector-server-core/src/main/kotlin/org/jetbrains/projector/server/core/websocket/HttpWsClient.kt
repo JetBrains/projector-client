@@ -105,7 +105,7 @@ public abstract class HttpWsClient(
   public override val wasStarted: Boolean by controlWebSocket::wasStarted
 
   public override fun start() {
-    logger.info { "Control socket connected to server with URI: ${this.controlWebSocket.uri}" }
+    logger.info { "Control socket connected to server with URI: ${controlWebSocket.uri}" }
     controlWebSocket.connect()
   }
 
