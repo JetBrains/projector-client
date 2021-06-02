@@ -32,12 +32,12 @@ import java.nio.ByteBuffer
 
 public class HttpWsServerBuilder(private val host: InetAddress, private val port: Int): TransportBuilder() {
 
-  public lateinit var getMainWindow: () -> List<MainWindow>
+  public lateinit var getMainWindows: () -> List<MainWindow>
 
   override fun build(): HttpWsServer {
     val wsServer =  object : HttpWsServer(host, port) {
       override fun getMainWindows(): List<MainWindow> {
-        return this@HttpWsServerBuilder.getMainWindow()
+        return this@HttpWsServerBuilder.getMainWindows()
       }
 
       override fun onStart() {
