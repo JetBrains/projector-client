@@ -30,6 +30,7 @@ import org.java_websocket.handshake.ServerHandshake
 import org.jetbrains.projector.common.protocol.toServer.ClientInControlEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientOutControlEvent
 import org.jetbrains.projector.common.protocol.toServer.KotlinxJsonClientEventSerializer
+import org.jetbrains.projector.util.logging.Logger
 import java.net.URI
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -104,6 +105,7 @@ public abstract class HttpWsClient(
   public override val wasStarted: Boolean by controlWebSocket::wasStarted
 
   public override fun start() {
+    logger.info { "Control socket connected to server with URI: ${this.controlWebSocket.uri}" }
     controlWebSocket.connect()
   }
 
@@ -147,5 +149,9 @@ public abstract class HttpWsClient(
     }
     clientWebSocket.connect()
     clients[clientId] = clientWebSocket
+  }
+
+  private companion object {
+    private val logger = Logger<HttpWsClient>()
   }
 }
