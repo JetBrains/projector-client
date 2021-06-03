@@ -4,7 +4,7 @@ To run an app with Projector, you need to create a server. There are multiple va
 
 Variant | Supported platforms | [Mode](#mode)
 ---|---|---
-[installer](#installer) | Linux | Headless
+[Installer](#installer) | Linux | Headless
 [Docker](#docker) | Any | Headless
 [IDE Plugin](#ide-plugin) | Any | GUI
 
@@ -20,12 +20,12 @@ There are two ways of how the server is run:
 You may wonder what to choose. Let's describe some differences that should help you decide.
 
 - Currently, headless mode is available **only on Linux** (or inside Docker) – we have a request to fix it: [PRJ-75](https://youtrack.jetbrains.com/issue/PRJ-75). On the other hand, GUI mode is available everywhere.
-- Headless mode doesn't require **Desktop Environment** nor **XServer** nor **virtual framebuffer** to be available on the device, while GUI mode in Linux obviously does. This makes Projector be able to run on headless machines such as servers in clouds.
+- Headless mode doesn't require **Desktop Environment** nor **X-Server** nor **virtual framebuffer** to be available on the device, while GUI mode in Linux obviously does. This makes Projector be able to run easily on headless machines such as servers in clouds.
 - Headless mode can adapt to the connected client machine better, especially when the client has different screen parameters (DPI, resolution).
 
-## installer
+## Installer
 
-Installer is a console application that allows to install, configure, and run JetBrains IDEs with Projector. Currently it works on Linux or in [WSL](https://docs.microsoft.com/windows/wsl/). The IDE will be run **headlessly**.
+Installer is a console application that allows to install, configure, and run JetBrains IDEs with Projector. Currently it works on Linux or in [WSL](https://docs.microsoft.com/windows/wsl/). BSD is supported too. The IDE will be run **headlessly**.
 
 You can find instructions in the corresponding repo: <https://github.com/JetBrains/projector-installer>.
 

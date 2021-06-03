@@ -71,13 +71,14 @@ On the other hand, X11, VNC, and RDP are well-known solutions, and system admini
 
 Also, we have a [special documentation page](../about/comparison.md) where we list advantages of Projector.
 
-## Is it Open Source?
+## Is it open-source?
 
-Now, everything is an Open Source or Free Software:
+Now, everything is free and open-source software:
 
-*   Dockerfiles (Apache License 2.0): <https://github.com/JetBrains/projector-docker>.
-*   Server (GNU GPL v2.0): <https://github.com/JetBrains/projector-server>.
-*   Client (MIT License): <https://github.com/JetBrains/projector-client>.
+* Dockerfiles (Apache License 2.0): <https://github.com/JetBrains/projector-docker>.
+* Installer (Apache License 2.0): <https://github.com/JetBrains/projector-installer>.
+* Server (GNU GPL v2.0 + Classpath Exception): <https://github.com/JetBrains/projector-server>.
+* Client (MIT License): <https://github.com/JetBrains/projector-client>.
 
 ## Known problems
 

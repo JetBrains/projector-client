@@ -17,16 +17,15 @@ If your server is located remotely, just use the corresponding host address inst
 
 ### Latest client
 
-The latest client is always available at our site: <https://projector.jetbrains.com/client/?host=HOST&port=PORT>. So this variant is useful if you
-want to check out the recent update in the client.
+The latest client is always available at our site: <https://projector.jetbrains.com/client/?host=HOST&port=PORT>. So this variant is useful if you want to check out the recent update in the client.
 
-You should set `HOST` and `PORT` matching your server. For the previous example, it will
-be <https://projector.jetbrains.com/client/?host=localhost&port=9999>.
+You should set `HOST` and `PORT` matching your server. For the previous example, it will be <https://projector.jetbrains.com/client/?host=localhost&port=9999>.
 
-!!! warning "Secure connection is required for the latest client"
-Your server must be secure when using the latest client because our domain is secure itself. Before connection, make sure that your browser
-trusts the certificate you use on your server (in this case, connection via the bundled client should succeed). For more info,
-read [below](#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page).
+!!! info "Secure connection is required for the latest client"
+    Your server must be secure when using the latest client because our domain is secure itself. Before connection, make sure that your browser trusts the certificate you use on your server (in this case, connection via the bundled client should succeed). For more info, read [below](#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page).
+
+!!! warning "The latest client can introduce incompatible changes"
+    The latest client can be incompatible with the latest release or another release that you use. 
 
 ### Known issues
 
@@ -34,7 +33,7 @@ Due to limitations of web browsers, there are some issues in the Web Client. The
 
 #### iPad as a client
 
-iPads don't support self-signed WebSockets, so if you want to use a browser on iPad as a client, you now have to disable security on the server.
+iPads don't support self-signed WebSockets, so if you want to use a browser on iPad as a client, you now have to disable security on the server or use a well-signed certificate on your server.
 
 #### Some hotkeys are intercepted by the browser
 
@@ -100,7 +99,7 @@ Run `projector.exe` file.
 
 Run `projector` file.
 
-#### Mac (darwin)
+#### Mac (Darwin)
 
 Run `projector` app (on other OSes it's visible like `projector.app` dir).
 
