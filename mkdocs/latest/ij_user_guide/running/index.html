@@ -305,7 +305,7 @@
       
         <li class="md-nav__item">
   <a href="#installer" class="md-nav__link">
-    installer
+    Installer
   </a>
   
 </li>
@@ -562,7 +562,7 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="#installer">installer</a></td>
+<td><a href="#installer">Installer</a></td>
 <td>Linux</td>
 <td>Headless</td>
 </tr>
@@ -588,11 +588,11 @@
 <p>You may wonder what to choose. Let's describe some differences that should help you decide.</p>
 <ul>
 <li>Currently, headless mode is available <strong>only on Linux</strong> (or inside Docker) – we have a request to fix it: <a href="https://youtrack.jetbrains.com/issue/PRJ-75">PRJ-75</a>. On the other hand, GUI mode is available everywhere.</li>
-<li>Headless mode doesn't require <strong>Desktop Environment</strong> nor <strong>XServer</strong> nor <strong>virtual framebuffer</strong> to be available on the device, while GUI mode in Linux obviously does. This makes Projector be able to run on headless machines such as servers in clouds.</li>
+<li>Headless mode doesn't require <strong>Desktop Environment</strong> nor <strong>X-Server</strong> nor <strong>virtual framebuffer</strong> to be available on the device, while GUI mode in Linux obviously does. This makes Projector be able to run easily on headless machines such as servers in clouds.</li>
 <li>Headless mode can adapt to the connected client machine better, especially when the client has different screen parameters (DPI, resolution).</li>
 </ul>
-<h2 id="installer">installer<a class="headerlink" href="#installer" title="Permanent link">&para;</a></h2>
-<p>Installer is a console application that allows to install, configure, and run JetBrains IDEs with Projector. Currently it works on Linux or in <a href="https://docs.microsoft.com/windows/wsl/">WSL</a>. The IDE will be run <strong>headlessly</strong>.</p>
+<h2 id="installer">Installer<a class="headerlink" href="#installer" title="Permanent link">&para;</a></h2>
+<p>Installer is a console application that allows to install, configure, and run JetBrains IDEs with Projector. Currently it works on Linux or in <a href="https://docs.microsoft.com/windows/wsl/">WSL</a>. BSD is supported too. The IDE will be run <strong>headlessly</strong>.</p>
 <p>You can find instructions in the corresponding repo: <a href="https://github.com/JetBrains/projector-installer">https://github.com/JetBrains/projector-installer</a>.</p>
 <h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h2>
 <p>We have a sample Docker script that allows you to generate Docker images containing JetBrains IDEs and Projector inside. This allows you to run IDEs anywhere where Docker is available. The IDE will be run <strong>headlessly</strong> and isolated inside Docker.</p>

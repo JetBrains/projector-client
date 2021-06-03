@@ -430,7 +430,7 @@
         
           <li class="md-nav__item">
   <a href="#mac-darwin" class="md-nav__link">
-    Mac (darwin)
+    Mac (Darwin)
   </a>
   
 </li>
@@ -683,20 +683,20 @@
 <p>Recent versions of servers have bundled client files. So for example if you start a server on port 9999, you can access it via a browser locally opening <a href="http://localhost:9999/">http://localhost:9999/</a> (or <a href="https://...">https://...</a> if your server is secure).</p>
 <p>If your server is located remotely, just use the corresponding host address instead of <code>localhost</code>.</p>
 <h3 id="latest-client">Latest client<a class="headerlink" href="#latest-client" title="Permanent link">&para;</a></h3>
-<p>The latest client is always available at our site: <a href="https://projector.jetbrains.com/client/?host=HOST&amp;port=PORT">https://projector.jetbrains.com/client/?host=HOST&amp;port=PORT</a>. So this variant is useful if you
-want to check out the recent update in the client.</p>
-<p>You should set <code>HOST</code> and <code>PORT</code> matching your server. For the previous example, it will
-be <a href="https://projector.jetbrains.com/client/?host=localhost&amp;port=9999">https://projector.jetbrains.com/client/?host=localhost&amp;port=9999</a>.</p>
-<div class="admonition warning">
+<p>The latest client is always available at our site: <a href="https://projector.jetbrains.com/client/?host=HOST&amp;port=PORT">https://projector.jetbrains.com/client/?host=HOST&amp;port=PORT</a>. So this variant is useful if you want to check out the recent update in the client.</p>
+<p>You should set <code>HOST</code> and <code>PORT</code> matching your server. For the previous example, it will be <a href="https://projector.jetbrains.com/client/?host=localhost&amp;port=9999">https://projector.jetbrains.com/client/?host=localhost&amp;port=9999</a>.</p>
+<div class="admonition info">
 <p class="admonition-title">Secure connection is required for the latest client</p>
+<p>Your server must be secure when using the latest client because our domain is secure itself. Before connection, make sure that your browser trusts the certificate you use on your server (in this case, connection via the bundled client should succeed). For more info, read <a href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page">below</a>.</p>
 </div>
-<p>Your server must be secure when using the latest client because our domain is secure itself. Before connection, make sure that your browser
-trusts the certificate you use on your server (in this case, connection via the bundled client should succeed). For more info,
-read <a href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page">below</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">The latest client can introduce incompatible changes</p>
+<p>The latest client can be incompatible with the latest release or another release that you use. </p>
+</div>
 <h3 id="known-issues">Known issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h3>
 <p>Due to limitations of web browsers, there are some issues in the Web Client. They can be solved via native implementations of the client.</p>
 <h4 id="ipad-as-a-client">iPad as a client<a class="headerlink" href="#ipad-as-a-client" title="Permanent link">&para;</a></h4>
-<p>iPads don't support self-signed WebSockets, so if you want to use a browser on iPad as a client, you now have to disable security on the server.</p>
+<p>iPads don't support self-signed WebSockets, so if you want to use a browser on iPad as a client, you now have to disable security on the server or use a well-signed certificate on your server.</p>
 <h4 id="some-hotkeys-are-intercepted-by-the-browser">Some hotkeys are intercepted by the browser<a class="headerlink" href="#some-hotkeys-are-intercepted-by-the-browser" title="Permanent link">&para;</a></h4>
 <p>For example, <code>Ctrl+Q</code> in Windows/Linux or <code>Cmd+N</code> in Mac is handled by the browser.</p>
 <p>Since some shortcuts close the tab or the window, we implemented a confirmation which is shown when the page is about to close (if <code>blockClosing</code> parameter is enabled).</p>
@@ -729,7 +729,7 @@ read <a href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-w
 <p>Run <code>projector.exe</code> file.</p>
 <h4 id="linux">Linux<a class="headerlink" href="#linux" title="Permanent link">&para;</a></h4>
 <p>Run <code>projector</code> file.</p>
-<h4 id="mac-darwin">Mac (darwin)<a class="headerlink" href="#mac-darwin" title="Permanent link">&para;</a></h4>
+<h4 id="mac-darwin">Mac (Darwin)<a class="headerlink" href="#mac-darwin" title="Permanent link">&para;</a></h4>
 <p>Run <code>projector</code> app (on other OSes it's visible like <code>projector.app</code> dir).</p>
 <p>We publish <strong>signed notarized</strong> and <strong>unsigned</strong> version of the app. If you want to run the app <strong>easily</strong>, please use the <strong>signed notarized</strong> version.</p>
 <p>If you want to try the unsigned version, Mac doesn't allow unsigned apps to be run easily, and will ask you to put the app to Trash Bin. So you need to select <a href="https://stackoverflow.com/a/59899342">"Open Anyway" in System Preferences</a> to allow launching. We believe the only advantage of the unsigned version is that it's available right away after the new release, and we need some more time to publish the signed notarized version.</p>
