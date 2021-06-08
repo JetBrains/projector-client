@@ -85,7 +85,7 @@ class NoMessagesFromServerTest {
         clientLoadNotifier.send(Unit)
 
         while (true) {
-          receiver()
+          receiver() ?: break
         }
       }
     )
@@ -112,7 +112,7 @@ class NoMessagesFromServerTest {
       clientLoadNotifier.send(Unit)
 
       while (true) {
-        receiver()
+        receiver() ?: break
       }
     }
     server.start()
@@ -146,7 +146,7 @@ class NoMessagesFromServerTest {
         clientLoadNotifier.send(Unit)
 
         while (true) {
-          val events = receiver()
+          val events = receiver() ?: break
           if (canAnswerPing) {
             events.forEach {
               if (it is ClientRequestPingEvent) {

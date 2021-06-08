@@ -96,7 +96,8 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
         while (true) {
           val list = mutableListOf<Any>()
 
-          val events = receiver()
+          val events = receiver() ?: break
+
           events.forEach {
             when (it) {
               is ClientKeyPressEvent -> list.add(it.toAwtKeyEvent(0, JLabel()))
