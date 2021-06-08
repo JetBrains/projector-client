@@ -40,7 +40,7 @@ actual object ParamsProvider {
 
   private fun getCurrentPort(): String {
     val port = window.location.port
-    return if (port.isNullOrEmpty()) protocolPort() else port
+    return if (port.isEmpty()) protocolPort() else port
   }
 
   private val DEFAULT_HOST = getCurrentHostname()
@@ -95,11 +95,11 @@ actual object ParamsProvider {
 
   init {
     with(URL(window.location.href)) {
-      ENABLE_RELAY = searchParams.has("enableRelay")
+      SERVER_ID = searchParams.get("serverId")
+      ENABLE_RELAY = SERVER_ID != null
       CLIPPING_BORDERS = searchParams.has("clipping")
       HOST = searchParams.get("host") ?: DEFAULT_HOST
       PORT = searchParams.get("port") ?: if (ENABLE_RELAY) protocolPort() else DEFAULT_PORT
-      SERVER_ID = searchParams.get("serverId")
       LOG_UNSUPPORTED_EVENTS = searchParams.has("logUnsupportedEvents")
       DOUBLE_BUFFERING = searchParams.has("doubleBuffering")
       ENABLE_COMPRESSION = searchParams.has("enableCompression")

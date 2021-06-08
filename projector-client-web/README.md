@@ -66,8 +66,7 @@ Name | Type | Default value | Description
 `repaintInterval` | Int | `333` | Set interval of repainting that is needed to paint loaded images in ms.
 `cacheSize` | Int | `5M` | Set size of cache for images in Chars.
 `blockClosing` | Boolean | `true` | Enable blocking of accidental closing of the web page
-`enableRelay` | Presence | Not present | Establish connection to Projector server via relay. The address of relay server should be passed via `host` parameter. 
-`serverId` | String? | Not present | Identifier of Projector server to connect to, when relay is used.  
+`serverId` | String? | Not present | Identifier of Projector server to connect to for relay connection. Warning: Static files must be accessed via https when relay is used.    
 
 ## Shortcuts
 - `Ctrl + F10` prints statistics to the browser console. Example:  
