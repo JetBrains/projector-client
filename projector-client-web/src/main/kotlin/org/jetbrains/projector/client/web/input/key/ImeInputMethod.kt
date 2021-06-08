@@ -99,6 +99,10 @@ class ImeInputMethod(
       }
     }
 
+    onclick = {
+      it.stopPropagation()
+    }
+
     document.body!!.appendChild(this)
   }
 

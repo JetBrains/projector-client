@@ -37,6 +37,8 @@ import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientMouseEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientRawKeyEvent
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
 import org.jetbrains.projector.server.core.convert.toAwt.toAwtKeyEvent
@@ -47,14 +49,13 @@ import javax.swing.JLabel
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 @Ignore
 abstract class AbstractKeyboardTest(private val inputMethod: String) {
 
   private companion object {
 
-    private fun testWithReadableException(events: List<KeyEvent>, tests: (events: List<KeyEvent>) -> Unit) {
+    private fun testWithReadableException(events: List<Any>, tests: (events: List<Any>) -> Unit) {
       try {
         tests(events)
       }
@@ -64,8 +65,8 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
       }
     }
 
-    private fun checkEvent(actual: KeyEvent?, id: Int, keyCode: Int, keyChar: Char, keyLocation: Int?, modifiersEx: Int) {
-      assertNotNull(actual)
+    private fun checkEvent(actual: Any?, id: Int, keyCode: Int, keyChar: Char, keyLocation: Int?, modifiersEx: Int) {
+      check(actual is KeyEvent)  // todo: replace with assertIsType
       assertEquals(id, actual.id)
       assertEquals(keyCode, actual.keyCode)
       // keyText is generated from keyCode so no need to compare it
@@ -77,13 +78,13 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
       }
     }
 
-    private fun createServerAndReceiveKeyEvents(keyEvents: Channel<List<KeyEvent>>): ApplicationEngine {
+    private fun createServerAndReceiveKeyEvents(keyEvents: Channel<List<Any>>): ApplicationEngine {
       return startServerAndDoHandshake { (sender, receiver) ->
         val window = WindowData(
           id = 1,
           isShowing = true,
           zOrder = 0,
-          bounds = CommonRectangle(10.0, 10.0, 100.0, 100.0),
+          bounds = CommonRectangle(0.0, 0.0, 100.0, 100.0),
           resizable = true,
           modal = false,
           undecorated = false,
@@ -93,13 +94,15 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
         sender(listOf(ServerWindowSetChangedEvent(listOf(window))))
 
         while (true) {
-          val list = mutableListOf<KeyEvent>()
+          val list = mutableListOf<Any>()
 
           val events = receiver()
           events.forEach {
             when (it) {
               is ClientKeyPressEvent -> list.add(it.toAwtKeyEvent(0, JLabel()))
               is ClientKeyEvent -> list.add(it.toAwtKeyEvent(0, JLabel()))
+              is ClientRawKeyEvent -> list.add(it.toAwtKeyEvent(0, JLabel()))
+              is ClientMouseEvent -> list.add(it)  // check that no mouse events are generated when typing
               else -> Unit
             }
           }
@@ -128,9 +131,9 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     expectedEvents: Int? = null,  // todo: get rid of expectedEvents and tester, pass a list with expected events
     f: Keys? = null,
     esc: Boolean = false,
-    tester: (events: List<KeyEvent>) -> Unit,
+    tester: (events: List<Any>) -> Unit,
   ) {
-    val keyEvents = Channel<List<KeyEvent>>()
+    val keyEvents = Channel<List<Any>>()
 
     val server = createServerAndReceiveKeyEvents(keyEvents)
     server.start()

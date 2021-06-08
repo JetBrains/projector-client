@@ -156,6 +156,10 @@ class MobileInputMethod(
       }
     }
 
+    onclick = {
+      it.stopPropagation()
+    }
+
     document.body!!.appendChild(this)
   }
 
