@@ -21,14 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.intTest
+package org.jetbrains.projector.intTest.keyboard
 
 import com.codeborne.selenide.Condition.appear
 import com.codeborne.selenide.Selenide.element
 import com.codeborne.selenide.Selenide.open
 import io.ktor.server.engine.ApplicationEngine
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowSetChangedEvent
 import org.jetbrains.projector.common.protocol.toClient.WindowData
@@ -42,17 +44,19 @@ import org.jetbrains.projector.util.logging.loggerFactory
 import org.openqa.selenium.Keys
 import java.awt.event.KeyEvent
 import javax.swing.JLabel
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class ImeKeyboardTest {
+@Ignore
+abstract class AbstractKeyboardTest(private val inputMethod: String) {
 
   private companion object {
 
-    private fun withReadableException(events: List<KeyEvent?>, checks: (events: List<KeyEvent?>) -> Unit) {
+    private fun testWithReadableException(events: List<KeyEvent>, tests: (events: List<KeyEvent>) -> Unit) {
       try {
-        checks(events)
+        tests(events)
       }
       catch (e: AssertionError) {
         val eventsString = events.joinToString(separator = "\n", prefix = "[\n", postfix = "\n]")
@@ -73,7 +77,7 @@ class ImeKeyboardTest {
       }
     }
 
-    private fun createServerAndReceiveKeyEvents(keyEvents: Channel<List<KeyEvent?>>): ApplicationEngine {
+    private fun createServerAndReceiveKeyEvents(keyEvents: Channel<List<KeyEvent>>): ApplicationEngine {
       return startServerAndDoHandshake { (sender, receiver) ->
         val window = WindowData(
           id = 1,
@@ -89,7 +93,7 @@ class ImeKeyboardTest {
         sender(listOf(ServerWindowSetChangedEvent(listOf(window))))
 
         while (true) {
-          val list = mutableListOf<KeyEvent?>()
+          val list = mutableListOf<KeyEvent>()
 
           val events = receiver()
           events.forEach {
@@ -106,31 +110,62 @@ class ImeKeyboardTest {
         }
       }
     }
+  }
 
-    private fun test(vararg keysToSend: CharSequence, tester: (events: List<KeyEvent?>) -> Unit) {
-      val keyEvents = Channel<List<KeyEvent?>>()
+  protected abstract fun input(
+    vararg keysToSend: CharSequence,
+    ctrl: Boolean,
+    shift: Boolean,
+    f: Keys?,
+    esc: Boolean,
+  )
 
-      val server = createServerAndReceiveKeyEvents(keyEvents)
-      server.start()
+  @OptIn(ExperimentalStdlibApi::class)
+  private fun test(
+    vararg keysToSend: CharSequence,
+    ctrl: Boolean = false,
+    shift: Boolean = false,
+    expectedEvents: Int? = null,  // todo: get rid of expectedEvents and tester, pass a list with expected events
+    f: Keys? = null,
+    esc: Boolean = false,
+    tester: (events: List<KeyEvent>) -> Unit,
+  ) {
+    val keyEvents = Channel<List<KeyEvent>>()
 
-      try {
-        open("$clientUrl&inputMethod=ime")
-        element(".window").should(appear)
+    val server = createServerAndReceiveKeyEvents(keyEvents)
+    server.start()
 
-        element("body").sendKeys(*keysToSend)
+    try {
+      open("$clientUrl&inputMethod=$inputMethod")
+      element(".window").should(appear)
 
-        val events = runBlocking { keyEvents.receive() }
+      input(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
 
-        withReadableException(events, tester)
+      val events = runBlocking {
+        buildList {
+          try {
+            withTimeout(5_000L) {
+              do {
+                addAll(keyEvents.receive())
+              }
+              while (expectedEvents?.let { it > this@buildList.size } == true)
+            }
+          }
+          catch (e: TimeoutCancellationException) {
+            println("warning: Timeout exceeded but not all events are received!")
+          }
+        }
       }
-      finally {
-        server.stop(500, 1000)
-      }
+
+      testWithReadableException(events, tester)
+    }
+    finally {
+      server.stop(500, 1000)
     }
   }
 
   @Test
-  fun testSimpleSymbol() = test("h") {
+  open fun testSimpleSymbol() = test("h") {
     // expected (tested "h" press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='h',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='h',keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
@@ -143,7 +178,7 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testShiftedSimpleSymbol() = test("H") {
+  open fun testShiftedSimpleSymbol() = test("h", shift = true, expectedEvents = 5) {
     // expected (tested "H" press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
@@ -161,7 +196,25 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testTab() = test(Keys.TAB) {
+  open fun testAlreadyShiftedSimpleSymbol() = test("H") {
+    // expected (tested "H" press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
+
+    assertEquals(5, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT,
+               -64)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
+    checkEvent(it[1], KeyEvent.KEY_PRESSED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
+    checkEvent(it[2], KeyEvent.KEY_TYPED, 0, 'H', KeyEvent.KEY_LOCATION_UNKNOWN, 64)
+    checkEvent(it[3], KeyEvent.KEY_RELEASED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
+    checkEvent(it[4], KeyEvent.KEY_RELEASED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 0)
+  }
+
+  @Test
+  open fun testTab() = test(Keys.TAB) {
     // expected (tested TAB press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=9,keyText=Tab,keyChar=Tab,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Tab,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
@@ -174,7 +227,7 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testEnter() = test(Keys.ENTER) {  // test ENTER
+  open fun testEnter() = test(Keys.ENTER) {  // test ENTER
     // expected (tested Enter press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=10,keyText=Enter,keyChar=Enter,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Enter,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
@@ -187,7 +240,7 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testBackspace() = test(Keys.BACK_SPACE) {
+  open fun testBackspace() = test(Keys.BACK_SPACE) {
     // expected (tested Backspace press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=8,keyText=Backspace,keyChar=Backspace,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Backspace,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
@@ -200,7 +253,7 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testSpace() = test(Keys.SPACE) {
+  open fun testSpace() = test(Keys.SPACE) {
     // expected (tested Space press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=32,keyText=Space,keyChar=' ',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=' ',keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
@@ -213,7 +266,33 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testCtrlLetter() = test(Keys.chord(Keys.CONTROL, "z")) {
+  open fun testEscape() = test(esc = true) {
+    // expected (tested Space press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=27,keyText=Escape,keyChar=Escape,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Escape,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=27,keyText=Escape,keyChar=Escape,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 27, '\u001b', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\u001b', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 27, '\u001b', KeyEvent.KEY_LOCATION_STANDARD, 0)
+  }
+
+  @Test
+  open fun testDelete() = test(Keys.DELETE) {
+    // expected (tested Space press in a headful app):
+    // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=127,keyText=Delete,keyChar=Delete,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Delete,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=127,keyText=Delete,keyChar=Delete,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+
+    assertEquals(3, it.size)
+    checkEvent(it[0], KeyEvent.KEY_PRESSED, 127, '\u007f', KeyEvent.KEY_LOCATION_STANDARD, 0)
+    checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\u007f', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
+    checkEvent(it[2], KeyEvent.KEY_RELEASED, 127, '\u007f', KeyEvent.KEY_LOCATION_STANDARD, 0)
+  }
+
+  @Test
+  open fun testCtrlLetter() = test("z", ctrl = true, expectedEvents = 5) {
     // expected (tested Ctrl+Z press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
     //java.awt.event.KeyEvent[KEY_PRESSED,keyCode=90,keyText=Z,keyChar='',modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
@@ -230,7 +309,7 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testFunctionalKey() = test(Keys.F6) {
+  open fun testFunctionalKey() = test(f = Keys.F6) {
     // expected (tested F6 press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
@@ -241,7 +320,7 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testShiftedFunctionalKey() = test(Keys.chord(Keys.SHIFT, Keys.F6)) {
+  open fun testShiftedFunctionalKey() = test(f = Keys.F6, shift = true, expectedEvents = 4) {
     // expected (tested Shift+F6 press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
@@ -256,7 +335,7 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testCtrlShiftedLetter() = test(Keys.chord(Keys.CONTROL, Keys.SHIFT, "k")) {
+  open fun testCtrlShiftedLetter() = test("k", ctrl = true, shift = true, expectedEvents = 7) {
     // expected (tested Ctrl+Shift+K press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Ctrl+Shift,extModifiers=Ctrl+Shift,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 192
@@ -278,7 +357,7 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testArrow() = test(Keys.ARROW_RIGHT) {
+  open fun testArrow() = test(Keys.ARROW_RIGHT) {
     // expected (tested Right Arrow press in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=39,keyText=Right,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=39,keyText=Right,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
@@ -289,11 +368,11 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testNumpadWithNumLock() = test(Keys.NUMPAD5) {
+  open fun testNumpadWithNumLock() = test(Keys.NUMPAD5) {
     // expected (tested NUMPAD5+numlock (5) press on virtual keyboard in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=101,keyText=NumPad-5,keyChar='5',modifiers=Button1,extModifiers=Button1,keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
-    //java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='5',modifiers=Button1,extModifiers=Button1,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
-    //java.awt.event.KeyEvent[KEY_RELEASED,keyCode=101,keyText=NumPad-5,keyChar='5',keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='5',modifiers=Button1,extModifiers=Button1,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
+    // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=101,keyText=NumPad-5,keyChar='5',keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
 
     // todo: change key location from null to KeyEvent.KEY_LOCATION_NUMPAD when there is a chance to run this test on a pc with numpad.
     //       On a laptop without numpad, the browser sends standard location. If it sends the same even with numpad, we need to fix it
@@ -305,7 +384,7 @@ class ImeKeyboardTest {
   }
 
   @Test
-  fun testNumpadWithoutNumLock() = test("\uE057") {  // Numpad Home code point: https://www.w3.org/TR/webdriver
+  open fun testNumpadWithoutNumLock() = test("\uE057") {  // Numpad Home code point: https://www.w3.org/TR/webdriver
     // expected (tested NUMPAD7-numlock (home) press on virtual keyboard in a headful app):
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=36,keyText=Home,keyChar=Undefined keyChar,modifiers=Button1,extModifiers=Button1,keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=36,keyText=Home,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_NUMPAD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0

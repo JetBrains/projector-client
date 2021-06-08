@@ -1,0 +1,68 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019-2021 JetBrains s.r.o.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.jetbrains.projector.intTest.keyboard
+
+import com.codeborne.selenide.Selenide.element
+import org.openqa.selenium.Keys
+import kotlin.test.Ignore
+import kotlin.test.Test
+
+class MobileKeyboardTest : AbstractKeyboardTest("mobile") {
+
+  override fun input(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
+    element("#toggleInput").click()
+    if (ctrl) {
+      element("#toggleCtrl").click()
+    }
+    if (shift) {
+      element("#toggleShift").click()
+    }
+
+    if (keysToSend.isNotEmpty()) {
+      element("body").sendKeys(*keysToSend)
+    }
+
+    if (esc) {
+      element("#pressEsc").click()
+    }
+    if (f != null) {
+      val fId = f.ordinal - Keys.F1.ordinal + 1
+      element("#toggleFunctionalKeys").click()
+      element("#pressF$fId").click()
+    }
+
+    if (shift) {
+      element("#toggleShift").click()
+    }
+    if (ctrl) {
+      element("#toggleCtrl").click()
+    }
+  }
+
+  @Test
+  @Ignore("need to somehow determine on the client that exactly numpad5 is sent, not plain5")
+  override fun testNumpadWithNumLock() {
+    // todo
+  }
+}
