@@ -54,7 +54,7 @@ class Application {
     val host = ParamsProvider.HOST
     val port = ":${ParamsProvider.PORT}"
     val path = when (ParamsProvider.ENABLE_RELAY) {
-      true -> "/connect/${ParamsProvider.SERVER_ID}/${generateKey()}"
+      true -> "/connect/${ParamsProvider.RELAY_SERVER_ID}/${generateKey()}"
       false -> ""
     }
 
