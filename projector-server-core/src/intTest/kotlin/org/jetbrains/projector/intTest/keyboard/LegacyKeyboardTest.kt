@@ -23,13 +23,11 @@
  */
 package org.jetbrains.projector.intTest.keyboard
 
-import com.codeborne.selenide.Selenide.element
 import org.openqa.selenium.Keys
 
 class LegacyKeyboardTest : AbstractKeyboardTest("legacy") {
 
   override fun input(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
-    val keys = toSeleniumKeys(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
-    element("body").sendKeys(keys)
+    inputOnDesktop(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
   }
 }

@@ -23,11 +23,38 @@
  */
 package org.jetbrains.projector.intTest.keyboard
 
+import com.codeborne.selenide.Selenide.element
 import org.openqa.selenium.Keys
 
-class ImeKeyboardTest : AbstractKeyboardTest("ime") {
+fun activateMobileKeyboard() {
+  element("#toggleInput").click()
+}
 
-  override fun input(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
-    inputOnDesktop(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
+fun inputWithMobileButtons(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
+  if (ctrl) {
+    element("#toggleCtrl").click()
+  }
+  if (shift) {
+    element("#toggleShift").click()
+  }
+
+  if (keysToSend.isNotEmpty()) {
+    element("body").sendKeys(*keysToSend)
+  }
+
+  if (esc) {
+    element("#pressEsc").click()
+  }
+  if (f != null) {
+    val fId = f.ordinal - Keys.F1.ordinal + 1
+    element("#toggleFunctionalKeys").click()
+    element("#pressF$fId").click()
+  }
+
+  if (shift) {
+    element("#toggleShift").click()
+  }
+  if (ctrl) {
+    element("#toggleCtrl").click()
   }
 }

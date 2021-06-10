@@ -25,9 +25,9 @@ package org.jetbrains.projector.intTest.keyboard
 
 import org.openqa.selenium.Keys
 
-class ImeKeyboardTest : AbstractKeyboardTest("ime") {
+class MobileOnlyButtonsKeyboardTest : AbstractKeyboardTest("mobileOnlyButtons") {
 
   override fun input(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
-    inputOnDesktop(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
+    inputWithMobileButtons(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
   }
 }
