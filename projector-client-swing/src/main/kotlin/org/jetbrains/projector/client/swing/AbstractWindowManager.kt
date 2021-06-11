@@ -46,7 +46,7 @@ abstract class AbstractWindowManager<FrameType> {
 
     frameData.surfaceSizeScale = getScalingForWindow(frameData)
     frameData.surface.setBounds((it.bounds.width * frameData.surfaceSizeScale).toInt(), (it.bounds.height * frameData.surfaceSizeScale).toInt())
-    frameData.surface.scalingRatio = frameData.surfaceSizeScale
+    frameData.surface.scalingRatio = 1.0 // transforms sent from remote already contain the required scale factor
   }
 
   fun getFrameData(windowId: Int) = currentWindows[windowId]
