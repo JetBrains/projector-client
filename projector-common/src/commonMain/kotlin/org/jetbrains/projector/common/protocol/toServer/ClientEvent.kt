@@ -25,6 +25,7 @@ package org.jetbrains.projector.common.protocol.toServer
 
 import kotlinx.serialization.Serializable
 import org.jetbrains.projector.common.protocol.data.*
+import org.jetbrains.projector.common.protocol.handshake.DisplayDescription
 
 enum class ResizeDirection {
   NW,
@@ -196,6 +197,11 @@ data class ClientWindowResizeEvent(
 data class ClientWindowSetBoundsEvent(
   val windowId: Int,
   val bounds: CommonIntRectangle
+) : ClientEvent()
+
+@Serializable
+data class ClientDisplaySetChangeEvent(
+  val newDisplays: List<DisplayDescription>
 ) : ClientEvent()
 
 @Serializable

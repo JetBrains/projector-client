@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 package org.jetbrains.projector.client.swing
 
 import kotlinx.coroutines.GlobalScope
@@ -36,7 +37,10 @@ import org.jetbrains.projector.client.common.protocol.SerializationToServerMessa
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.handshake.*
 import org.jetbrains.projector.common.protocol.toClient.*
+import org.jetbrains.projector.common.protocol.toServer.ClientDisplaySetChangeEvent
 import org.jetbrains.projector.util.logging.Logger
+import sun.awt.DisplayChangedListener
+import sun.java2d.SunGraphicsEnvironment
 import java.awt.GraphicsEnvironment
 import java.util.*
 import javax.swing.SwingUtilities
@@ -58,6 +62,23 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
         timer.stop()
       }
     }
+
+    val displayListener = object: DisplayChangedListener {
+      override fun displayChanged() = sendDisplayChangeEvent()
+      override fun paletteChanged() = sendDisplayChangeEvent()
+    }
+
+    val sunGraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment() as? SunGraphicsEnvironment
+    sunGraphicsEnvironment?.addDisplayChangedListener(displayListener)
+    transport.onClosed.handle { _, _ ->
+      SwingUtilities.invokeLater {
+        sunGraphicsEnvironment?.removeDisplayChangedListener(displayListener)
+      }
+    }
+  }
+
+  fun sendDisplayChangeEvent() {
+    transport.send(ClientDisplaySetChangeEvent(produceDisplayList()))
   }
 
   fun processEvent(serverEvent: ServerEvent) {
@@ -91,11 +112,7 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
 
     transport.onOpen.await()
 
-    val allScreens = GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices.map {
-      with(it.defaultConfiguration.bounds) {
-        DisplayDescription(x, y, width, height, it.defaultConfiguration.defaultTransform.scaleX)
-      }
-    }
+    val allScreens = produceDisplayList()
 
     val handshake = ToServerHandshakeEvent(
       commonVersion = COMMON_VERSION,
@@ -143,6 +160,16 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
           processEvent(it)
         }
       }
+    }
+
+    SwingUtilities.invokeLater {
+      windowManager.windowSetUpdated(ServerWindowSetChangedEvent())
+    }
+  }
+
+  private fun produceDisplayList() = GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices.map {
+    with(it.defaultConfiguration.bounds) {
+      DisplayDescription(x, y, width, height, it.defaultConfiguration.defaultTransform.scaleX)
     }
   }
 }
