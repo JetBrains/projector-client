@@ -44,9 +44,7 @@ class WindowManager(private val stateMachine: ClientStateMachine) : Iterable<Win
   fun getTopWindow(x: Int, y: Int): Window? = windows.values.filter { it.isShowing && it.contains(x, y) }.maxByOrNull { it.zIndex }
 
   fun getOrCreate(windowData: WindowData): Window {
-    val window = windows[windowData.id] ?: Window(windowData, stateMachine)
-    windows[windowData.id] = window
-    return window
+    return windows.getOrPut(windowData.id) { Window(windowData, stateMachine) }
   }
 
   fun cleanup(presentedWindowIds: Set<Int>) {
