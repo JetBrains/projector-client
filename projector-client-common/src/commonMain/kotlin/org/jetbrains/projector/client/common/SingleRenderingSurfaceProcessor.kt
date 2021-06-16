@@ -44,18 +44,24 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
   fun process(drawEvents: ArrayDeque<DrawEvent>) {
     stateSaver.restoreIfNeeded()
 
-    var removing = true
+    var firstUnsuccessful: Int? = null
 
-    drawEvents.removeAll { drawEvent ->
+    drawEvents.forEachIndexed { index, drawEvent ->
       val drawIsSuccessful = handleDrawEvent(drawEvent)
 
-      if (!drawIsSuccessful && removing) {
+      if (!drawIsSuccessful && firstUnsuccessful == null) {
         stateSaver.save()
-
-        removing = false
+        firstUnsuccessful = index
       }
+    }
 
-      removing
+    if (firstUnsuccessful == null) {
+      drawEvents.clear()
+    }
+    else {
+      repeat(firstUnsuccessful!!) {
+        drawEvents.removeFirst()
+      }
     }
   }
 
