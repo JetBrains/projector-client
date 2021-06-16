@@ -98,12 +98,15 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
         is ServerDrawCommandsEvent.Target.Offscreen -> {
           val offscreenProcessor = ImageCacher.getOffscreenProcessor(target)
 
-          // todo: don't create this deque every time
           val drawEvents = ArrayDeque<DrawEvent>().apply { addAll(event.drawEvents.shrinkByPaintEvents()) }
 
-          offscreenProcessor.process(drawEvents)
+          val firstUnsuccessful = offscreenProcessor.processNew(drawEvents)
+          if (firstUnsuccessful != null) {
+            // todo: don't create deque every time but remember unsuccessful events and redraw pending ones as for windows
+            logger.error { "Encountered unsuccessful drawing for an offscreen surface ${target.pVolatileImageId}, skipping" }
+          }
 
-          windowDataEventsProcessor.redrawWindows()
+          windowDataEventsProcessor.drawPendingEvents()
         }
       }
     }

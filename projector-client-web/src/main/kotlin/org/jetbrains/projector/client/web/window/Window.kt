@@ -52,8 +52,8 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   val id = windowData.id
 
-  @OptIn(ExperimentalStdlibApi::class)
-  val drawEvents = ArrayDeque<DrawEvent>()
+  val pendingDrawEvents = ArrayDeque<DrawEvent>()
+  val newDrawEvents = ArrayDeque<DrawEvent>()
 
   var title: String? = null
     set(value) {
@@ -254,11 +254,26 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     header?.dispose()
   }
 
-  @OptIn(ExperimentalStdlibApi::class)
-  fun drawBufferedEvents() {
-    commandProcessor.process(drawEvents)
+  fun drawPendingEvents() {
+    commandProcessor.processPending(pendingDrawEvents)
     renderingSurface.flush()
-    header?.draw()
+    header?.draw()  // todo: do we need to draw it every time?
+  }
+
+  fun drawNewEvents() {
+    val firstUnsuccessful = commandProcessor.processNew(newDrawEvents)
+    renderingSurface.flush()
+    header?.draw()  // todo: do we need to draw it every time?
+
+    if (firstUnsuccessful != null) {
+      if (pendingDrawEvents.isEmpty()) {
+        pendingDrawEvents.addAll(newDrawEvents.subList(firstUnsuccessful, newDrawEvents.lastIndex))
+      }
+      else {
+        pendingDrawEvents.addAll(newDrawEvents)
+      }
+    }
+    newDrawEvents.clear()
   }
 
   companion object {

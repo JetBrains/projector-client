@@ -331,10 +331,10 @@ sealed class ClientState {
 
     private val windowDataEventsProcessor = WindowDataEventsProcessor(windowManager)
 
-    private var redrawWindows = GlobalScope.launch {
+    private var drawPendingEvents = GlobalScope.launch {
       // redraw windows in case any missing images are loaded now
       while (true) {
-        windowDataEventsProcessor.redrawWindows()
+        windowDataEventsProcessor.drawPendingEvents()
         delay(ParamsProvider.REPAINT_INTERVAL_MS.toLong())
       }
     }
@@ -521,7 +521,7 @@ sealed class ClientState {
           is ClientAction.WebSocket.Close.FinishNormal -> {
             logger.info { "Connection is closed..." }
 
-            redrawWindows.cancel()
+            drawPendingEvents.cancel()
             pingStatistics.onClose()
             windowDataEventsProcessor.onClose()
             inputController.removeListeners()
@@ -550,7 +550,7 @@ sealed class ClientState {
     private fun reloadConnection(messageText: String): ClientState {
       logger.info { messageText }
 
-      redrawWindows.cancel()
+      drawPendingEvents.cancel()
       pingStatistics.onClose()
       inputController.removeListeners()
       windowSizeController.removeListener()

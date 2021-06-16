@@ -40,10 +40,22 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
 
   private val stateSaver = StateSaver(renderer, renderingSurface)
 
-  @OptIn(ExperimentalStdlibApi::class)
-  fun process(drawEvents: ArrayDeque<DrawEvent>) {
+  fun processPending(drawEvents: ArrayDeque<DrawEvent>) {
     stateSaver.restoreIfNeeded()
 
+    val firstUnsuccessful = processNew(drawEvents)
+
+    if (firstUnsuccessful == null) {
+      drawEvents.clear()
+    }
+    else {
+      repeat(firstUnsuccessful) {
+        drawEvents.removeFirst()
+      }
+    }
+  }
+
+  fun processNew(drawEvents: ArrayDeque<DrawEvent>): Int? {
     var firstUnsuccessful: Int? = null
 
     drawEvents.forEachIndexed { index, drawEvent ->
@@ -55,14 +67,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
       }
     }
 
-    if (firstUnsuccessful == null) {
-      drawEvents.clear()
-    }
-    else {
-      repeat(firstUnsuccessful!!) {
-        drawEvents.removeFirst()
-      }
-    }
+    return firstUnsuccessful
   }
 
   private fun handleDrawEvent(command: DrawEvent): Boolean {

@@ -43,10 +43,9 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
 
   private var excludedWindowIds = emptyList<Int>()
 
-  @OptIn(ExperimentalStdlibApi::class)
-  fun redrawWindows() {
+  fun drawPendingEvents() {
     synchronized(windowManager) {
-      windowManager.forEach(Window::drawBufferedEvents)
+      windowManager.forEach(Window::drawPendingEvents)
     }
   }
 
@@ -120,7 +119,6 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
     document.head!!.appendChild(link)
   }
 
-  @OptIn(ExperimentalStdlibApi::class)
   fun draw(windowId: Int, commands: List<ServerWindowEvent>) {
     if (windowId in excludedWindowIds) {
       return
@@ -137,8 +135,8 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
       val newEvents = commands.shrinkByPaintEvents()
 
       if (newEvents.isNotEmpty()) {
-        window.drawEvents.addAll(newEvents)
-        window.drawBufferedEvents()
+        window.newDrawEvents.addAll(newEvents)
+        window.drawNewEvents()
       }
     }
   }
