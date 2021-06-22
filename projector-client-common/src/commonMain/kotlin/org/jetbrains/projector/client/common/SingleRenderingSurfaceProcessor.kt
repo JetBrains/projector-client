@@ -237,16 +237,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
     fun restoreIfNeeded() {
       lastSuccessfulState?.let {
         renderer.drawImageRaw(it.image)
-
-        it.renderingState.let {
-          renderer.requestedState.apply {
-            identitySpaceClip = it.identitySpaceClip
-            transform = it.transform
-            strokeData = it.strokeData
-            font = it.font
-            paint = it.paint
-          }
-        }
+        renderer.requestedState.setTo(it.renderingState)
 
         lastSuccessfulState = null
       }

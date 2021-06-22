@@ -624,6 +624,17 @@ class Renderer(private val renderingSurface: RenderingSurface) {
       var rule: AlphaCompositeRule = AlphaCompositeRule.SRC_OVER,
       var alpha: Double = 1.0,
       var paint: PaintColor? = SolidColor(Defaults.FOREGROUND_COLOR_ARGB),
-    )
+    ) {
+
+      fun setTo(other: RequestedRenderingState) {
+        identitySpaceClip = other.identitySpaceClip
+        transform = other.transform
+        strokeData = other.strokeData
+        font = other.font
+        rule = other.rule
+        alpha = other.alpha
+        paint = other.paint
+      }
+    }
   }
 }
