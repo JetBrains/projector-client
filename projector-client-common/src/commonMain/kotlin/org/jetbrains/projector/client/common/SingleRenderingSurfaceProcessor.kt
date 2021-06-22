@@ -55,7 +55,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
     }
   }
 
-  fun processNew(drawEvents: ArrayDeque<DrawEvent>): Int? {
+  fun processNew(drawEvents: Iterable<DrawEvent>): Int? {
     var firstUnsuccessful: Int? = null
 
     drawEvents.forEachIndexed { index, drawEvent ->

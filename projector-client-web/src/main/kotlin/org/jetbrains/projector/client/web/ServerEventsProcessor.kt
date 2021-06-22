@@ -24,7 +24,6 @@
 package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
-import org.jetbrains.projector.client.common.DrawEvent
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
@@ -98,11 +97,11 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
         is ServerDrawCommandsEvent.Target.Offscreen -> {
           val offscreenProcessor = ImageCacher.getOffscreenProcessor(target)
 
-          val drawEvents = ArrayDeque<DrawEvent>().apply { addAll(event.drawEvents.shrinkByPaintEvents()) }
+          val drawEvents = event.drawEvents.shrinkByPaintEvents()
 
           val firstUnsuccessful = offscreenProcessor.processNew(drawEvents)
           if (firstUnsuccessful != null) {
-            // todo: don't create deque every time but remember unsuccessful events and redraw pending ones as for windows
+            // todo: remember unsuccessful events and redraw pending ones as for windows
             logger.error { "Encountered unsuccessful drawing for an offscreen surface ${target.pVolatileImageId}, skipping" }
           }
 
