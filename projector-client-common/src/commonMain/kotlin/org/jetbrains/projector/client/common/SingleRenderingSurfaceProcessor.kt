@@ -62,7 +62,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
       val drawIsSuccessful = handleDrawEvent(drawEvent)
 
       if (!drawIsSuccessful && firstUnsuccessful == null) {
-        stateSaver.save()
+        stateSaver.saveIfNeeded()
         firstUnsuccessful = index
       }
     }
@@ -223,7 +223,11 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
 
     private var lastSuccessfulState: LastSuccessfulState? = null
 
-    fun save() {
+    fun saveIfNeeded() {
+      if (lastSuccessfulState != null) {
+        return
+      }
+
       lastSuccessfulState = LastSuccessfulState(
         renderingState = renderer.requestedState.copy(),
         image = renderingSurface.canvas.takeSnapshot()
