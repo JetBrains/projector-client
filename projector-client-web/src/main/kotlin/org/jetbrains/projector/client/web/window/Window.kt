@@ -255,8 +255,10 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   }
 
   fun drawPendingEvents() {
-    commandProcessor.processPending(pendingDrawEvents)
-    renderingSurface.flush()
+    if (pendingDrawEvents.isNotEmpty()) {
+      commandProcessor.processPending(pendingDrawEvents)
+      renderingSurface.flush()
+    }
     header?.draw()  // todo: do we need to draw it every time?
   }
 
