@@ -267,7 +267,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
     if (firstUnsuccessful != null) {
       if (pendingDrawEvents.isEmpty()) {
-        pendingDrawEvents.addAll(newDrawEvents.subList(firstUnsuccessful, newDrawEvents.lastIndex))
+        pendingDrawEvents.addAll(newDrawEvents.subList(firstUnsuccessful, newDrawEvents.size))
       }
       else {
         pendingDrawEvents.addAll(newDrawEvents)
