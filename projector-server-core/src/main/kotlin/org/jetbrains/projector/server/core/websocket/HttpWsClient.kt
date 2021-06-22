@@ -67,7 +67,6 @@ public abstract class HttpWsClient(
       }
 
     override fun onOpen(handshakedata: ServerHandshake?) {
-      onStart()
 
       lock.withLock {
         wasInitialized = true

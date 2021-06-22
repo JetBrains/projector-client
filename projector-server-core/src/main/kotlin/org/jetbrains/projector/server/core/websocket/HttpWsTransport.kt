@@ -32,7 +32,6 @@ public interface HttpWsTransport {
   public fun stop(timeout: Int = 0)
   public fun forEachOpenedConnection(action: (client: WebSocket) -> Unit)
 
-  public fun onStart()
   public fun onError(connection: WebSocket?, e: Exception)
   public fun onWsOpen(connection: WebSocket)
   public fun onWsClose(connection: WebSocket)
