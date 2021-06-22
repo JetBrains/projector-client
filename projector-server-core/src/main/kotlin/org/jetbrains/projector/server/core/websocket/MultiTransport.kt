@@ -38,8 +38,6 @@ public class MultiTransport(private val transports: List<HttpWsTransport>) : Htt
     transports.forEach { it.forEachOpenedConnection(action) }
   }
 
-  override fun onStart(): Unit = transports.forEach { it.onStart() }
-
   override fun onError(connection: WebSocket?, e: Exception): Unit = transports.forEach { it.onError(connection, e) }
 
   override fun onWsOpen(connection: WebSocket): Unit = transports.forEach { it.onWsOpen((connection)) }

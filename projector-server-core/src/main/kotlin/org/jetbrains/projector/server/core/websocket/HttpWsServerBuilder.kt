@@ -40,10 +40,6 @@ public class HttpWsServerBuilder(private val host: InetAddress, private val port
         return this@HttpWsServerBuilder.getMainWindows()
       }
 
-      override fun onStart() {
-        this@HttpWsServerBuilder.onStart()
-      }
-
       override fun onError(connection: WebSocket?, e: Exception) {
         this@HttpWsServerBuilder.onError(connection, e)
       }

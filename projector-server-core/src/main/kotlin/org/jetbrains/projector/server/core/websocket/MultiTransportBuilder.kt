@@ -30,7 +30,6 @@ public class MultiTransportBuilder(private val builders: List<TransportBuilder>)
   }
 
   private fun prepareBuilder(builder: TransportBuilder) = builder.apply {
-    onStart = this@MultiTransportBuilder.onStart
     onError = this@MultiTransportBuilder.onError
     onWsOpen = this@MultiTransportBuilder.onWsOpen
     onWsClose = this@MultiTransportBuilder.onWsClose

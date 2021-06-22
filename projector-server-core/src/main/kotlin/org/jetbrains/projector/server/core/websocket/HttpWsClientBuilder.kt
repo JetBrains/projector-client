@@ -30,9 +30,6 @@ public class HttpWsClientBuilder(private val relayUrl: String, private val serve
 
   override fun build(): HttpWsClient {
     return object : HttpWsClient(relayUrl, serverId) {
-      override fun onStart() {
-        this@HttpWsClientBuilder.onStart()
-      }
 
       override fun onError(connection: WebSocket?, e: Exception) {
         this@HttpWsClientBuilder.onError(connection, e)

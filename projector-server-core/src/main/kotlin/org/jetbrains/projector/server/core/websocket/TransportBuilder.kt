@@ -27,7 +27,6 @@ import org.java_websocket.WebSocket
 import java.nio.ByteBuffer
 
 public abstract class TransportBuilder {
-  public lateinit var onStart: () -> Unit
   public lateinit var onError: (WebSocket?, Exception) -> Unit
   public lateinit var onWsOpen: (connection: WebSocket) -> Unit
   public lateinit var onWsClose: (connection: WebSocket) -> Unit

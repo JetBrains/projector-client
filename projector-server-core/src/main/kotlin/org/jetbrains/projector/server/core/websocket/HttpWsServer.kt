@@ -268,7 +268,6 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) : HttpWsTranspo
 
     override fun onStart() {
       logger.info { "Server started on host $host and port $port" }
-      this@HttpWsServer.onStart()
 
       lock.withLock {
         wasInitialized = true
