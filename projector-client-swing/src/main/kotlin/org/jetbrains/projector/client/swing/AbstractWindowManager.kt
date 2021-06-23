@@ -89,9 +89,9 @@ abstract class AbstractWindowManager<FrameType> {
     }
 
     val newDrawEvents = drawEvents.shrinkByPaintEvents()
-    if (newDrawEvents.isNotEmpty()) {
-      window.drawEvents.addAll(newDrawEvents)
-      window.processor.process(window.drawEvents)
+    window.drawEvents.addAll(newDrawEvents)
+    if (window.drawEvents.isNotEmpty()) {
+      window.processor.processPending(window.drawEvents)
       window.surface.flush()
       redrawWindow(window)
     }

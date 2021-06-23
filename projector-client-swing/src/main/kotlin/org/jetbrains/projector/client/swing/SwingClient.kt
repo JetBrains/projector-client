@@ -41,7 +41,6 @@ import java.awt.GraphicsEnvironment
 import java.util.*
 import javax.swing.SwingUtilities
 import javax.swing.Timer
-import kotlin.collections.ArrayDeque
 
 class SwingClient(val transport: ProjectorTransport, val windowManager: AbstractWindowManager<*>) {
   val logger = Logger<SwingClient>()
@@ -73,8 +72,11 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
           is ServerDrawCommandsEvent.Target.Onscreen -> windowManager.doWindowDraw(target.windowId, serverEvent.drawEvents)
           is ServerDrawCommandsEvent.Target.Offscreen -> {
             val processor = ImageCacher.getOffscreenProcessor(target)
-            val deque = ArrayDeque(serverEvent.drawEvents.shrinkByPaintEvents())
-            processor.process(deque)
+            val newEvents = serverEvent.drawEvents.shrinkByPaintEvents()
+            val firstUnsuccessfulEvent = processor.processNew(newEvents)
+            firstUnsuccessfulEvent?.let {
+              logger.error { "Skipping drawing unsuccessful event for $target" }  // todo: support it
+            }
           }
         }
       }
