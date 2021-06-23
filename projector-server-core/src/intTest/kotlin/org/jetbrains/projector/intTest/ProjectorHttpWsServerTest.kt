@@ -58,8 +58,6 @@ class ProjectorHttpWsServerTest {
 
     private fun createServer() = object : HttpWsServer(PORT) {
 
-      override fun onStart() {}
-
       override fun onError(connection: WebSocket?, e: Exception) {}
 
       override fun onWsOpen(connection: WebSocket) {
