@@ -85,7 +85,7 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
     Do exhaustive when(serverEvent) {
       is ServerImageDataReplyEvent -> ImageCacher.putImageData(serverEvent.imageId, serverEvent.imageData)
       is ServerPingReplyEvent -> logger.debug { "Received and discarded server ping reply event: $serverEvent" }
-      is ServerClipboardEvent -> logger.debug { "Received and discarded server clipboard event: ${serverEvent.stringContent}" }
+      is ServerClipboardEvent -> windowManager.handleClipboardEvent(serverEvent)
       is ServerWindowSetChangedEvent -> windowManager.windowSetUpdated(serverEvent)
       is ServerDrawCommandsEvent -> {
         val target = serverEvent.target
@@ -102,7 +102,7 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
         }
       }
       is ServerCaretInfoChangedEvent -> logger.debug { "Received and discarded caret info event: $serverEvent" }
-      is ServerMarkdownEvent -> logger.debug { "Received and discarded markdown event: $serverEvent" }
+      is ServerMarkdownEvent -> windowManager.handleMarkdownEvent(serverEvent)
       is ServerWindowColorsEvent -> logger.debug { "Received and discarded color event: $serverEvent" }
     }
   }
