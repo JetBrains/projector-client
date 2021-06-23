@@ -267,13 +267,14 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     renderingSurface.flush()
     header?.draw()  // todo: do we need to draw it every time?
 
-    if (firstUnsuccessful != null) {
-      if (pendingDrawEvents.isEmpty()) {
-        pendingDrawEvents.addAll(newDrawEvents.subList(firstUnsuccessful, newDrawEvents.size))
+    if (pendingDrawEvents.isNotEmpty()) {
+      pendingDrawEvents.addAll(newDrawEvents)
+    }
+    else if (firstUnsuccessful != null) {
+      if (pendingDrawEvents.isNotEmpty()) {
+        console.error("Non empty pendingDrawEvents are handled by another branch, aren't they? This branch works only for empty.")
       }
-      else {
-        pendingDrawEvents.addAll(newDrawEvents)
-      }
+      pendingDrawEvents.addAll(newDrawEvents.subList(firstUnsuccessful, newDrawEvents.size))
     }
     newDrawEvents.clear()
   }
