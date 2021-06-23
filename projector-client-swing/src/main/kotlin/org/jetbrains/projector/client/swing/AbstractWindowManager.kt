@@ -97,6 +97,13 @@ abstract class AbstractWindowManager<FrameType> {
     }
   }
 
+  open fun handleClipboardEvent(event: ServerClipboardEvent) {
+    logger.debug { "Received and discarded server clipboard event: ${event.stringContent}" }
+  }
+  open fun handleMarkdownEvent(event: ServerMarkdownEvent) {
+    logger.debug { "Received and discarded markdown event: $event" }
+  }
+
   inner class FrameData(
     val frame: FrameType,
     var windowData: WindowData,
