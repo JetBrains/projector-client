@@ -14,7 +14,7 @@ Please don't forget to specify fields of the ticket (in the top right corner):
 * Subsystem (if you are *not sure*, we have a corresponding item),
 * Affected versions (we use the following formats: `server-vX.Y.Z` for plain Projector server and client, `installer-vX.Y.Z` for projector-installer, `agent-vX.Y.Z` for projector-plugin, `launcher-vX.Y.Z` for Projector Electron App; if multiple items are affected, they can be enumerated separated by a comma with a space).
 
-If you've found the same ticket, please **avoid creating a duplicate**. Better vote (and comment with more info) for the existing! Some tickets have a workaround, so maybe you will get a temporary solution right away.
+If you've found the same ticket, please **avoid creating a duplicate**. Better vote (and comment with more info) for the existing one! Some tickets have a workaround, so maybe you will get a temporary solution right away.
 
 There are some explanations on how we work with YouTrack to make you a bit more comfortable.
 
@@ -35,13 +35,13 @@ Sometimes the fields are not applicable, so we leave them with a default value.
 
 ### Ticket states
 
-Please don't change the state field of a ticket. When we see triage the ticket, we will change its state from `Submitted` to `Open`.
+Please don't change the state field of a ticket. When we triage the ticket, we will change its state from `Submitted` to `Open`.
 
 When we are looking for an answer from a reporter, we will change the state to `Wait for reply`.
 
 Sometimes we place tickets to `Backlog` meaning that the task will be solved without the priority queue, hopefully soon.
 
-When a ticket is marked as gray and stroked, it means it's closed.
+When a ticket is marked as gray and strikethrough, it means it's closed.
 
 ### Ticket activity settings
 
