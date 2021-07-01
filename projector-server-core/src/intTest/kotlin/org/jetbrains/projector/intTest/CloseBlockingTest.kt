@@ -26,6 +26,7 @@ package org.jetbrains.projector.intTest
 import com.codeborne.selenide.Condition.appear
 import com.codeborne.selenide.Condition.text
 import com.codeborne.selenide.Selenide.*
+import com.codeborne.selenide.WebDriverRunner
 import io.ktor.http.cio.websocket.close
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
@@ -35,7 +36,9 @@ import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
-import org.openqa.selenium.NoAlertPresentException
+import org.openqa.selenium.TimeoutException
+import org.openqa.selenium.support.ui.ExpectedConditions
+import org.openqa.selenium.support.ui.WebDriverWait
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -51,10 +54,10 @@ class CloseBlockingTest {
 
     private fun isAlertPresent(): Boolean {
       try {
-        switchTo().alert()
-        return true
+        val wait = WebDriverWait(WebDriverRunner.getWebDriver(), 5)
+        return wait.until(ExpectedConditions.alertIsPresent()) != null
       }
-      catch (e: NoAlertPresentException) {
+      catch (e: TimeoutException) {
         return false
       }
     }
