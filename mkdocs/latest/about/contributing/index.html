@@ -579,7 +579,7 @@
 <li>Subsystem (if you are <em>not sure</em>, we have a corresponding item),</li>
 <li>Affected versions (we use the following formats: <code>server-vX.Y.Z</code> for plain Projector server and client, <code>installer-vX.Y.Z</code> for projector-installer, <code>agent-vX.Y.Z</code> for projector-plugin, <code>launcher-vX.Y.Z</code> for Projector Electron App; if multiple items are affected, they can be enumerated separated by a comma with a space).</li>
 </ul>
-<p>If you've found the same ticket, please <strong>avoid creating a duplicate</strong>. Better vote (and comment with more info) for the existing! Some tickets have a workaround, so maybe you will get a temporary solution right away.</p>
+<p>If you've found the same ticket, please <strong>avoid creating a duplicate</strong>. Better vote (and comment with more info) for the existing one! Some tickets have a workaround, so maybe you will get a temporary solution right away.</p>
 <p>There are some explanations on how we work with YouTrack to make you a bit more comfortable.</p>
 <h3 id="ticket-fields">Ticket fields<a class="headerlink" href="#ticket-fields" title="Permanent link">&para;</a></h3>
 <p>Fields is a table in the top right corner of a ticket screen. Projector project has the following ones:</p>
@@ -592,13 +592,15 @@
 <li>Affected versions – which Projector versions have the issue.</li>
 <li>Fix versions – in which Projector versions the issue is resolved.</li>
 <li>Assignee – who is working/has worked on the issue.</li>
+<li>Testing – how we should test the issue.</li>
+<li>Tester – visible only if we should test the issue.</li>
 </ul>
 <p>Sometimes the fields are not applicable, so we leave them with a default value.</p>
 <h3 id="ticket-states">Ticket states<a class="headerlink" href="#ticket-states" title="Permanent link">&para;</a></h3>
-<p>Please don't change the state field of a ticket. When we see triage the ticket, we will change its state from <code>Submitted</code> to <code>Open</code>.</p>
+<p>Please don't change the state field of a ticket. When we triage the ticket, we will change its state from <code>Submitted</code> to <code>Open</code>.</p>
 <p>When we are looking for an answer from a reporter, we will change the state to <code>Wait for reply</code>.</p>
 <p>Sometimes we place tickets to <code>Backlog</code> meaning that the task will be solved without the priority queue, hopefully soon.</p>
-<p>When a ticket is marked as gray and stroked, it means it's closed.</p>
+<p>When a ticket is marked as gray and strikethrough, it means it's closed.</p>
 <h3 id="ticket-activity-settings">Ticket activity settings<a class="headerlink" href="#ticket-activity-settings" title="Permanent link">&para;</a></h3>
 <p>By default, YouTrack shows only comments under the description of a ticket. You can also enable <em>Issue history</em> to see changes in the description and fields and <em>VCS changes</em> to see the commits and pull requests related to the issue. You can find the corresponding switcher buttons <a href="https://www.jetbrains.com/help/youtrack/standalone/VCS-Changes.html">just under the description of a ticket</a>.</p>
 <h2 id="submitting-changes">Submitting changes<a class="headerlink" href="#submitting-changes" title="Permanent link">&para;</a></h2>
