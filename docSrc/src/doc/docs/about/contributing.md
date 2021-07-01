@@ -30,6 +30,8 @@ Fields is a table in the top right corner of a ticket screen. Projector project 
 * Affected versions – which Projector versions have the issue.
 * Fix versions – in which Projector versions the issue is resolved.
 * Assignee – who is working/has worked on the issue.
+* Testing – how we should test the issue.
+* Tester – visible only if we should test the issue.
 
 Sometimes the fields are not applicable, so we leave them with a default value.
 
