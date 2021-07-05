@@ -138,7 +138,7 @@ actual object ParamsProvider {
             "onlyButtons" -> InputMethodType.OVERLAY_BUTTONS
             else -> InputMethodType.OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD
           }
-          false -> InputMethodType.LEGACY
+          false -> InputMethodType.IME
         }
       }
       IDE_WINDOW_ID = searchParams.get("ideWindow")?.toIntOrNull()
