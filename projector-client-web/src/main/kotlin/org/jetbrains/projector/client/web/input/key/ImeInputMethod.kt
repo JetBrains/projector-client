@@ -123,18 +123,29 @@ class ImeInputMethod(
     inputField.remove()
   }
 
-  private companion object {
+  private var skipNextKeyUp = false
 
-    private fun fireKeyEvent(
-      clientEventConsumer: (ClientEvent) -> Unit,
-      openingTimeStamp: Int,
-      type: ClientKeyEvent.KeyEventType,
-    ) = lambda@{ event: KeyboardEvent ->
-      if (event.key == "Process") {
-        return@lambda
-      }
-
-      clientEventConsumer.fireKeyEvent(type, event, openingTimeStamp)
+  private fun fireKeyEvent(
+    clientEventConsumer: (ClientEvent) -> Unit,
+    openingTimeStamp: Int,
+    type: ClientKeyEvent.KeyEventType,
+  ) = lambda@{ event: KeyboardEvent ->
+    if (event.key == "Process") {
+      return@lambda
     }
+
+    if (event.keyCode == 229 && type == DOWN) {
+      // an Input Method Editor is processing key input
+      // source: https://w3c.github.io/uievents/#determine-keydown-keyup-keyCode
+      skipNextKeyUp = true
+      return@lambda
+    }
+
+    if (skipNextKeyUp && type == UP) {
+      skipNextKeyUp = false
+      return@lambda
+    }
+
+    clientEventConsumer.fireKeyEvent(type, event, openingTimeStamp)
   }
 }
