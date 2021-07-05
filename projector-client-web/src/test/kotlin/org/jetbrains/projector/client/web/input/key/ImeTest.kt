@@ -23,9 +23,17 @@
  */
 package org.jetbrains.projector.client.web.input.key
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.promise
 import org.jetbrains.projector.client.web.input.key.util.assertEqualsWithoutTimeStamp
 import org.jetbrains.projector.client.web.input.key.util.toEvent
+import org.jetbrains.projector.common.protocol.data.VK
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.DOWN
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.UP
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.STANDARD
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.w3c.dom.events.Event
 import kotlin.test.Test
@@ -34,7 +42,40 @@ import kotlin.test.assertEquals
 class ImeTest {
 
   @Test
-  fun macSafariChinese() {
+  fun simpleQwerty() = runTest {
+    // type "abc"
+
+    val initial = """
+      keydown: 5800763 a KeyA false 65 undefined
+      input: 5800777 undefined undefined false undefined a
+      keyup: 5800888 a KeyA false 65 undefined
+      keydown: 5801123 b KeyB false 66 undefined
+      input: 5801131 undefined undefined false undefined b
+      keyup: 5801216 b KeyB false 66 undefined
+      keydown: 5801404 c KeyC false 67 undefined
+      input: 5801416 undefined undefined false undefined c
+      keyup: 5801467 c KeyC false 67 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(9, initial.size)
+
+    val expected = listOf(
+      ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+      ClientKeyPressEvent(42, 'a', emptySet()),
+      ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), UP),
+      ClientKeyEvent(42, 'b', VK.B, STANDARD, emptySet(), DOWN),
+      ClientKeyPressEvent(42, 'b', emptySet()),
+      ClientKeyEvent(42, 'b', VK.B, STANDARD, emptySet(), UP),
+      ClientKeyEvent(42, 'c', VK.C, STANDARD, emptySet(), DOWN),
+      ClientKeyPressEvent(42, 'c', emptySet()),
+      ClientKeyEvent(42, 'c', VK.C, STANDARD, emptySet(), UP),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
+  fun macSafariChinese() = runTest {
     // type "zhongwen" one by one char and type space
 
     val initial = """
@@ -89,7 +130,7 @@ class ImeTest {
   }
 
   @Test
-  fun macChromiumChinese() {
+  fun macChromiumChinese() = runTest {
     // type "zhongwen" one by one char and type space
 
     val initial = """
@@ -145,16 +186,21 @@ class ImeTest {
 
   private companion object {
 
-    private fun handleEventsAndTest(
+    private suspend fun handleEventsAndTest(
       initial: List<Event>,
-      expected: List<ClientKeyPressEvent>,
+      expected: List<ClientEvent>,
     ) {
       val actual = mutableListOf<ClientEvent>()
 
       val handler = ImeInputMethodEventHandler(42, actual::add, clearInputField = {})
       initial.forEach(handler::handleEvent)
 
+      delay(1000)
+
       assertEqualsWithoutTimeStamp(expected, actual)
     }
+
+    // https://youtrack.jetbrains.com/issue/KT-22228#focus=Comments-27-3964713.0-0
+    fun runTest(block: suspend () -> Unit): dynamic = GlobalScope.promise { block() }
   }
 }

@@ -26,6 +26,10 @@ package org.jetbrains.projector.client.web.input.key.util
 import org.jetbrains.projector.common.protocol.data.VK
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.DOWN
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.UP
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.LEFT
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.STANDARD
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.common.protocol.toServer.KeyModifier
 import kotlin.test.Test
@@ -38,6 +42,7 @@ fun assertEqualsWithoutTimeStamp(expected: List<ClientEvent>, actual: List<Clien
     val act = actual[i]
     when {
       exp is ClientKeyPressEvent && act is ClientKeyPressEvent -> assertEqualsWithoutTimeStamp(exp, act, "difference in event $i")
+      exp is ClientKeyEvent && act is ClientKeyEvent -> assertEqualsWithoutTimeStamp(exp, act, "difference in event $i")
 
       else -> throw AssertionError("bad event types at index $i; actual list: $actual")
     }
@@ -47,6 +52,14 @@ fun assertEqualsWithoutTimeStamp(expected: List<ClientEvent>, actual: List<Clien
 fun assertEqualsWithoutTimeStamp(expected: ClientKeyPressEvent, actual: ClientKeyPressEvent, message: String? = null) {
   assertEquals(expected.char, actual.char, message)
   assertEquals(expected.modifiers, actual.modifiers, message)
+}
+
+fun assertEqualsWithoutTimeStamp(expected: ClientKeyEvent, actual: ClientKeyEvent, message: String? = null) {
+  assertEquals(expected.char, actual.char, message)
+  assertEquals(expected.code, actual.code, message)
+  assertEquals(expected.location, actual.location, message)
+  assertEquals(expected.modifiers, actual.modifiers, message)
+  assertEquals(expected.keyEventType, actual.keyEventType, message)
 }
 
 class AssertEqualsWithoutTimeStampTest {
@@ -66,13 +79,13 @@ class AssertEqualsWithoutTimeStampTest {
     assertFailsWith<AssertionError> {
       assertEqualsWithoutTimeStamp(
         listOf(ClientKeyPressEvent(42, 'a', emptySet())),
-        listOf(ClientKeyEvent(42, 'a', VK.A, ClientKeyEvent.KeyLocation.STANDARD, emptySet(), ClientKeyEvent.KeyEventType.DOWN)),
+        listOf(ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN)),
       )
     }
   }
 
   @Test
-  fun differentTimeStamp() {
+  fun differentTimeStampForKeyPress() {
     assertEqualsWithoutTimeStamp(
       ClientKeyPressEvent(42, 'a', emptySet()),
       ClientKeyPressEvent(11, 'a', emptySet()),
@@ -80,7 +93,7 @@ class AssertEqualsWithoutTimeStampTest {
   }
 
   @Test
-  fun differentChar() {
+  fun differentCharForKeyPress() {
     assertFailsWith<AssertionError> {
       assertEqualsWithoutTimeStamp(
         ClientKeyPressEvent(42, 'a', emptySet()),
@@ -90,11 +103,69 @@ class AssertEqualsWithoutTimeStampTest {
   }
 
   @Test
-  fun differentModifiers() {
+  fun differentModifiersForKeyPress() {
     assertFailsWith<AssertionError> {
       assertEqualsWithoutTimeStamp(
         ClientKeyPressEvent(42, 'a', emptySet()),
         ClientKeyPressEvent(42, 'a', setOf(KeyModifier.ALT_KEY)),
+      )
+    }
+  }
+
+  @Test
+  fun differentTimeStampForKey() {
+    assertEqualsWithoutTimeStamp(
+      ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+      ClientKeyEvent(11, 'a', VK.A, STANDARD, emptySet(), DOWN),
+    )
+  }
+
+  @Test
+  fun differentCharForKey() {
+    assertFailsWith<AssertionError> {
+      assertEqualsWithoutTimeStamp(
+        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+        ClientKeyEvent(42, 'b', VK.A, STANDARD, emptySet(), DOWN),
+      )
+    }
+  }
+
+  @Test
+  fun differentCodeForKey() {
+    assertFailsWith<AssertionError> {
+      assertEqualsWithoutTimeStamp(
+        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+        ClientKeyEvent(42, 'a', VK.B, STANDARD, emptySet(), DOWN),
+      )
+    }
+  }
+
+  @Test
+  fun differentLocationForKey() {
+    assertFailsWith<AssertionError> {
+      assertEqualsWithoutTimeStamp(
+        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+        ClientKeyEvent(42, 'a', VK.A, LEFT, emptySet(), DOWN),
+      )
+    }
+  }
+
+  @Test
+  fun differentModifiersForKey() {
+    assertFailsWith<AssertionError> {
+      assertEqualsWithoutTimeStamp(
+        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+        ClientKeyEvent(42, 'a', VK.A, STANDARD, setOf(KeyModifier.ALT_KEY), DOWN),
+      )
+    }
+  }
+
+  @Test
+  fun differentTypeForKey() {
+    assertFailsWith<AssertionError> {
+      assertEqualsWithoutTimeStamp(
+        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), UP),
       )
     }
   }
