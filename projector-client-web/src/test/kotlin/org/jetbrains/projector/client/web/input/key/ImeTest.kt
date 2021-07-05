@@ -33,9 +33,11 @@ import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.DOWN
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.UP
+import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.LEFT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.STANDARD
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.w3c.dom.events.Event
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -179,6 +181,190 @@ class ImeTest {
     val expected = listOf(
       ClientKeyPressEvent(42, '中', emptySet()),
       ClientKeyPressEvent(42, '文', emptySet()),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
+  fun macSafariBrazilian1() = runTest {
+    // a composition of SHIFT + ' (to get ^), release everything and then type u
+
+    val initial = """
+      keydown: 1923870.0000000002 Shift ShiftLeft false 16 undefined
+      compositionstart: 1924139.0000000002 undefined undefined false undefined 
+      compositionupdate: 1924140 undefined undefined false undefined ^
+      input: 1924143 undefined undefined false undefined ^
+      keydown: 1924126 Dead Quote false 229 undefined
+      keyup: 1924222 " Quote false 222 undefined
+      keyup: 1924406 Shift ShiftLeft false 16 undefined
+      input: 1925279 undefined undefined false undefined null
+      input: 1925281 undefined undefined false undefined û
+      compositionend: 1925282.0000000002 undefined undefined false undefined û
+      keydown: 1925262 û KeyU false 229 undefined
+      keyup: 1925318 u KeyU false 85 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(12, initial.size)
+
+    val expected = listOf(
+      ClientKeyPressEvent(42, 'û', emptySet()),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), DOWN),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), UP),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
+  fun macChromiumBrazilian1() = runTest {
+    // a composition of SHIFT + ' (to get ^), release everything and then type u
+
+    val initial = """
+      keydown: 1585562.595 Shift ShiftLeft false 16 undefined
+      keydown: 1585810.4449999996 Dead Quote false 229 undefined
+      compositionstart: 1585812.4149999998 undefined undefined false undefined 
+      compositionupdate: 1585812.52 undefined undefined false undefined ^
+      input: 1585813.1550000003 undefined undefined false undefined ^
+      keyup: 1585882.4449999998 Dead Quote false 222 undefined
+      keyup: 1585986.4199999997 Shift ShiftLeft false 16 undefined
+      keydown: 1587714.6100000003 û KeyU false 229 undefined
+      compositionupdate: 1587719.1749999998 undefined undefined false undefined û
+      input: 1587720.315 undefined undefined false undefined û
+      compositionend: 1587720.3649999998 undefined undefined false undefined û
+      keyup: 1587770.5549999997 u KeyU false 85 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(12, initial.size)
+
+    val expected = listOf(
+      ClientKeyPressEvent(42, 'û', emptySet()),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), DOWN),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), UP),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
+  fun macSafariBrazilian2() = runTest {
+    // a composition of SHIFT + ' (to get ^), release everything and then type space
+
+    val initial = """
+      keydown: 3287995 Shift ShiftLeft false 16 undefined
+      compositionstart: 3288323 undefined undefined false undefined 
+      compositionupdate: 3288323 undefined undefined false undefined ^
+      input: 3288325.0000000005 undefined undefined false undefined ^
+      keydown: 3288259 Dead Quote false 229 undefined
+      keyup: 3288339 " Quote false 222 undefined
+      keyup: 3288451 Shift ShiftLeft false 16 undefined
+      input: 3288830 undefined undefined false undefined null
+      input: 3288833 undefined undefined false undefined ˆ
+      compositionend: 3288834.0000000005 undefined undefined false undefined ˆ
+      keydown: 3288763 ˆ Space false 229 undefined
+      keyup: 3288835 | Space false 32 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(12, initial.size)
+
+    val expected = listOf(
+      ClientKeyPressEvent(42, 'ˆ', emptySet()),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), DOWN),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), UP),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
+  fun macChromiumBrazilian2() = runTest {
+    // a composition of SHIFT + ' (to get ^), release everything and then type space
+
+    val initial = """
+      keydown: 3026658.5900000003 Shift ShiftLeft false 16 undefined
+      keydown: 3027026.5999999996 Dead Quote false 229 undefined
+      compositionstart: 3027030.0549999997 undefined undefined false undefined 
+      compositionupdate: 3027030.235 undefined undefined false undefined ^
+      input: 3027031.275 undefined undefined false undefined ^
+      keyup: 3027106.5650000004 Dead Quote false 222 undefined
+      keyup: 3027314.5850000004 Shift ShiftLeft false 16 undefined
+      keydown: 3027986.585 ˆ Space false 229 undefined
+      compositionupdate: 3027990.88 undefined undefined false undefined ˆ
+      input: 3027992.0450000004 undefined undefined false undefined ˆ
+      compositionend: 3027992.095 undefined undefined false undefined ˆ
+      keyup: 3028042.535 | Space false 32 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(12, initial.size)
+
+    val expected = listOf(
+      ClientKeyPressEvent(42, 'ˆ', emptySet()),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), DOWN),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), UP),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
+  @Ignore
+  fun macSafariBrazilian3() = runTest {
+    // a composition of SHIFT + ' (to get ^), release everything and then type d
+
+    val initial = """
+      keydown: 3441023 Shift ShiftLeft false 16 undefined
+      compositionstart: 3441315 undefined undefined false undefined 
+      compositionupdate: 3441315 undefined undefined false undefined ^
+      input: 3441317 undefined undefined false undefined ^
+      keydown: 3441247.0000000005 Dead Quote false 229 undefined
+      keyup: 3441335 " Quote false 222 undefined
+      keyup: 3441471 Shift ShiftLeft false 16 undefined
+      input: 3441822 undefined undefined false undefined null
+      input: 3441824 undefined undefined false undefined ^
+      compositionend: 3441825.0000000005 undefined undefined false undefined ^
+      keydown: 3441751 ^d KeyD false 68 undefined
+      input: 3441834.0000000005 undefined undefined false undefined d
+      keyup: 3441831 d KeyD false 68 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(13, initial.size)
+
+    val expected = listOf(
+      ClientKeyPressEvent(42, '^', emptySet()),
+      ClientKeyPressEvent(42, 'd', emptySet()),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), DOWN),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), UP),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
+  fun macChromiumBrazilian3() = runTest {
+    // a composition of SHIFT + ' (to get ^), release everything and then type d
+
+    val initial = """
+      keydown: 3141562.5999999996 Shift ShiftLeft false 16 undefined
+      keydown: 3141810.5600000005 Dead Quote false 229 undefined
+      compositionstart: 3141813.92 undefined undefined false undefined 
+      compositionupdate: 3141814.1 undefined undefined false undefined ^
+      input: 3141815.045 undefined undefined false undefined ^
+      keyup: 3141898.57 Dead Quote false 222 undefined
+      keyup: 3141986.58 Shift ShiftLeft false 16 undefined
+      keydown: 3142298.585 d KeyD false 229 undefined
+      compositionupdate: 3142302.875 undefined undefined false undefined ^d
+      input: 3142303.8950000005 undefined undefined false undefined ^d
+      compositionend: 3142303.9450000003 undefined undefined false undefined ^d
+      keyup: 3142394.5850000004 d KeyD false 68 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(12, initial.size)
+
+    val expected = listOf(
+      ClientKeyPressEvent(42, '^', emptySet()),
+      ClientKeyPressEvent(42, 'd', emptySet()),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), DOWN),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), UP),
     )
 
     handleEventsAndTest(initial, expected)
