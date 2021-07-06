@@ -273,6 +273,13 @@ sealed class ClientState {
         }
       }
 
+      is ClientAction.WebSocket.Close -> {
+        showDisconnectedMessage(webSocket.url, action.closeCode)
+        onHandshakeFinish()
+
+        Disconnected
+      }
+
       else -> super.consume(action)
     }
   }
