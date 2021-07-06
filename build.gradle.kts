@@ -60,7 +60,7 @@ subprojects {
 
 if (System.getenv("CHROME_BIN") == null) {
   gradle.taskGraph.beforeTask {
-    if (name in setOf("jsTest", "jsBrowserTest")) {
+    if (name in setOf("jsTest", "jsBrowserTest", "browserTest")) {
       actions.clear()
       System.err.println("Skipping task as no CHROME_BIN env is set")
     }
