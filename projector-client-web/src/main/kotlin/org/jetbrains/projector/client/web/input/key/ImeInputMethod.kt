@@ -109,9 +109,21 @@ class ImeInputMethodEventHandler(
     else -> throw UnsupportedOperationException("Unknown event '$event' with type '${event.type}'")
   }
 
-  private var skipNextKeyUp = false
+  private var skipNextKey = false
 
   private fun fireKeyEvent(event: KeyboardEvent) {
+    if (event.keyCode == 229) {
+      // an Input Method Editor is processing key input
+      // source: https://w3c.github.io/uievents/#determine-keydown-keyup-keyCode
+      skipNextKey = true
+      return
+    }
+
+    if (skipNextKey) {
+      skipNextKey = false
+      return
+    }
+
     if (event.key == "Process") {
       return
     }
@@ -120,18 +132,6 @@ class ImeInputMethodEventHandler(
       "keydown" -> DOWN
       "keyup" -> UP
       else -> throw IllegalArgumentException("Bad event type '${event.type}'")
-    }
-
-    if (event.keyCode == 229 && type == DOWN) {
-      // an Input Method Editor is processing key input
-      // source: https://w3c.github.io/uievents/#determine-keydown-keyup-keyCode
-      skipNextKeyUp = true
-      return
-    }
-
-    if (skipNextKeyUp && type == UP) {
-      skipNextKeyUp = false
-      return
     }
 
     clientEventConsumer.fireKeyEvent(type, event, openingTimeStamp)

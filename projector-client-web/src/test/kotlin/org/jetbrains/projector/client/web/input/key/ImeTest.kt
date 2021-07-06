@@ -77,6 +77,81 @@ class ImeTest {
   }
 
   @Test
+  fun windowsChinese() = runTest {
+    // type "zhongwen" one by one char and type space
+    // kudos to https://youtrack.jetbrains.com/issue/PRJ-514#focus=Comments-27-5016836.0-0
+
+    val initial = """
+      keydown: 207435.25999994017 Process KeyZ false 229 undefined
+      compositionstart: 207439.85500000417 undefined undefined false undefined 
+      compositionupdate: 207440.14500000048 undefined undefined false undefined z
+      input: 207442.02499999665 undefined undefined false undefined z
+      compositionupdate: 207444.6000000462 undefined undefined false undefined z
+      input: 207446.9500000123 undefined undefined false undefined z
+      keyup: 207552.44500003755 Process KeyZ false 229 undefined
+      keydown: 207706.4750000136 Process KeyH false 229 undefined
+      compositionupdate: 207774.5199999772 undefined undefined false undefined zh
+      input: 207781.39999997802 undefined undefined false undefined zh
+      compositionupdate: 207785.84000002593 undefined undefined false undefined zh
+      input: 207787.8250000067 undefined undefined false undefined zh
+      keyup: 207798.42999996617 Process KeyH false 229 undefined
+      keydown: 208061.7899999488 Process KeyO false 229 undefined
+      compositionupdate: 208118.30999993253 undefined undefined false undefined zho
+      input: 208132.89999996778 undefined undefined false undefined zho
+      compositionupdate: 208138.99000000674 undefined undefined false undefined zho
+      input: 208143.88500002678 undefined undefined false undefined zho
+      keyup: 208131.50499993935 Process KeyO false 229 undefined
+      keydown: 208273.58000003733 Process KeyN false 229 undefined
+      compositionupdate: 208325.24499995634 undefined undefined false undefined zhon
+      input: 208335.64499998465 undefined undefined false undefined zhon
+      compositionupdate: 208341.23999997973 undefined undefined false undefined zhon
+      input: 208348.54000003543 undefined undefined false undefined zhon
+      keyup: 208368.2999999728 Process KeyN false 229 undefined
+      keydown: 208502.08500004373 Process KeyG false 229 undefined
+      compositionupdate: 208536.97499993723 undefined undefined false undefined zhong
+      input: 208543.8650000142 undefined undefined false undefined zhong
+      compositionupdate: 208549.83000003267 undefined undefined false undefined zhong
+      input: 208555.3249999648 undefined undefined false undefined zhong
+      keyup: 208572.46499997564 Process KeyG false 229 undefined
+      keydown: 208724.67499994673 Process KeyW false 229 undefined
+      compositionupdate: 208819.47999994736 undefined undefined false undefined zhong'w
+      input: 208826.849999954 undefined undefined false undefined zhong'w
+      compositionupdate: 208839.61000002455 undefined undefined false undefined zhong'w
+      input: 208846.73500002827 undefined undefined false undefined zhong'w
+      keydown: 208827.90000003297 Process KeyE false 229 undefined
+      compositionupdate: 208882.07499997225 undefined undefined false undefined zhong'we
+      input: 208886.39500003774 undefined undefined false undefined zhong'we
+      compositionupdate: 208888.84499995038 undefined undefined false undefined zhong'we
+      input: 208891.24999998603 undefined undefined false undefined zhong'we
+      keyup: 208883.18500004243 Process KeyW false 229 undefined
+      keydown: 208952.09999999497 Process KeyN false 229 undefined
+      keyup: 208953.0650000088 Process KeyE false 229 undefined
+      compositionupdate: 209005.09500002954 undefined undefined false undefined zhong'wen
+      input: 209010.34999999683 undefined undefined false undefined zhong'wen
+      compositionupdate: 209016.82000001892 undefined undefined false undefined zhong'wen
+      input: 209022.03999995254 undefined undefined false undefined zhong'wen
+      keyup: 209016.78499998525 Process KeyN false 229 undefined
+      keyup: 209017.344999942 n KeyN false 78 undefined
+      keydown: 209332.1500000311 Process Space false 229 undefined
+      compositionupdate: 209354.13999995217 undefined undefined false undefined 中文
+      input: 209367.66500002705 undefined undefined false undefined 中文
+      compositionupdate: 209381.03499996942 undefined undefined false undefined 中文
+      input: 209390.78499993775 undefined undefined false undefined 中文
+      compositionend: 209391.02999994066 undefined undefined false undefined 中文
+      keyup: 209450.69500000682 Process Space false 229 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(57, initial.size)
+
+    val expected = listOf(
+      ClientKeyPressEvent(42, '中', emptySet()),
+      ClientKeyPressEvent(42, '文', emptySet()),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
   fun macSafariChinese() = runTest {
     // type "zhongwen" one by one char and type space
 
