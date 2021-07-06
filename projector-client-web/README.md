@@ -32,10 +32,11 @@ Tested browsers:
 You can set some settings in query parameters like this: `index.html?host=localhost&port=8887&wss`. Actual list of parameters can be found in the `ParamsProvider.kt` file. Here we describe them.
 
 ### Main parameters
-Name | Type | Default value | Description 
+Name | Type | Default value | Description
 ---|---|---|---
 `host` | String | Host of the web page | Set the host of `projector-server` to connect.
-`port` | String | `8887` | Set the port of `projector-server` to connect.
+`port` | String | Port of the web page | Set the port of `projector-server` to connect.
+`path` | String | Path of the web page | Set the path of `projector-server` to connect.
 `wss` | Presence | Protocol of the web page | Enable security of WebSocket connection.
 `notSecureWarning` | Boolean | `true` | Enable warning saying that the context is not [secure](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
 `token` | String? | Not present | Set a password which will be checked by the server on the connection.

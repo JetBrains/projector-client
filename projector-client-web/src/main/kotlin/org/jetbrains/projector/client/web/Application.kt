@@ -52,13 +52,14 @@ class Application {
       true -> "wss://"
     }
     val host = ParamsProvider.HOST
-    val port = ":${ParamsProvider.PORT}"
-    val path = when (ParamsProvider.ENABLE_RELAY) {
+    val port = ParamsProvider.PORT
+    val path = ParamsProvider.PATH
+    val relayPath = when (ParamsProvider.ENABLE_RELAY) {
       true -> "/connect/${ParamsProvider.RELAY_SERVER_ID}/${generateKey()}"
       false -> ""
     }
 
-    val url = "$scheme$host$port${ParamsProvider.PATH}$path"
+    val url = "$scheme$host:$port$path$relayPath"
 
     try {
       setClipboardPermissions()

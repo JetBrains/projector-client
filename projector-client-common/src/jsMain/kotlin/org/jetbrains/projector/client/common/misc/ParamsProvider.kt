@@ -47,7 +47,10 @@ actual object ParamsProvider {
 
   private val DEFAULT_HOST = getCurrentHostname()
   private val DEFAULT_PORT = getCurrentPort()
-  private val DEFAULT_PATH = getCurrentPath()
+  private val DEFAULT_PATH = when (getCurrentHostname()) {
+    "projector.jetbrains.com" -> ""
+    else -> getCurrentPath()
+  }
   private val DEFAULT_TO_CLIENT_FORMAT: ToClientFormat = ToClientFormat.KOTLINX_JSON_MANUAL
   private const val DEFAULT_IMAGE_TTL = 60_000.0  // in ms
   private const val DEFAULT_FLUSH_DELAY = 1
@@ -103,7 +106,7 @@ actual object ParamsProvider {
       CLIPPING_BORDERS = searchParams.has("clipping")
       HOST = searchParams.get("host") ?: DEFAULT_HOST
       PORT = searchParams.get("port") ?: if (ENABLE_RELAY) protocolPort() else DEFAULT_PORT
-      PATH = DEFAULT_PATH
+      PATH = searchParams.get("path") ?: DEFAULT_PATH
       LOG_UNSUPPORTED_EVENTS = searchParams.has("logUnsupportedEvents")
       DOUBLE_BUFFERING = searchParams.has("doubleBuffering")
       ENABLE_COMPRESSION = searchParams.has("enableCompression")
