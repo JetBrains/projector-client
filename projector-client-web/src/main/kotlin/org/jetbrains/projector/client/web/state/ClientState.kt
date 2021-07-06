@@ -196,7 +196,7 @@ sealed class ClientState {
       }
 
       is ClientAction.WebSocket.Close -> {
-        showDisconnectedMessage(webSocket.url, action.closeCode)
+        showDisconnectedMessage(webSocket.url, action)
         onHandshakeFinish()
 
         Disconnected
@@ -274,7 +274,7 @@ sealed class ClientState {
       }
 
       is ClientAction.WebSocket.Close -> {
-        showDisconnectedMessage(webSocket.url, action.closeCode)
+        showDisconnectedMessage(webSocket.url, action)
         onHandshakeFinish()
 
         Disconnected
@@ -525,8 +525,8 @@ sealed class ClientState {
       }
 
       is ClientAction.WebSocket.Close -> {
-        Do exhaustive when (action) {
-          is ClientAction.WebSocket.Close.FinishNormal -> {
+        Do exhaustive when (action.endedNormally) {
+          true -> {
             logger.info { "Connection is closed..." }
 
             drawPendingEvents.cancel()
@@ -540,12 +540,11 @@ sealed class ClientState {
             selectionBlocker.unblockSelection()
             connectionWatcher.removeWatcher()
 
-            showDisconnectedMessage(webSocket.url, action.closeCode)
+            showDisconnectedMessage(webSocket.url, action)
             Disconnected
           }
 
-          is ClientAction.WebSocket.Close.FinishError ->
-            reloadConnection("Connection is closed unexpectedly, retrying the connection...")
+          false -> reloadConnection("Connection is closed unexpectedly, retrying the connection...")
         }
       }
 
@@ -587,23 +586,25 @@ sealed class ClientState {
     private const val NORMAL_CLOSURE_STATUS_CODE: Short = 1000
     private const val GOING_AWAY_STATUS_CODE: Short = 1001
 
-    private fun showDisconnectedMessage(url: String, closeCode: Short) {
-      Do exhaustive when (closeCode in setOf(NORMAL_CLOSURE_STATUS_CODE, GOING_AWAY_STATUS_CODE)) {
+    private val ClientAction.WebSocket.Close.endedNormally: Boolean
+      get() = this.wasClean && this.code in setOf(NORMAL_CLOSURE_STATUS_CODE, GOING_AWAY_STATUS_CODE)
+
+    private fun showDisconnectedMessage(url: String, action: ClientAction.WebSocket.Close) {
+      val reason = action.reason.ifBlank { null }?.let { "Reason: $it" } ?: "The server hasn't reported a reason of the disconnection."
+
+      Do exhaustive when (action.endedNormally) {
         true -> OnScreenMessenger.showText(
           "Disconnected",
-          "It seems that your connection is ended normally.",
+          "It seems that your connection is ended normally. $reason",
           canReload = true
         )
 
         false -> OnScreenMessenger.showText(
           "Connection problem",
-          buildString {
-            append("There is no connection to <strong>$url</strong>. ")
-            append("The browser console can contain the error and a more detailed description. ")
-            append("Everything we know is that <code>CloseEvent.code=$closeCode</code> ")
-            append(
-              "(<a href='https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#Status_codes'>https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#Status_codes</a>).")
-          },
+          "There is no connection to <strong>$url</strong>. " +
+          "The browser console can contain the error and a more detailed description. " +
+          "Everything we know is that <code>CloseEvent.code=${action.code}</code>, " +
+          "<code>CloseEvent.wasClean=${action.wasClean}</code>. $reason",
           canReload = true
         )
       }
@@ -620,12 +621,7 @@ sealed class ClientState {
         onclose = fun(event: Event) {
           require(event is CloseEvent)
 
-          val action = when (event.code) {
-            NORMAL_CLOSURE_STATUS_CODE, GOING_AWAY_STATUS_CODE -> ClientAction.WebSocket.Close.FinishNormal(event.code)
-            else -> ClientAction.WebSocket.Close.FinishError(event.code)
-          }
-
-          stateMachine.fire(action)
+          stateMachine.fire(ClientAction.WebSocket.Close(wasClean = event.wasClean, code = event.code, reason = event.reason))
         }
 
         onmessage = fun(messageEvent: MessageEvent) {

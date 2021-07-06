@@ -38,11 +38,7 @@ sealed class ClientAction {
 
     class Open(val openingTimeStamp: Int) : WebSocket()
     class Message(val message: ByteArray) : WebSocket()
-    sealed class Close(val closeCode: Short) : WebSocket() {
-
-      class FinishNormal(closeCode: Short) : Close(closeCode)
-      class FinishError(closeCode: Short) : Close(closeCode)
-    }
+    class Close(val wasClean: Boolean, val code: Short, val reason: String) : WebSocket()
     class NoReplies(val elapsedTimeMs: Int) : WebSocket()
   }
 
