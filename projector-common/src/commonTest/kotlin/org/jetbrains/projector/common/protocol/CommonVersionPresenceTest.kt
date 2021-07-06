@@ -24,11 +24,28 @@
 package org.jetbrains.projector.common.protocol
 
 import org.jetbrains.projector.common.protocol.handshake.COMMON_VERSION
+import org.jetbrains.projector.common.protocol.handshake.HANDSHAKE_VERSION
 import org.jetbrains.projector.common.protocol.handshake.commonVersionList
+import org.jetbrains.projector.common.protocol.handshake.handshakeVersionList
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
 class CommonVersionPresenceTest {
+
+  @Test
+  fun handshakeVersionListShouldContainCurrentHandshakeVersion() {
+    assertTrue(
+      HANDSHAKE_VERSION in handshakeVersionList,
+      """
+        |Current handshake version of protocol should be in `handshakeVersionList`.
+        |It seems that protocol has been updated.
+        |Please append the current HANDSHAKE_VERSION to the `handshakeVersionList` as the last element.
+        |Current values:
+        |HANDSHAKE_VERSION = $HANDSHAKE_VERSION
+        |handshakeVersionList = $handshakeVersionList
+      """.trimMargin()
+    )
+  }
 
   @Test
   fun commonVersionListShouldContainCurrentCommonVersion() {
@@ -37,7 +54,7 @@ class CommonVersionPresenceTest {
       """
         |Current common version of protocol should be in `commonVersionList`.
         |It seems that protocol has been updated.
-        |Please append the current COMMON_VERSION to the commonVersionList as the last element.
+        |Please append the current COMMON_VERSION to the `commonVersionList` as the last element.
         |Current values:
         |COMMON_VERSION = $COMMON_VERSION
         |commonVersionList = $commonVersionList

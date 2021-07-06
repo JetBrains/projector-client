@@ -28,6 +28,15 @@ import org.jetbrains.projector.common.misc.compatibilityHash
 import org.jetbrains.projector.common.protocol.toClient.ServerEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 
+val HANDSHAKE_VERSION = listOf(ToClientHandshakeEvent.serializer(), ToServerHandshakeEvent.serializer())
+  .map { ListSerializer(it).descriptor.compatibilityHash }
+  .reduce(Int::xor)
+
+// Don't change order here: it's used to obtain readable "human id"
+val handshakeVersionList = listOf(
+  456250626,
+)
+
 val COMMON_VERSION = listOf(ServerEvent.serializer(), ClientEvent.serializer())
   .map { ListSerializer(it).descriptor.compatibilityHash }
   .reduce(Int::xor)
@@ -42,5 +51,5 @@ val commonVersionList = listOf(
   -625612891,
   -560999684,
   471600343,
-  -215338327
+  -215338327,
 )

@@ -39,9 +39,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.receiveOrNull
 import org.jetbrains.projector.common.protocol.data.FontDataHolder
 import org.jetbrains.projector.common.protocol.data.TtfFontData
-import org.jetbrains.projector.common.protocol.handshake.COMMON_VERSION
-import org.jetbrains.projector.common.protocol.handshake.ToClientHandshakeSuccessEvent
-import org.jetbrains.projector.common.protocol.handshake.commonVersionList
+import org.jetbrains.projector.common.protocol.handshake.*
 import org.jetbrains.projector.common.protocol.toClient.ServerPingReplyEvent
 import org.jetbrains.projector.common.protocol.toClient.ToClientMessageType
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
@@ -77,6 +75,12 @@ object ConnectionUtil {
 
   @OptIn(ExperimentalCoroutinesApi::class)
   private suspend fun DefaultWebSocketServerSession.doHandshake(handlePing: Boolean): SenderReceiver {
+    val (handshakeVersion, handshakeVersionId) = (incoming.receive() as Frame.Text).readText().split(";")
+    assertEquals("$HANDSHAKE_VERSION", handshakeVersion,
+                 "Incompatible handshake versions: server - $HANDSHAKE_VERSION (#${handshakeVersionList.indexOf(HANDSHAKE_VERSION)}), " +
+                 "client - $handshakeVersion (#$handshakeVersionId)"
+    )
+
     val handshakeText = (incoming.receive() as Frame.Text).readText()
     val toServerHandshakeEvent = KotlinxJsonToServerHandshakeDecoder.decode(handshakeText)
 

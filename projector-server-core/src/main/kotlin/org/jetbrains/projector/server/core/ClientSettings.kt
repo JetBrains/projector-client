@@ -45,6 +45,11 @@ public class ConnectedClientSettings(
   override val address: String?,
 ) : ClientSettings()
 
+public class SupportedHandshakeClientSettings(
+  override val connectionMillis: Long,
+  override val address: String?,
+) : ClientSettings()
+
 public data class SetUpClientData(
   val hasWriteAccess: Boolean,
   val toClientMessageEncoder: ToClientMessageEncoder,

@@ -180,6 +180,7 @@ sealed class ClientState {
           )
         }
 
+        webSocket.send("$HANDSHAKE_VERSION;${handshakeVersionList.indexOf(HANDSHAKE_VERSION)}")
         webSocket.send(KotlinxJsonToServerHandshakeEncoder.encode(handshakeEvent))
 
         OnScreenMessenger.showText("Connection is opened", "Handshake is sent...", canReload = false)
