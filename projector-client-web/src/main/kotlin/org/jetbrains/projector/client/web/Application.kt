@@ -58,7 +58,7 @@ class Application {
       false -> ""
     }
 
-    val url = "$scheme$host$port$path"
+    val url = "$scheme$host$port${ParamsProvider.PATH}$path"
 
     try {
       setClipboardPermissions()
