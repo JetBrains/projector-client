@@ -104,3 +104,9 @@ public class ReadyClientSettings(
     }
   }
 }
+
+public class ClosedClientSettings(
+  override val connectionMillis: Long,
+  override val address: String?,
+  public val reason: String,
+) : ClientSettings()
