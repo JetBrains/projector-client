@@ -225,7 +225,7 @@ sealed class ClientState {
             webSocket.close()
             onHandshakeFinish()
 
-            this  // todo: handle this case
+            Disconnected
           }
 
           is ToClientHandshakeSuccessEvent -> {
