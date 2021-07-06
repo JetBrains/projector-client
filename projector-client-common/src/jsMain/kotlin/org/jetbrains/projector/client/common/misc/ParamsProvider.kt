@@ -34,7 +34,10 @@ actual object ParamsProvider {
     else -> hostname
   }
 
-  private fun getCurrentPath(): String = window.location.pathname
+  private fun getCurrentPath(): String = when (window.location.protocol) {
+    "file:" -> ""
+    else -> window.location.pathname
+  }
 
   private fun protocolPort(): String {
     return if (window.location.protocol == "https:") "443" else "80"
