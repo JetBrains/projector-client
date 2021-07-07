@@ -109,6 +109,7 @@ class SwingClient(val transport: ProjectorTransport, val windowManager: Abstract
       supportedToServerProtocols = listOf(ProtocolType.KOTLINX_JSON)
     )
 
+    transport.send("$HANDSHAKE_VERSION;${handshakeVersionList.indexOf(HANDSHAKE_VERSION)}")
     transport.send(KotlinxJsonToServerHandshakeEncoder.encode(handshake))
 
     val response = transport.messages.receive()
