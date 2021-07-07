@@ -58,15 +58,10 @@ dependencies {
   implementation(npm("open", openVersion))
   implementation("org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion")
-  implementation("org.jetbrains:kotlin-extensions:$kotlinExtensionsVersion")
+  implementation("org.jetbrains.kotlin-wrappers:kotlin-extensions:$kotlinExtensionsVersion")
 }
 
 version = "1.0.0"  // todo: npm doesn't support versions like "1.0-SNAPSHOT"
-
-repositories {
-  jcenter()
-  maven("https://kotlin.bintray.com/kotlin-js-wrappers")
-}
 
 val isWindows = DefaultNativePlatform.getCurrentOperatingSystem().isWindows
 

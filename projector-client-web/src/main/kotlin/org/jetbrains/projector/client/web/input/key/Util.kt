@@ -169,7 +169,7 @@ fun ((ClientEvent) -> Unit).fireKeyEvent(
 
     val message = ClientKeyEvent(
       timeStamp = event.timeStamp.toInt() - openingTimeStamp,
-      char = if (specialKeysState?.isShiftEnabled == true) char.toUpperCase() else char,
+      char = if (specialKeysState?.isShiftEnabled == true) char.uppercaseChar() else char,
       code = vk,
       location = toCommonKeyLocation(event.location, event.code),
       modifiers = mergeModifiers(event, specialKeysState),

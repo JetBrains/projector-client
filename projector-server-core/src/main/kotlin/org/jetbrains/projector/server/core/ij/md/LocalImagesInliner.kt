@@ -56,7 +56,7 @@ internal object LocalImagesInliner {
       val bytes = Files.readAllBytes(localPath)
       val base64Content = Base64.getEncoder().encodeToString(bytes)
 
-      when (extension.toLowerCase()) {
+      when (extension.lowercase()) {
         "svg" -> "data:image/svg+xml;base64,$base64Content"
 
         else -> "data:image/$extension;base64,$base64Content"

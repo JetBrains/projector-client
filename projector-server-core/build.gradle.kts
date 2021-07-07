@@ -133,9 +133,7 @@ dependencies {
   implementation("dnsjava:dnsjava:$dnsjavaVersion")
   implementation("org.jsoup:jsoup:$jsoupVersion")
 
-  // todo: remove these dependencies: they should be exported from projector-common but now it seems not working
   testImplementation(kotlin("test", kotlinVersion))
-  testImplementation(kotlin("test-junit", kotlinVersion))
 
   intTestImplementation("com.codeborne:selenide:$selenideVersion")
   intTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
@@ -143,10 +141,8 @@ dependencies {
   intTestImplementation("io.ktor:ktor-server-netty:$ktorVersion")
   intTestImplementation("io.ktor:ktor-websockets:$ktorVersion")
   intTestImplementation("io.ktor:ktor-client-cio:$ktorVersion")
-
-  // todo: remove these dependencies: they should be exported from projector-common but now it seems not working
-  intTestImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
-  intTestImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
+  intTestImplementation(kotlin("test", kotlinVersion))
+  intTestImplementation(kotlin("test-junit", kotlinVersion))
 }
 
 val copyProjectorClientWebDistributionToResources = task<Copy>("copyProjectorClientWebDistributionToResources") {

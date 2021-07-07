@@ -102,7 +102,9 @@ class ProjectorHttpWsServerTest {
   @Test
   fun test404() {
     val server = createServer().also { it.start() }
-    val client = HttpClient()
+    val client = HttpClient {
+      expectSuccess = false
+    }
 
     val response = runBlocking { client.get<HttpResponse>(prj("/abc")) }
 

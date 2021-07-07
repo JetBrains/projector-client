@@ -28,11 +28,5 @@ object Do { // https://youtrack.jetbrains.com/issue/KT-12380
   inline infix fun <reified T> exhaustive(any: T) = any
 }
 
-// https://youtrack.jetbrains.com/issue/KT-12109
-fun <T, R : Any> Iterable<T>.firstNotNullOrNull(selector: (T) -> R?): R? = mapNotNull(selector).firstOrNull()
-
 // https://youtrack.jetbrains.com/issue/KT-9374
 expect fun Double.toString(fractionDigitsToLeave: Int): String
-
-// https://youtrack.jetbrains.com/issue/KT-39906
-fun Char.isUpperCase(): Boolean = this.toLowerCase() != this

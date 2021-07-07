@@ -52,8 +52,7 @@ kotlin {
 
     val commonTest by getting {
       dependencies {
-        api(kotlin("test-common", kotlinVersion))
-        api(kotlin("test-annotations-common", kotlinVersion))
+        api(kotlin("test", kotlinVersion))
       }
     }
 
@@ -61,19 +60,12 @@ kotlin {
     }
 
     val jsTest by getting {
-      dependencies {
-        api(kotlin("test-js", kotlinVersion))
-      }
     }
 
     val jvmMain by getting {
     }
 
     val jvmTest by getting {
-      dependencies {
-        api(kotlin("test", kotlinVersion))
-        api(kotlin("test-junit", kotlinVersion))
-      }
     }
   }
 }

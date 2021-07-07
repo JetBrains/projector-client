@@ -29,7 +29,6 @@ import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.web.input.JsKey
 import org.jetbrains.projector.client.web.input.SpecialKeysState
 import org.jetbrains.projector.client.web.misc.toDisplayType
-import org.jetbrains.projector.common.misc.isUpperCase
 import org.jetbrains.projector.common.protocol.data.VK
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
@@ -227,7 +226,7 @@ class MobileInputMethod(
     clientEventConsumer(
       ClientKeyEvent(
         timeStamp = TimeStamp.current.roundToInt() - openingTimeStamp,
-        char = if (specialKeysState.isShiftEnabled) char.toUpperCase() else char,
+        char = if (specialKeysState.isShiftEnabled) char.uppercaseChar() else char,
         code = code,
         location = location,
         modifiers = specialKeysState.keyModifiers,
@@ -240,7 +239,7 @@ class MobileInputMethod(
     clientEventConsumer(
       ClientKeyPressEvent(
         timeStamp = TimeStamp.current.roundToInt() - openingTimeStamp,
-        char = if (specialKeysState.isShiftEnabled) char.toUpperCase() else char,
+        char = if (specialKeysState.isShiftEnabled) char.uppercaseChar() else char,
         modifiers = specialKeysState.keyModifiers
       )
     )

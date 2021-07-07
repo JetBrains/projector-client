@@ -41,6 +41,7 @@ import org.jetbrains.projector.util.logging.Logger
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
+import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -165,7 +166,7 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) : HttpWsTranspo
       }
     }
 
-    private fun String.calculateContentType() = when (this.substringAfterLast('.').toLowerCase()) {
+    private fun String.calculateContentType() = when (this.substringAfterLast('.').lowercase()) {
       "css" -> "text/css"
       "html" -> "text/html"
       "js" -> "text/javascript"

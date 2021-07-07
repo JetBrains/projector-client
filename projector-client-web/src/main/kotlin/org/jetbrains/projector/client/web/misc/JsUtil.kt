@@ -34,7 +34,7 @@ fun ArrayBuffer.asByteArray(): ByteArray = Int8Array(this).unsafeCast<ByteArray>
 
 val nativeKeymap: UserKeymap
   get() {
-    val lowerCasedPlatformName = window.navigator.platform.toLowerCase()
+    val lowerCasedPlatformName = window.navigator.platform.lowercase()
 
     return when {
       "win" in lowerCasedPlatformName -> UserKeymap.WINDOWS

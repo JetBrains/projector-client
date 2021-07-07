@@ -31,6 +31,7 @@ import kotlinx.serialization.descriptors.elementNames
 
 private val List<Int>.compatibilityHash: Int get() = reduce { acc, c -> 31 * acc + c }
 
+@Suppress("DEPRECATION")  // https://youtrack.jetbrains.com/issue/KT-47644
 private val String.compatibilityHash: Int get() = map(Char::toInt).compatibilityHash
 
 private val Boolean.compatibilityHash: Int get() = if (this) 1 else 0

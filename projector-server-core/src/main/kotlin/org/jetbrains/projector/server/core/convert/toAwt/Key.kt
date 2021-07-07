@@ -45,7 +45,7 @@ public fun ClientRawKeyEvent.toAwtKeyEvent(connectionMillis: Long, target: Compo
 
 private fun createAwtChar(char: Char, modifiers: Set<KeyModifier>): Char {
   return when (KeyModifier.CTRL_KEY in modifiers) {
-    true -> controlCharMap[char.toUpperCase().toInt()] ?: KeyEvent.CHAR_UNDEFINED
+    true -> controlCharMap[char.uppercaseChar().code] ?: KeyEvent.CHAR_UNDEFINED
     false -> char
   }
 }
