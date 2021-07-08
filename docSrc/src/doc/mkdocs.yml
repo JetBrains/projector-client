@@ -29,9 +29,10 @@ extra:
     - icon: fontawesome/brands/github
       # TODO: rename to "projector"?
       link: https://github.com/JetBrains/projector-client
-      # TODO: other sites?
-#    - type: 'twitter'
-#      link: 'https://twitter.com/you'
+    - icon: fontawesome/brands/twitter
+      link: 'https://twitter.com/ProjectorJB'
+    - icon: fontawesome/solid/globe
+      link: 'https://projector.jetbrains.com'
 
 plugins:
   - search
