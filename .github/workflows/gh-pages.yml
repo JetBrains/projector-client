@@ -36,6 +36,7 @@ jobs:
           cd -
           # Add new ones:
           cp -r master/docSrc/build/mkdocs gh-pages
+          cp master/docSrc/src/index.html gh-pages
       - name: Commit and push
         run: |
           cd gh-pages
