@@ -61,4 +61,4 @@ jobs:
       - name: check projector-launcher building windows
         run: |
           npm cache clean --force
-          gradlew :projector-launcher:distZip
+          ./gradlew :projector-launcher:distZip
