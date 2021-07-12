@@ -21,22 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.agent.ijInjector
+package org.jetbrains.projector.common.ij
 
-import org.jetbrains.projector.common.ij.toArgsMap
-import org.jetbrains.projector.util.logging.Logger
-import java.lang.instrument.Instrumentation
+object IjArgs {
+  const val isAgent = "isAgent"
+  const val ijClProviderClass = "ijClProviderClass"
+  const val ijClProviderMethod = "ijClProviderMethod"
+  const val mdPanelMakerClass = "mdPanelMakerClass"
+  const val mdPanelMakerMethod = "mdPanelMakerMethod"
+}
 
-public object IjInjectorAgent {
+fun Map<String, Any>.toIjArgs(): String {
+  return entries.joinToString(separator = ";") { "${it.key}=${it.value}" }
+}
 
-  private val logger = Logger<IjInjectorAgent>()
+fun String.toArgsMap(): Map<String, String> {
 
-  @JvmStatic
-  public fun agentmain(args: String, instrumentation: Instrumentation) {
-    logger.debug { "IjInjectorAgent agentmain start, args=$args" }
-
-    IjInjector.agentmain(instrumentation, args.toArgsMap())
-
-    logger.debug { "IjInjectorAgent agentmain finish" }
+  return split(";").associate {
+    val (key, value) = it.split("=")
+    key to value
   }
 }
