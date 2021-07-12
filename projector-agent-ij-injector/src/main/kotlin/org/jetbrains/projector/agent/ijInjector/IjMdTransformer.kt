@@ -26,6 +26,7 @@ package org.jetbrains.projector.agent.ijInjector
 import javassist.ClassPool
 import javassist.LoaderClassPath
 import org.jetbrains.projector.agent.common.getClassFromClassfileBuffer
+import org.jetbrains.projector.common.ij.IjArgs
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
@@ -122,10 +123,7 @@ internal class IjMdTransformer private constructor(
     private const val jcefClass = "org.intellij.plugins.markdown.ui.preview.jcef.JCEFHtmlPanelProvider"
     private val jcefPath = jcefClass.replace('.', '/')
 
-    fun agentmain(
-      utils: IjInjector.Utils,
-      mdPanelMakerClass: String, mdPanelMakerMethod: String,
-    ) {
+    fun agentmain(utils: IjInjector.Utils) {
       logger.debug { "IjMdTransformer agentmain start" }
 
       val extensionPointName = utils.createExtensionPointName(MD_EXTENSION_ID)
@@ -136,6 +134,10 @@ internal class IjMdTransformer private constructor(
       val mdCp = ClassPool().apply {
         appendClassPath(LoaderClassPath(mdClassloader))
       }
+
+      val mdPanelMakerClass = utils.args.getValue(IjArgs.mdPanelMakerClass)
+      val mdPanelMakerMethod = utils.args.getValue(IjArgs.mdPanelMakerMethod)
+
       val transformer = IjMdTransformer(mdCp, mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod)
 
       utils.instrumentation.addTransformer(transformer, true)

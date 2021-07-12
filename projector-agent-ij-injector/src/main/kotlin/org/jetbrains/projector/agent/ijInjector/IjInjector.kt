@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
+import org.jetbrains.projector.common.ij.IjArgs
 import java.lang.instrument.Instrumentation
 
 internal typealias ExtensionPointName = Any
@@ -34,9 +35,14 @@ internal object IjInjector {
     val instrumentation: Instrumentation,
     val createExtensionPointName: (ExtensionPointId) -> ExtensionPointName,
     val extensionPointNameGetExtensions: (ExtensionPointName) -> Array<*>,
+    val args: Map<String, String>,
   )
 
-  private fun createUtils(instrumentation: Instrumentation, ijClProviderClass: String, ijClProviderMethod: String): Utils {
+  private fun createUtils(instrumentation: Instrumentation, args: Map<String, String>): Utils {
+
+    val ijClProviderClass = args.getValue(IjArgs.ijClProviderClass)
+    val ijClProviderMethod = args.getValue(IjArgs.ijClProviderMethod)
+
     val ijCl = Class.forName(ijClProviderClass).getDeclaredMethod(ijClProviderMethod).invoke(null) as ClassLoader
     val extensionPointNameClass = Class.forName("com.intellij.openapi.extensions.ExtensionPointName", false, ijCl)
     val extensionPointNameCreateMethod = extensionPointNameClass.getDeclaredMethod("create", String::class.java)
@@ -46,21 +52,18 @@ internal object IjInjector {
       instrumentation = instrumentation,
       createExtensionPointName = { extensionPointNameCreateMethod.invoke(null, it) },
       extensionPointNameGetExtensions = { extensionPointNameGetExtensionsMethod.invoke(it) as Array<*> },
+      args = args
     )
   }
 
-  fun agentmain(
-    instrumentation: Instrumentation,
-    isAgent: Boolean,
-    ijClProviderClass: String, ijClProviderMethod: String,
-    mdPanelMakerClass: String, mdPanelMakerMethod: String,
-  ) {
-    val utils = createUtils(instrumentation, ijClProviderClass = ijClProviderClass, ijClProviderMethod = ijClProviderMethod)
+  fun agentmain(instrumentation: Instrumentation, args: Map<String, String>) {
+    val utils = createUtils(instrumentation, args)
 
     IjLigaturesDisablerTransformer.agentmain(utils)
 
+    val isAgent = args[IjArgs.isAgent] == "true"
     if (!isAgent) {  // todo: support variant for agent too
-      IjMdTransformer.agentmain(utils, mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod)
+      IjMdTransformer.agentmain(utils)
       IjBrowserUtilTransformer.agentmain(utils)
     }
   }
