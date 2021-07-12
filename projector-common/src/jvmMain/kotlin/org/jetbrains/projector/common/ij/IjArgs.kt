@@ -24,11 +24,11 @@
 package org.jetbrains.projector.common.ij
 
 object IjArgs {
-  const val isAgent = "isAgent"
-  const val ijClProviderClass = "ijClProviderClass"
-  const val ijClProviderMethod = "ijClProviderMethod"
-  const val mdPanelMakerClass = "mdPanelMakerClass"
-  const val mdPanelMakerMethod = "mdPanelMakerMethod"
+  const val IS_AGENT = "isAgent"
+  const val IJ_CL_PROVIDER_CLASS = "ijClProviderClass"
+  const val IJ_CL_PROVIDER_METHOD = "ijClProviderMethod"
+  const val MD_PANEL_MAKER_CLASS = "mdPanelMakerClass"
+  const val MD_PANEL_MAKER_METHOD = "mdPanelMakerMethod"
 }
 
 fun Map<String, Any>.toIjArgs(): String {

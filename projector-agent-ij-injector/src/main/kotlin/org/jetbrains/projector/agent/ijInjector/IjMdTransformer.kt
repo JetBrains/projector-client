@@ -135,8 +135,8 @@ internal class IjMdTransformer private constructor(
         appendClassPath(LoaderClassPath(mdClassloader))
       }
 
-      val mdPanelMakerClass = utils.args.getValue(IjArgs.mdPanelMakerClass)
-      val mdPanelMakerMethod = utils.args.getValue(IjArgs.mdPanelMakerMethod)
+      val mdPanelMakerClass = utils.args.getValue(IjArgs.MD_PANEL_MAKER_CLASS)
+      val mdPanelMakerMethod = utils.args.getValue(IjArgs.MD_PANEL_MAKER_METHOD)
 
       val transformer = IjMdTransformer(mdCp, mdPanelMakerClass = mdPanelMakerClass, mdPanelMakerMethod = mdPanelMakerMethod)
 
