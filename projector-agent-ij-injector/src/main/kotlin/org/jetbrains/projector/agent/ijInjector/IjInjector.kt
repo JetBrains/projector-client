@@ -40,8 +40,8 @@ internal object IjInjector {
 
   private fun createUtils(instrumentation: Instrumentation, args: Map<String, String>): Utils {
 
-    val ijClProviderClass = args.getValue(IjArgs.ijClProviderClass)
-    val ijClProviderMethod = args.getValue(IjArgs.ijClProviderMethod)
+    val ijClProviderClass = args.getValue(IjArgs.IJ_CL_PROVIDER_CLASS)
+    val ijClProviderMethod = args.getValue(IjArgs.IJ_CL_PROVIDER_METHOD)
 
     val ijCl = Class.forName(ijClProviderClass).getDeclaredMethod(ijClProviderMethod).invoke(null) as ClassLoader
     val extensionPointNameClass = Class.forName("com.intellij.openapi.extensions.ExtensionPointName", false, ijCl)
@@ -61,7 +61,7 @@ internal object IjInjector {
 
     IjLigaturesDisablerTransformer.agentmain(utils)
 
-    val isAgent = args[IjArgs.isAgent] == "true"
+    val isAgent = args[IjArgs.IS_AGENT] == "true"
     if (!isAgent) {  // todo: support variant for agent too
       IjMdTransformer.agentmain(utils)
       IjBrowserUtilTransformer.agentmain(utils)

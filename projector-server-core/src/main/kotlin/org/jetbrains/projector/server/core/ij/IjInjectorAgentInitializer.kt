@@ -49,11 +49,11 @@ public object IjInjectorAgentInitializer {
       val mdPanelMakerMethod = MarkdownPanelMaker::createMarkdownHtmlPanel.name
 
       val args = mapOf(
-        IjArgs.isAgent to isAgent,
-        IjArgs.ijClProviderClass to ijClProviderClass,
-        IjArgs.ijClProviderMethod to ijClProviderMethod,
-        IjArgs.mdPanelMakerClass to mdPanelMakerClass,
-        IjArgs.mdPanelMakerMethod to mdPanelMakerMethod,
+        IjArgs.IS_AGENT to isAgent,
+        IjArgs.IJ_CL_PROVIDER_CLASS to ijClProviderClass,
+        IjArgs.IJ_CL_PROVIDER_METHOD to ijClProviderMethod,
+        IjArgs.MD_PANEL_MAKER_CLASS to mdPanelMakerClass,
+        IjArgs.MD_PANEL_MAKER_METHOD to mdPanelMakerMethod,
       ).toIjArgs()
 
       copyAgentToTempJarAndAttach(
