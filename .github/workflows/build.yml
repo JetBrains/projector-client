@@ -1,0 +1,64 @@
+name: Builds
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build-client:
+
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macOS-latest ]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gradle/wrapper-validation-action@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - run: ./gradlew clean
+      - run: ./gradlew build
+
+  build-launcher-linux:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - run: sudo apt update && sudo apt install wine-stable -y
+      - name: check projector-launcher building linux
+        run: ./gradlew :projector-launcher:distZip
+
+#    build-launcher-macOS:
+#
+#      runs-on: macOS-latest
+#
+#      steps:
+#        - uses: actions/checkout@v2
+#        - uses: actions/setup-java@v1
+#          with:
+#            java-version: '11'
+#        - run: brew install --cask wine-stable
+#        - name: check projector-launcher building macOS
+#          run: ./gradlew :projector-launcher:distZip
+#
+#    build-launcher-windows:
+#
+#      runs-on: windows-latest
+#
+#      steps:
+#        - uses: actions/checkout@v2
+#        - uses: actions/setup-java@v1
+#          with:
+#            java-version: '11'
+#        - name: check projector-launcher building windows
+#          run: |
+#            npm cache clean --force
+#            ./gradlew :projector-launcher:distZip
