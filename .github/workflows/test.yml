@@ -59,4 +59,6 @@ jobs:
         with:
           java-version: '11'
       - name: check projector-launcher building windows
-        run: ./gradlew :projector-launcher:distZip
+        run: |
+          npm cache clean --force
+          gradlew :projector-launcher:distZip
