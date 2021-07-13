@@ -23,8 +23,8 @@
  */
 package org.jetbrains.projector.server.core.ij
 
-import org.jetbrains.projector.common.ij.IjArgs
-import org.jetbrains.projector.common.ij.toIjArgs
+import org.jetbrains.projector.agent.init.IjArgs
+import org.jetbrains.projector.agent.init.toIjArgs
 import org.jetbrains.projector.server.core.ij.md.MarkdownPanelMaker
 import org.jetbrains.projector.util.agent.copyAgentToTempJarAndAttach
 import java.lang.ref.WeakReference

@@ -26,7 +26,7 @@ package org.jetbrains.projector.agent.ijInjector
 import javassist.ClassPool
 import javassist.LoaderClassPath
 import org.jetbrains.projector.agent.common.getClassFromClassfileBuffer
-import org.jetbrains.projector.common.ij.IjArgs
+import org.jetbrains.projector.agent.init.IjArgs
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain

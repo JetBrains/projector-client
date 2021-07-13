@@ -39,6 +39,7 @@ rootProject.name = "projector-client"
 include("docSrc")
 include("projector-agent-common")
 include("projector-agent-ij-injector")
+include("projector-agent-initialization")
 include("projector-common")
 include("projector-client-common")
 include("projector-client-swing")

@@ -21,21 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.common.ij
+package org.jetbrains.projector.agent.init
 
-object IjArgs {
-  const val IS_AGENT = "isAgent"
-  const val IJ_CL_PROVIDER_CLASS = "ijClProviderClass"
-  const val IJ_CL_PROVIDER_METHOD = "ijClProviderMethod"
-  const val MD_PANEL_MAKER_CLASS = "mdPanelMakerClass"
-  const val MD_PANEL_MAKER_METHOD = "mdPanelMakerMethod"
+public object IjArgs {
+  public const val IS_AGENT: String = "isAgent"
+  public const val IJ_CL_PROVIDER_CLASS: String = "ijClProviderClass"
+  public const val IJ_CL_PROVIDER_METHOD: String = "ijClProviderMethod"
+  public const val MD_PANEL_MAKER_CLASS: String = "mdPanelMakerClass"
+  public const val MD_PANEL_MAKER_METHOD: String = "mdPanelMakerMethod"
 }
 
-fun Map<String, Any>.toIjArgs(): String {
+public fun Map<String, Any>.toIjArgs(): String {
   return entries.joinToString(separator = ";") { "${it.key}=${it.value}" }
 }
 
-fun String.toArgsMap(): Map<String, String> {
+public fun String.toArgsMap(): Map<String, String> {
 
   return split(";").associate {
     val (key, value) = it.split("=")
