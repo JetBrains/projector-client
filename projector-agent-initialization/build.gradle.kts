@@ -10,11 +10,8 @@ repositories {
   mavenCentral()
 }
 
-dependencies {
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-}
+val kotlinVersion: String by project
 
-tasks.getByName<Test>("test") {
-  useJUnitPlatform()
+dependencies {
+  testImplementation(kotlin("test", kotlinVersion))
 }
