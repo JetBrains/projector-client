@@ -41,6 +41,5 @@ publishing {
 val javassistVersion: String by project
 
 dependencies {
-  api(project(":projector-common"))
   implementation("org.javassist:javassist:$javassistVersion")
 }

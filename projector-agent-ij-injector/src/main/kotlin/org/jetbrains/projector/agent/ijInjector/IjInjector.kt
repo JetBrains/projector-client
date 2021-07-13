@@ -23,7 +23,7 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
-import org.jetbrains.projector.common.ij.IjArgs
+import org.jetbrains.projector.agent.init.IjArgs
 import java.lang.instrument.Instrumentation
 
 internal typealias ExtensionPointName = Any

@@ -23,7 +23,7 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
-import org.jetbrains.projector.common.ij.toArgsMap
+import org.jetbrains.projector.agent.init.toArgsMap
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.Instrumentation
 
