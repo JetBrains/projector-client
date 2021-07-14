@@ -77,6 +77,113 @@ class ImeTest {
   }
 
   @Test
+  @Ignore
+  fun windowsAltEnDash() = runTest {
+    // type Alt + 0150
+
+    val initial = """
+      keydown: 1279940 Alt AltLeft false 18 undefined
+      keydown: 1280282 0 Numpad0 false 96 undefined
+      keyup: 1280360 0 Numpad0 false 96 undefined
+      keydown: 1280549 1 Numpad1 false 97 undefined
+      keyup: 1280626 1 Numpad1 false 97 undefined
+      keydown: 1280767 5 Numpad5 false 101 undefined
+      keyup: 1280846 5 Numpad5 false 101 undefined
+      keydown: 1280986 0 Numpad0 false 96 undefined
+      keyup: 1281065 0 Numpad0 false 96 undefined
+      keyup: 1281251 Alt AltLeft false 18 undefined
+      input: 1281259 undefined undefined false undefined –
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(11, initial.size)
+
+    val expected = listOf(
+      // todo
+      ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+      ClientKeyPressEvent(42, 'a', emptySet()),
+      ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), UP),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
+  @Ignore
+  fun macAltEnDash() = runTest {
+    // type Alt(Option) + Minus
+
+    val initial = """
+      keydown: 4698 Alt AltLeft false 18 undefined
+      keydown: 4874 – Minus false 189 undefined
+      input: 4882 undefined undefined false undefined –
+      keyup: 4954 – Minus false 189 undefined
+      keyup: 5106 Alt AltLeft false 18 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(5, initial.size)
+
+    val expected = listOf(
+      // todo
+      ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+      ClientKeyPressEvent(42, 'a', emptySet()),
+      ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), UP),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
+  fun linuxAltEnDash() = runTest {
+    // type Ctrl + Shift + u + 2013
+
+    val initial = """
+      keydown: 113889 Control ControlLeft false 17 undefined
+      keydown: 114088 Shift ShiftLeft false 16 undefined
+      keydown: 114520 Process KeyU false 229 undefined
+      compositionstart: 114520 undefined undefined false undefined 
+      compositionupdate: 114520 undefined undefined false undefined u
+      input: 114528 undefined undefined false undefined u
+      keyup: 114621 U KeyU false 85 undefined
+      keydown: 115300 Process Digit2 false 229 undefined
+      compositionupdate: 115300 undefined undefined false undefined u2
+      input: 115308 undefined undefined false undefined u2
+      keyup: 115436 @ Digit2 false 50 undefined
+      keydown: 115696 Process Digit0 false 229 undefined
+      compositionupdate: 115696 undefined undefined false undefined u20
+      input: 115705 undefined undefined false undefined u20
+      keyup: 115793 ) Digit0 false 48 undefined
+      keydown: 115891 Process Digit1 false 229 undefined
+      compositionupdate: 115891 undefined undefined false undefined u201
+      input: 115898 undefined undefined false undefined u201
+      keyup: 116000 ! Digit1 false 49 undefined
+      keydown: 116138 Process Digit3 false 229 undefined
+      compositionupdate: 116139 undefined undefined false undefined u2013
+      input: 116144 undefined undefined false undefined u2013
+      keyup: 116258 # Digit3 false 51 undefined
+      keyup: 116348 Process ShiftLeft false 229 undefined
+      compositionupdate: 116348 undefined undefined false undefined 
+      input: 116360 undefined undefined false undefined 
+      compositionend: 116348 undefined undefined false undefined 
+      input: 116362 undefined undefined false undefined 
+      compositionstart: 116348 undefined undefined false undefined 
+      compositionupdate: 116348 undefined undefined false undefined –
+      compositionend: 116348 undefined undefined false undefined –
+      input: 116385 undefined undefined false undefined –
+      keyup: 116353 Control ControlLeft false 17 undefined
+    """.trimIndent().lines().map(String::toEvent)
+
+    assertEquals(33, initial.size)
+
+    val expected = listOf(
+      ClientKeyPressEvent(42, '–', emptySet()),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.CONTROL, LEFT, emptySet(), DOWN),
+      ClientKeyEvent(42, 0xFFFF.toChar(), VK.SHIFT, LEFT, emptySet(), DOWN),
+    )
+
+    handleEventsAndTest(initial, expected)
+  }
+
+  @Test
   fun windowsChinese() = runTest {
     // type "zhongwen" one by one char and type space
     // kudos to https://youtrack.jetbrains.com/issue/PRJ-514#focus=Comments-27-5016836.0-0
