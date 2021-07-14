@@ -38,21 +38,25 @@ kotlin {
 
 jacoco {
   toolVersion = "0.8.7"
-  reportsDirectory.set(layout.buildDirectory.dir("JacocoReportDir"))
+  reportsDirectory.set(layout.buildDirectory.dir("JacocoReportDirProjectorServerCore"))
 }
 
 tasks.jacocoTestReport {
   reports {
     xml.required.set(true)
     csv.required.set(false)
-    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtmlProjectorServerCore"))
   }
 }
 
-tasks.register<JacocoReport>("projector-server-core"){
-  executionData(tasks.test.get())
-  sourceSets(sourceSets.main.get())
-}
+//tasks.register<JacocoReport>("projector-server-core"){
+//  executionData(tasks.check.get())
+//  sourceSets(sourceSets.main.get())
+//  reports {
+//    xml.required.set(true)
+//    xml.outputLocation.set(layout.buildDirectory.file("kek.xml"))
+//  }
+//}
 
 publishing {
   publications {
