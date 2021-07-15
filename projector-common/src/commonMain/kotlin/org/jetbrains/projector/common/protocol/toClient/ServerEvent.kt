@@ -121,17 +121,17 @@ data class ServerCaretInfoChangedEvent(
       @SerialName("c")
       val fontSize: Int,
       @SerialName("d")
-      val nominalLineHeight: Int,
-      @SerialName("e")
       val plainSpaceWidth: Float,
-      @SerialName("f")
+      @SerialName("e")
       val editorWindowId: Int,
-      @SerialName("g")
+      @SerialName("f")
       val editorMetrics: CommonRectangle,
-      @SerialName("h")
+      @SerialName("g")
       val lineHeight: Int,
-      @SerialName("i")
+      @SerialName("h")
       val lineDescent: Int,
+      @SerialName("i")
+      val scrollBarWidth: Int,
     ) : CaretInfoChange()
   }
 }

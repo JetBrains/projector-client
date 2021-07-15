@@ -145,19 +145,30 @@ sealed class Typing {
         rect(
           x = editorMetrics.x,
           y = editorMetrics.y,
-          w = editorMetrics.width - 10,  // todo: -10 to prevent scrollbar be repainted
+          w = editorMetrics.width,
           h = editorMetrics.height
         )
         clip()
 
-        val imageData = getImageData(
-          sx = firstCaretLocation.x,
-          sy = firstCaretLocation.y,
-          sw = editorMetrics.width - (firstCaretLocation.x - editorMetrics.x),
-          sh = currentCarets.nominalLineHeight.toDouble() + 2 + 2
-        )
 
-        putImageData(imageData, firstCaretLocation.x + currentCarets.plainSpaceWidth, firstCaretLocation.y)
+        val speculativeCharWidth = currentCarets.plainSpaceWidth
+
+        val sw = editorMetrics.width - (firstCaretLocation.x - editorMetrics.x) - currentCarets.scrollBarWidth - speculativeCharWidth
+
+        if (sw > 0) { // check we actually have some graphics to move
+          val imageData = getImageData(
+            sx = firstCaretLocation.x,
+            sy = firstCaretLocation.y,
+            sw = sw,
+            sh = currentCarets.lineHeight.toDouble()
+          )
+
+          putImageData(imageData, firstCaretLocation.x + speculativeCharWidth, firstCaretLocation.y)
+        }
+
+        val caretOffsetFromEditorEnd = editorMetrics.x + editorMetrics.width - firstCaretLocation.x
+        // check there is space to draw speculative symbol
+        if (caretOffsetFromEditorEnd < speculativeCharWidth) return@apply
 
         val fontFace = currentCarets.fontId?.toFontFaceName() ?: "Arial"
         val fontSize = "${currentCarets.fontSize}px"
