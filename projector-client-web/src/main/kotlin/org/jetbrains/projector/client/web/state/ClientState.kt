@@ -500,7 +500,7 @@ sealed class ClientState {
         val event = action.event
 
         if (event is ClientKeyPressEvent) {
-          typing.addChar(event.char)
+          typing.addEventChar(event)
         }
 
         eventsToSend.add(event)
