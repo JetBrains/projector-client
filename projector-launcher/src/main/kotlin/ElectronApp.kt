@@ -70,6 +70,7 @@ class ElectronApp(val url: String) {
                     height: height,
                     webPreferences: {
                         nodeIntegration: true,
+                        enableRemoteModule: true,
                         webSecurity: false,
                         worldSafeExecuteJavaScript: true,
                         preload: preloadPath
