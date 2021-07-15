@@ -52,6 +52,8 @@ dependencies {
   implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$kotlinStyledComponentsVersion")
   implementation(npm("radium", radiumVersion))
   implementation(npm("react-loading-indicator", reactLoadingIndicatorVersion))
+  implementation(npm("istanbul-instrumenter-loader", "3.0.1"))
+  implementation(npm("karma-coverage-istanbul-reporter", "3.0.3"))
 
   testImplementation(kotlin("test", kotlinVersion))
 }

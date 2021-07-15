@@ -21,48 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("multiplatform")
-  `maven-publish`
-}
 
-val kotlinVersion: String by project
 
-kotlin {
-  js {
-    browser()
-  }
+;(function(config) {
+  const path = require("path")
 
-  jvm {
-  }
+  config.reporters.push("coverage-istanbul")
+  config.plugins.push("karma-coverage-istanbul-reporter")
 
-  sourceSets {
-    val commonMain by getting {
-      dependencies {
-        api(kotlin("reflect", kotlinVersion))
-        implementation(project(":projector-common"))
-        implementation(project(":projector-util-logging"))
-        implementation(npm("istanbul-instrumenter-loader", "3.0.1"))
-        implementation(npm("karma-coverage-istanbul-reporter", "3.0.3"))
+  config.webpack.module.rules.push(
+      {
+        test: /\.js$/,
+        use: {loader: 'istanbul-instrumenter-loader'},
+        include: [path.resolve(__dirname, '../kotlin-js-coverage/kotlin/')]
       }
-    }
+  )
 
-    val jsMain by getting {
-    }
-
-    val jvmMain by getting {
-    }
-
-    val commonTest by getting {
-      dependencies {
-        api(kotlin("test", kotlinVersion))
-      }
-    }
-
-    val jsTest by getting {
-    }
-
-    val jvmTest by getting {
-    }
+  config.coverageIstanbulReporter = {
+    reports: ["html"]
   }
-}
+}(config));
