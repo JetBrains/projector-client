@@ -128,6 +128,12 @@ data class ServerCaretInfoChangedEvent(
       val editorWindowId: Int,
       @SerialName("g")
       val editorMetrics: CommonRectangle,
+      @SerialName("h")
+      val lineHeight: Int,
+      @SerialName("i")
+      val lineDescent: Int,
+      @SerialName("j")
+      val scrollBarWidth: Int,
     ) : CaretInfoChange()
   }
 }
