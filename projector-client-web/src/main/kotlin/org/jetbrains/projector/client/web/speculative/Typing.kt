@@ -165,7 +165,9 @@ sealed class Typing {
         font = "$fontSize $fontFace"  // todo: use a proper font style
         fillStyle = "#888"  // todo: use a proper color
 
-        val stringYPos = firstCaretLocation.y + currentCarets.fontSize  // todo: offsetting by fontSize seems to be not exact
+        val baselineTopOffset = currentCarets.lineHeight - currentCarets.lineDescent
+        val stringYPos = firstCaretLocation.y + baselineTopOffset
+
         fillText(event.char.toString(), firstCaretLocation.x, stringYPos)
       }
 
