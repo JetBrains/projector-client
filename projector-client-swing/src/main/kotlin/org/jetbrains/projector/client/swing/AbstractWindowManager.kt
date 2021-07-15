@@ -46,7 +46,7 @@ abstract class AbstractWindowManager<FrameType> {
 
     frameData.surfaceSizeScale = getScalingForWindow(frameData)
     frameData.surface.setBounds((it.bounds.width * frameData.surfaceSizeScale).toInt(), (it.bounds.height * frameData.surfaceSizeScale).toInt())
-    frameData.surface.scalingRatio = frameData.surfaceSizeScale
+    frameData.surface.scalingRatio = 1.0 // transforms sent from remote already contain the required scale factor
   }
 
   fun getFrameData(windowId: Int) = currentWindows[windowId]
@@ -95,6 +95,13 @@ abstract class AbstractWindowManager<FrameType> {
       window.surface.flush()
       redrawWindow(window)
     }
+  }
+
+  open fun handleClipboardEvent(event: ServerClipboardEvent) {
+    logger.debug { "Received and discarded server clipboard event: ${event.stringContent}" }
+  }
+  open fun handleMarkdownEvent(event: ServerMarkdownEvent) {
+    logger.debug { "Received and discarded markdown event: $event" }
   }
 
   inner class FrameData(

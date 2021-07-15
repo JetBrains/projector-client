@@ -30,7 +30,6 @@ import org.jetbrains.projector.common.protocol.toServer.ClientWindowMoveEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowResizeEvent
 import org.jetbrains.projector.common.protocol.toServer.ResizeDirection
 import org.jetbrains.projector.util.logging.Logger
-import org.jetbrains.projector.util.logging.loggerFactory
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.event.*
@@ -47,7 +46,7 @@ open class JFrameWindowManager(val transport: ProjectorTransport) : AbstractWind
   override fun newFrame(windowId: Int, canvas: SwingCanvas, windowData: WindowData): JFrame {
     return JFrame().apply {
       rootPane.contentPane.add(ProjectorViewPanel(canvas, transport.connectionTime).apply a2@{
-        addListeners(windowId, this@apply) {
+        addListeners(windowId) {
           // todo: grouping?
           transport.send(it)
         }
