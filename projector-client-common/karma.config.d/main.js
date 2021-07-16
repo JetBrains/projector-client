@@ -33,7 +33,7 @@
       {
         test: /\.js$/,
         use: {loader: 'istanbul-instrumenter-loader'},
-        include: [path.resolve(__dirname, '../projector-client-projector-client-common-test/kotlin/')]
+        include: [path.resolve(__dirname,'../projector-client-projector-client-common/kotlin/')]
       }
   )
 
