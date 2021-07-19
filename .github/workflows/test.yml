@@ -32,4 +32,4 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./JacocoReports/jacocoTestReport.xml
+          directory: ./JacocoReports/
