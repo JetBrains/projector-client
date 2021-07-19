@@ -29,10 +29,24 @@ plugins {
   kotlin("jvm")
   `maven-publish`
   idea
+  jacoco
 }
 
 kotlin {
   explicitApi()
+}
+
+jacoco {
+  toolVersion = "0.8.7"
+}
+
+tasks.withType<JacocoReport> {
+  reports {
+    xml.isEnabled = true
+    xml.destination = file(layout.buildDirectory.dir("../../JacocoReports/jacocoReportServer.xml"))
+    csv.required.set(false)
+    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtmlProjectorServerCore"))
+  }
 }
 
 publishing {
@@ -118,6 +132,7 @@ val integrationTest = task<Test>("integrationTest") {
     true -> dependsOn(":projector-client-web:browserDevelopmentWebpack")
     false -> dependsOn(":projector-client-web:browserProductionWebpack")
   }
+  finalizedBy(tasks.jacocoTestReport)
 }
 
 // todo: understand why it doesn't work on CI (https://github.com/JetBrains/projector-client/runs/1045863376)
