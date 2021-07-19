@@ -38,7 +38,7 @@ kotlin {
 
 jacoco {
   toolVersion = "0.8.7"
-  reportsDirectory.set(layout.buildDirectory.dir("JacocoReportDirProjectorServerCore"))
+  reportsDirectory.set(layout.buildDirectory.dir("../../JacocoReports/JacocoReportDirProjectorServerCore"))
 }
 
 tasks.jacocoTestReport {
@@ -48,15 +48,6 @@ tasks.jacocoTestReport {
     html.outputLocation.set(layout.buildDirectory.dir("jacocoHtmlProjectorServerCore"))
   }
 }
-
-//tasks.register<JacocoReport>("projector-server-core"){
-//  executionData(tasks.check.get())
-//  sourceSets(sourceSets.main.get())
-//  reports {
-//    xml.required.set(true)
-//    xml.outputLocation.set(layout.buildDirectory.file("kek.xml"))
-//  }
-//}
 
 publishing {
   publications {
