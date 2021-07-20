@@ -1,9 +1,18 @@
 plugins {
   kotlin("jvm")
+  `maven-publish`
 }
 
 kotlin {
   explicitApi()
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      from(components["java"])
+    }
+  }
 }
 
 repositories {
