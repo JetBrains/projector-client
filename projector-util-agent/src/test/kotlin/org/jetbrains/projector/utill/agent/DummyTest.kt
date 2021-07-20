@@ -21,44 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("jvm")
-  `maven-publish`
-  jacoco
-}
+package org.jetbrains.projector.utill.agent
 
-jacoco {
-  toolVersion = "0.8.7"
-}
+import kotlin.test.Test
+import kotlin.test.assertTrue
 
-tasks.withType<JacocoReport> {
-  reports {
-    xml.isEnabled = true
-    xml.destination = file(layout.buildDirectory.dir("../../JacocoReports/jacocoReportUtillAgent.xml"))
-    csv.required.set(false)
-    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtmlProjectorUtillAgent"))
+class DummyTest {
+  @Test
+  fun `dummy test for coverage building`() {
+    assertTrue(true)
   }
-}
-
-kotlin {
-  explicitApi()
-}
-
-publishing {
-  publications {
-    create<MavenPublication>("maven") {
-      from(components["java"])
-    }
-  }
-}
-
-dependencies {
-  implementation(project(":projector-util-logging"))
-
-  testImplementation(kotlin("test"))
-}
-
-tasks.test {
-  useJUnitPlatform()
-  finalizedBy(tasks.jacocoTestReport)
 }
