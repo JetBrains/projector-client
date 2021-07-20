@@ -29,6 +29,7 @@ jobs:
           ./gradlew check build
           ./gradlew :projector-server-core:jacocoTestReport
           ./gradlew :projector-common:jacocoTestReport
+          ./gradlew :projector-agent-common:jacocoTestReport
       - name: test coverage
         uses: codecov/codecov-action@v1
         with:
