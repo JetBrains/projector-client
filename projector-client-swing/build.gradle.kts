@@ -24,7 +24,22 @@
 
 plugins {
   kotlin("jvm")
+  jacoco
 }
+
+jacoco {
+  toolVersion = "0.8.7"
+}
+
+tasks.withType<JacocoReport> {
+  reports {
+    xml.isEnabled = true
+    xml.destination = file(layout.buildDirectory.dir("../../JacocoReports/jacocoReportClientSwing.xml"))
+    csv.required.set(false)
+    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtmlProjectorClientSwing"))
+  }
+}
+
 
 val coroutinesVersion: String by project
 val serializationVersion: String by project
@@ -39,8 +54,14 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
   implementation("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
+
+  testImplementation(kotlin("test"))
 }
 
 kotlin {
 
+}
+tasks.test {
+  useJUnitPlatform()
+  finalizedBy(tasks.jacocoTestReport)
 }
