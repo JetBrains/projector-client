@@ -15,10 +15,6 @@ publishing {
   }
 }
 
-repositories {
-  mavenCentral()
-}
-
 val kotlinVersion: String by project
 
 dependencies {
