@@ -25,6 +25,20 @@ import org.gradle.jvm.tasks.Jar
 
 plugins {
   kotlin("jvm")
+  jacoco
+}
+
+jacoco {
+  toolVersion = "0.8.7"
+}
+
+tasks.withType<JacocoReport> {
+  reports {
+    xml.isEnabled = true
+    xml.destination = file(layout.buildDirectory.dir("../../JacocoReports/jacocoReportAgentIjInjector.xml"))
+    csv.required.set(false)
+    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtmlProjectorClient"))
+  }
 }
 
 kotlin {
@@ -38,6 +52,7 @@ dependencies {
   implementation(project(":projector-agent-initialization"))
   implementation(project(":projector-util-logging"))
   implementation("org.javassist:javassist:$javassistVersion")
+  testImplementation(kotlin("test"))
 }
 
 val agentClass = "org.jetbrains.projector.agent.ijInjector.IjInjectorAgent"
@@ -54,4 +69,9 @@ tasks.withType<Jar> {
   exclude("META-INF/versions/9/module-info.class")
 
   from(inline(configurations.runtimeClasspath))
+}
+
+tasks.test {
+  useJUnitPlatform()
+  finalizedBy(tasks.jacocoTestReport)
 }
