@@ -35,6 +35,8 @@ import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.window.DragEventsInterceptor
 import org.jetbrains.projector.client.web.window.WindowManager
 import org.jetbrains.projector.common.protocol.toServer.*
+import org.jetbrains.projector.common.protocol.toClient.ServerEvent
+import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.w3c.dom.TouchEvent
 import org.w3c.dom.clipboard.ClipboardEvent
 import org.w3c.dom.events.Event
@@ -386,6 +388,12 @@ class InputController(
 
       return modifiers.union(specialKeysState.mouseModifiers)
     }
+
+  public fun handleServerEvent(serverEvent: ServerEvent) {
+    if (serverEvent is ServerCaretInfoChangedEvent && inputMethod is ImeInputMethod) {
+      inputMethod.handleServerCaretInfoChangedEvent(serverEvent)
+    }
+  }
 
   private companion object {
 
