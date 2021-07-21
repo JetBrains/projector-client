@@ -35,12 +35,14 @@ import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
+import org.jetbrains.projector.client.web.input.InputController
 import org.w3c.dom.url.URL
 
 class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEventsProcessor) {
 
   @OptIn(ExperimentalStdlibApi::class)
-  fun process(commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager) {
+  fun process(commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager,
+              inputController: InputController) {
     val drawCommandsEvents = mutableListOf<ServerDrawCommandsEvent>()
 
     commands.forEach { command ->
@@ -81,6 +83,7 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           OnScreenMessenger.lookAndFeelChanged()
         }
       }
+      inputController.handleServerEvent(command)
     }
 
     // todo: determine the moment better
