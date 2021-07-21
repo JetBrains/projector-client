@@ -30,6 +30,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.UP
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.common.protocol.toServer.KeyModifier
+import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.events.CompositionEvent
 import org.w3c.dom.events.Event
@@ -51,8 +52,7 @@ class ImeInputMethod(
   private val inputField = (document.createElement("textarea") as HTMLTextAreaElement).apply {
     style.apply {
       position = "fixed"
-      bottom = "-30%"
-      left = "50%"
+      opacity = "0"
     }
 
     autocomplete = "off"
@@ -91,6 +91,19 @@ class ImeInputMethod(
 
   override fun dispose() {
     inputField.remove()
+  }
+
+  fun handleServerCaretInfoChangedEvent(serverEvent: ServerCaretInfoChangedEvent) {
+    val carets = serverEvent.data as ServerCaretInfoChangedEvent.CaretInfoChange.Carets
+    val caretInfo = carets.caretInfoList[0]
+    val x = caretInfo.locationInWindow.x
+    val y = caretInfo.locationInWindow.y
+
+    inputField.style.apply {
+      top = "${y}px"
+      left = "${x}px"
+      fontSize = "${carets.fontSize}px"
+    }
   }
 }
 

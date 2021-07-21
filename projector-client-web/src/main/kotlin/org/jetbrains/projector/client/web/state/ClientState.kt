@@ -430,7 +430,7 @@ sealed class ClientState {
         val decompressTimeStamp = TimeStamp.current
         val commands = decoder.decode(decompressed)
         val decodeTimestamp = TimeStamp.current
-        serverEventsProcessor.process(commands, pingStatistics, typing, markdownPanelManager)
+        serverEventsProcessor.process(commands, pingStatistics, typing, markdownPanelManager, inputController)
         val drawTimestamp = TimeStamp.current
 
         ImageCacher.collectGarbage()
