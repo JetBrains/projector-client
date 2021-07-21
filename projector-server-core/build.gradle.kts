@@ -126,6 +126,8 @@ val integrationTest = task<Test>("integrationTest") {
 
   systemProperties = System.getProperties().map { (k, v) -> k.toString() to v }.toMap()
 
+  useJUnitPlatform()
+
   shouldRunAfter("test")
   dependsOn(downloadIntTestFont)
   when (devBuilding) {
@@ -159,7 +161,7 @@ dependencies {
   intTestImplementation("io.ktor:ktor-websockets:$ktorVersion")
   intTestImplementation("io.ktor:ktor-client-cio:$ktorVersion")
   intTestImplementation(kotlin("test", kotlinVersion))
-  intTestImplementation(kotlin("test-junit", kotlinVersion))
+  intTestImplementation(kotlin("test-junit5", kotlinVersion))
 }
 
 val copyProjectorClientWebDistributionToResources = task<Copy>("copyProjectorClientWebDistributionToResources") {
