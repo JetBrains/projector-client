@@ -35,6 +35,8 @@ jacoco {
 
 val kotlinVersion: String by project
 val serializationVersion: String by project
+val usernameProp: String by project
+val passwordProp: String by project
 
 tasks.withType<JacocoReport> {
   dependsOn("jvmTest")
@@ -96,6 +98,26 @@ kotlin {
     }
 
     val jvmTest by getting {
+    }
+  }
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      groupId = "org.jetbrains.projector-client"
+      artifactId = "projector-common"
+      version = "-SNAPSHOT"
+      from(components["kotlin"])
+    }
+  }
+  repositories {
+    maven {
+      url = uri("https://packages.jetbrains.team/maven/p/prj/projector-client")
+      credentials {
+        username = usernameProp
+        password = passwordProp
+      }
     }
   }
 }

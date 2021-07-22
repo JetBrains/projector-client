@@ -27,6 +27,8 @@ plugins {
 }
 
 val kotlinVersion: String by project
+val usernameProp: String by project
+val passwordProp: String by project
 
 kotlin {
   explicitApi()
@@ -44,6 +46,26 @@ kotlin {
     }
 
     val jvmMain by getting {
+    }
+  }
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      groupId = "org.jetbrains.projector-client"
+      artifactId = "projector-util-logging"
+      version = "-SNAPSHOT"
+      from(components["kotlin"])
+    }
+  }
+  repositories {
+    maven {
+      url = uri("https://packages.jetbrains.team/maven/p/prj/projector-client")
+      credentials {
+        username = usernameProp
+        password = passwordProp
+      }
     }
   }
 }
