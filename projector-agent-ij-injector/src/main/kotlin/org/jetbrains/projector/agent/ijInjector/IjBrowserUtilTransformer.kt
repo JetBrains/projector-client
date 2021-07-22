@@ -31,7 +31,7 @@ import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
 
 internal class IjBrowserUtilTransformer private constructor(
-  private val mdCp: ClassPool,
+  private val ideCp: ClassPool,
 ) : ClassFileTransformer {
 
   override fun transform(
@@ -60,11 +60,11 @@ internal class IjBrowserUtilTransformer private constructor(
 
   private fun transformBrowserUtil(className: String, classfileBuffer: ByteArray): ByteArray {
     logger.debug { "Transforming BrowserUtil..." }
-    val clazz = getClassFromClassfileBuffer(mdCp, className, classfileBuffer)
+    val clazz = getClassFromClassfileBuffer(ideCp, className, classfileBuffer)
     clazz.defrost()
 
     clazz
-      .getDeclaredMethod("browse", arrayOf(mdCp["java.lang.String"]))
+      .getDeclaredMethod("browse", arrayOf(ideCp["java.lang.String"]))
       .setBody(
         """
           {
@@ -74,7 +74,7 @@ internal class IjBrowserUtilTransformer private constructor(
       )
 
     clazz
-      .getDeclaredMethod("browse", arrayOf(mdCp["java.lang.String"], mdCp["com.intellij.openapi.project.Project"]))
+      .getDeclaredMethod("browse", arrayOf(ideCp["java.lang.String"], ideCp["com.intellij.openapi.project.Project"]))
       .setBody(
         """
           {
@@ -92,7 +92,7 @@ internal class IjBrowserUtilTransformer private constructor(
 
     private val logger = Logger<IjBrowserUtilTransformer>()
 
-    private const val MD_EXTENSION_ID = "org.intellij.markdown.html.panel.provider"
+    private const val SE_CONTRIBUTOR_EP = "com.intellij.searchEverywhereContributor"
 
     private const val browserUtilClass = "com.intellij.ide.BrowserUtil"
     private val browserUtilPath = browserUtilClass.replace('.', '/')
@@ -104,16 +104,15 @@ internal class IjBrowserUtilTransformer private constructor(
     ) {
       logger.debug { "agentmain start" }
 
-      // todo: get rid of md, it's needed only to get IDE classloader
-      val extensionPointName = utils.createExtensionPointName(MD_EXTENSION_ID)
+      val extensionPointName = utils.createExtensionPointName(SE_CONTRIBUTOR_EP)
       val extensions = utils.extensionPointNameGetExtensions(extensionPointName)
 
-      val mdClassloader = extensions.filterNotNull().first()::class.java.classLoader
+      val ideClassloader = extensions.filterNotNull().first()::class.java.classLoader
 
-      val mdCp = ClassPool().apply {
-        appendClassPath(LoaderClassPath(mdClassloader))
+      val ideCp = ClassPool().apply {
+        appendClassPath(LoaderClassPath(ideClassloader))
       }
-      val transformer = IjBrowserUtilTransformer(mdCp)
+      val transformer = IjBrowserUtilTransformer(ideCp)
 
       utils.instrumentation.addTransformer(transformer, true)
 
@@ -121,7 +120,7 @@ internal class IjBrowserUtilTransformer private constructor(
         browserUtilClass,
       ).forEach { clazz ->
         try {
-          utils.instrumentation.retransformClasses(Class.forName(clazz, false, mdClassloader))
+          utils.instrumentation.retransformClasses(Class.forName(clazz, false, ideClassloader))
         }
         catch (t: Throwable) {
           logger.error(t) { "Class retransform error" }

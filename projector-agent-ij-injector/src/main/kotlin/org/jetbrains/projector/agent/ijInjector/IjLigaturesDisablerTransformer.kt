@@ -31,7 +31,7 @@ import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
 
 internal class IjLigaturesDisablerTransformer private constructor(
-  private val mdCp: ClassPool,
+  private val ideCp: ClassPool,
 ) : ClassFileTransformer {
 
   override fun transform(
@@ -60,7 +60,7 @@ internal class IjLigaturesDisablerTransformer private constructor(
 
   private fun transformFontPrefs(className: String, classfileBuffer: ByteArray): ByteArray {
     logger.debug { "Transforming fontprefs..." }
-    val clazz = getClassFromClassfileBuffer(mdCp, className, classfileBuffer)
+    val clazz = getClassFromClassfileBuffer(ideCp, className, classfileBuffer)
     clazz.defrost()
 
     clazz
@@ -80,7 +80,7 @@ internal class IjLigaturesDisablerTransformer private constructor(
 
     private val logger = Logger<IjLigaturesDisablerTransformer>()
 
-    private const val MD_EXTENSION_ID = "org.intellij.markdown.html.panel.provider"
+    private const val SE_CONTRIBUTOR_EP = "com.intellij.searchEverywhereContributor"
 
     private const val fontPrefsClass = "com.intellij.openapi.editor.colors.impl.FontPreferencesImpl"
     private val fontPrefsPath = fontPrefsClass.replace('.', '/')
@@ -90,16 +90,15 @@ internal class IjLigaturesDisablerTransformer private constructor(
     ) {
       logger.debug { "agentmain start" }
 
-      // todo: get rid of md, it's needed only to get IDE classloader
-      val extensionPointName = utils.createExtensionPointName(MD_EXTENSION_ID)
+      val extensionPointName = utils.createExtensionPointName(SE_CONTRIBUTOR_EP)
       val extensions = utils.extensionPointNameGetExtensions(extensionPointName)
 
-      val mdClassloader = extensions.filterNotNull().first()::class.java.classLoader
+      val ideClassloader = extensions.filterNotNull().first()::class.java.classLoader
 
-      val mdCp = ClassPool().apply {
-        appendClassPath(LoaderClassPath(mdClassloader))
+      val ideCp = ClassPool().apply {
+        appendClassPath(LoaderClassPath(ideClassloader))
       }
-      val transformer = IjLigaturesDisablerTransformer(mdCp)
+      val transformer = IjLigaturesDisablerTransformer(ideCp)
 
       utils.instrumentation.addTransformer(transformer, true)
 
@@ -107,7 +106,7 @@ internal class IjLigaturesDisablerTransformer private constructor(
         fontPrefsClass,
       ).forEach { clazz ->
         try {
-          utils.instrumentation.retransformClasses(Class.forName(clazz, false, mdClassloader))
+          utils.instrumentation.retransformClasses(Class.forName(clazz, false, ideClassloader))
         }
         catch (t: Throwable) {
           logger.error(t) { "Class retransform error" }
