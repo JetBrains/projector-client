@@ -33,8 +33,8 @@ val kotlinVersion: String by project
 val targetJvm: String by project
 
 subprojects {
-  group = "org.jetbrains"
-  version = "1.0-SNAPSHOT"
+  group = "org.jetbrains.projector-client"
+  version = "-SNAPSHOT"
 
   repositories {
     mavenCentral()
