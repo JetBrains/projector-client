@@ -4,6 +4,8 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B26573%2Fgithub.com%2FJetBrains%2Fprojector-client.svg?type=shield)](https://app.fossa.com/projects/custom%2B26573%2Fgithub.com%2FJetBrains%2Fprojector-client?ref=badge_shield)
 
 
+[![Build status badge](https://github.com/JetBrains/projector-client/workflows/Builds/badge.svg)](https://github.com/JetBrains/projector-client/actions)
+
 Common and client-related code for running Swing applications remotely.
 
 [Documentation](https://jetbrains.github.io/projector-client/mkdocs/latest/) | [Issue tracker](https://youtrack.jetbrains.com/issues/PRJ)
