@@ -51,19 +51,20 @@ tasks.withType<JacocoReport> {
 
 val usernameProp: String by project
 val passwordProp: String by project
+val versionProp: String by project
 
 publishing {
   publications {
     create<MavenPublication>("maven") {
-      groupId = "org.jetbrains.projector-client"
+      groupId = "org.jetbrains.projector"
       artifactId = "projector-server-core"
-      version = "-SNAPSHOT"
+      version = versionProp
       from(components["java"])
     }
   }
   repositories {
     maven {
-      url = uri("https://packages.jetbrains.team/maven/p/prj/projector-client")
+      url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
       credentials {
         username = usernameProp
         password = passwordProp
