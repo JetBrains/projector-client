@@ -48,7 +48,13 @@ import org.jetbrains.projector.common.protocol.toServer.ResizeDirection
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.math.roundToInt
 
-class Window(windowData: WindowData, private val stateMachine: ClientStateMachine) : LafListener {
+interface Positionable {
+
+  val bounds: CommonRectangle
+  val zIndex: Int
+}
+
+class Window(windowData: WindowData, private val stateMachine: ClientStateMachine) : LafListener, Positionable {
 
   val id = windowData.id
 
@@ -86,7 +92,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   private val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface)
 
-  var bounds: CommonRectangle = CommonRectangle(0.0, 0.0, 0.0, 0.0)
+  override var bounds: CommonRectangle = CommonRectangle(0.0, 0.0, 0.0, 0.0)
     set(value) {
       if (field == value) {
         return
@@ -95,7 +101,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
       applyBounds()
     }
 
-  var zIndex: Int = 0
+  override var zIndex: Int = 0
     set(value) {
       if (field != value) {
         field = value

@@ -25,12 +25,14 @@ package org.jetbrains.projector.client.web.input.key
 
 import kotlinx.browser.document
 import org.jetbrains.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.web.window.Positionable
+import org.jetbrains.projector.common.misc.Do
+import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.DOWN
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.UP
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.common.protocol.toServer.KeyModifier
-import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.events.CompositionEvent
 import org.w3c.dom.events.Event
@@ -41,6 +43,7 @@ import kotlin.math.roundToInt
 class ImeInputMethod(
   openingTimeStamp: Int,
   clientEventConsumer: (ClientEvent) -> Unit,
+  private val windowPositionByIdGetter: (windowId: Int) -> Positionable?,
 ) : InputMethod {
 
   private val handler = ImeInputMethodEventHandler(
@@ -52,7 +55,14 @@ class ImeInputMethod(
   private val inputField = (document.createElement("textarea") as HTMLTextAreaElement).apply {
     style.apply {
       position = "fixed"
-      opacity = "0"
+      background = "none"
+      border = "none"
+      resize = "none"
+      outline = "none"
+      color = "transparent"  // remove the caret
+      width = "100%"
+      bottom = "-30%"
+      left = "50%"
     }
 
     autocomplete = "off"
@@ -93,16 +103,38 @@ class ImeInputMethod(
     inputField.remove()
   }
 
-  fun handleServerCaretInfoChangedEvent(serverEvent: ServerCaretInfoChangedEvent) {
-    val carets = serverEvent.data as ServerCaretInfoChangedEvent.CaretInfoChange.Carets
-    val caretInfo = carets.caretInfoList[0]
-    val x = caretInfo.locationInWindow.x
-    val y = caretInfo.locationInWindow.y
+  override fun handleCaretInfoChange(caretInfoChange: ServerCaretInfoChangedEvent.CaretInfoChange) {
+    fun resetInputFieldPosition() {
+      inputField.style.apply {
+        removeProperty("top")
+        bottom = "-30%"
+        left = "50%"
+      }
+    }
 
-    inputField.style.apply {
-      top = "${y}px"
-      left = "${x}px"
-      fontSize = "${carets.fontSize}px"
+    Do exhaustive when (caretInfoChange) {
+      is ServerCaretInfoChangedEvent.CaretInfoChange.NoCarets -> resetInputFieldPosition()
+
+      is ServerCaretInfoChangedEvent.CaretInfoChange.Carets -> {
+        val windowPosition = windowPositionByIdGetter(caretInfoChange.editorWindowId) ?: run {
+          console.warn("Can't find window with ID #${caretInfoChange.editorWindowId}, resetting input field position")
+          resetInputFieldPosition()
+          return
+        }
+        val caretInfo = caretInfoChange.caretInfoList.first()  // todo: support all
+        val x = caretInfo.locationInWindow.x + windowPosition.bounds.x
+        val y = caretInfo.locationInWindow.y + windowPosition.bounds.y
+
+        inputField.style.apply {
+          zIndex = "${windowPosition.zIndex + 1}"
+          top = "${y}px"
+          removeProperty("bottom")
+          left = "${x}px"
+          fontSize = "${caretInfoChange.fontSize}px"
+          textShadow = "0 0 0 #888"  // use text shadow to set text color to avoid showing caret // todo: set correct color
+          // todo: style other things like font family
+        }
+      }
     }
   }
 }

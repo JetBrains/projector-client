@@ -23,7 +23,10 @@
  */
 package org.jetbrains.projector.client.web.input.key
 
+import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
+
 interface InputMethod {
 
   fun dispose()
+  fun handleCaretInfoChange(caretInfoChange: ServerCaretInfoChangedEvent.CaretInfoChange)
 }

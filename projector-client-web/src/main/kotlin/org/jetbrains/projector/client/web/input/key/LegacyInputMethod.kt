@@ -25,6 +25,7 @@ package org.jetbrains.projector.client.web.input.key
 
 import kotlinx.browser.document
 import org.jetbrains.projector.client.web.input.SpecialKeysState
+import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.DOWN
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.UP
@@ -50,5 +51,9 @@ class LegacyInputMethod(
     documentActionListeners.forEach { (type, handler) ->
       document.removeEventListener(type, handler)
     }
+  }
+
+  override fun handleCaretInfoChange(caretInfoChange: ServerCaretInfoChangedEvent.CaretInfoChange) {
+    // nop
   }
 }
