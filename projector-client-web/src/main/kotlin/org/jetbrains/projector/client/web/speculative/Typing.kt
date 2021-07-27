@@ -116,7 +116,7 @@ sealed class Typing {
      * - Chars inputted with any of Ctrl/Alt/Meta modifiers (Example: Ctrl+C)
      * - Chars with Unicode category from "Other" group (Example: Esc or Meta)
      */
-    private fun shouldSkipEvent(event: ClientKeyPressEvent): Boolean {
+    internal fun shouldSkipEvent(event: ClientKeyPressEvent): Boolean {
       return KeyModifier.CTRL_KEY in event.modifiers
              || KeyModifier.ALT_KEY in event.modifiers
              || KeyModifier.META_KEY in event.modifiers
