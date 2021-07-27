@@ -33,10 +33,10 @@ import org.jetbrains.projector.client.web.misc.toScrollingMode
 import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.window.DragEventsInterceptor
+import org.jetbrains.projector.client.web.window.Positionable
 import org.jetbrains.projector.client.web.window.WindowManager
-import org.jetbrains.projector.common.protocol.toServer.*
-import org.jetbrains.projector.common.protocol.toClient.ServerEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
+import org.jetbrains.projector.common.protocol.toServer.*
 import org.w3c.dom.TouchEvent
 import org.w3c.dom.clipboard.ClipboardEvent
 import org.w3c.dom.events.Event
@@ -50,6 +50,7 @@ class InputController(
   private val openingTimeStamp: Int,
   private val stateMachine: ClientStateMachine,
   private val windowManager: WindowManager,
+  windowPositionByIdGetter: (windowId: Int) -> Positionable?,
 ) {
 
   private val specialKeysState = SpecialKeysState()
@@ -57,7 +58,7 @@ class InputController(
   private val inputMethod = { event: ClientEvent -> stateMachine.fire(ClientAction.AddEvent(event)) }.let {
     when (ParamsProvider.INPUT_METHOD_TYPE) {
       ParamsProvider.InputMethodType.LEGACY -> LegacyInputMethod(openingTimeStamp, specialKeysState, it)
-      ParamsProvider.InputMethodType.IME -> ImeInputMethod(openingTimeStamp, it)
+      ParamsProvider.InputMethodType.IME -> ImeInputMethod(openingTimeStamp, it, windowPositionByIdGetter)
       ParamsProvider.InputMethodType.OVERLAY_BUTTONS,
       -> MobileInputMethod(openingTimeStamp, specialKeysState, false, it)
       ParamsProvider.InputMethodType.OVERLAY_BUTTONS_N_VIRTUAL_KEYBOARD,
@@ -389,10 +390,8 @@ class InputController(
       return modifiers.union(specialKeysState.mouseModifiers)
     }
 
-  public fun handleServerEvent(serverEvent: ServerEvent) {
-    if (serverEvent is ServerCaretInfoChangedEvent && inputMethod is ImeInputMethod) {
-      inputMethod.handleServerCaretInfoChangedEvent(serverEvent)
-    }
+  fun handleCaretInfoChange(caretInfoChange: ServerCaretInfoChangedEvent.CaretInfoChange) {
+    inputMethod.handleCaretInfoChange(caretInfoChange)
   }
 
   private companion object {

@@ -30,6 +30,7 @@ import org.jetbrains.projector.client.web.input.JsKey
 import org.jetbrains.projector.client.web.input.SpecialKeysState
 import org.jetbrains.projector.client.web.misc.toDisplayType
 import org.jetbrains.projector.common.protocol.data.VK
+import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.DOWN
@@ -346,6 +347,10 @@ class MobileInputMethod(
     if (supportVirtualKeyboard) {
       document.removeEventListener("selectionchange", this::handleVirtualKeyboardSelection)
     }
+  }
+
+  override fun handleCaretInfoChange(caretInfoChange: ServerCaretInfoChangedEvent.CaretInfoChange) {
+    // todo
   }
 
   private class ToggleButton(

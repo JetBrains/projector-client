@@ -387,7 +387,8 @@ sealed class ClientState {
     private val inputController = InputController(
       openingTimeStamp = openingTimeStamp,
       stateMachine = stateMachine,
-      windowManager = windowManager
+      windowManager = windowManager,
+      windowPositionByIdGetter = windowManager::get,
     ).apply {
       addListeners()
     }

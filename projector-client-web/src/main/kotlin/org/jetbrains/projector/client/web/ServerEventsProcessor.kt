@@ -27,6 +27,7 @@ import kotlinx.browser.window
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
+import org.jetbrains.projector.client.web.input.InputController
 import org.jetbrains.projector.client.web.misc.PingStatistics
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.state.ProjectorUI
@@ -35,7 +36,6 @@ import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
-import org.jetbrains.projector.client.web.input.InputController
 import org.w3c.dom.url.URL
 
 class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEventsProcessor) {
@@ -59,7 +59,10 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           command.imageData,
         )
 
-        is ServerCaretInfoChangedEvent -> typing.changeCaretInfo(command.data)
+        is ServerCaretInfoChangedEvent -> {
+          typing.changeCaretInfo(command.data)
+          inputController.handleCaretInfoChange(command.data)
+        }
 
         is ServerClipboardEvent -> handleServerClipboardChange(command)
 
@@ -83,7 +86,6 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           OnScreenMessenger.lookAndFeelChanged()
         }
       }
-      inputController.handleServerEvent(command)
     }
 
     // todo: determine the moment better
