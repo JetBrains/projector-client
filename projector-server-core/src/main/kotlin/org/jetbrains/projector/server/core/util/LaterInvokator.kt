@@ -25,6 +25,7 @@
 
 package org.jetbrains.projector.server.core.util
 
+import org.jetbrains.projector.util.loading.unprotect
 import sun.awt.AppContext
 import java.awt.AWTEvent
 import java.awt.EventQueue
