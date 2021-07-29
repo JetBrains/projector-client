@@ -21,35 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.agent.ijInjector
+package org.jetbrains.projector.server.core.classloader
 
-import org.jetbrains.projector.agent.init.IjArgs
-import org.jetbrains.projector.agent.init.toArgsMap
-import org.jetbrains.projector.util.logging.Logger
-import java.lang.instrument.Instrumentation
+import org.jetbrains.projector.server.core.ij.IjInjectorAgentInitializer
+import org.jetbrains.projector.server.core.ij.invokeWhenIdeaIsInitialized
+import org.jetbrains.projector.server.core.ij.md.PanelUpdater
+import org.jetbrains.projector.util.loading.ProjectorClassLoader
 
-@Suppress("unused")
-public object IjInjectorAgent {
+public fun initClassLoader(classLoader: ClassLoader): ClassLoader {
+  val prjClassLoader = if (classLoader is ProjectorClassLoader) classLoader else ProjectorClassLoader.instance
 
-  private val logger = Logger<IjInjectorAgent>()
+  // accessed in agent to get ide ana projector classloaders in platform classloader context
+  prjClassLoader.forceLoadByPlatform(IjInjectorAgentInitializer.IjInjectorAgentClassLoaders::class.java.name)
+  // accessed in client side markdown previewer in platform classloader context
+  prjClassLoader.forceLoadByPlatform(PanelUpdater::class.java.name)
+  // without this server not works...
+  prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.websocket.")
 
-  @JvmStatic
-  public fun agentmain(args: String, instrumentation: Instrumentation) {
-    logger.debug { "IjInjectorAgent agentmain start, args=$args" }
-
-    val argsMap = args.toArgsMap()
-
-    val ijClProviderClass = argsMap.getValue(IjArgs.IJ_CL_PROVIDER_CLASS)
-    val prjClProviderMethod = argsMap.getValue(IjArgs.PRJ_CL_PROVIDER_METHOD)
-
-    val prjCl = Class.forName(ijClProviderClass).getDeclaredMethod(prjClProviderMethod).invoke(null) as ClassLoader
-
-    val injectorClazz = Class.forName("${javaClass.packageName}.IjInjector", false, prjCl)
-
-    injectorClazz
-      .getDeclaredMethod("agentmain", Instrumentation::class.java, Map::class.java)
-      .invoke(null, instrumentation, argsMap)
-
-    logger.debug { "IjInjectorAgent agentmain finish" }
+  invokeWhenIdeaIsInitialized("Init ProjectorClassLoader") {
+    prjClassLoader.ideaClassLoader = it
   }
+
+  return prjClassLoader
 }

@@ -31,20 +31,16 @@ import java.lang.ref.WeakReference
 
 public object IjInjectorAgentInitializer {
 
-  private lateinit var ijClassLoader: WeakReference<ClassLoader>
-
-  @JvmStatic
-  public fun getIdeClassloader(): ClassLoader? {
-    return ijClassLoader.get()
-  }
-
+  @Suppress("unused")
   @OptIn(ExperimentalStdlibApi::class)
   public fun init(isAgent: Boolean) {
+    IjInjectorAgentClassLoaders.prjClassLoader = WeakReference(javaClass.classLoader)
     invokeWhenIdeaIsInitialized("attach IJ injector agent") { ideClassLoader ->
-      this.ijClassLoader = WeakReference(ideClassLoader)
+      IjInjectorAgentClassLoaders.ijClassLoader = WeakReference(ideClassLoader)
 
-      val ijClProviderClass = IjInjectorAgentInitializer::class.java.name
-      val ijClProviderMethod = IjInjectorAgentInitializer::getIdeClassloader.name
+      val ijClProviderClass = IjInjectorAgentClassLoaders::class.java.name
+      val ijClProviderMethod = IjInjectorAgentClassLoaders::getIdeClassloader.name
+      val prjClProviderMethod = IjInjectorAgentClassLoaders::getProjectorClassloader.name
       val mdPanelMakerClass = MarkdownPanelMaker::class.java.name
       val mdPanelMakerMethod = MarkdownPanelMaker::createMarkdownHtmlPanel.name
 
@@ -52,14 +48,33 @@ public object IjInjectorAgentInitializer {
         IjArgs.IS_AGENT to isAgent,
         IjArgs.IJ_CL_PROVIDER_CLASS to ijClProviderClass,
         IjArgs.IJ_CL_PROVIDER_METHOD to ijClProviderMethod,
+        IjArgs.PRJ_CL_PROVIDER_METHOD to prjClProviderMethod,
         IjArgs.MD_PANEL_MAKER_CLASS to mdPanelMakerClass,
         IjArgs.MD_PANEL_MAKER_METHOD to mdPanelMakerMethod,
       ).toIjArgs()
 
       copyAgentToTempJarAndAttach(
-        agentJar = this::class.java.getResourceAsStream("/projector-agent/projector-agent-ij-injector.jar"),
+        agentJar = this::class.java.getResourceAsStream("/projector-agent/projector-agent-ij-injector.jar")!!,
         args = args,
       )
+    }
+  }
+
+  // loaded via AppClassLoader to be accessible in agent
+  public object IjInjectorAgentClassLoaders {
+
+    internal lateinit var ijClassLoader: WeakReference<ClassLoader>
+
+    internal lateinit var prjClassLoader: WeakReference<ClassLoader>
+
+    @JvmStatic
+    public fun getIdeClassloader(): ClassLoader? {
+      return ijClassLoader.get()
+    }
+
+    @JvmStatic
+    public fun getProjectorClassloader(): ClassLoader? {
+      return prjClassLoader.get()
     }
   }
 }
