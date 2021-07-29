@@ -23,35 +23,25 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
+import com.intellij.openapi.extensions.ExtensionPointName
 import org.jetbrains.projector.agent.init.IjArgs
 import java.lang.instrument.Instrumentation
-
-internal typealias ExtensionPointName = Any
-internal typealias ExtensionPointId = String
 
 internal object IjInjector {
 
   class Utils(
     val instrumentation: Instrumentation,
-    val createExtensionPointName: (ExtensionPointId) -> ExtensionPointName,
-    val extensionPointNameGetExtensions: (ExtensionPointName) -> Array<*>,
+    val createExtensionPointName: (String) -> ExtensionPointName<*>,
+    val extensionPointNameGetExtensions: (ExtensionPointName<*>) -> Array<*>,
     val args: Map<String, String>,
   )
 
   private fun createUtils(instrumentation: Instrumentation, args: Map<String, String>): Utils {
 
-    val ijClProviderClass = args.getValue(IjArgs.IJ_CL_PROVIDER_CLASS)
-    val ijClProviderMethod = args.getValue(IjArgs.IJ_CL_PROVIDER_METHOD)
-
-    val ijCl = Class.forName(ijClProviderClass).getDeclaredMethod(ijClProviderMethod).invoke(null) as ClassLoader
-    val extensionPointNameClass = Class.forName("com.intellij.openapi.extensions.ExtensionPointName", false, ijCl)
-    val extensionPointNameCreateMethod = extensionPointNameClass.getDeclaredMethod("create", String::class.java)
-    val extensionPointNameGetExtensionsMethod = extensionPointNameClass.getDeclaredMethod("getExtensions")
-
     return Utils(
       instrumentation = instrumentation,
-      createExtensionPointName = { extensionPointNameCreateMethod.invoke(null, it) },
-      extensionPointNameGetExtensions = { extensionPointNameGetExtensionsMethod.invoke(it) as Array<*> },
+      createExtensionPointName = { ExtensionPointName.create<Any>(it) },
+      extensionPointNameGetExtensions = { it.extensions },
       args = args
     )
   }
