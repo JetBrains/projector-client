@@ -46,12 +46,16 @@ kotlin {
 }
 
 val javassistVersion: String by project
+val intellijPlatformVersion: String by project
 
 dependencies {
   implementation(project(":projector-agent-common"))
   implementation(project(":projector-agent-initialization"))
   implementation(project(":projector-util-logging"))
   implementation("org.javassist:javassist:$javassistVersion")
+
+  compileOnly("com.jetbrains.intellij.platform:extensions:$intellijPlatformVersion")
+
   testImplementation(kotlin("test"))
 }
 
