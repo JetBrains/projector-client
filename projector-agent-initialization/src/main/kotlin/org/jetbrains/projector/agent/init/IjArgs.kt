@@ -27,6 +27,7 @@ public object IjArgs {
   public const val IS_AGENT: String = "isAgent"
   public const val IJ_CL_PROVIDER_CLASS: String = "ijClProviderClass"
   public const val IJ_CL_PROVIDER_METHOD: String = "ijClProviderMethod"
+  public const val PRJ_CL_PROVIDER_METHOD: String = "prjClProviderMethod"
   public const val MD_PANEL_MAKER_CLASS: String = "mdPanelMakerClass"
   public const val MD_PANEL_MAKER_METHOD: String = "mdPanelMakerMethod"
 }
