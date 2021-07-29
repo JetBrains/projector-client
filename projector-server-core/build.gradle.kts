@@ -142,6 +142,7 @@ dependencies {
   api(project(":projector-common"))
   implementation(project(":projector-agent-initialization"))
   implementation(project(":projector-util-agent"))
+  implementation(project(":projector-util-loading"))
   implementation(project(":projector-util-logging"))
   implementation("org.javassist:javassist:$javassistVersion")
   api("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")

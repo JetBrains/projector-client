@@ -23,7 +23,7 @@
  */
 package org.jetbrains.projector.server.core.ij
 
-import org.jetbrains.projector.server.core.util.unprotect
+import org.jetbrains.projector.util.loading.unprotect
 import org.jetbrains.projector.util.logging.Logger
 import java.awt.RenderingHints
 import javax.swing.UIManager
