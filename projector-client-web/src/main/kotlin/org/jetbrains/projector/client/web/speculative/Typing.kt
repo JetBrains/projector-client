@@ -150,8 +150,13 @@ sealed class Typing {
         )
         clip()
 
+        val fontFace = currentCarets.fontId?.toFontFaceName() ?: "Arial"
+        val fontSize = "${currentCarets.fontSize}px"
 
-        val speculativeCharWidth = currentCarets.plainSpaceWidth
+        font = "$fontSize $fontFace"  // todo: use a proper font style
+        fillStyle = "#888"  // todo: use a proper color
+
+        val speculativeCharWidth = measureText(event.char.toString()).width
 
         val sw = editorMetrics.width - (firstCaretLocation.x - editorMetrics.x) - currentCarets.scrollBarWidth - speculativeCharWidth
 
@@ -169,12 +174,6 @@ sealed class Typing {
         val caretOffsetFromEditorEnd = editorMetrics.x + editorMetrics.width - firstCaretLocation.x
         // check there is space to draw speculative symbol
         if (caretOffsetFromEditorEnd < speculativeCharWidth) return@apply
-
-        val fontFace = currentCarets.fontId?.toFontFaceName() ?: "Arial"
-        val fontSize = "${currentCarets.fontSize}px"
-
-        font = "$fontSize $fontFace"  // todo: use a proper font style
-        fillStyle = "#888"  // todo: use a proper color
 
         val baselineTopOffset = currentCarets.lineHeight - currentCarets.lineDescent
         val stringYPos = firstCaretLocation.y + baselineTopOffset
