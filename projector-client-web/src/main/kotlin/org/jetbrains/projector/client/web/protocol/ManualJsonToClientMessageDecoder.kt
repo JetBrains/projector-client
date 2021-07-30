@@ -97,6 +97,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
         content["f"] as Int,
         content["g"] as Int,
         content["h"] as Int,
+        content["i"] as Int,
       )
       else -> throw IllegalArgumentException("Unsupported caret info type: ${JSON.stringify(this)}")
     }

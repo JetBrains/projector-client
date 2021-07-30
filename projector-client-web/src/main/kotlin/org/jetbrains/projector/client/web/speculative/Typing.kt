@@ -24,6 +24,7 @@
 package org.jetbrains.projector.client.web.speculative
 
 import kotlinx.browser.document
+import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
 import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
 import org.jetbrains.projector.client.common.misc.ParamsProvider.SCALING_RATIO
 import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
@@ -154,7 +155,7 @@ sealed class Typing {
         val fontSize = "${currentCarets.fontSize}px"
 
         font = "$fontSize $fontFace"  // todo: use a proper font style
-        fillStyle = "#888"  // todo: use a proper color
+        fillStyle = currentCarets.textColor.argbIntToRgbaString()
 
         val speculativeCharWidth = measureText(event.char.toString()).width
 
