@@ -130,6 +130,8 @@ data class ServerCaretInfoChangedEvent(
       val lineAscent: Int,
       @SerialName("h")
       val verticalScrollBarWidth: Int,
+      @SerialName("i")
+      val textColor: Int,
     ) : CaretInfoChange()
   }
 }
