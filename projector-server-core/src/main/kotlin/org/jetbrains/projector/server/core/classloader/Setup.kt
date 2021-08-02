@@ -37,6 +37,11 @@ public fun initClassLoader(classLoader: ClassLoader): ClassLoader {
   prjClassLoader.forceLoadByPlatform(PanelUpdater::class.java.name)
   // without this server not works...
   prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.websocket.")
+  // we need only version of this class loaded by platform
+  prjClassLoader.forceLoadByPlatform("com.intellij.ide.WindowsCommandLineProcessor")
+
+  // to prevent problems caused by loading classes like kotlin.jvm.functions.Function0 by both ProjectorClassLoader and IDE ClassLoader
+  prjClassLoader.forceLoadByProjectorClassLoader("com.intellij.openapi.application.ActionsKt")
 
   invokeWhenIdeaIsInitialized("Init ProjectorClassLoader") {
     prjClassLoader.ideaClassLoader = it
