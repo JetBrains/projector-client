@@ -5,6 +5,9 @@ on:
     tags:
       - "launcher-v*"
 
+
+
+
 jobs:
   main:
     name: Upload Release Asset (launcher)
