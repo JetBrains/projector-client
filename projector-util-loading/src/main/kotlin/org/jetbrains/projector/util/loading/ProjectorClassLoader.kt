@@ -32,10 +32,6 @@ import java.util.jar.JarFile
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : ClassLoader(parent) {
 
-  init {
-    if (myInstance == null) myInstance = this
-  }
-
   public var ideaClassLoader: ClassLoader? = null
 
   private val loadMethod = ClassLoader::class.java.getDeclaredMethod("loadClass", String::class.java, Boolean::class.java).apply(Method::unprotect)
@@ -51,13 +47,24 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
 
   private val forceLoadByPlatform = mutableSetOf<String>()
 
-  private val jarFiles = mutableListOf<String>()
+  private val forceLoadByOurselves = mutableSetOf<String>()
+
+  private val jarFiles = mutableSetOf<String>()
+
+  init {
+    if (myInstance == null) myInstance = this
+  }
 
   public fun forceLoadByPlatform(className: String) {
-    forceLoadByPlatform.add(className)
+    forceLoadByPlatform += className
+  }
+
+  public fun forceLoadByProjectorClassLoader(className: String) {
+    forceLoadByOurselves += className
   }
 
   private fun mustBeLoadedByPlatform(name: String): Boolean = forceLoadByPlatform.any { name.startsWith(it) }
+  private fun mustBeLoadedByOurselves(name: String): Boolean = forceLoadByOurselves.any { name.startsWith(it) }
 
   private fun isProjectorAgentClass(name: String): Boolean = name.startsWith(PROJECTOR_AGENT_PACKAGE_PREFIX)
   private fun isProjectorClass(name: String): Boolean = name.startsWith(PROJECTOR_PACKAGE_PREFIX) && name != javaClass.name
@@ -83,39 +90,36 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
             loadProjectorClass(name, resolve)
           }
         }
+        mustBeLoadedByOurselves(name) -> defineClass(name, resolve, ::getResourceAsStream)
         isIntellijClass(name) -> myIdeaLoader.loadClass(name, resolve)
         else -> myAppClassLoader.loadClass(name, resolve)
       }
     }
-
   }
 
   private fun ClassLoader.loadClass(name: String, resolve: Boolean): Class<*> = loadMethod.invoke(this, name, resolve) as Class<*>
 
   private fun String.toClassFileName() = "${replace('.', '/')}.class"
 
-  private fun loadProjectorClass(name: String, resolve: Boolean): Class<*> {
-    val fileName = name.toClassFileName()
-    return defineClass(name, myAppClassLoader.getResourceAsStream(fileName), resolve)
-  }
+  private fun loadProjectorClass(name: String, resolve: Boolean): Class<*> = defineClass(name, resolve, myAppClassLoader::getResourceAsStream)
 
   private fun loadProjectorAgentClass(name: String, resolve: Boolean): Class<*> {
-    val fileName = name.toClassFileName()
-    jarFiles.forEach { jarPath ->
-      val file = File(jarPath)
-      if (!file.exists()) return@forEach
+    return defineClass(name, resolve) { classFileName ->
 
-      val jarFile = JarFile(file)
-      val entry = jarFile.getJarEntry(fileName) ?: return@forEach
+      jarFiles.mapNotNull { jarPath ->
+        val file = File(jarPath)
+        if (!file.exists()) return@mapNotNull null
 
-      return defineClass(name, jarFile.getInputStream(entry), resolve)
+        val jarFile = JarFile(file)
+        val entry = jarFile.getJarEntry(classFileName) ?: return@mapNotNull null
+
+        jarFile.getInputStream(entry)
+      }.firstOrNull()
     }
-
-    throw ClassNotFoundException(name)
   }
 
-  private fun defineClass(name: String, inputStream: InputStream?, resolve: Boolean): Class<*> {
-    val bytes = inputStream?.use { it.readAllBytes() } ?: throw ClassNotFoundException(name)
+  private fun defineClass(name: String, resolve: Boolean, inputStreamProvider: (String) -> InputStream?): Class<*> {
+    val bytes = inputStreamProvider(name.toClassFileName())?.use { it.readAllBytes() } ?: throw ClassNotFoundException(name)
 
     val clazz = defineClass(name, bytes, 0, bytes.size)
     if (resolve) {
