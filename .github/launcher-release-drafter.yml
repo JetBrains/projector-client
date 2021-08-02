@@ -1,0 +1,24 @@
+name-template: 'v$NEXT_PATCH_VERSION'
+tag-template: 'v$NEXT_PATCH_VERSION'
+exclude-labels:
+  - 'skip-changelog'
+include-labels:
+  - 'launcher:feature'
+  - 'launcher:fix'
+  - 'launcher:bug'
+categories:
+  - title: '🚀 New Features'
+    labels:
+      - 'launcher:feature'
+
+  - title: '🐛 Fixes'
+    labels:
+      - 'launcher:fix'
+      - 'launcher:bug'
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+template: |
+  ## Changes
+  $CHANGES
+  ## Contributors
+  $CONTRIBUTORS
