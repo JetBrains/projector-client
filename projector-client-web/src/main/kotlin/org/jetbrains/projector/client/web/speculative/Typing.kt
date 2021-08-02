@@ -154,7 +154,7 @@ sealed class Typing {
         val fontFace = currentCarets.fontId?.toFontFaceName() ?: "Arial"
         val fontSize = "${currentCarets.fontSize}px"
 
-        font = "$fontSize $fontFace"  // todo: use a proper font style
+        font = "$fontSize $fontFace"
         fillStyle = currentCarets.textColor.argbIntToRgbaString()
 
         val speculativeCharWidth = measureText(event.char.toString()).width
