@@ -31,7 +31,7 @@ import java.lang.ref.WeakReference
 
 public object IjInjectorAgentInitializer {
 
-  @Suppress("unused")
+  @Suppress("unused") // Called from projector-server, don't trigger linter that doesn't know it
   @OptIn(ExperimentalStdlibApi::class)
   public fun init(isAgent: Boolean) {
     IjInjectorAgentClassLoaders.prjClassLoader = WeakReference(javaClass.classLoader)
@@ -60,18 +60,20 @@ public object IjInjectorAgentInitializer {
     }
   }
 
-  // loaded via AppClassLoader to be accessible in agent
+  @Suppress("RedundantVisibilityModifier") // loaded via AppClassLoader to be accessible in agent (that's why it's public)
   public object IjInjectorAgentClassLoaders {
 
     internal lateinit var ijClassLoader: WeakReference<ClassLoader>
 
     internal lateinit var prjClassLoader: WeakReference<ClassLoader>
 
+    @Suppress("RedundantVisibilityModifier") // public to be accessible in agent
     @JvmStatic
     public fun getIdeClassloader(): ClassLoader? {
       return ijClassLoader.get()
     }
 
+    @Suppress("RedundantVisibilityModifier") // public to be accessible in agent
     @JvmStatic
     public fun getProjectorClassloader(): ClassLoader? {
       return prjClassLoader.get()

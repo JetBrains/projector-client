@@ -46,7 +46,6 @@ internal object IjInjector {
     )
   }
 
-  @Suppress("unused")
   @JvmStatic
   fun agentmain(instrumentation: Instrumentation, args: Map<String, String>) {
     val utils = createUtils(instrumentation, args)
