@@ -26,6 +26,7 @@ package org.jetbrains.projector.util.loading
 import org.jetbrains.projector.util.logging.Logger
 import java.io.File
 import java.io.InputStream
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.jar.JarFile
 
@@ -97,7 +98,11 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     }
   }
 
-  private fun ClassLoader.loadClass(name: String, resolve: Boolean): Class<*> = loadMethod.invoke(this, name, resolve) as Class<*>
+  private fun ClassLoader.loadClass(name: String, resolve: Boolean): Class<*> = try {
+    loadMethod.invoke(this, name, resolve) as Class<*>
+  } catch (e: InvocationTargetException) {
+    throw e.targetException
+  }
 
   private fun String.toClassFileName() = "${replace('.', '/')}.class"
 
