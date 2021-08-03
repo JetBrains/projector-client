@@ -155,7 +155,6 @@ sealed class Typing {
         val fontSize = "${currentCarets.fontSize}px"
 
         font = "$fontSize $fontFace"
-        fillStyle = currentCarets.textColor.argbIntToRgbaString()
 
         val speculativeCharWidth = measureText(event.char.toString()).width
 
@@ -174,6 +173,10 @@ sealed class Typing {
 
         val stringYPos = firstCaretLocation.y + currentCarets.lineAscent
 
+        fillStyle = currentCarets.backgroundColor.argbIntToRgbaString()
+        fillRect(firstCaretLocation.x, firstCaretLocation.y, speculativeCharWidth, currentCarets.lineHeight.toDouble())
+
+        fillStyle = currentCarets.textColor.argbIntToRgbaString()
         fillText(event.char.toString(), firstCaretLocation.x, stringYPos)
       }
 

@@ -132,6 +132,8 @@ data class ServerCaretInfoChangedEvent(
       val verticalScrollBarWidth: Int,
       @SerialName("i")
       val textColor: Int,
+      @SerialName("j")
+      val backgroundColor: Int,
     ) : CaretInfoChange()
   }
 }
