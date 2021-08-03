@@ -23,6 +23,8 @@
  */
 package org.jetbrains.projector.agent.init
 
+@Suppress("RedundantVisibilityModifier")
+// these values are used both in projector-client and projector-server and so require public visibility. Suppress to make Qodana happy
 public object IjArgs {
   public const val IS_AGENT: String = "isAgent"
   public const val IJ_CL_PROVIDER_CLASS: String = "ijClProviderClass"

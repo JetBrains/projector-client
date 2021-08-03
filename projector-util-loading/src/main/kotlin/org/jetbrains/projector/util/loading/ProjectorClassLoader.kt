@@ -30,9 +30,10 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.jar.JarFile
 
-@Suppress("unused", "MemberVisibilityCanBePrivate")
+@Suppress("unused", "MemberVisibilityCanBePrivate", "RedundantVisibilityModifier") // public to be accessible for additional setup
 public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : ClassLoader(parent) {
 
+  @Suppress("RedundantVisibilityModifier") // Once JB IDE is loaded we must assign this field from outside
   public var ideaClassLoader: ClassLoader? = null
 
   private val loadMethod = ClassLoader::class.java.getDeclaredMethod("loadClass", String::class.java, Boolean::class.java).apply(Method::unprotect)
@@ -56,10 +57,12 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     if (myInstance == null) myInstance = this
   }
 
+  @Suppress("RedundantVisibilityModifier") // public to be accessible for additional setup
   public fun forceLoadByPlatform(className: String) {
     forceLoadByPlatform += className
   }
 
+  @Suppress("RedundantVisibilityModifier") // public to be accessible for additional setup
   public fun forceLoadByProjectorClassLoader(className: String) {
     forceLoadByOurselves += className
   }
@@ -147,6 +150,7 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     jarFiles += jarPath
   }
 
+  @Suppress("RedundantVisibilityModifier") // public so that `instance` is accessible for additional setup
   public companion object {
 
     private const val INTELLIJ_PACKAGE_PREFIX = "com.intellij."
@@ -157,6 +161,7 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
 
     private var myInstance: ProjectorClassLoader? = null
 
+    @Suppress("RedundantVisibilityModifier") // public to be accessible for additional setup
     @JvmStatic
     public val instance: ProjectorClassLoader get() = myInstance ?: ProjectorClassLoader()
   }

@@ -27,6 +27,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
+@Suppress("RedundantVisibilityModifier") // used in other modules
 public fun Field.unprotect() {
   isAccessible = true
 
@@ -36,6 +37,7 @@ public fun Field.unprotect() {
   }
 }
 
+@Suppress("RedundantVisibilityModifier") // used in other modules
 public fun Method.unprotect() {
   isAccessible = true
 }
