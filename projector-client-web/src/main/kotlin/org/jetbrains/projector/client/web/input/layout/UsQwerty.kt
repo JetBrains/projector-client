@@ -147,6 +147,7 @@ object UsQwerty : KeyboardLayout {
     "Help" to VK.HELP,
     "NumpadParenLeft" to VK.LEFT_PARENTHESIS,
     "NumpadParenRight" to VK.RIGHT_PARENTHESIS,
+    "NumpadEnter" to VK.ENTER,
     "F13" to VK.F13,
     "F14" to VK.F14,
     "F15" to VK.F15,
