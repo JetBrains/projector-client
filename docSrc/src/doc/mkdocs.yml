@@ -77,6 +77,7 @@ nav:
       - Arbitrary Swing app: swing_user_guide/arbitrary.md
   - Developer guide:
       - Ecosystem: dev_guide/ecosystem.md
+      - Projector ClassLoader: dev_guide/classloader.md
       - Academic works: dev_guide/works.md
   - About:
       - Comparison to other remote access solutions: about/comparison.md
