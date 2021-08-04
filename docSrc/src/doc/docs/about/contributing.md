@@ -62,6 +62,22 @@ If you want to resolve an **issue submitted in the issue tracker** or propose a 
 
 **Commits naming**. If there are issues that you address, please mention them in the prefix of commit messages. Usually, a commit name starts with a verb. Example: `PRJ-68 Make clipboard owners lose ownership when clipboard is changed by a client`.
 
+**Labels**. It is obligatory to specify labels for pull requests, if the label is not specified, the merge will be blocked.
+
+Tags are divided into 5 categories:
+
+* `bug` - if you have found a bug or are processing it, then you put this mark. When processed, remove this label and put the `fix` label;
+* `feature` - if you add a new feature, then you put this label;
+* `fix` - after you have fixed the error, put this label;
+* `tests` - when writing new tests, put this label;
+* `skip-changelog` - if you do not want this PR to be included in the version changelog, put this label.
+
+You cannot combine labels. If you wrote a new feature and wrote unit tests for it, then you are great and put a `feature` label. Label `tests` can only be labeled if the whole pull request consists of tests.
+
+Also, labels are divided into modules, in the client repository, they are `client` and `launcher`, in the server repository they are `server` and `agent`. When creating a pull request, please choose the correct tags, this is important.
+
+[![labels](https://www.linkpicture.com/q/Screenshot-from-2021-08-03-14-26-07-1.png)](https://www.linkpicture.com/view.php?img=LPic610a42744f9dd866497342)
+
 ## Spread Projector
 
 We are glad when people talk about our technology. Feel free to tell your friends and colleagues about Projector. If you have written something publicly, a guide or just a short review, or maybe even used Projector in another project, you can always share it on Twitter mentioning [@ProjectorJB](https://twitter.com/ProjectorJB), we often answer and retweet.
