@@ -106,8 +106,7 @@ class ImeInputMethod(
   override fun handleCaretInfoChange(caretInfoChange: ServerCaretInfoChangedEvent.CaretInfoChange) {
     fun resetInputFieldPosition() {
       inputField.style.apply {
-        removeProperty("top")
-        bottom = "-30%"
+        top = "-30%"
         left = "50%"
       }
     }
