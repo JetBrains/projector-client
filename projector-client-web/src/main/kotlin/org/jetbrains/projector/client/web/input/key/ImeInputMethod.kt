@@ -24,6 +24,7 @@
 package org.jetbrains.projector.client.web.input.key
 
 import kotlinx.browser.document
+import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.web.window.Positionable
 import org.jetbrains.projector.common.misc.Do
@@ -69,8 +70,7 @@ class ImeInputMethod(
     asDynamic().autocapitalize = "none"
 
     onblur = {
-      this.focus()
-      this.click()
+      window.setTimeout(::focusInputField, 0) // https://stackoverflow.com/questions/7046798/jquery-focus-fails-on-firefox
     }
 
     addEventListener("compositionstart", handler::handleEvent)
@@ -95,6 +95,10 @@ class ImeInputMethod(
   }
 
   init {
+    focusInputField()
+  }
+
+  private fun focusInputField() {
     inputField.focus()
     inputField.click()
   }
