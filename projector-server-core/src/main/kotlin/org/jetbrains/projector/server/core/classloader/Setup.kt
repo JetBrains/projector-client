@@ -28,25 +28,35 @@ import org.jetbrains.projector.server.core.ij.invokeWhenIdeaIsInitialized
 import org.jetbrains.projector.server.core.ij.md.PanelUpdater
 import org.jetbrains.projector.util.loading.ProjectorClassLoader
 
-@Suppress("unused", "RedundantVisibilityModifier") // Called from projector-server, don't trigger linter that doesn't know it
-public fun initClassLoader(classLoader: ClassLoader): ClassLoader {
-  val prjClassLoader = if (classLoader is ProjectorClassLoader) classLoader else ProjectorClassLoader.instance
+@Suppress("RedundantVisibilityModifier") // Accessed in projector-server, don't trigger linter that doesn't know it
+public object ProjectorClassLoaderSetup {
 
-  // accessed in agent to get ide and projector classloaders in platform classloader context
-  prjClassLoader.forceLoadByPlatform(IjInjectorAgentInitializer.IjInjectorAgentClassLoaders::class.java.name)
-  // accessed in client side markdown previewer in platform classloader context
-  prjClassLoader.forceLoadByPlatform(PanelUpdater::class.java.name)
-  // without this server not works...
-  prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.websocket.")
-  // we need only version of this class loaded by platform
-  prjClassLoader.forceLoadByPlatform("com.intellij.ide.WindowsCommandLineProcessor")
+  internal var ideaClassLoaderInitialized = false
+    private set
 
-  // to prevent problems caused by loading classes like kotlin.jvm.functions.Function0 by both ProjectorClassLoader and IDE ClassLoader
-  prjClassLoader.forceLoadByProjectorClassLoader("com.intellij.openapi.application.ActionsKt")
+  @Suppress("unused", "RedundantVisibilityModifier") // Called from projector-server, don't trigger linter that doesn't know it
+  public fun initClassLoader(classLoader: ClassLoader): ClassLoader {
+    val prjClassLoader = if (classLoader is ProjectorClassLoader) classLoader else ProjectorClassLoader.instance
 
-  invokeWhenIdeaIsInitialized("Init ProjectorClassLoader") {
-    prjClassLoader.ideaClassLoader = it
+    // accessed in agent to get ide and projector classloaders in platform classloader context
+    prjClassLoader.forceLoadByPlatform(IjInjectorAgentInitializer.IjInjectorAgentClassLoaders::class.java.name)
+    // accessed in client side markdown previewer in platform classloader context
+    prjClassLoader.forceLoadByPlatform(PanelUpdater::class.java.name)
+    // without this server not works...
+    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.websocket.")
+    // we need only version of this class loaded by platform
+    prjClassLoader.forceLoadByPlatform("com.intellij.ide.WindowsCommandLineProcessor")
+    // to access ideaClassLoaderInitialized field only from AppClassLoader context
+    prjClassLoader.forceLoadByPlatform(ProjectorClassLoaderSetup::class.java.name)
+
+    // to prevent problems caused by loading classes like kotlin.jvm.functions.Function0 by both ProjectorClassLoader and IDE ClassLoader
+    prjClassLoader.forceLoadByProjectorClassLoader("com.intellij.openapi.application.ActionsKt")
+
+    invokeWhenIdeaIsInitialized("Init ProjectorClassLoader", onClassLoaderFetched = {
+      prjClassLoader.ideaClassLoader = it
+      ideaClassLoaderInitialized = true
+    })
+
+    return prjClassLoader
   }
-
-  return prjClassLoader
 }
