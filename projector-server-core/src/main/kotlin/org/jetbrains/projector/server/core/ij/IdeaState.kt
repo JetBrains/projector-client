@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.server.core.ij
 
+import org.jetbrains.projector.server.core.classloader.ProjectorClassLoaderSetup
 import org.jetbrains.projector.util.logging.Logger
 import kotlin.concurrent.thread
 
@@ -40,11 +41,33 @@ private fun isIdeaInProperState(ideaClassLoader: ClassLoader?): Boolean {
 
 private val logger = Logger("IdeState")
 
+/**
+ * Invokes given function when one of IDEA state is meet:
+ * 1. no running IDEA instance is found
+ * 2. IDEA ClassLoader is instantiated, initialized and fetched
+ * 3. IDEA is fully initialized
+ *
+ * You can combine querying for states 1 and 2 or 1 and 3, but not 2 and 3,
+ * as the second takes precedence over the third
+ *
+ * @param purpose               purpose of querying initialization state, used for logging
+ * @param onNoIdeaFound         function invoked when no IDEA instance cannot be found
+ * @param onClassLoaderFetched  function invoked when IDEA ClassLoader is initialized
+ * @param onInitialized         function invoked when IDEA is fully initialized
+ */
 public fun invokeWhenIdeaIsInitialized(
   purpose: String,
   onNoIdeaFound: (() -> Unit)? = null,
-  onInitialized: (ideaClassLoader: ClassLoader) -> Unit,
+  onClassLoaderFetched: ((ideaClassLoader: ClassLoader) -> Unit)? = null,
+  onInitialized: ((ideaClassLoader: ClassLoader) -> Unit)? = null,
 ) {
+
+  fun logJobDone() {
+    if (onNoIdeaFound == null) {
+      logger.debug { "\"$purpose\" is done" }
+    }
+  }
+
   thread(isDaemon = true) {
     //val logger = Logger("invokeWhenIdeaIsInitialized: $purpose")  // todo: can't do that because Logger calls this fun recursively
 
@@ -61,12 +84,17 @@ public fun invokeWhenIdeaIsInitialized(
         if (ideaMainClassWithIdeaClassLoader != null) {  // null means we run with IDEA but it's not initialized yet
           val ideaClassLoader = ideaMainClassWithIdeaClassLoader.classLoader
 
-          if (isIdeaInProperState(ideaClassLoader)) {
-            onInitialized(ideaClassLoader)
+          if (onClassLoaderFetched != null) {
+            onClassLoaderFetched(ideaClassLoader)
 
-            if (onNoIdeaFound == null) {
-              logger.debug { "\"$purpose\" is done" }
-            }
+            logJobDone()
+            break
+          }
+
+          if (ProjectorClassLoaderSetup.ideaClassLoaderInitialized && isIdeaInProperState(ideaClassLoader)) {
+            onInitialized!!(ideaClassLoader)
+
+            logJobDone()
             break
           }
         }
