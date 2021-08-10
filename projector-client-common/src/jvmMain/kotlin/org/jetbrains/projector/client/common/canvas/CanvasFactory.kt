@@ -23,24 +23,16 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-import java.io.ByteArrayInputStream
-import java.util.*
-import javax.imageio.ImageIO
-
 actual object CanvasFactory {
-  actual fun create(): Canvas {
-    return SwingCanvas()
-  }
+  lateinit var factoryImpl: CanvasFactoryJvm
 
-  actual fun createImageSource(
-    pngBase64: String,
-    onLoad: (Canvas.ImageSource) -> Unit,
-  ) {
-    val image = ImageIO.read(ByteArrayInputStream(Base64.getDecoder().decode(pngBase64)))
-    onLoad(SwingCanvas.SwingImageSource(image))
-  }
+  actual fun create() = factoryImpl.create()
+  actual fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit) = factoryImpl.createImageSource(pngBase64, onLoad)
+  actual fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit) = factoryImpl.createEmptyImageSource(onLoad)
+}
 
-  actual fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit) {
-    onLoad(SwingCanvas.SwingImageSource())
-  }
+interface CanvasFactoryJvm {
+  fun create(): Canvas
+  fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit)
+  fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit)
 }

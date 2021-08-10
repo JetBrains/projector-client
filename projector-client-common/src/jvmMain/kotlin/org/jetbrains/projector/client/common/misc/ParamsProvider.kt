@@ -43,6 +43,6 @@ object JvmParamsProviderImpl {
   var SHOW_TEXT_WIDTH: Boolean = false
   var REPAINT_AREA: RepaintAreaSetting = RepaintAreaSetting.Disabled
   var LOG_UNSUPPORTED_EVENTS: Boolean = true
-  var IMAGE_TTL: Double = 0.0
-  var IMAGE_CACHE_SIZE_CHARS: Int = 0
+  var IMAGE_TTL: Double = 60_000.0
+  var IMAGE_CACHE_SIZE_CHARS: Int = 5_000_000
 }
