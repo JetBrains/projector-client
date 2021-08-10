@@ -24,7 +24,8 @@
 package org.jetbrains.projector.client.common.canvas
 
 actual object CanvasFactory {
-  lateinit var factoryImpl: CanvasFactoryJvm
+  @Suppress("MemberVisibilityCanBePrivate") // it's intended to be modifiable
+  var factoryImpl: CanvasFactoryJvm = DummyCanvasFactoryJvm()
 
   actual fun create() = factoryImpl.create()
   actual fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit) = factoryImpl.createImageSource(pngBase64, onLoad)
@@ -35,4 +36,23 @@ interface CanvasFactoryJvm {
   fun create(): Canvas
   fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit)
   fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit)
+}
+
+internal class DummyCanvasFactoryJvm : CanvasFactoryJvm {
+  internal class DummyCanvas: Canvas {
+    override val context2d: Context2d
+      get() = error("DummyCanvas has no context2d")
+    override var width: Int = 1
+    override var height: Int = 1
+    override val imageSource = DummyImageSource()
+    override fun takeSnapshot() = DummyImageSource()
+  }
+
+  internal class DummyImageSource : Canvas.Snapshot {
+    override fun isEmpty() = true
+  }
+
+  override fun create() = DummyCanvas()
+  override fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit) = onLoad(DummyImageSource())
+  override fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit) = onLoad(DummyImageSource())
 }
