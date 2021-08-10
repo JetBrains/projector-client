@@ -24,7 +24,6 @@
 package org.jetbrains.projector.client.common.misc
 
 import java.time.Instant
-import java.util.*
 
 actual object TimeStamp {
   actual val current: Double
