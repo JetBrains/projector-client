@@ -72,7 +72,7 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
 
   private fun isProjectorAgentClass(name: String): Boolean = name.startsWith(PROJECTOR_AGENT_PACKAGE_PREFIX)
   private fun isProjectorClass(name: String): Boolean = name.startsWith(PROJECTOR_PACKAGE_PREFIX) && name != javaClass.name
-  private fun isIntellijClass(name: String): Boolean = name.startsWith(INTELLIJ_PACKAGE_PREFIX) && !isProjectorClass(name)
+  private fun isIntellijClass(name: String): Boolean = name.startsWith(INTELLIJ_PACKAGE_PREFIX) || (name.startsWith(JETBRAINS_PACKAGE_PREFIX) && !isProjectorClass(name))
 
   override fun loadClass(name: String, resolve: Boolean): Class<*> {
     synchronized(getClassLoadingLock(name)) {
@@ -154,6 +154,7 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
   public companion object {
 
     private const val INTELLIJ_PACKAGE_PREFIX = "com.intellij."
+    private const val JETBRAINS_PACKAGE_PREFIX = "org.jetbrains."
     private const val PROJECTOR_PACKAGE_PREFIX = "org.jetbrains.projector."
     private const val PROJECTOR_AGENT_PACKAGE_PREFIX = "org.jetbrains.projector.agent."
 
