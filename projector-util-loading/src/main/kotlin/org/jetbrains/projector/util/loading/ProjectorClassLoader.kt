@@ -51,6 +51,8 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
 
   private val forceLoadByOurselves = mutableSetOf<String>()
 
+  private val forceLoadByIdea = mutableSetOf<String>()
+
   private val jarFiles = mutableSetOf<String>()
 
   init {
@@ -67,8 +69,14 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     forceLoadByOurselves += className
   }
 
+  @Suppress("unused", "RedundantVisibilityModifier") // public to be accessible for additional setup
+  public fun forceLoadByIdea(className: String) {
+    forceLoadByIdea += className
+  }
+
   private fun mustBeLoadedByPlatform(name: String): Boolean = forceLoadByPlatform.any { name.startsWith(it) }
   private fun mustBeLoadedByOurselves(name: String): Boolean = forceLoadByOurselves.any { name.startsWith(it) }
+  private fun mustBeLoadedByIdea(name: String): Boolean = forceLoadByIdea.any { name.startsWith(it) }
 
   private fun isProjectorAgentClass(name: String): Boolean = name.startsWith(PROJECTOR_AGENT_PACKAGE_PREFIX)
   private fun isProjectorClass(name: String): Boolean = name.startsWith(PROJECTOR_PACKAGE_PREFIX) && name != javaClass.name
@@ -95,7 +103,7 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
           }
         }
         mustBeLoadedByOurselves(name) -> defineClass(name, resolve, ::getResourceAsStream)
-        isIntellijClass(name) -> myIdeaLoader.loadClass(name, resolve)
+        isIntellijClass(name) || mustBeLoadedByIdea(name) -> myIdeaLoader.loadClass(name, resolve)
         else -> myAppClassLoader.loadClass(name, resolve)
       }
     }
