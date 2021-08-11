@@ -71,6 +71,7 @@ class ImeInputMethod(
 
     onblur = {
       window.setTimeout(::focusInputField, 0) // https://stackoverflow.com/questions/7046798/jquery-focus-fails-on-firefox
+      focusInputField()  // make keyboard int tests work in Chromium
     }
 
     addEventListener("compositionstart", handler::handleEvent)
