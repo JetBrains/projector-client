@@ -24,6 +24,7 @@
 package org.jetbrains.projector.intTest.lowLevelKeyboard
 
 import com.codeborne.selenide.Condition.appear
+import com.codeborne.selenide.Configuration
 import com.codeborne.selenide.Selenide.element
 import com.codeborne.selenide.Selenide.open
 import io.ktor.server.engine.ApplicationEngine
@@ -43,11 +44,13 @@ import org.jetbrains.projector.common.protocol.toServer.ClientRawKeyEvent
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
 import org.jetbrains.projector.server.core.convert.toAwt.toAwtKeyEvent
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
 import java.awt.Robot
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
+import java.awt.event.MouseEvent
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -120,9 +123,17 @@ class LowLevelKeyboardTest {
     } + " (size: $size)"
   }
 
+  @BeforeEach
+  fun setupBrowser() {
+    Configuration.browserPosition = "200x200"
+    Configuration.browserSize = "200x200"
+  }
+
   @OptIn(ExperimentalStdlibApi::class)
   private fun test(expectedInputText: String, input: Robot.() -> Unit) {
-    val robot = Robot()
+    val robot = Robot().apply {
+      autoDelay = 20
+    }
 
     val events = Channel<List<Any>>()
 
@@ -135,12 +146,13 @@ class LowLevelKeyboardTest {
 
       input(robot)
 
-      runBlocking { delay(500) }
+      runBlocking { delay(100) }
+      robot.waitForIdle()
 
       val allEvents = mutableListOf<Any>()
       runBlocking {
         try {
-          withTimeout(500) {
+          withTimeout(100) {
             while (true) {
               val next = events.receive()
               allEvents.addAll(next)
@@ -178,15 +190,33 @@ class LowLevelKeyboardTest {
 
         frame.isVisible = true
 
-        runBlocking { delay(500) }
+        runBlocking { delay(100) }
+
+        if (OS.MAC.isCurrentOs) {
+          // switch windows manually
+          robot.mouseMove(frame.x, frame.y)
+          robot.mousePress(MouseEvent.BUTTON1_DOWN_MASK)
+          robot.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK)
+
+          runBlocking { delay(100) }
+        }
 
         input(robot)
 
-        runBlocking { delay(500) }
+        runBlocking { delay(100) }
+        robot.waitForIdle()
 
-        assertEquals(expectedInputText, textArea.text, "Wrong text is input")
+        if (OS.MAC.isCurrentOs) {
+          // switch windows manually
+          robot.mouseMove(300, 300)
+          robot.mousePress(MouseEvent.BUTTON1_DOWN_MASK)
+          robot.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK)
+
+          runBlocking { delay(100) }
+        }
 
         assertNotEquals(0, expectedEvents.size, "No expected events received (actual key events size: ${keyEvents.size})...")
+        assertEquals(expectedInputText, textArea.text, "Wrong text is input")
         assertEquals(expectedEvents.size, keyEvents.size,
                      "Different sizes: actual ${keyEvents.toPrettyString()}, expected ${expectedEvents.toPrettyString()}")
 
