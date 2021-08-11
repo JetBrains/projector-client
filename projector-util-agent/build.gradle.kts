@@ -44,28 +44,8 @@ kotlin {
   explicitApi()
 }
 
-val usernameProp: String by project
-val passwordProp: String by project
-val versionProp: String by project
-
 publishing {
-  publications {
-    create<MavenPublication>("maven") {
-      groupId = "org.jetbrains.projector"
-      artifactId = "projector-util-agent"
-      version = versionProp
-      from(components["java"])
-    }
-  }
-  repositories {
-    maven {
-      url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
-      credentials {
-        username = usernameProp
-        password = passwordProp
-      }
-    }
-  }
+  publishOnSpace(this, "java")
 }
 
 dependencies {
