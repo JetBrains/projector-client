@@ -32,9 +32,11 @@ import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.maven
 
 fun Project.publishOnSpace(publishingExtension: PublishingExtension, fromComponents: String) {
-  publishingExtension.publications {
-    create<MavenPublication>("maven") {
-      from(components[fromComponents])
+  if (fromComponents.equals("java", false)) {
+    publishingExtension.publications {
+      create<MavenPublication>("maven") {
+        from(components[fromComponents])
+      }
     }
   }
   publishingExtension.repositories {
