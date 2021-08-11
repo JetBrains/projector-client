@@ -31,11 +31,11 @@ plugins {
 
 val kotlinVersion: String by project
 val targetJvm: String by project
-val versionProp: String by project
+val publishingVersion: String by project
 
 subprojects {
   group = "org.jetbrains.projector"
-  version = versionProp
+  version = publishingVersion
 
   repositories {
     mavenCentral()

@@ -21,33 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("multiplatform")
-  `maven-publish`
-}
 
-val kotlinVersion: String by project
+import org.gradle.api.Project
+import org.gradle.api.artifacts.repositories.PasswordCredentials
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.credentials
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.maven
 
-kotlin {
-  explicitApi()
-
-  js {
-    browser()
-  }
-  jvm()
-
-  sourceSets {
-    val commonMain by getting {
-    }
-
-    val jsMain by getting {
-    }
-
-    val jvmMain by getting {
+fun Project.publishOnSpace(publishingExtension: PublishingExtension, fromComponents: String) {
+  publishingExtension.publications {
+    create<MavenPublication>("maven") {
+      from(components[fromComponents])
     }
   }
-}
-
-publishing {
-  publishOnSpace(this, "kotlin")
+  publishingExtension.repositories {
+    maven("https://packages.jetbrains.team/maven/p/prj/projector-maven") {
+      credentials(PasswordCredentials::class)
+    }
+  }
 }

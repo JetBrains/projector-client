@@ -33,9 +33,6 @@ jacoco {
 }
 
 val kotlinVersion: String by project
-val usernameProp: String by project
-val passwordProp: String by project
-val versionProp: String by project
 
 tasks.withType<JacocoReport> {
   dependsOn("jvmTest")
@@ -99,21 +96,5 @@ kotlin {
 }
 
 publishing {
-  publications {
-    create<MavenPublication>("maven") {
-      groupId = "org.jetbrains.projector"
-      artifactId = "projector-client-common"
-      version = versionProp
-      from(components["kotlin"])
-    }
-  }
-  repositories {
-    maven {
-      url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
-      credentials {
-        username = usernameProp
-        password = passwordProp
-      }
-    }
-  }
+  publishOnSpace(this, "kotlin")
 }
