@@ -374,4 +374,13 @@ class LowLevelKeyboardTest {
     keyRelease(KeyEvent.VK_SHIFT)
     keyRelease(KeyEvent.VK_CONTROL)
   }
+
+  @Test
+  @EnabledOnOs(OS.MAC)
+  fun testMacAltCode() = test("–") {
+    keyPress(KeyEvent.VK_ALT)
+    keyPress(KeyEvent.VK_MINUS)
+    keyRelease(KeyEvent.VK_MINUS)
+    keyRelease(KeyEvent.VK_ALT)
+  }
 }
