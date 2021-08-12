@@ -108,7 +108,18 @@ data class ServerPaintRectEvent(
   val width: Double,
   @SerialName("e")
   val height: Double,
-) : ServerWindowPaintEvent()
+) : ServerWindowPaintEvent() {
+
+  //init {
+  //
+  //  if (height.toInt() == 375) {
+  //    //println("AATU")
+  //    //Exception().printStackTrace()
+  //  }
+  //
+  //}
+
+}
 
 @Serializable
 @SerialName("e")
@@ -247,3 +258,10 @@ data class ServerSetUnknownStrokeEvent(
   @SerialName("a")
   val className: String,
 ) : ServerWindowToDoStateEvent()
+
+@Serializable
+@SerialName("u")
+data class ServerFromEditorEvent(
+  @SerialName("a")
+  val dummy: Boolean = true
+): ServerWindowStateEvent()

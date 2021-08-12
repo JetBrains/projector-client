@@ -31,4 +31,8 @@ import org.jetbrains.projector.common.protocol.data.Point
 data class CaretInfo(
   @SerialName("a")
   val locationInWindow: Point,
+  @SerialName("b")
+  val offset: Int,
+  @SerialName("c")
+  val locationInEditor: Point,
 )

@@ -39,12 +39,14 @@ import org.jetbrains.projector.client.web.state.LafListener
 import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.jetbrains.projector.common.protocol.data.CursorType
+import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowCloseEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowMoveEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowResizeEvent
 import org.jetbrains.projector.common.protocol.toServer.ResizeDirection
+import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.math.roundToInt
 
@@ -83,7 +85,24 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   //public only for speculative typing.
   val canvas = createCanvas()
-  private val renderingSurface = createRenderingSurface(canvas)
+
+
+  val editorCanvas = (document.createElement("canvas") as HTMLCanvasElement).apply {
+
+    style.display = "block"
+    style.position = "fixed"
+    id = "EDITOR"
+
+    //(getContext("2d") as CanvasRenderingContext2D).apply {
+    //  scale(0.002, 0.002)
+    //  this.translate(400.0, 600.0)
+    //}
+
+    document.body!!.appendChild(this)
+  }
+
+
+  public val renderingSurface = createRenderingSurface(canvas)
 
   private var header: WindowHeader? = null
   private var headerVerticalPosition: Double = 0.0
@@ -213,6 +232,75 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     document.body!!.appendChild(this)
   }
 
+  init {
+    renderingSurface.editorCanvas = DomCanvas(editorCanvas)
+  }
+
+  fun Number.toPxStr(): String = "${this}px"
+
+  var lastCarets: ServerCaretInfoChangedEvent.CaretInfoChange.Carets? = null
+
+  fun applyCaretInfo(caretInfo: ServerCaretInfoChangedEvent.CaretInfoChange) {
+    if (caretInfo !is ServerCaretInfoChangedEvent.CaretInfoChange.Carets) return
+
+    val ctx = editorCanvas.getContext("2d") as CanvasRenderingContext2D
+
+    ctx.apply {
+      restore()
+      save()
+
+      ParamsProvider.SCALING_RATIO.let { scale(it, it) }
+
+      if (caretInfo.editorMetrics != lastCarets?.editorMetrics) {
+        console.log("ClearRect")
+        //ctx.clearRect(0.0, 0.0, editorCanvas.width.toDouble(), editorCanvas.height.toDouble())
+      }
+
+      val editorMetrics = caretInfo.editorMetrics
+      beginPath()
+      rect(
+        x = editorMetrics.x,
+        y = editorMetrics.y,
+        w = editorMetrics.width,
+        h = editorMetrics.height
+      )
+      clip()
+    }
+
+    //editorCanvas.style.let { speculativeStyle ->
+    //  speculativeStyle.left = caretInfo.editorMetrics.x.toPxStr()
+    //  speculativeStyle.top = caretInfo.editorMetrics.y.toPxStr()
+    //  speculativeStyle.width = caretInfo.editorMetrics.width.toPxStr()
+    //  speculativeStyle.height = caretInfo.editorMetrics.height.toPxStr()
+    //  speculativeStyle.zIndex = "11"
+    //}
+
+    lastCarets = caretInfo
+  }
+
+  private fun ensureSpeculativeCanvasSize(canvas: HTMLCanvasElement, targetCanvas: HTMLCanvasElement) {
+
+    console.log("main: $canvas; target: $targetCanvas")
+
+    canvas.style.let { canvasStyle ->
+      targetCanvas.style.let { speculativeStyle ->
+        speculativeStyle.left = canvasStyle.left
+        speculativeStyle.top = canvasStyle.top
+        speculativeStyle.width = canvasStyle.width
+        speculativeStyle.height = canvasStyle.height
+        speculativeStyle.zIndex = canvasStyle.zIndex.let {
+          val z = it.toIntOrNull() ?: return@let it
+          (z + 1).toString()
+        }
+      }
+    }
+
+    if (targetCanvas.width != canvas.width || targetCanvas.height != canvas.height) {
+      targetCanvas.width = canvas.width
+      targetCanvas.height = canvas.height
+    }
+  }
+
   fun applyBounds() {
     val userScalingRatio = ParamsProvider.USER_SCALING_RATIO
     val scalingRatio = ParamsProvider.SCALING_RATIO
@@ -252,6 +340,8 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
       width = (bounds.width * scalingRatio).roundToInt(),
       height = (bounds.height * scalingRatio).roundToInt()
     )
+
+    ensureSpeculativeCanvasSize(canvas, editorCanvas)
   }
 
   fun dispose() {

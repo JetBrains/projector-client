@@ -26,6 +26,7 @@ package org.jetbrains.projector.client.web.debug
 import kotlinx.browser.document
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.events.MouseEvent
 import kotlin.math.roundToInt
 
 interface PingShower {
@@ -64,6 +65,13 @@ class DivPingShower : PingShower {
       style.asDynamic().pointerEvents = "none"
 
       document.body!!.appendChild(this)
+    }
+
+    if (ParamsProvider.PRINT_COORDINATES_OF_MOUSE) {
+      document.addEventListener("mousemove", {
+        val mouseEvent = it as MouseEvent
+        console.log("Mouse: ${mouseEvent.x}:${mouseEvent.y}")
+      })
     }
   }
 

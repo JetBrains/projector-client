@@ -33,5 +33,11 @@ interface RenderingSurface {
 
   val canvas: Canvas
 
+  var editorCanvas: Canvas?
+
+  var drawToEditor: Boolean
+    get() = false
+    set(value) {}
+
   fun flush()
 }

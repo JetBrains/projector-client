@@ -24,9 +24,11 @@
 package org.jetbrains.projector.client.web.speculative
 
 import kotlinx.browser.document
+import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
 import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
 import org.jetbrains.projector.client.common.misc.ParamsProvider.SCALING_RATIO
 import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
+import org.jetbrains.projector.common.protocol.toClient.data.idea.CaretInfo
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.common.protocol.toServer.KeyModifier
 import org.w3c.dom.CanvasRenderingContext2D

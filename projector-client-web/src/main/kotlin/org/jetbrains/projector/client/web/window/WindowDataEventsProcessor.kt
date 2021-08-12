@@ -28,10 +28,7 @@ import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Com
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.common.protocol.data.ImageId
-import org.jetbrains.projector.common.protocol.toClient.ServerWindowEvent
-import org.jetbrains.projector.common.protocol.toClient.ServerWindowSetChangedEvent
-import org.jetbrains.projector.common.protocol.toClient.WindowData
-import org.jetbrains.projector.common.protocol.toClient.WindowType
+import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLImageElement
@@ -116,6 +113,26 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
       href = selectedIconUrl
     }
     document.head!!.appendChild(link)
+  }
+
+  fun applyCarets(carets: ServerCaretInfoChangedEvent.CaretInfoChange.Carets) {
+    val windowId = carets.editorWindowId
+
+    if (windowId in excludedWindowIds) {
+      return
+    }
+
+    synchronized(windowManager) {
+      val window = windowManager[windowId]
+
+      if (window == null) {
+        logger.error { "Skipping nonexistent window: $windowId" }
+        return
+      }
+
+      window.applyCaretInfo(carets)
+    }
+
   }
 
   fun draw(windowId: Int, commands: List<ServerWindowEvent>) {

@@ -46,10 +46,28 @@ import kotlin.math.PI
 import kotlin.random.Random
 
 class Renderer(private val renderingSurface: RenderingSurface) {
-  private val ctx: Context2d
-    get() = renderingSurface.canvas.context2d
 
-  private val canvasState = CanvasRenderingState()
+  //var renderingToOffscreen = false
+
+  private val ctx: Context2d
+    get() = if (renderingSurface.drawToEditor) renderingSurface.editorCanvas!!.context2d.also {
+      //ParamsProvider.Sc
+      //it.scale()
+    } else renderingSurface.canvas.context2d
+
+  val editorCanvasState = CanvasRenderingState()
+  val originalCanvasState = CanvasRenderingState()
+
+  val editorRequestedState = RequestedRenderingState()
+  val originalRequestedState = RequestedRenderingState()
+
+  //val canvasState: CanvasRenderingState
+  //  get() = if (renderingSurface.drawToEditor) editorCanvasState else originalCanvasState
+  //val requestedState: RequestedRenderingState
+  //  get() = if (renderingSurface.drawToEditor) editorRequestedState else originalRequestedState
+
+  val canvasState = CanvasRenderingState()
+
   val requestedState = RequestedRenderingState()
 
   private fun applyFillStyle(newFillStyle: PaintColor?) {
@@ -581,7 +599,7 @@ class Renderer(private val renderingSurface: RenderingSurface) {
       return SolidColor(0x7F_00_00_00 + Random.nextInt(0x01_00_00_00))
     }
 
-    private data class CanvasRenderingState(
+    data class CanvasRenderingState(
       var identitySpaceClip: CommonShape? = DEFAULT_IDENTITY_SPACE_CLIP,
       var transform: List<Double> = DEFAULT_TRANSFORM,
       var strokeData: StrokeData = DEFAULT_STROKE_DATA,

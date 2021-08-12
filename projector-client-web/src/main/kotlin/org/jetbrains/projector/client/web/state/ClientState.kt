@@ -55,6 +55,7 @@ import org.jetbrains.projector.common.protocol.MessageEncoder
 import org.jetbrains.projector.common.protocol.compress.MessageCompressor
 import org.jetbrains.projector.common.protocol.compress.MessageDecompressor
 import org.jetbrains.projector.common.protocol.handshake.*
+import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toClient.ToClientMessageDecoder
 import org.jetbrains.projector.common.protocol.toServer.*

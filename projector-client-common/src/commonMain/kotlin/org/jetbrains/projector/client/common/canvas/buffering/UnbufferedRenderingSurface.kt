@@ -34,7 +34,11 @@ class UnbufferedRenderingSurface(override val canvas: Canvas) : RenderingSurface
     canvas.resizeSavingImage(width, height)
   }
 
+  override var editorCanvas: Canvas? = null
+
   override fun flush() {
     // flushing not needed
   }
+
+  override var drawToEditor: Boolean = false
 }

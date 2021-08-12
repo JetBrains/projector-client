@@ -41,6 +41,8 @@ class DoubleBufferedRenderingSurface(private val target: Canvas) : RenderingSurf
     target.resizeSavingImage(width, height)
   }
 
+  override var editorCanvas: Canvas? = null
+
   override fun flush() {
     if (buffer.width == 0 || buffer.height == 0) return
 
@@ -54,4 +56,6 @@ class DoubleBufferedRenderingSurface(private val target: Canvas) : RenderingSurf
         height = target.height
       }
   }
+
+  override var drawToEditor: Boolean = false
 }

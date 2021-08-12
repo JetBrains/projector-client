@@ -25,6 +25,7 @@ package org.jetbrains.projector.client.common
 
 import org.jetbrains.projector.client.common.Renderer.Companion.RequestedRenderingState
 import org.jetbrains.projector.client.common.canvas.Canvas
+import org.jetbrains.projector.client.common.canvas.CanvasFactory
 import org.jetbrains.projector.client.common.canvas.buffering.RenderingSurface
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
@@ -34,11 +35,15 @@ import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
 
-class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
+class SingleRenderingSurfaceProcessor(private val renderingSurface: RenderingSurface) {
 
   private val renderer = Renderer(renderingSurface)
 
   private val stateSaver = StateSaver(renderer, renderingSurface)
+
+  init {
+    //renderingSurface.editorCanvas = CanvasFactory.createWithId("editorImpl")
+  }
 
   fun processPending(drawEvents: ArrayDeque<DrawEvent>) {
     stateSaver.restoreIfNeeded()
@@ -98,11 +103,19 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
 
         is ServerSetTransformEvent -> renderer.setTransform(it.tx)
 
+        is ServerFromEditorEvent -> {
+          renderingSurface.drawToEditor = true
+        }
+
         is ServerWindowToDoStateEvent -> logUnsupportedCommand(it)
       }
     }
 
     var success = true
+
+    //if (renderingSurface.drawToEditor && command.paintEvent !is ServerDrawStringEvent) {
+    //  logger.debug { "DrawoEditor: ${command.paintEvent}" }
+    //}
 
     with(command.paintEvent) {
       Do exhaustive when (this) {
@@ -216,6 +229,8 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
       }
     }
 
+    renderingSurface.drawToEditor = false
+
     return success
   }
 
@@ -261,13 +276,29 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
 
       var prerequisites = mutableListOf<ServerWindowStateEvent>()
 
+      //var fromEditor = false
+
       this.forEach {
         Do exhaustive when (it) {
-          is ServerWindowStateEvent -> prerequisites.add(it)
+          is ServerWindowStateEvent -> {
+
+            //if (it is ServerFromEditorEvent) {
+            //  fromEditor = true
+            //}
+
+            prerequisites.add(it)
+          }
 
           is ServerWindowPaintEvent -> {
+
+            //if (fromEditor && it !is ServerDrawStringEvent) {
+            //  Exception().printStackTrace()
+            //  logger.debug { "FromEditttor: ${it}; Shrinked: ${joinToString { it::class.simpleName.toString() }}" }
+            //}
+
             result.add(DrawEvent(prerequisites, it))
             prerequisites = mutableListOf()
+            //fromEditor = false
           }
         }
       }

@@ -56,4 +56,15 @@ actual object CanvasFactory {
       fillRect(0.0, 0.0, 20.0, 20.0)
     }
   }
+
+  actual fun createWithId(id: String): Canvas {
+
+    val htmlCanvas = document.createElement("canvas") as HTMLCanvasElement
+    htmlCanvas.id = id
+    htmlCanvas.style.display = "none"
+
+    document.body!!.appendChild(htmlCanvas)
+
+    return DomCanvas(htmlCanvas)
+  }
 }

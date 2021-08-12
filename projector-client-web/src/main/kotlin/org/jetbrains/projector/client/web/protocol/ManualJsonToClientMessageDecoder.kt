@@ -27,6 +27,7 @@ import org.jetbrains.projector.common.protocol.data.*
 import org.jetbrains.projector.common.protocol.handshake.ProtocolType
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.common.protocol.toClient.data.idea.CaretInfo
+import org.jetbrains.projector.common.protocol.toClient.data.idea.SelectionInfo
 import kotlin.js.Json
 import kotlin.math.roundToLong
 

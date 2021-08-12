@@ -34,15 +34,19 @@ import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
 import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.common.misc.Do
+import org.jetbrains.projector.common.protocol.data.Point
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.url.URL
+import kotlin.js.Date
 
 class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEventsProcessor) {
 
+  var i = 0
+
   @OptIn(ExperimentalStdlibApi::class)
-  fun process(commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager,
-              inputController: InputController) {
+  fun process(commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager) {
+    i++
     val drawCommandsEvents = mutableListOf<ServerDrawCommandsEvent>()
 
     commands.forEach { command ->
@@ -62,6 +66,17 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
         is ServerCaretInfoChangedEvent -> {
           typing.changeCaretInfo(command.data)
           inputController.handleCaretInfoChange(command.data)
+
+          val data = command.data
+
+          if (data is ServerCaretInfoChangedEvent.CaretInfoChange.Carets) {
+            windowDataEventsProcessor.applyCarets(data)
+          }
+
+          CaretsCacher.carets = data
+          CaretsCacher.lastError = data === ServerCaretInfoChangedEvent.CaretInfoChange.NoCarets
+
+          Unit
         }
 
         is ServerClipboardEvent -> handleServerClipboardChange(command)
@@ -85,17 +100,38 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           // todo: should WindowManager.lookAndFeelChanged() be called here?
           OnScreenMessenger.lookAndFeelChanged()
         }
+
+        is SpeculativeEvent -> when (command) {
+          is SpeculativeEvent.SpeculativeStringDrawnEvent -> {
+            typing.onRequestProcessed(command.requestId)
+          }
+        }
       }
     }
 
-    // todo: determine the moment better
-    if (drawCommandsEvents.any { it.drawEvents.any { drawEvent -> drawEvent is ServerDrawStringEvent } }) {
-      typing.removeSpeculativeImage()
-    }
+    //enclosing@ for (command in drawCommandsEvents) {
+    //  var verticalOffset = 0.0
+    //  for (drawEvent in command.drawEvents) {
+    //
+    //    when {
+    //      drawEvent is ServerSetTransformEvent -> verticalOffset = drawEvent.tx[5]
+    //      drawEvent is ServerDrawStringEvent && typing.intersects(drawEvent, Point(0.0, verticalOffset)).also {
+    //        if (drawEvent.str.contains("й")) {
+    //          logger.debug { "intersects check at iter $i" }
+    //        }
+    //      } -> {
+    //        console.log("Intersection of draw event (${drawEvent.str}) : ${Date().toTimeString()}")
+    //        typing.removeSpeculativeImage()
+    //        break@enclosing
+    //      }
+    //    }
+    //  }
+    //}
 
     drawCommandsEvents.sortWith(drawingOrderComparator)
 
     drawCommandsEvents.forEach { event ->
+
       Do exhaustive when (val target = event.target) {
         is ServerDrawCommandsEvent.Target.Onscreen -> windowDataEventsProcessor.draw(target.windowId, event.drawEvents)
 
@@ -114,6 +150,8 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
         }
       }
     }
+
+    SingleRenderingSurfaceProcessor.processingSpeculative = false
   }
 
   fun onResized() {

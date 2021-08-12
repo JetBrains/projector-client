@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.server.core.convert.toClient
 
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.jetbrains.projector.common.protocol.toClient.*
@@ -48,6 +49,8 @@ private fun ServerDrawStringEvent.isVisible(font: ServerSetFontEvent?, clip: Ser
   if (font == null || clip == null || tx == null) {
     return true  // can't tell
   }
+
+  //EditorUtil.getEditorFont().
 
   val height = font.fontSize * 3  // todo: it's rough rounding up
 
@@ -85,9 +88,25 @@ public fun List<List<ServerWindowEvent>>.convertToSimpleList(): List<ServerWindo
   var lastFontEvent: ServerSetFontEvent? = null
   var lastSetPaintEvent: ServerSetPaintEvent? = null
   var lastStrokeEvent: ServerSetStrokeEvent? = null
+  var lastFromEditorEvent: ServerFromEditorEvent? = null
+
+  var prereq = 0
+
+
+  var fromEditorSeen = false
 
   this.forEach { packedEvents ->
+
+    val sizeBefore = answer.size
+
+    var seen: ServerFromEditorEvent? = null
+
     packedEvents.forEach innerLoop@{ event ->
+
+      if (event is ServerWindowStateEvent) {
+        prereq++
+      }
+
       Do exhaustive when (event) {
         is ServerWindowStateEvent -> Do exhaustive when (event) {
           is ServerSetCompositeEvent -> if (event == lastCompositeEvent) {
@@ -139,6 +158,24 @@ public fun List<List<ServerWindowEvent>>.convertToSimpleList(): List<ServerWindo
           }
 
           is ServerWindowToDoStateEvent -> answer.add(event)
+          is ServerFromEditorEvent -> {
+
+            fromEditorSeen = true
+            seen = event
+            prereq--
+
+            //println("Converting: ${joinToString("___") { it.joinToString(",") { it.javaClass.simpleName } }}")
+
+            //if (event == lastFromEditorEvent) {
+            //  println("PPPPPPP")
+            //  Unit
+            //}
+            //else {
+            //  println("PPPPPPP_OO")
+            //  lastFromEditorEvent = event
+            //  answer.add(event)
+            //}
+          }
         }
 
         is ServerWindowPaintEvent -> {
@@ -149,12 +186,32 @@ public fun List<List<ServerWindowEvent>>.convertToSimpleList(): List<ServerWindo
           }
 
           if (visible) {
+
+            if (seen != null) {
+              //println("Adding for ${event.javaClass.name}")
+              //
+              //if (event !is ServerDrawStringEvent) {
+              //  println("EUIUIEFJIJFKJKf: ${event.javaClass.name}")
+              //}
+
+              answer.add(sizeBefore, seen!!)
+            }
+
             answer.add(event)
           }
           else {
+
+            //println("Skipping")
+
+            //answer.dropLast(prereq)
+            prereq = 0
+
             Unit
           }
+
+          prereq = 0
         }
+        //is ServerFromEditorEvent -> {}
       }
     }
   }

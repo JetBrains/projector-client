@@ -23,6 +23,10 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
+import java.io.ByteArrayInputStream
+import java.util.*
+import javax.imageio.ImageIO
+
 actual object CanvasFactory {
   @Suppress("MemberVisibilityCanBePrivate") // it's intended to be modifiable
   var factoryImpl: CanvasFactoryJvm = DummyCanvasFactoryJvm()
