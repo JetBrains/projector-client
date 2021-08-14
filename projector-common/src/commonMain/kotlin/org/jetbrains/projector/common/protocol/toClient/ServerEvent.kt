@@ -134,6 +134,10 @@ data class ServerCaretInfoChangedEvent(
       val textColor: Int,
       @SerialName("j")
       val backgroundColor: Int,
+      @SerialName("k")
+      val editorScrolled: Point,
+      @SerialName("l")
+      val editorId: Int,
     ) : CaretInfoChange()
   }
 }
@@ -242,4 +246,16 @@ data class ServerWindowColorsEvent(
     @SerialName("f")
     val windowHeaderInactiveText: PaintValue.Color,
   )
+}
+
+@Serializable
+sealed class SpeculativeEvent : ServerEvent() {
+
+  @Serializable
+  @SerialName("q")
+  data class SpeculativeStringDrawnEvent(
+    @SerialName("a")
+    val operationId: Int,
+  ) : SpeculativeEvent()
+
 }

@@ -31,4 +31,20 @@ import org.jetbrains.projector.common.protocol.data.Point
 data class CaretInfo(
   @SerialName("a")
   val locationInWindow: Point,
+  @SerialName("b")
+  val offset: Int,
+  @SerialName("c")
+  val selection: SelectionInfo?,
+)
+
+@Serializable
+data class SelectionInfo(
+  @SerialName("a")
+  val startLocation: Point,
+  @SerialName("b")
+  val startOffset: Int,
+  @SerialName("c")
+  val endLocation: Point,
+  @SerialName("d")
+  val endOffset: Int,
 )

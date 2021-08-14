@@ -27,6 +27,7 @@ import org.jetbrains.projector.common.protocol.data.*
 import org.jetbrains.projector.common.protocol.handshake.ProtocolType
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.common.protocol.toClient.data.idea.CaretInfo
+import org.jetbrains.projector.common.protocol.toClient.data.idea.SelectionInfo
 import kotlin.js.Json
 import kotlin.math.roundToLong
 
@@ -67,6 +68,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "n" -> ServerMarkdownEvent.ServerMarkdownScrollEvent(content["a"] as Int, content["b"] as Int)
       "o" -> ServerMarkdownEvent.ServerMarkdownBrowseUriEvent(content["a"] as String)
       "p" -> ServerWindowColorsEvent(content["a"].unsafeCast<Json>().toColorsStorage())
+      "q" -> SpeculativeEvent.SpeculativeStringDrawnEvent(content["a"] as Int)
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }
   }
@@ -99,13 +101,28 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
         content["h"] as Int,
         content["i"] as Int,
         content["j"] as Int,
+        content["k"].unsafeCast<Json>().toPoint(),
+        content["l"] as Int,
       )
       else -> throw IllegalArgumentException("Unsupported caret info type: ${JSON.stringify(this)}")
     }
   }
 
   private fun Json.toCaretInfo(): CaretInfo {
-    return CaretInfo(this["a"].unsafeCast<Json>().toPoint())
+    return CaretInfo(
+      this["a"].unsafeCast<Json>().toPoint(),
+      this["b"] as Int,
+      this["c"]?.let { it.unsafeCast<Json>().toSelectionInfo() },
+    )
+  }
+
+  private fun Json.toSelectionInfo(): SelectionInfo {
+    return SelectionInfo(
+      this["a"].unsafeCast<Json>().toPoint(),
+      this["b"] as Int,
+      this["c"].unsafeCast<Json>().toPoint(),
+      this["d"] as Int,
+    )
   }
 
   private fun Array<Any>.toTarget(): ServerDrawCommandsEvent.Target {

@@ -65,6 +65,7 @@ actual object ParamsProvider {
   private const val DEFAULT_REPAINT_INTERVAL_MS = 333
   private const val DEFAULT_IMAGE_CACHE_SIZE_CHARS = 5_000_000
   private const val DEFAULT_BLOCK_CLOSING = true
+  private val DEFAULT_TYPING_CLEAR_STRATEGY = TypingClearStrategy.SERVER_VALIDATION
 
   val SYSTEM_SCALING_RATIO
     get() = window.devicePixelRatio  // get every time because it can be changed
@@ -100,6 +101,7 @@ actual object ParamsProvider {
   actual val IMAGE_CACHE_SIZE_CHARS: Int
   val BLOCK_CLOSING: Boolean
   val LAYOUT_TYPE: LayoutType
+  val TYPING_CLEAR_STRATEGY: TypingClearStrategy
   val SCALING_RATIO: Double
     get() = SYSTEM_SCALING_RATIO * USER_SCALING_RATIO
 
@@ -161,6 +163,12 @@ actual object ParamsProvider {
         "frAzerty" -> LayoutType.FR_AZERTY
         else -> LayoutType.JS_DEFAULT
       }
+      TYPING_CLEAR_STRATEGY = when (searchParams.get("typingClearStrategy")) {
+        "server" -> TypingClearStrategy.SERVER_VALIDATION
+        "position" -> TypingClearStrategy.BY_POSITION
+        "naive" -> TypingClearStrategy.NAIVE
+        else -> DEFAULT_TYPING_CLEAR_STRATEGY
+      }
     }
   }
 
@@ -180,5 +188,11 @@ actual object ParamsProvider {
   enum class LayoutType {
     JS_DEFAULT,
     FR_AZERTY,
+  }
+
+  enum class TypingClearStrategy {
+    NAIVE,
+    BY_POSITION,
+    SERVER_VALIDATION,
   }
 }

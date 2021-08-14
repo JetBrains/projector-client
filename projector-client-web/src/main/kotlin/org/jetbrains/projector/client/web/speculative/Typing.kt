@@ -27,7 +27,11 @@ import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
 import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
 import org.jetbrains.projector.client.common.misc.ParamsProvider.SCALING_RATIO
+import org.jetbrains.projector.common.protocol.data.Point
 import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
+import org.jetbrains.projector.common.protocol.toClient.ServerDrawStringEvent
+import org.jetbrains.projector.common.protocol.toClient.data.idea.CaretInfo
+import org.jetbrains.projector.common.protocol.toClient.data.idea.SelectionInfo
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.common.protocol.toServer.KeyModifier
 import org.w3c.dom.CanvasRenderingContext2D
@@ -39,9 +43,21 @@ sealed class Typing {
 
   abstract fun removeSpeculativeImage()
 
-  abstract fun addEventChar(event: ClientKeyPressEvent)
+  abstract fun onDrawString(stringEvent: ServerDrawStringEvent, offset: Point)
+
+  abstract fun onSymbolValidated(requestId: Int)
+
+  abstract fun addEventChar(event: ClientKeyPressEvent) : DrawingResult
 
   abstract fun dispose()
+
+  sealed class DrawingResult {
+
+    object Skip : DrawingResult()
+
+    data class Drawn(val operationId: Int, val editorId: Int, val virtualOffset: Int, val selection: SelectionInfo?): DrawingResult()
+
+  }
 
   object NotSpeculativeTyping : Typing() {
 
@@ -53,9 +69,15 @@ sealed class Typing {
       // do nothing
     }
 
-    override fun addEventChar(event: ClientKeyPressEvent) {
+    override fun onDrawString(stringEvent: ServerDrawStringEvent, offset: Point) {
       // do nothing
     }
+
+    override fun onSymbolValidated(requestId: Int) {
+      // do nothing
+    }
+
+    override fun addEventChar(event: ClientKeyPressEvent) = DrawingResult.Skip
 
     override fun dispose() {
       // do nothing
@@ -65,6 +87,7 @@ sealed class Typing {
   class SpeculativeTyping(private val canvasByIdGetter: (Int) -> HTMLCanvasElement?) : Typing() {
 
     private val speculativeCanvasImage = (document.createElement("canvas") as HTMLCanvasElement).apply {
+      id = "speculativeCanvas"
       style.apply {
         position = "fixed"
         display = "none"
@@ -80,6 +103,10 @@ sealed class Typing {
     }
 
     private var carets: ServerCaretInfoChangedEvent.CaretInfoChange = ServerCaretInfoChangedEvent.CaretInfoChange.NoCarets
+
+    private var drawnSpeculativeSymbols = mutableMapOf<Int, DrawnSymbol>()
+
+    private var lastId = 0
 
     private fun updateCanvas() {
       val caret = carets as? ServerCaretInfoChangedEvent.CaretInfoChange.Carets
@@ -103,11 +130,98 @@ sealed class Typing {
     }
 
     override fun changeCaretInfo(caretInfoChange: ServerCaretInfoChangedEvent.CaretInfoChange) {
+      val oldCarets = carets
+      if (caretInfoChange is ServerCaretInfoChangedEvent.CaretInfoChange.Carets
+          && oldCarets is ServerCaretInfoChangedEvent.CaretInfoChange.Carets
+          && caretInfoChange.editorScrolled != oldCarets.editorScrolled
+      ) {
+        removeSpeculativeImage()
+      }
       carets = caretInfoChange
     }
 
     override fun removeSpeculativeImage() {
+      if (drawnSpeculativeSymbols.isNotEmpty()) {
+        drawnSpeculativeSymbols.clear()
+        updateCanvas()
+      }
+    }
+
+    /**
+     * Checks that symbol is located at event right bound
+     */
+    private fun isSymbolAtEventEnd(symbol: DrawnSymbol, stringEvent: ServerDrawStringEvent, eventOffset: Point): Boolean {
+      val currentCarets = (carets as? ServerCaretInfoChangedEvent.CaretInfoChange.Carets) ?: return false
+
+      val shiftToLineTop = currentCarets.lineHeight - currentCarets.lineDescent
+      val totalVerticalPaintOffset = stringEvent.y + eventOffset.y - shiftToLineTop
+
+      val offsetInEditor = totalVerticalPaintOffset - currentCarets.editorMetrics.y
+
+      val symbolShiftX = symbol.carets.run { editorMetrics.x - editorScrolled.x }
+      val symbolShiftY = symbol.carets.run { editorMetrics.y - editorScrolled.y }
+
+      // event rectangle
+      val topLeftX1 = stringEvent.x
+      val topLeftY1 = offsetInEditor + currentCarets.editorScrolled.y
+      val bottomRightX1 = topLeftX1 + stringEvent.desiredWidth
+      val bottomRightY1 = topLeftY1 + currentCarets.lineHeight
+
+      // speculative symbol rectangle
+      val topLeftX2 = symbol.x - symbolShiftX
+      val topLeftY2 = symbol.y - symbolShiftY
+      val bottomRightX2 = topLeftX2 + symbol.width
+      val bottomRightY2 = topLeftY2 + symbol.height
+
+      return bottomRightX1 == bottomRightX2 && topLeftY1 == topLeftY2 && bottomRightY1 == bottomRightY2
+    }
+
+    private fun removeSymbolIfNeeded(symbol: DrawnSymbol, stringEvent: ServerDrawStringEvent, eventOffset: Point): Boolean {
+      if (!isSymbolAtEventEnd(symbol, stringEvent, eventOffset)) return false
+      symbol.removeFromCanvas()
+      return true
+    }
+
+    private fun clearSpeculativeCanvas() {
+      speculativeCanvasContext.clearRect(0.0, 0.0, speculativeCanvasImage.width.toDouble(), speculativeCanvasImage.height.toDouble())
       updateCanvas()
+    }
+
+    private fun clearSpeculativeCanvasIfNeeded() {
+      if (drawnSpeculativeSymbols.isEmpty()) {
+        clearSpeculativeCanvas()
+      }
+    }
+
+    override fun onDrawString(stringEvent: ServerDrawStringEvent, offset: Point) {
+      if (drawnSpeculativeSymbols.isNotEmpty()) {
+        val notRemoved = mutableSetOf<Int>() // skipped ids
+        val toRemove = mutableSetOf<Int>() // ids' of chars that should be removed
+
+        drawnSpeculativeSymbols.entries.forEach { (id, symbol) ->
+          val removed = removeSymbolIfNeeded(symbol, stringEvent, offset)
+          if (removed) {
+            // remove all previously skipped chars
+            notRemoved.removeAll { notRemovedId ->
+              drawnSpeculativeSymbols[notRemovedId]?.removeFromCanvas()
+              toRemove.add(notRemovedId)
+            }
+            toRemove += id
+          } else {
+            notRemoved += id
+          }
+        }
+
+        toRemove.forEach { drawnSpeculativeSymbols.remove(it) }
+
+        clearSpeculativeCanvasIfNeeded()
+      }
+    }
+
+    override fun onSymbolValidated(requestId: Int) {
+      val symbol = drawnSpeculativeSymbols.remove(requestId) ?: return
+      symbol.removeFromCanvas()
+      clearSpeculativeCanvasIfNeeded()
     }
 
     /**
@@ -124,16 +238,29 @@ sealed class Typing {
              || event.char.category.fromOtherUnicodeGroup
     }
 
-    override fun addEventChar(event: ClientKeyPressEvent) {
-      if (shouldSkipEvent(event)) return
+    override fun addEventChar(event: ClientKeyPressEvent): DrawingResult {
+      if (shouldSkipEvent(event)) return DrawingResult.Skip
 
-      val currentCarets = carets as? ServerCaretInfoChangedEvent.CaretInfoChange.Carets ?: return
+      val currentCarets = carets as? ServerCaretInfoChangedEvent.CaretInfoChange.Carets ?: return DrawingResult.Skip
 
-      val canvas = canvasByIdGetter(currentCarets.editorWindowId) ?: return
+      val canvas = canvasByIdGetter(currentCarets.editorWindowId) ?: return DrawingResult.Skip
 
-      val firstCaretLocation = currentCarets.caretInfoList.firstOrNull()?.locationInWindow ?: return  // todo: support multiple carets
+      val serverFirstCaretInfo = currentCarets.caretInfoList.firstOrNull() ?: return DrawingResult.Skip  // todo: support multiple carets
+
+      val paintOffset = drawnSpeculativeSymbols.values.sumOf { it.width }
+      val firstCaretInfo = serverFirstCaretInfo.copy(
+        locationInWindow = serverFirstCaretInfo.locationInWindow.copy(
+          x = serverFirstCaretInfo.locationInWindow.x + paintOffset
+        )
+      )
+
+      val firstCaretLocation = firstCaretInfo.locationInWindow
 
       ensureSpeculativeCanvasSize(canvas)
+
+      val newId = lastId + 1
+      val virtualOffset = firstCaretInfo.offset + drawnSpeculativeSymbols.size
+      val virtualSelection = if (drawnSpeculativeSymbols.isEmpty()) firstCaretInfo.selection else null
 
       speculativeCanvasContext.apply {
         restore()
@@ -178,10 +305,18 @@ sealed class Typing {
 
         fillStyle = currentCarets.textColor.argbIntToRgbaString()
         fillText(event.char.toString(), firstCaretLocation.x, stringYPos)
+
+        drawnSpeculativeSymbols[newId] = DrawnSymbol(firstCaretLocation.x, firstCaretLocation.y,
+                                                     speculativeCharWidth, currentCarets.lineHeight.toDouble(),
+                                                     currentCarets)
       }
 
       speculativeCanvasImage.style.display = "block"
       canvas.style.display = "none"
+
+      lastId = newId
+
+      return DrawingResult.Drawn(newId, currentCarets.editorId, virtualOffset, virtualSelection)
     }
 
     private fun ensureSpeculativeCanvasSize(canvas: HTMLCanvasElement) {
@@ -203,6 +338,16 @@ sealed class Typing {
 
     override fun dispose() {
       speculativeCanvasImage.remove()
+    }
+
+    private data class DrawnSymbol(
+      val x: Double, val y: Double,
+      val width: Double, val height: Double,
+      val carets: ServerCaretInfoChangedEvent.CaretInfoChange.Carets,
+    )
+
+    private fun DrawnSymbol.removeFromCanvas() {
+      speculativeCanvasContext.clearRect(x, y, width, height)
     }
   }
 }
