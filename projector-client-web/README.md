@@ -66,6 +66,7 @@ Name | Type | Default value | Description
 `cacheSize` | Int | `5M` | Set size of cache for images in Chars.
 `blockClosing` | Boolean | `true` | Enable blocking of accidental closing of the web page
 `relayServerId` | String? | Not present | Identifier of Projector server to connect to for relay connection. Warning: Static files must be accessed via https when relay is used.
+`speculativeTypingLatency` | Int | `0` | Sets latency before key press event is sent to server if speculative symbol for the event was drawn.
 
 ## Shortcuts
 - `Ctrl + F10` prints statistics to the browser console. Example:  
