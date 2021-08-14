@@ -102,6 +102,9 @@ sealed class Typing {
       save()
     }
 
+    private val CaretInfo.isVisibleInEditor: Boolean
+      get() = locationInWindow.x >= 0 && locationInWindow.y >= 0
+
     private var carets: ServerCaretInfoChangedEvent.CaretInfoChange = ServerCaretInfoChangedEvent.CaretInfoChange.NoCarets
 
     private var drawnSpeculativeSymbols = mutableMapOf<Int, DrawnSymbol>()
@@ -153,7 +156,7 @@ sealed class Typing {
     private fun isSymbolAtEventEnd(symbol: DrawnSymbol, stringEvent: ServerDrawStringEvent, eventOffset: Point): Boolean {
       val currentCarets = (carets as? ServerCaretInfoChangedEvent.CaretInfoChange.Carets) ?: return false
 
-      val shiftToLineTop = currentCarets.lineHeight - currentCarets.lineDescent
+      val shiftToLineTop = currentCarets.lineAscent
       val totalVerticalPaintOffset = stringEvent.y + eventOffset.y - shiftToLineTop
 
       val offsetInEditor = totalVerticalPaintOffset - currentCarets.editorMetrics.y
@@ -253,6 +256,8 @@ sealed class Typing {
           x = serverFirstCaretInfo.locationInWindow.x + paintOffset
         )
       )
+
+      if (!firstCaretInfo.isVisibleInEditor) return DrawingResult.Skip
 
       val firstCaretLocation = firstCaretInfo.locationInWindow
 
