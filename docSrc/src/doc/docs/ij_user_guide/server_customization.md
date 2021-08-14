@@ -52,6 +52,16 @@ If you use a custom keymap or, for some other reason, don't want to switch keyma
 !!! note
     If you disable this setting, the keymap won't be reverted back to what it has been set to automatically. Please set it back manually in IDE Settings/Preferences.
 
+### Force keyboard modifiers mode
+
+Name | Type | Default value
+---|---|---
+`ORG_JETBRAINS_PROJECTOR_SERVER_MAC_KEYBOARD` | Boolean? | `null`
+
+Set to `true` to make keyboard modifiers like "Option(Alt)+Minus gives Dash" work for Mac clients. Set to `false` to disable this.
+
+By default, it's dynamic (`null`): it's based on the last connected client OS.
+
 ### Assigning connection password
 
 Name | Type | Default value

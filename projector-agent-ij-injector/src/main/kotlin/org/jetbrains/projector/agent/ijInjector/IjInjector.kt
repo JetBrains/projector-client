@@ -56,6 +56,7 @@ internal object IjInjector {
     if (!isAgent) {  // todo: support variant for agent too
       IjMdTransformer.agentmain(utils)
       IjBrowserUtilTransformer.agentmain(utils)
+      IjUiUtilsTransformer.agentmain(utils)
     }
   }
 }
