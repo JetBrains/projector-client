@@ -66,6 +66,7 @@ actual object ParamsProvider {
   private const val DEFAULT_IMAGE_CACHE_SIZE_CHARS = 5_000_000
   private const val DEFAULT_BLOCK_CLOSING = true
   private val DEFAULT_TYPING_CLEAR_STRATEGY = TypingClearStrategy.SERVER_VALIDATION
+  private const val DEFAULT_HIDE_MAIN_CANVAS_ON_SPECULATIVE_TYPING = false
 
   val SYSTEM_SCALING_RATIO
     get() = window.devicePixelRatio  // get every time because it can be changed
@@ -102,6 +103,7 @@ actual object ParamsProvider {
   val BLOCK_CLOSING: Boolean
   val LAYOUT_TYPE: LayoutType
   val TYPING_CLEAR_STRATEGY: TypingClearStrategy
+  val HIDE_MAIN_CANVAS_ON_SPECULATIVE_TYPING: Boolean
   val SCALING_RATIO: Double
     get() = SYSTEM_SCALING_RATIO * USER_SCALING_RATIO
 
@@ -169,6 +171,8 @@ actual object ParamsProvider {
         "naive" -> TypingClearStrategy.NAIVE
         else -> DEFAULT_TYPING_CLEAR_STRATEGY
       }
+      HIDE_MAIN_CANVAS_ON_SPECULATIVE_TYPING = searchParams.get("hideOnSpeculative")?.toBoolean()
+                                               ?: DEFAULT_HIDE_MAIN_CANVAS_ON_SPECULATIVE_TYPING
     }
   }
 

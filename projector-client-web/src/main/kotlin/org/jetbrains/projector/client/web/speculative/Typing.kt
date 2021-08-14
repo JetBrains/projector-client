@@ -26,6 +26,7 @@ package org.jetbrains.projector.client.web.speculative
 import kotlinx.browser.document
 import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
 import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
+import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.ParamsProvider.SCALING_RATIO
 import org.jetbrains.projector.common.protocol.data.Point
 import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
@@ -116,17 +117,8 @@ sealed class Typing {
 
       val canvas = caret?.editorWindowId?.let { canvasByIdGetter(it) }
 
-      if (canvas != null) {
+      if (canvas != null && ParamsProvider.HIDE_MAIN_CANVAS_ON_SPECULATIVE_TYPING) {
         canvas.style.display = "block"
-
-        ensureSpeculativeCanvasSize(canvas)
-
-        speculativeCanvasContext.apply {
-          restore()
-          save()
-
-          drawImage(canvas, 0.0, 0.0)
-        }
       }
 
       speculativeCanvasImage.style.display = "none"
@@ -317,7 +309,9 @@ sealed class Typing {
       }
 
       speculativeCanvasImage.style.display = "block"
-      canvas.style.display = "none"
+      if (ParamsProvider.HIDE_MAIN_CANVAS_ON_SPECULATIVE_TYPING) {
+        canvas.style.display = "none"
+      }
 
       lastId = newId
 
@@ -331,7 +325,10 @@ sealed class Typing {
           speculativeStyle.top = canvasStyle.top
           speculativeStyle.width = canvasStyle.width
           speculativeStyle.height = canvasStyle.height
-          speculativeStyle.zIndex = canvasStyle.zIndex
+          speculativeStyle.zIndex = canvasStyle.zIndex.let zTransform@ {
+            if (ParamsProvider.HIDE_MAIN_CANVAS_ON_SPECULATIVE_TYPING) return@zTransform it
+            (it.toInt() + 1).toString()
+          }
         }
       }
 
