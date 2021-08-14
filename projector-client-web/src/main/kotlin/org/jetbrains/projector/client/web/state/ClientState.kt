@@ -508,12 +508,25 @@ sealed class ClientState {
       is ClientAction.AddEvent -> {
         val event = action.event
 
-        if (event is ClientKeyPressEvent) {
-          typing.addEventChar(event)
+        fun addEvent() {
+          eventsToSend.add(event)
+          messagingPolicy.onAddEvent()
         }
 
-        eventsToSend.add(event)
-        messagingPolicy.onAddEvent()
+        var latency = 0
+
+        if (event is ClientKeyPressEvent) {
+          val added = typing.addEventChar(event)
+          if (added) {
+            latency = ParamsProvider.SPECULATIVE_TYPING_LATENCY
+          }
+        }
+
+        if (latency > 0) {
+          window.setTimeout(::addEvent, latency)
+        } else {
+          addEvent()
+        }
 
         this
       }
