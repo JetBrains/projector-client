@@ -21,31 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-pluginManagement {
-  val gradleMkdocsPluginVersion: String by settings
-  val kotlinVersion: String by settings
 
-  plugins {
-    kotlin("multiplatform") version kotlinVersion apply false
-    kotlin("js") version kotlinVersion apply false
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
-    id("ru.vyarus.mkdocs") version gradleMkdocsPluginVersion apply false
-  }
+plugins {
+  id("io.gatling.gradle") version "3.6.1"
+  scala
 }
 
-rootProject.name = "projector-client"
+gatling {
+}
 
-include("docSrc")
-include("projector-agent-common")
-include("projector-agent-ij-injector")
-include("projector-agent-initialization")
-include("projector-common")
-include("projector-client-common")
-include("projector-client-web")
-include("projector-launcher")
-include("projector-server-core")
-include("projector-util-agent")
-include("projector-util-loading")
-include("projector-util-logging")
-include("projector-performance-test")
+dependencies {
+  gatling("org.scala-lang:scala-library:2.11.8")
+  gatling ("io.gatling.highcharts:gatling-charts-highcharts:2.2.5")
+}
+
+version = "1.0-SNAPSHOT"
