@@ -25,7 +25,10 @@ package org.jetbrains.projector.client.web.input.key
 
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.jetbrains.projector.client.common.canvas.Extensions.argbIntToRgbaString
+import org.jetbrains.projector.client.common.canvas.Extensions.toFontFaceName
 import org.jetbrains.projector.client.common.misc.TimeStamp
+import org.jetbrains.projector.client.web.externalDeclarartion.textDecorationThickness
 import org.jetbrains.projector.client.web.window.Positionable
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
@@ -34,11 +37,14 @@ import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventT
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyEventType.UP
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.common.protocol.toServer.KeyModifier
-import org.w3c.dom.HTMLTextAreaElement
+import org.w3c.dom.*
 import org.w3c.dom.events.CompositionEvent
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.nextUp
 import kotlin.math.roundToInt
 
 class ImeInputMethod(
@@ -53,6 +59,9 @@ class ImeInputMethod(
     clearInputField = ::clearInputField,
   )
 
+  private var lineHeight = 0
+  private var maxWidth = 0.0
+
   private val inputField = (document.createElement("textarea") as HTMLTextAreaElement).apply {
     style.apply {
       position = "fixed"
@@ -64,6 +73,14 @@ class ImeInputMethod(
       width = "100%"
       top = "-30%"
       left = "50%"
+      margin = "0"
+      padding = "0"
+      letterSpacing = "0px"
+      rows = 1
+      textDecorationLine = "underline"
+      textDecorationStyle = "double"
+      overflowY = "hidden"
+      textDecorationThickness = "from-font"
     }
 
     autocomplete = "off"
@@ -82,7 +99,26 @@ class ImeInputMethod(
     addEventListener("compositionend", handler::handleEvent)
     onkeydown = handler::handleEvent
     onkeyup = handler::handleEvent
-    oninput = handler::handleEvent
+    oninput = {
+      handler.handleEvent(it)
+
+      var newWidth = 0
+
+      if (value.isNotEmpty()) {
+        val canvas = document.createElement("canvas") as HTMLCanvasElement
+        val context = canvas.getContext("2d") as CanvasRenderingContext2D
+        context.font = style.font
+        val measured = context.measureText(value)
+
+        // ensure width is always bigger than content to prevent new lines appearing when not needed
+        newWidth = measured.width.roundToInt() + 1
+      }
+
+      style.overflowY = if (newWidth > maxWidth) "auto" else "hidden"
+
+      style.width = "${newWidth}px"
+      resizeInputField()
+    }
 
     onclick = {
       it.stopPropagation()
@@ -97,10 +133,22 @@ class ImeInputMethod(
 
   private fun clearInputField() {
     inputField.value = ""
+    inputField.style.width = "0"
   }
 
   init {
     focusInputField()
+  }
+
+  private fun resizeInputField() {
+    inputField.style.height = "auto" // forces re-compute of scrollHeight
+
+    val alignedInputHeight = if (lineHeight > 0) {
+      val rowsCount = (inputField.scrollHeight.toDouble() / lineHeight).roundToInt()
+      rowsCount * lineHeight // somewhy scrollHeight may not be a multiple of lineHeight, fix it
+    } else inputField.scrollHeight
+
+    inputField.style.height = "${alignedInputHeight}px"
   }
 
   private fun focusInputField() {
@@ -133,13 +181,25 @@ class ImeInputMethod(
         val x = caretInfo.locationInWindow.x + windowPosition.bounds.x
         val y = caretInfo.locationInWindow.y + windowPosition.bounds.y
 
+        val fontFace = caretInfoChange.fontId?.toFontFaceName() ?: "Arial"
+        val fontSize = "${caretInfoChange.fontSize}px"
+        val maxInputWidth = caretInfoChange.editorMetrics.width - (x - caretInfoChange.editorMetrics.x)
+        val maxInputHeight = caretInfoChange.editorMetrics.height - (y - caretInfoChange.editorMetrics.y)
+
+        lineHeight = caretInfoChange.lineHeight
+        maxWidth = maxInputWidth
+
         inputField.style.apply {
           zIndex = "${windowPosition.zIndex + 1}"
           top = "${y}px"
           left = "${x}px"
-          fontSize = "${caretInfoChange.fontSize}px"
-          textShadow = "0 0 0 #888"  // use text shadow to set text color to avoid showing caret // todo: set correct color
-          // todo: style other things like font family
+          font = "$fontSize $fontFace"
+          textShadow = "0 0 0 ${caretInfoChange.textColor.argbIntToRgbaString()}"  // use text shadow to set text color to avoid showing caret
+          backgroundColor = caretInfoChange.backgroundColor.argbIntToRgbaString()
+          textDecorationColor = caretInfoChange.textColor.argbIntToRgbaString()
+          maxWidth = "${maxInputWidth}px"
+          maxHeight = "${maxInputHeight}px"
+          lineHeight = "${caretInfoChange.lineHeight}px"
         }
       }
     }
