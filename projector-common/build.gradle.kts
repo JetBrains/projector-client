@@ -37,7 +37,7 @@ val kotlinVersion: String by project
 val serializationVersion: String by project
 
 tasks.withType<JacocoReport> {
-  jacocoReport(this, "Projector-common", true)
+  jacocoReport(project, "Projector-common", true)
 }
 
 kotlin {

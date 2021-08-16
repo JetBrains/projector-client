@@ -26,30 +26,30 @@ import org.gradle.api.Project
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.io.File
 
-fun Project.jacocoReport(jacocoReport: JacocoReport, moduleName: String, kotlinJsModule: Boolean = false) {
+fun JacocoReport.jacocoReport(project: Project, moduleName: String, kotlinJsModule: Boolean = false) {
   if (kotlinJsModule) {
-    jacocoReport.dependsOn("jvmTest")
+    dependsOn("jvmTest")
     group = "Reporting"
     description = "Generate Jacoco coverage reports"
     val coverageSourceDirs = arrayOf(
       "commonMain/src",
       "jvmMain/src"
     )
-    val classFiles = File("${buildDir}/classes/kotlin/jvm/")
+    val classFiles = File("${project.buildDir}/classes/kotlin/jvm/")
       .walkBottomUp()
       .toSet()
-    with(jacocoReport) {
+
       classDirectories.setFrom(classFiles)
-      sourceDirectories.setFrom(files(coverageSourceDirs))
-      additionalSourceDirs.setFrom(files(coverageSourceDirs))
+      sourceDirectories.setFrom(project.files(coverageSourceDirs))
+      additionalSourceDirs.setFrom(project.files(coverageSourceDirs))
       executionData
-        .setFrom(files("${buildDir}/jacoco/jvmTest.exec"))
-    }
+        .setFrom(project.files("${project.buildDir}/jacoco/jvmTest.exec"))
+
   }
-  jacocoReport.reports {
+  reports {
     xml.isEnabled = true
-    xml.destination = file(layout.buildDirectory.dir("../../JacocoReports/jacocoReport$moduleName.xml"))
+    xml.destination = project.file(project.layout.buildDirectory.dir("../../JacocoReports/jacocoReport$moduleName.xml"))
     csv.required.set(false)
-    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml$moduleName"))
+    html.outputLocation.set(project.layout.buildDirectory.dir("jacocoHtml$moduleName"))
   }
 }

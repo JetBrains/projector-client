@@ -44,7 +44,7 @@ jacoco {
 System.setProperty("user.dir", projectDir.toString())
 
 tasks.withType<JacocoReport> {
-  jacocoReport(this, "Projector-server-core")
+  jacocoReport(project, "Projector-server-core")
 }
 
 publishing {
