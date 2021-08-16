@@ -32,12 +32,7 @@ jacoco {
 }
 
 tasks.withType<JacocoReport> {
-  reports {
-    xml.isEnabled = true
-    xml.destination = file(layout.buildDirectory.dir("../../JacocoReports/jacocoReportUtillAgent.xml"))
-    csv.required.set(false)
-    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtmlProjectorUtillAgent"))
-  }
+  jacocoReport(this, "Projector-util-agent")
 }
 
 kotlin {
