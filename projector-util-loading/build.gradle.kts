@@ -9,7 +9,7 @@ jacoco {
 }
 
 tasks.withType<JacocoReport> {
-  jacocoReport(this, "Projector-util-loading")
+  jacocoReport(project, "Projector-util-loading")
 }
 
 kotlin {
@@ -22,4 +22,5 @@ publishing {
 
 dependencies {
   api(project(":projector-util-logging"))
+  testImplementation(kotlin("test"))
 }
