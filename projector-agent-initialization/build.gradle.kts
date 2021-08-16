@@ -8,7 +8,7 @@ kotlin {
 }
 
 publishing {
-  publishOnSpace(this, "java")
+  publishOnSpace(project, "java")
 }
 val kotlinVersion: String by project
 

@@ -50,7 +50,7 @@ kotlin {
 }
 
 publishing {
-  publishOnSpace(this, "java")
+  publishOnSpace(project, "java")
 }
 
 val javassistVersion: String by project

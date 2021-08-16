@@ -45,7 +45,7 @@ kotlin {
 }
 
 publishing {
-  publishOnSpace(this, "java")
+  publishOnSpace(project, "java")
 }
 
 dependencies {

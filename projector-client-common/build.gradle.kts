@@ -96,5 +96,5 @@ kotlin {
 }
 
 publishing {
-  publishOnSpace(this, "kotlin")
+  publishOnSpace(project, "kotlin")
 }
