@@ -31,15 +31,24 @@ import org.gradle.kotlin.dsl.credentials
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.maven
 
-fun Project.publishOnSpace(publishingExtension: PublishingExtension, fromComponents: String) {
-  if (fromComponents.equals("java", false)) {
-    publishingExtension.publications {
+fun PublishingExtension.publishOnSpace(project: Project, fromComponent: String) {
+  if (fromComponent == "java") {
+    this.publications {
       create<MavenPublication>("maven") {
-        from(components[fromComponents])
+        pom {
+          url.set("https://github.com/JetBrains/projector-client")
+          licenses {
+            license {
+              name.set("MIT Licence")
+              url.set("https://github.com/JetBrains/projector-client/blob/master/LICENSE.txt")
+            }
+          }
+        }
+        from(project.components[fromComponent])
       }
     }
   }
-  publishingExtension.repositories {
+  this.repositories {
     maven("https://packages.jetbrains.team/maven/p/prj/projector-maven") {
       credentials(PasswordCredentials::class)
     }

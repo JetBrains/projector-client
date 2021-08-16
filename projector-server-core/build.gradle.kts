@@ -50,7 +50,7 @@ tasks.withType<JacocoReport> {
 }
 
 publishing {
-  publishOnSpace(this, "java")
+  publishOnSpace(project, "java")
 }
 
 val coroutinesVersion: String by project
