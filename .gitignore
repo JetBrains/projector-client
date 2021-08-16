@@ -6,4 +6,5 @@
 !.idea/runConfigurations/
 build/
 out/
+JacocoReports/
 local.properties
