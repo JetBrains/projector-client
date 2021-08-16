@@ -41,12 +41,7 @@ jacoco {
 }
 
 tasks.withType<JacocoReport> {
-  reports {
-    xml.isEnabled = true
-    xml.destination = file(layout.buildDirectory.dir("../../JacocoReports/jacocoReportServer.xml"))
-    csv.required.set(false)
-    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtmlProjectorServerCore"))
-  }
+  jacocoReport(this, "Projector-server-core")
 }
 
 publishing {
