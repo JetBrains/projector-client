@@ -158,21 +158,20 @@ sealed class Typing {
 
         val speculativeCharWidth = measureText(event.char.toString()).width
 
-        val sw = editorMetrics.width - (firstCaretLocation.x - editorMetrics.x) - currentCarets.scrollBarWidth - speculativeCharWidth
+        val widthToMove = editorMetrics.width - (firstCaretLocation.x - editorMetrics.x) - currentCarets.verticalScrollBarWidth - speculativeCharWidth
 
-        if (sw > 0) { // check we actually have some graphics to move
+        if (widthToMove > 0) {
           val imageData = getImageData(
             sx = firstCaretLocation.x,
             sy = firstCaretLocation.y,
-            sw = sw,
+            sw = widthToMove,
             sh = currentCarets.lineHeight.toDouble()
           )
 
           putImageData(imageData, firstCaretLocation.x + speculativeCharWidth, firstCaretLocation.y)
         }
 
-        val baselineTopOffset = currentCarets.lineHeight - currentCarets.lineDescent
-        val stringYPos = firstCaretLocation.y + baselineTopOffset
+        val stringYPos = firstCaretLocation.y + currentCarets.lineAscent
 
         fillText(event.char.toString(), firstCaretLocation.x, stringYPos)
       }
