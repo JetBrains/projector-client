@@ -171,10 +171,6 @@ sealed class Typing {
           putImageData(imageData, firstCaretLocation.x + speculativeCharWidth, firstCaretLocation.y)
         }
 
-        val caretOffsetFromEditorEnd = editorMetrics.x + editorMetrics.width - firstCaretLocation.x
-        // check there is space to draw speculative symbol
-        if (caretOffsetFromEditorEnd < speculativeCharWidth) return@apply
-
         val baselineTopOffset = currentCarets.lineHeight - currentCarets.lineDescent
         val stringYPos = firstCaretLocation.y + baselineTopOffset
 
