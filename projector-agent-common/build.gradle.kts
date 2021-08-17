@@ -32,7 +32,7 @@ jacoco {
 }
 
 tasks.withType<JacocoReport> {
-  jacocoReport(project, "Projector-agent-common")
+  setupReporting(project, "ProjectorAgentCommon")
 }
 
 tasks.test {

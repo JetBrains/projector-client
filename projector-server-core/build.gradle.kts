@@ -41,7 +41,7 @@ jacoco {
 }
 
 tasks.withType<JacocoReport> {
-  jacocoReport(project, "Projector-server-core")
+  setupReporting(project, "ProjectorServerCore")
 }
 
 publishing {

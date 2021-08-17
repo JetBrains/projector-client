@@ -26,8 +26,8 @@ import org.gradle.api.Project
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.io.File
 
-fun JacocoReport.jacocoReport(project: Project, moduleName: String, kotlinJsModule: Boolean = false) {
-  if (kotlinJsModule) {
+fun JacocoReport.setupReporting(project: Project, moduleName: String, isKotlinJsModule: Boolean = false) {
+  if (isKotlinJsModule) {
     dependsOn("jvmTest")
     group = "Reporting"
     description = "Generate Jacoco coverage reports"
@@ -44,7 +44,6 @@ fun JacocoReport.jacocoReport(project: Project, moduleName: String, kotlinJsModu
       additionalSourceDirs.setFrom(project.files(coverageSourceDirs))
       executionData
         .setFrom(project.files("${project.buildDir}/jacoco/jvmTest.exec"))
-
   }
   reports {
     xml.isEnabled = true
