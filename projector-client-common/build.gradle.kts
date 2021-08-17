@@ -35,7 +35,7 @@ jacoco {
 val kotlinVersion: String by project
 
 tasks.withType<JacocoReport> {
-  jacocoReport(project, "Projector-client-common", true)
+  setupReporting(project, "ProjectorClientCommon", true)
 }
 
 kotlin {
