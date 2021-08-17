@@ -34,6 +34,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
+import org.jetbrains.projector.common.protocol.data.VK
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowSetChangedEvent
 import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
@@ -55,13 +56,10 @@ import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JTextArea
-import kotlin.test.Ignore
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 // todo: test not only IME
-class LowLevelKeyboardTest {
+class kLowLevelKeyboardTest {
 
   private companion object {
 
@@ -242,6 +240,141 @@ class LowLevelKeyboardTest {
     finally {
       server.stop(500, 1000)
     }
+  }
+
+  private var shiftedSymbols = arrayOf<Char>('!','@','#','$','%','^','&','*','(',')','_','+','{','}',':','"','|','<','>','?')
+
+  @Test
+  fun shiftedLettersTest() {
+    for (i in 'A'..'Z') {
+      pressKeys(i.toString(), i)
+    }
+  }
+
+  @Test
+  fun lettersTest() {
+    for (i in 'a'..'z') {
+      pressKeys(i.toString(), i)
+    }
+  }
+
+  @Test
+  fun symbolsTest() {
+    for (i in '!'..'@') {
+      pressKeys(i.toString(), i)
+    }
+    for (i in '['..'_') {
+      pressKeys(i.toString(), i)
+    }
+    for (i in '{'..'}') {
+      pressKeys(i.toString(), i)
+    }
+  }
+
+  private fun pressKeys(symbol : String, symbolChar: Char) = test(symbol) {
+    if (symbolChar in 'A'..'Z' || symbolChar in shiftedSymbols)
+      keyPress(KeyEvent.VK_SHIFT)
+
+    when(symbolChar.lowercaseChar() ) {
+      in 'a' .. 'z' -> {
+        var charOffset = symbolChar.lowercaseChar() - 'a'
+        val vk = KeyEvent.VK_A + charOffset
+        keyPress(vk)
+        keyRelease(vk)
+      }
+    }
+
+    when(symbol) {
+      "1","!" -> {keyPress(KeyEvent.VK_1); keyRelease(KeyEvent.VK_1)}
+      "2","@" -> {keyPress(KeyEvent.VK_2); keyRelease(KeyEvent.VK_2)}
+      "3","#" -> {keyPress(KeyEvent.VK_3); keyRelease(KeyEvent.VK_3)}
+      "4","$" -> {keyPress(KeyEvent.VK_4); keyRelease(KeyEvent.VK_4)}
+      "5","%" -> {keyPress(KeyEvent.VK_5); keyRelease(KeyEvent.VK_5)}
+      "6","^" -> {keyPress(KeyEvent.VK_6); keyRelease(KeyEvent.VK_6)}
+      "7","&" -> {keyPress(KeyEvent.VK_7); keyRelease(KeyEvent.VK_7)}
+      "8","*" -> {keyPress(KeyEvent.VK_8); keyRelease(KeyEvent.VK_8)}
+      "9","(" -> {keyPress(KeyEvent.VK_9); keyRelease(KeyEvent.VK_9)}
+      "0",")" -> {keyPress(KeyEvent.VK_0); keyRelease(KeyEvent.VK_0)}
+      "-","_" -> {keyPress(KeyEvent.VK_MINUS); keyRelease(KeyEvent.VK_MINUS)}
+      "=","+" -> {keyPress(KeyEvent.VK_EQUALS); keyRelease(KeyEvent.VK_EQUALS)}
+      "[","{" -> {keyPress(KeyEvent.VK_OPEN_BRACKET); keyRelease(KeyEvent.VK_OPEN_BRACKET)}
+      "]","}" -> {keyPress(KeyEvent.VK_CLOSE_BRACKET); keyRelease(KeyEvent.VK_CLOSE_BRACKET)}
+      ";",":" -> {keyPress(KeyEvent.VK_SEMICOLON); keyRelease(KeyEvent.VK_SEMICOLON)}
+      "'", "\"" -> {keyPress(KeyEvent.VK_QUOTE); keyRelease(KeyEvent.VK_QUOTE)}
+      "\\" ,"|" -> {keyPress(KeyEvent.VK_BACK_SLASH); keyRelease(KeyEvent.VK_BACK_SLASH)}
+      ",","<" -> {keyPress(KeyEvent.VK_COMMA); keyRelease(KeyEvent.VK_COMMA)}
+      ".",">" -> {keyPress(KeyEvent.VK_PERIOD); keyRelease(KeyEvent.VK_PERIOD)}
+      "/","?" -> {keyPress(KeyEvent.VK_SLASH); keyRelease(KeyEvent.VK_SLASH)}
+    }
+    if (symbolChar in 'A'..'Z' || symbolChar in shiftedSymbols)
+      keyRelease(KeyEvent.VK_SHIFT)
+  }
+
+  @Test   //for all qwertz
+  fun qwertzTest() = test("z") {
+    keyPress(KeyEvent.VK_Y)
+    keyRelease(KeyEvent.VK_Y)
+  }
+
+  @Ignore
+  @Test   //чешская, словацкая и немецкая
+  fun qwertzDeadKeyTestA() = test("á")
+  {
+    keyPress(KeyEvent.VK_EQUALS)
+    keyRelease(KeyEvent.VK_EQUALS)
+    keyPress(KeyEvent.VK_A)
+    keyRelease(KeyEvent.VK_A)
+  }
+
+  @Ignore
+  @Test   //чешская, словацкая и немецкая
+  fun qwertzDeadKeyTest() = test("''")
+  {
+    keyPress(KeyEvent.VK_EQUALS)
+    keyRelease(KeyEvent.VK_EQUALS)
+    keyPress(KeyEvent.VK_1)
+    keyRelease(KeyEvent.VK_1)
+  }
+
+  @Test
+  fun azertyTest() = test("a")
+  {
+    keyPress(KeyEvent.VK_Q)
+    keyRelease(KeyEvent.VK_Q)
+  }
+
+  @Ignore // Todo: Fix this
+  @Test
+  fun chineseSimpleInputTest() = test("請問") {
+    keyPress(KeyEvent.VK_Q)
+    keyRelease(KeyEvent.VK_Q)
+    keyPress(KeyEvent.VK_W)
+    keyRelease(KeyEvent.VK_W)
+    keyPress(KeyEvent.VK_SPACE)
+    keyRelease(KeyEvent.VK_SPACE)
+  }
+
+  @Test
+  fun funKeysTest() {
+    for (j in 0 .. 1) {
+      var vk = KeyEvent.VK_F2
+      for (i in 2..10) {
+        pressFunKey(vk, j)
+        vk += 1
+      }
+      vk += 1
+      pressFunKey(vk, j)
+      //pressFunKey(vk - 11, j)   //Todo: fix this (f1)
+    }
+  }
+
+  fun pressFunKey(vk: Int, shift: Int) = test("") {
+    if (shift == 1)
+      keyPress(KeyEvent.VK_SHIFT)
+    keyPress(vk)
+    keyRelease(vk)
+    if (shift == 1)
+      keyRelease(KeyEvent.VK_SHIFT)
   }
 
   @Test
