@@ -33,7 +33,7 @@ jacoco {
 }
 
 tasks.withType<JacocoReport> {
-  jacocoReport(project, "Projector-agent-ij-injector")
+  setupReporting(project, "ProjectorAgentIjInjector")
 }
 
 kotlin {

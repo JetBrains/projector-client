@@ -9,7 +9,7 @@ jacoco {
 }
 
 tasks.withType<JacocoReport> {
-  jacocoReport(project, "Projector-util-loading")
+  setupReporting(project, "ProjectorUtilLoading")
 }
 
 kotlin {
