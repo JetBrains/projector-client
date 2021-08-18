@@ -23,62 +23,40 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
-import javassist.ClassPool
-import javassist.LoaderClassPath
-import org.jetbrains.projector.agent.common.getClassFromClassfileBuffer
+import com.intellij.ide.BrowserUtil
+import com.intellij.openapi.project.Project
+import javassist.CtClass
+import org.jetbrains.projector.agent.common.getDeclaredMethod
 import org.jetbrains.projector.util.logging.Logger
-import java.lang.instrument.ClassFileTransformer
-import java.security.ProtectionDomain
 
-internal class IjBrowserUtilTransformer private constructor(
-  private val ideCp: ClassPool,
-) : ClassFileTransformer {
+internal object IjBrowserUtilTransformer : TransformerSetup {
 
-  override fun transform(
-    loader: ClassLoader,
-    className: String,
-    classBeingRedefined: Class<*>?,
-    protectionDomain: ProtectionDomain?,
-    classfileBuffer: ByteArray,
-  ): ByteArray? {
-    return transformClass(className, classfileBuffer)
-  }
+  override val logger = Logger<IjBrowserUtilTransformer>()
 
-  private fun transformClass(className: String, classfileBuffer: ByteArray): ByteArray? {
-    return try {
-      when (className) {
-        browserUtilPath -> transformBrowserUtil(className, classfileBuffer)
+  override val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
+    BrowserUtil::class.java to ::transformBrowserUtil,
+  )
 
-        else -> classfileBuffer
-      }
-    }
-    catch (e: Exception) {
-      logger.error(e) { "Class transform error" }
-      null
-    }
-  }
-
-  private fun transformBrowserUtil(className: String, classfileBuffer: ByteArray): ByteArray {
-    logger.debug { "Transforming BrowserUtil..." }
-    val clazz = getClassFromClassfileBuffer(ideCp, className, classfileBuffer)
-    clazz.defrost()
+  private fun transformBrowserUtil(clazz: CtClass): ByteArray {
 
     clazz
-      .getDeclaredMethod("browse", arrayOf(ideCp["java.lang.String"]))
+      .getDeclaredMethod("browse", String::class.java)
       .setBody(
+        // language=java prefix="class BrowserUtil { public static void browse(@NotNull String $1)" suffix="}"
         """
           {
-            java.awt.Desktop.getDesktop().browse(new java.net.URI((java.lang.String) $JAVASSIST_ARGS[0]));
+            java.awt.Desktop.getDesktop().browse(new java.net.URI($1));
           }
         """.trimIndent()
       )
 
     clazz
-      .getDeclaredMethod("browse", arrayOf(ideCp["java.lang.String"], ideCp["com.intellij.openapi.project.Project"]))
+      .getDeclaredMethod("browse", String::class.java, Project::class.java)
       .setBody(
+        // language=java prefix="class BrowserUtil { public static void browse(@NotNull String $1, @Nullable Project $2)" suffix="}"
         """
           {
-            java.awt.Desktop.getDesktop().browse(new java.net.URI((java.lang.String) $JAVASSIST_ARGS[0]));
+            java.awt.Desktop.getDesktop().browse(new java.net.URI($1));
           }
         """.trimIndent()
       )
@@ -86,48 +64,5 @@ internal class IjBrowserUtilTransformer private constructor(
     // todo: need to support other BrowserUtil.browse methods
 
     return clazz.toBytecode()
-  }
-
-  companion object {
-
-    private val logger = Logger<IjBrowserUtilTransformer>()
-
-    private const val SE_CONTRIBUTOR_EP = "com.intellij.searchEverywhereContributor"
-
-    private const val browserUtilClass = "com.intellij.ide.BrowserUtil"
-    private val browserUtilPath = browserUtilClass.replace('.', '/')
-
-    private const val JAVASSIST_ARGS = "\$args"
-
-    fun agentmain(
-      utils: IjInjector.Utils,
-    ) {
-      logger.debug { "agentmain start" }
-
-      val extensionPointName = utils.createExtensionPointName(SE_CONTRIBUTOR_EP)
-      val extensions = utils.extensionPointNameGetExtensions(extensionPointName)
-
-      val ideClassloader = extensions.filterNotNull().first()::class.java.classLoader
-
-      val ideCp = ClassPool().apply {
-        appendClassPath(LoaderClassPath(ideClassloader))
-      }
-      val transformer = IjBrowserUtilTransformer(ideCp)
-
-      utils.instrumentation.addTransformer(transformer, true)
-
-      listOf(
-        browserUtilClass,
-      ).forEach { clazz ->
-        try {
-          utils.instrumentation.retransformClasses(Class.forName(clazz, false, ideClassloader))
-        }
-        catch (t: Throwable) {
-          logger.error(t) { "Class retransform error" }
-        }
-      }
-
-      logger.debug { "agentmain finish" }
-    }
   }
 }

@@ -23,12 +23,17 @@
  */
 package org.jetbrains.projector.agent.common
 
-import javassist.ByteArrayClassPath
-import javassist.ClassPool
-import javassist.CtClass
+import javassist.*
 
-public fun getClassFromClassfileBuffer(pool: ClassPool, classSlashedName: String, classfileBuffer: ByteArray): CtClass {
-  val fqn = classSlashedName.replace('/', '.')
-  pool.insertClassPath(ByteArrayClassPath(fqn, classfileBuffer))
-  return pool.get(fqn)
+public fun getClassFromClassfileBuffer(pool: ClassPool, className: String, classfileBuffer: ByteArray): CtClass {
+  pool.insertClassPath(ByteArrayClassPath(className, classfileBuffer))
+  return pool.get(className).apply(CtClass::defrost)
 }
+
+private val currentClassPool: ClassPool by lazy { ClassPool().apply { appendClassPath(LoaderClassPath(object {}.javaClass.classLoader)) } }
+
+private fun CtClass.getDeclaredMethodImpl(name: String, classPool: ClassPool, params: Array<out Class<*>>): CtMethod =
+  getDeclaredMethod(name, params.map { classPool[it.name] }.toTypedArray())
+
+public fun CtClass.getDeclaredMethod(name: String, vararg params: Class<*>): CtMethod =
+  getDeclaredMethodImpl(name, currentClassPool, params)

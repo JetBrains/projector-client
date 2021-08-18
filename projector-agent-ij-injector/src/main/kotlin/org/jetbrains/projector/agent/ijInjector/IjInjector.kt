@@ -23,7 +23,6 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
-import com.intellij.openapi.extensions.ExtensionPointName
 import org.jetbrains.projector.agent.init.IjArgs
 import java.lang.instrument.Instrumentation
 
@@ -31,8 +30,6 @@ internal object IjInjector {
 
   class Utils(
     val instrumentation: Instrumentation,
-    val createExtensionPointName: (String) -> ExtensionPointName<*>,
-    val extensionPointNameGetExtensions: (ExtensionPointName<*>) -> Array<*>,
     val args: Map<String, String>,
   )
 
@@ -40,8 +37,6 @@ internal object IjInjector {
 
     return Utils(
       instrumentation = instrumentation,
-      createExtensionPointName = { ExtensionPointName.create<Any>(it) },
-      extensionPointNameGetExtensions = { it.extensions },
       args = args
     )
   }
@@ -50,13 +45,13 @@ internal object IjInjector {
   fun agentmain(instrumentation: Instrumentation, args: Map<String, String>) {
     val utils = createUtils(instrumentation, args)
 
-    IjLigaturesDisablerTransformer.agentmain(utils)
+    IjLigaturesDisablerTransformer.runTransformations(utils)
 
     val isAgent = args[IjArgs.IS_AGENT] == "true"
     if (!isAgent) {  // todo: support variant for agent too
-      IjMdTransformer.agentmain(utils)
-      IjBrowserUtilTransformer.agentmain(utils)
-      IjUiUtilsTransformer.agentmain(utils)
+      IjMdTransformer.runTransformations(utils)
+      IjBrowserUtilTransformer.runTransformations(utils)
+      IjUiUtilsTransformer.runTransformations(utils)
     }
   }
 }
