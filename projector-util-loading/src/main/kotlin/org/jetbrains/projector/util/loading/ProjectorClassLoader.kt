@@ -28,6 +28,7 @@ import java.io.File
 import java.io.InputStream
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
+import java.net.URL
 import java.util.jar.JarFile
 
 @Suppress("unused", "MemberVisibilityCanBePrivate", "RedundantVisibilityModifier") // public to be accessible for additional setup
@@ -145,13 +146,18 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     return clazz
   }
 
-  override fun getResourceAsStream(name: String?): InputStream? {
-    val resourceStream = listOf(myAppClassLoader, ideaClassLoader).fold(null as InputStream?) { stream, loader ->
-      stream ?: loader?.getResourceAsStream(name)
+  private fun <T> findInClassloaders(transform: (ClassLoader) -> T?): T? {
+    return listOf(myAppClassLoader, ideaClassLoader).fold(null as T?) { value, loader ->
+      value ?: loader?.let(transform)
     }
-    if (resourceStream != null) return resourceStream
+  }
 
-    return super.getResourceAsStream(name)
+  override fun getResourceAsStream(name: String?): InputStream? {
+    return findInClassloaders { it.getResourceAsStream(name) } ?: super.getResourceAsStream(name)
+  }
+
+  override fun getResource(name: String?): URL? {
+    return findInClassloaders { it.getResource(name) } ?: super.getResource(name)
   }
 
   private fun appendToClassPathForInstrumentation(jarPath: String) {
