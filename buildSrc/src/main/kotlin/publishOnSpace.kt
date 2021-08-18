@@ -49,7 +49,7 @@ fun PublishingExtension.publishOnSpace(project: Project, fromComponent: String) 
     }
   }
   this.repositories {
-    maven("https://packages.jetbrains.team/maven/p/prj/projector-maven") {
+    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") {
       credentials(PasswordCredentials::class)
     }
   }
