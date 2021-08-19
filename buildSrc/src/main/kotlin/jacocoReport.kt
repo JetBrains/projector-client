@@ -26,7 +26,7 @@ import org.gradle.api.Project
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.io.File
 
-fun JacocoReport.setupReporting(project: Project, moduleName: String, isKotlinJsModule: Boolean = false) {
+public fun JacocoReport.setupReporting(project: Project, moduleName: String, isKotlinJsModule: Boolean = false) {
   if (isKotlinJsModule) {
     dependsOn("jvmTest")
     group = "Reporting"
