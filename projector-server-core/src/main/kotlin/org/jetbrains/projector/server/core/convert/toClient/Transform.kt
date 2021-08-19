@@ -23,7 +23,6 @@
  */
 package org.jetbrains.projector.server.core.convert.toClient
 
-import com.intellij.openapi.editor.ex.util.EditorUtil
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.jetbrains.projector.common.protocol.toClient.*

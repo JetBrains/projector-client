@@ -24,6 +24,7 @@
 package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
+import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
@@ -45,7 +46,7 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
   var i = 0
 
   @OptIn(ExperimentalStdlibApi::class)
-  fun process(commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager) {
+  fun process(commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager, inputController: InputController) {
     i++
     val drawCommandsEvents = mutableListOf<ServerDrawCommandsEvent>()
 
@@ -100,12 +101,6 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           // todo: should WindowManager.lookAndFeelChanged() be called here?
           OnScreenMessenger.lookAndFeelChanged()
         }
-
-        is SpeculativeEvent -> when (command) {
-          is SpeculativeEvent.SpeculativeStringDrawnEvent -> {
-            typing.onRequestProcessed(command.requestId)
-          }
-        }
       }
     }
 
@@ -151,7 +146,7 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
       }
     }
 
-    SingleRenderingSurfaceProcessor.processingSpeculative = false
+    //SingleRenderingSurfaceProcessor.processingSpeculative = false
   }
 
   fun onResized() {

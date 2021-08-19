@@ -103,6 +103,8 @@ actual object ParamsProvider {
   val SCALING_RATIO: Double
     get() = SYSTEM_SCALING_RATIO * USER_SCALING_RATIO
 
+  val PRINT_COORDINATES_OF_MOUSE: Boolean
+
   init {
     with(URL(window.location.href)) {
       RELAY_SERVER_ID = searchParams.get("relayServerId")
@@ -161,6 +163,7 @@ actual object ParamsProvider {
         "frAzerty" -> LayoutType.FR_AZERTY
         else -> LayoutType.JS_DEFAULT
       }
+      PRINT_COORDINATES_OF_MOUSE = searchParams.get("printMouseCoordinates")?.toBoolean() ?: false
     }
   }
 

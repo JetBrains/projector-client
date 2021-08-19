@@ -27,7 +27,6 @@ import org.jetbrains.projector.common.protocol.data.*
 import org.jetbrains.projector.common.protocol.handshake.ProtocolType
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.common.protocol.toClient.data.idea.CaretInfo
-import org.jetbrains.projector.common.protocol.toClient.data.idea.SelectionInfo
 import kotlin.js.Json
 import kotlin.math.roundToLong
 
@@ -103,7 +102,11 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
   }
 
   private fun Json.toCaretInfo(): CaretInfo {
-    return CaretInfo(this["a"].unsafeCast<Json>().toPoint())
+    return CaretInfo(
+      this["a"].unsafeCast<Json>().toPoint(),
+      this["b"] as Int,
+      this["c"].unsafeCast<Json>().toPoint()
+    )
   }
 
   private fun Array<Any>.toTarget(): ServerDrawCommandsEvent.Target {
@@ -258,6 +261,8 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "s" -> ServerSetPaintEvent(content["a"].unsafeCast<Array<Any>>().toPaintValue())
 
       "t" -> ServerSetUnknownStrokeEvent(content["a"] as String)
+
+      "u" -> ServerFromEditorEvent()
 
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }

@@ -50,7 +50,7 @@ class ClientStateMachine {
           currentState = currentState.consume(action)
         }
         catch (t: Throwable) {
-          logger.error(t) { "Error consuming action, skipping the action" }
+          logger.error(t) { "Error consuming action ${action::class.simpleName}, skipping the action" }
         }
       }
     }

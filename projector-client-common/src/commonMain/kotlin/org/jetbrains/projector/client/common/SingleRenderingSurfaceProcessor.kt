@@ -35,7 +35,7 @@ import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
 
-class SingleRenderingSurfaceProcessor(private val renderingSurface: RenderingSurface) {
+public class SingleRenderingSurfaceProcessor(private val renderingSurface: RenderingSurface) {
 
   private val renderer = Renderer(renderingSurface)
 
