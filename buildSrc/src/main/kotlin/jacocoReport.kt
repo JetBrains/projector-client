@@ -46,8 +46,8 @@ fun JacocoReport.setupReporting(project: Project, moduleName: String, isKotlinJs
         .setFrom(project.files("${project.buildDir}/jacoco/jvmTest.exec"))
   }
   reports {
-    xml.isEnabled = true
-    xml.destination = project.file(project.layout.buildDirectory.dir("../../JacocoReports/jacocoReport$moduleName.xml"))
+    xml.required.set(true)
+    xml.outputLocation.set(project.file(project.layout.buildDirectory.dir("../../JacocoReports/jacocoReport$moduleName.xml")))
     csv.required.set(false)
     html.outputLocation.set(project.layout.buildDirectory.dir("jacocoHtml$moduleName"))
   }
