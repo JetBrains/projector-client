@@ -56,7 +56,21 @@ interface Positionable {
   val zIndex: Int
 }
 
-class Window(windowData: WindowData, private val stateMachine: ClientStateMachine) : LafListener, Positionable {
+interface Parent : Positionable {
+
+  val children: Collection<Child>
+
+}
+
+interface Child : Positionable {
+
+  val parent: Parent
+
+  fun onParentZIndexUpdated()
+
+}
+
+class Window(windowData: WindowData, private val stateMachine: ClientStateMachine) : LafListener, Parent {
 
   val id = windowData.id
 
@@ -90,6 +104,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   val editorCanvas = (document.createElement("canvas") as HTMLCanvasElement).apply {
 
     style.display = "block"
+    //style.display = "none"
     style.position = "fixed"
     id = "EDITOR"
 
@@ -98,7 +113,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     //  this.translate(400.0, 600.0)
     //}
 
-    document.body!!.appendChild(this)
+    //document.body!!.appendChild(this)
   }
 
 
@@ -110,6 +125,11 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   private val border = WindowBorder(windowData.resizable)
 
   private val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface)
+
+  private val _children = mutableListOf<Child>()
+
+  override val children: Collection<Child>
+    get() = _children
 
   override var bounds: CommonRectangle = CommonRectangle(0.0, 0.0, 0.0, 0.0)
     set(value) {
@@ -127,6 +147,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
         canvas.style.zIndex = "$zIndex"
         header?.zIndex = zIndex
         border.zIndex = zIndex - 1
+        _children.forEach { it.onParentZIndexUpdated() }
       }
     }
 
@@ -137,6 +158,30 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
         canvas.style.cursor = value.toJsCursorType()
       }
     }
+
+  val editorCanvasChild: Child = object : Child {
+
+    init {
+      _children.add(this)
+    }
+
+    override val parent: Parent
+      get() = this@Window
+
+    override fun onParentZIndexUpdated() {
+      zIndex = parent.zIndex + 1
+    }
+
+    override val bounds: CommonRectangle
+      get() = TODO("Not yet implemented")
+
+    override var zIndex: Int = parent.zIndex + 1
+      set(value) {
+        field = value
+        editorCanvas.style.zIndex = "$value"
+      }
+
+  }
 
   init {
     applyBounds()
@@ -348,6 +393,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     canvas.remove()
     border.dispose()
     header?.dispose()
+    editorCanvas.remove()
   }
 
   fun drawPendingEvents() {

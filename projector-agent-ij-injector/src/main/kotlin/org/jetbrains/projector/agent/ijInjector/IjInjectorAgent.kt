@@ -27,6 +27,7 @@ import org.jetbrains.projector.agent.init.IjArgs
 import org.jetbrains.projector.agent.init.toArgsMap
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.Instrumentation
+import java.lang.reflect.InvocationTargetException
 
 @Suppress("unused") // defined as agent entry point in build.gradle
 public object IjInjectorAgent {
@@ -57,9 +58,13 @@ public object IjInjectorAgent {
     /**
      * [org.jetbrains.projector.agent.ijInjector.IjInjector.agentmain]
      */
-    injectorClazz
-      .getDeclaredMethod("agentmain", Instrumentation::class.java, Map::class.java)
-      .invoke(null, instrumentation, argsMap)
+    try {
+      injectorClazz
+        .getDeclaredMethod("agentmain", Instrumentation::class.java, Map::class.java)
+        .invoke(null, instrumentation, argsMap)
+    } catch (e : InvocationTargetException) {
+      throw e.targetException
+    }
 
     logger.debug { "IjInjectorAgent agentmain finish" }
   }

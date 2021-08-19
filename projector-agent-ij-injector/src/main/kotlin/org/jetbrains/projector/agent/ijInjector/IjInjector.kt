@@ -50,7 +50,10 @@ internal object IjInjector {
   fun agentmain(instrumentation: Instrumentation, args: Map<String, String>) {
     val utils = createUtils(instrumentation, args)
 
+    ClassloaderFacilities.invoke(utils)
+
     IjLigaturesDisablerTransformer.agentmain(utils)
+    IjBalloonTransformer.transform(utils)
 
     val isAgent = args[IjArgs.IS_AGENT] == "true"
     if (!isAgent) {  // todo: support variant for agent too

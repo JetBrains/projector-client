@@ -56,6 +56,7 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
   private val jarFiles = mutableSetOf<String>()
 
   init {
+    println("NewProjectorLoader: ${javaClass.classLoader}")
     if (myInstance == null) myInstance = this
   }
 
@@ -82,7 +83,16 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
   private fun isProjectorClass(name: String): Boolean = name.startsWith(PROJECTOR_PACKAGE_PREFIX) && name != javaClass.name
   private fun isIntellijClass(name: String): Boolean = name.startsWith(INTELLIJ_PACKAGE_PREFIX) || (name.startsWith(JETBRAINS_PACKAGE_PREFIX) && !isProjectorClass(name))
 
+  private fun debug(name: String, messageSupplier: () -> String) {
+    if (name.startsWith("com.intellij.ui.Balloon")) {
+      logger.debug(null, messageSupplier)
+    }
+  }
+
   override fun loadClass(name: String, resolve: Boolean): Class<*> {
+
+    debug(name) { "loadClass [$name] by classloader $this" }
+
     synchronized(getClassLoadingLock(name)) {
 
       val found = findLoadedClass(name)
@@ -105,14 +115,21 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
         mustBeLoadedByOurselves(name) -> defineClass(name, resolve, ::getResourceAsStream)
         isIntellijClass(name) || mustBeLoadedByIdea(name) -> myIdeaLoader.loadClass(name, resolve)
         else -> myAppClassLoader.loadClass(name, resolve)
+      }.apply {
+        debug(name) { "loadClass done [${name}]" }
       }
     }
   }
 
   private fun ClassLoader.loadClass(name: String, resolve: Boolean): Class<*> = try {
+    debug(name) { "ClassLoader[$this].loadClass [${name}]" }
     loadMethod.invoke(this, name, resolve) as Class<*>
   } catch (e: InvocationTargetException) {
+    debug(name) { "InvocationTargetException [${name}]" }
     throw e.targetException
+  } catch (e: Throwable) {
+    debug(name) { "Exception [${name}]" }
+    throw e
   }
 
   private fun String.toClassFileName() = "${replace('.', '/')}.class"
@@ -172,6 +189,16 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
 
     @Suppress("RedundantVisibilityModifier") // public to be accessible for additional setup
     @JvmStatic
-    public val instance: ProjectorClassLoader get() = myInstance ?: ProjectorClassLoader()
+    public val instance: ProjectorClassLoader get() {
+      return myInstance ?: ProjectorClassLoader()
+    }
+
+    //internal object Fixer {
+    //
+    //  public val instance: ProjectorClassLoader get() {
+    //
+    //  }
+    //
+    //}
   }
 }
