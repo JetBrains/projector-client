@@ -103,9 +103,14 @@ val downloadIntTestFont = task("downloadIntTestFont") {
 }
 
 val intTestSourceSetName = "intTest"
+val perfTestSourceSetName = "perfTest"
 
 sourceSets {
   create(intTestSourceSetName) {
+    compileClasspath += sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().output
+  }
+  create(perfTestSourceSetName) {
     compileClasspath += sourceSets.main.get().output
     runtimeClasspath += sourceSets.main.get().output
   }
@@ -116,7 +121,6 @@ val intTestImplementation: Configuration by configurations.getting {
 }
 
 configurations["intTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
-
 val integrationTest = task<Test>("integrationTest") {
   description = "Runs integration tests."
   group = "verification"
@@ -136,9 +140,26 @@ val integrationTest = task<Test>("integrationTest") {
   }
   finalizedBy(tasks.jacocoTestReport)
 }
-
 // todo: understand why it doesn't work on CI (https://github.com/JetBrains/projector-client/runs/1045863376)
+
 //tasks.check { dependsOn(integrationTest) }
+val perfTestImplementation: Configuration by configurations.getting {
+  extendsFrom(configurations.implementation.get())
+}
+
+configurations["perfTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
+val performanceTest = task<Test>("performanceTest") {
+  description = "Runs performance tests"
+  group = "verification"
+
+  testClassesDirs = sourceSets[perfTestSourceSetName].output.classesDirs
+  classpath = sourceSets[perfTestSourceSetName].runtimeClasspath
+
+  systemProperties = System.getProperties().map { (k, v) -> k.toString() to v }.toMap()
+
+  shouldRunAfter("test")
+  dependsOn(downloadIntTestFont)
+}
 
 dependencies {
   api(project(":projector-common"))
