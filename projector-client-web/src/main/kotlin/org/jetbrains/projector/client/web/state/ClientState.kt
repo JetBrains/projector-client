@@ -314,6 +314,7 @@ sealed class ClientState {
           decompressor = decompressor,
           compressor = compressor,
           layers = layers,
+          ImageCacher()
         )
       }
 
@@ -331,11 +332,12 @@ sealed class ClientState {
     private val decompressor: MessageDecompressor<ByteArray>,
     private val compressor: MessageCompressor<String>,
     private val layers: AppLayers,
+    private val imageCacher: ImageCacher
   ) : ClientState() {
 
     private val eventsToSend = mutableListOf<ClientEvent>(ClientSetKeymapEvent(nativeKeymap))
 
-    private val windowManager = WindowManager(stateMachine)
+    private val windowManager = WindowManager(stateMachine, imageCacher)
 
     private val windowDataEventsProcessor = WindowDataEventsProcessor(windowManager)
 
@@ -434,9 +436,9 @@ sealed class ClientState {
         serverEventsProcessor.process(commands, pingStatistics, typing, markdownPanelManager, inputController)
         val drawTimestamp = TimeStamp.current
 
-        ImageCacher.collectGarbage()
+        imageCacher.collectGarbage()
 
-        eventsToSend.addAll(ImageCacher.extractImagesToRequest())
+        eventsToSend.addAll(imageCacher.extractImagesToRequest())
 
         messagingPolicy.onToClientMessage()
         sentReceivedBadgeShower.onToClientMessage()

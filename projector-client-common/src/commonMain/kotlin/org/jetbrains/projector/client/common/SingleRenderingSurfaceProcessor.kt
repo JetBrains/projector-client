@@ -34,7 +34,7 @@ import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
 
-class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
+class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface, private val imageCacher: ImageCacher) {
 
   private val renderer = Renderer(renderingSurface)
 
@@ -139,7 +139,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface) {
         )
 
         is ServerDrawImageEvent -> {
-          val image = ImageCacher.getImageData(imageId)
+          val image = imageCacher.getImageData(imageId)
 
           if (image == null) {
             success = false

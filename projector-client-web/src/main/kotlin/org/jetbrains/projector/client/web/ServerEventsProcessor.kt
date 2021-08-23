@@ -54,7 +54,7 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
 
         is ServerDrawCommandsEvent -> drawCommandsEvents.add(command)
 
-        is ServerImageDataReplyEvent -> ImageCacher.putImageData(
+        is ServerImageDataReplyEvent -> windowDataEventsProcessor.windowManager.imageCacher.putImageData(
           command.imageId,
           command.imageData,
         )
@@ -100,7 +100,7 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
         is ServerDrawCommandsEvent.Target.Onscreen -> windowDataEventsProcessor.draw(target.windowId, event.drawEvents)
 
         is ServerDrawCommandsEvent.Target.Offscreen -> {
-          val offscreenProcessor = ImageCacher.getOffscreenProcessor(target)
+          val offscreenProcessor = windowDataEventsProcessor.windowManager.imageCacher.getOffscreenProcessor(target)
 
           val drawEvents = event.drawEvents.shrinkByPaintEvents()
 
