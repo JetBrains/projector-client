@@ -38,7 +38,10 @@ enum class WindowType {
   POPUP,
 
   @SerialName("c")
-  IDEA_WINDOW
+  IDEA_WINDOW,
+
+  @SerialName("c")
+  HEAVYWEIGHT_WRAPPER,
 }
 
 @Serializable

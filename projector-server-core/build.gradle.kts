@@ -55,6 +55,7 @@ publishing {
 
 val coroutinesVersion: String by project
 val dnsjavaVersion: String by project
+val intellijPlatformVersion: String by project
 val javassistVersion: String by project
 val javaWebSocketVersion: String by project
 val jsoupVersion: String by project
@@ -147,6 +148,8 @@ dependencies {
   implementation("org.slf4j:slf4j-simple:$slf4jVersion")
   implementation("dnsjava:dnsjava:$dnsjavaVersion")
   implementation("org.jsoup:jsoup:$jsoupVersion")
+
+  compileOnly("com.jetbrains.intellij.platform:util-class-loader:$intellijPlatformVersion")
 
   testImplementation(kotlin("test", kotlinVersion))
 

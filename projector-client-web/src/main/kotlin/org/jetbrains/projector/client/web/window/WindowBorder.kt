@@ -35,7 +35,7 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 
-class WindowBorder(private val resizeable: Boolean) : DragEventsInterceptor, LafListener {
+class WindowBorder(private val resizeable: Boolean, private val applyShadow: Boolean) : DragEventsInterceptor, LafListener {
 
   var onResize: (deltaX: Int, deltaY: Int, direction: ResizeDirection) -> Unit = { _, _, _ -> }
 
@@ -48,6 +48,9 @@ class WindowBorder(private val resizeable: Boolean) : DragEventsInterceptor, Laf
 
   var visible: Boolean = true
     set(value) {
+
+      val value = value && !applyShadow
+
       if (field != value) {
         field = value
         style.display = if (value) "block" else "none"

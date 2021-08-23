@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.server.core.classloader
 
+import com.intellij.util.lang.UrlClassLoader
 import org.jetbrains.projector.server.core.ij.IjInjectorAgentInitializer
 import org.jetbrains.projector.server.core.ij.invokeWhenIdeaIsInitialized
 import org.jetbrains.projector.server.core.ij.md.PanelUpdater
@@ -48,6 +49,8 @@ public object ProjectorClassLoaderSetup {
     prjClassLoader.forceLoadByPlatform("com.intellij.ide.WindowsCommandLineProcessor")
     // to access ideaClassLoaderInitialized field only from AppClassLoader context
     prjClassLoader.forceLoadByPlatform(ProjectorClassLoaderSetup::class.java.name)
+    prjClassLoader.forceLoadByPlatform(ProjectorClassLoader::class.java.name)
+    prjClassLoader.forceLoadByPlatform(UrlClassLoader::class.java.name)
 
     // to prevent problems caused by loading classes like kotlin.jvm.functions.Function0 by both ProjectorClassLoader and IDE ClassLoader
     prjClassLoader.forceLoadByProjectorClassLoader("com.intellij.openapi.application.ActionsKt")

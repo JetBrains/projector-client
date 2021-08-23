@@ -56,7 +56,9 @@ dependencies {
   implementation("org.javassist:javassist:$javassistVersion")
 
   compileOnly("com.jetbrains.intellij.platform:ide-impl:$intellijPlatformVersion")
+  compileOnly("com.jetbrains.intellij.platform:core-ui:$intellijPlatformVersion")
   compileOnly("com.jetbrains.intellij.platform:extensions:$intellijPlatformVersion")
+  compileOnly("com.jetbrains.intellij.platform:util-class-loader:$intellijPlatformVersion")
 
   testImplementation(kotlin("test"))
 }

@@ -23,49 +23,26 @@
  */
 package org.jetbrains.projector.agent.ijInjector.components
 
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.awt.event.MouseWheelEvent
+import org.jetbrains.projector.util.logging.Logger
+import java.awt.Graphics
+import java.awt.Window
+import javax.swing.JWindow
 
-public class HwMouseAdapter : MouseAdapter() {
+public open class BalloonWindow @JvmOverloads constructor(owner: Window? = null, public val isButton: Boolean = false) : JWindow(owner) {
 
-  override fun mouseClicked(e: MouseEvent?) {
-    println("Clicked")
-    super.mouseClicked(e)
+  override fun paint(g: Graphics?) {
+    logger.debug { "paint" }
+    super.paint(g)
   }
 
-  override fun mousePressed(e: MouseEvent?) {
-    println("Pressed")
-    super.mousePressed(e)
+  override fun paintAll(g: Graphics?) {
+    logger.debug { "paintAll" }
+    super.paintAll(g)
   }
 
-  override fun mouseReleased(e: MouseEvent?) {
-    println("Released")
-    super.mouseReleased(e)
-  }
+  private companion object {
 
-  override fun mouseEntered(e: MouseEvent?) {
-    println("Entered")
-    super.mouseEntered(e)
-  }
+    val logger = Logger<BalloonWindow>()
 
-  override fun mouseExited(e: MouseEvent?) {
-    println("Exited")
-    super.mouseExited(e)
-  }
-
-  override fun mouseWheelMoved(e: MouseWheelEvent?) {
-    println("Wheel")
-    super.mouseWheelMoved(e)
-  }
-
-  override fun mouseDragged(e: MouseEvent?) {
-    println("Dragged")
-    super.mouseDragged(e)
-  }
-
-  override fun mouseMoved(e: MouseEvent?) {
-    println("Moved")
-    super.mouseMoved(e)
   }
 }

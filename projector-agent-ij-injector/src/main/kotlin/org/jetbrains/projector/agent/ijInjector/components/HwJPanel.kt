@@ -24,9 +24,11 @@
 package org.jetbrains.projector.agent.ijInjector.components
 
 import com.intellij.ui.jcef.HwFacadeHelper
+import java.awt.Component
 import java.awt.Graphics
 import java.awt.image.VolatileImage
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
 
 public class HwJPanel(private val facadeHelper: HwFacadeHelper) : JPanel() {
 
@@ -43,7 +45,7 @@ public class HwJPanel(private val facadeHelper: HwFacadeHelper) : JPanel() {
     super.paintComponent(g)
     val buffer = myBackBuffer
     if (buffer != null) {
-      g.drawImage(buffer, 0, 0, null);
+      //g.drawImage(buffer, 0, 0, null);
     }
   }
 

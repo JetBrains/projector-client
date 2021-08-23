@@ -24,6 +24,7 @@
 package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.dom.addClass
 import org.jetbrains.projector.client.common.DrawEvent
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
@@ -122,7 +123,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   private var header: WindowHeader? = null
   private var headerVerticalPosition: Double = 0.0
   private var headerHeight: Double = 0.0
-  private val border = WindowBorder(windowData.resizable)
+  private val border = WindowBorder(windowData.resizable, windowData.windowType != WindowType.HEAVYWEIGHT_WRAPPER)
 
   private val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface)
 
@@ -390,10 +391,18 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   }
 
   fun dispose() {
+
     canvas.remove()
     border.dispose()
     header?.dispose()
     editorCanvas.remove()
+
+    //window.setTimeout({
+    //                    canvas.remove()
+    //                    border.dispose()
+    //                    header?.dispose()
+    //                    editorCanvas.remove()
+    //                  }, 5000)
   }
 
   fun drawPendingEvents() {

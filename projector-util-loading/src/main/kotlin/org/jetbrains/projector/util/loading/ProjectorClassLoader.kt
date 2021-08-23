@@ -28,6 +28,7 @@ import java.io.File
 import java.io.InputStream
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
+import java.net.URL
 import java.util.jar.JarFile
 
 @Suppress("unused", "MemberVisibilityCanBePrivate", "RedundantVisibilityModifier") // public to be accessible for additional setup
@@ -80,11 +81,13 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
   private fun mustBeLoadedByIdea(name: String): Boolean = forceLoadByIdea.any { name.startsWith(it) }
 
   private fun isProjectorAgentClass(name: String): Boolean = name.startsWith(PROJECTOR_AGENT_PACKAGE_PREFIX)
-  private fun isProjectorClass(name: String): Boolean = name.startsWith(PROJECTOR_PACKAGE_PREFIX) && name != javaClass.name
+  private fun isProjectorClass(name: String): Boolean = name.startsWith(PROJECTOR_PACKAGE_PREFIX)
   private fun isIntellijClass(name: String): Boolean = name.startsWith(INTELLIJ_PACKAGE_PREFIX) || (name.startsWith(JETBRAINS_PACKAGE_PREFIX) && !isProjectorClass(name))
 
   private fun debug(name: String, messageSupplier: () -> String) {
-    if (name.startsWith("com.intellij.ui.Balloon")) {
+    val test = "org.jetbrains.projector.util.loading"
+    val testPath = test.replace('.', '/')
+    if (name.contains(test) || name.contains(testPath)) {
       logger.debug(null, messageSupplier)
     }
   }
@@ -162,13 +165,24 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     return clazz
   }
 
-  override fun getResourceAsStream(name: String?): InputStream? {
+  override fun getResourceAsStream(name: String): InputStream? {
+    logger.debug { "getResourceAsStream [$name]" }
     val resourceStream = listOf(myAppClassLoader, ideaClassLoader).fold(null as InputStream?) { stream, loader ->
       stream ?: loader?.getResourceAsStream(name)
     }
     if (resourceStream != null) return resourceStream
 
     return super.getResourceAsStream(name)
+  }
+
+  override fun getResource(name: String): URL? {
+    logger.debug { "getResource [$name]" }
+    val resource = listOf(myAppClassLoader, ideaClassLoader).fold(null as URL?) { stream, loader ->
+      stream ?: loader?.getResource(name)
+    }
+    if (resource != null) return resource
+
+    return super.getResource(name)
   }
 
   private fun appendToClassPathForInstrumentation(jarPath: String) {

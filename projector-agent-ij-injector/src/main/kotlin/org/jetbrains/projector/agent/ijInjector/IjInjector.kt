@@ -53,7 +53,7 @@ internal object IjInjector {
     ClassloaderFacilities.invoke(utils)
 
     IjLigaturesDisablerTransformer.agentmain(utils)
-    IjBalloonTransformer.transform(utils)
+    //IjBalloonTransformer.transform(utils)
 
     val isAgent = args[IjArgs.IS_AGENT] == "true"
     if (!isAgent) {  // todo: support variant for agent too
