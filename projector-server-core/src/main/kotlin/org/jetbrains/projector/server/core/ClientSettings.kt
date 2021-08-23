@@ -30,6 +30,7 @@ import org.jetbrains.projector.common.protocol.toClient.ToClientMessageEncoder
 import org.jetbrains.projector.common.protocol.toClient.ToClientTransferableType
 import org.jetbrains.projector.common.protocol.toServer.ToServerMessageDecoder
 import org.jetbrains.projector.common.protocol.toServer.ToServerTransferableType
+import org.jetbrains.projector.server.core.util.AbstractWindowDrawInterestManager
 import org.jetbrains.projector.server.core.util.SizeAware
 import org.jetbrains.projector.util.logging.Logger
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -68,6 +69,7 @@ public class ReadyClientSettings(
   override val connectionMillis: Long,
   override val address: String?,
   public val setUpClientData: SetUpClientData,
+  public val interestManager: AbstractWindowDrawInterestManager,
   bigCollectionSize: Int?,
 ) : ClientSettings() {
 
