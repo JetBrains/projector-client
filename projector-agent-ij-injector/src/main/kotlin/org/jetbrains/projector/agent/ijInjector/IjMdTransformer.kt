@@ -29,7 +29,6 @@ import org.jetbrains.projector.agent.common.getClassFromClassfileBuffer
 import org.jetbrains.projector.agent.init.IjArgs
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.ClassFileTransformer
-import java.lang.reflect.InvocationTargetException
 import java.security.ProtectionDomain
 
 internal class IjMdTransformer private constructor(
@@ -130,7 +129,7 @@ internal class IjMdTransformer private constructor(
       val extensionPointName = utils.createExtensionPointName(MD_EXTENSION_ID)
       val extensions = try {
         utils.extensionPointNameGetExtensions(extensionPointName)
-      } catch (e: InvocationTargetException) {
+      } catch (e: Exception) {
         logger.debug { "Markdown plugin is not installed. Skip the transform" }
         return
       }
