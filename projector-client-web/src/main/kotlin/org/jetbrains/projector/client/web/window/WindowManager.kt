@@ -23,16 +23,41 @@
  */
 package org.jetbrains.projector.client.web.window
 
+import kotlinx.browser.window
+import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.state.LafListener
 import org.jetbrains.projector.common.protocol.toClient.WindowData
+import org.jetbrains.projector.common.protocol.toServer.ClientWindowsActivationEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientWindowsDeactivationEvent
 import org.w3c.dom.HTMLCanvasElement
+import org.w3c.dom.events.FocusEvent
 
 class WindowManager(private val stateMachine: ClientStateMachine) : Iterable<Window>, LafListener {
 
   companion object {
     const val zIndexStride = 10
   }
+
+  init {
+    window.onblur = ::onDeactivated
+    window.onfocus = ::onActivated
+  }
+
+  private fun getVisibleWindows(): List<Window> {
+    return windows.values.filter { it.isShowing }
+  }
+
+  private fun onActivated(event: FocusEvent) {
+    val windowIds = getVisibleWindows().map { it.id }
+    stateMachine.fire(ClientAction.AddEvent(ClientWindowsActivationEvent(windowIds)))
+  }
+
+  private fun onDeactivated(event: FocusEvent) {
+    val windowIds = getVisibleWindows().map { it.id }
+    stateMachine.fire(ClientAction.AddEvent(ClientWindowsDeactivationEvent(windowIds)))
+  }
+
 
   private val windows = mutableMapOf<Int, Window>()
 

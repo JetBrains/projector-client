@@ -208,3 +208,13 @@ data class ClientDisplaySetChangeEvent(
 data class ClientWindowCloseEvent(
   val windowId: Int,
 ) : ClientEvent()
+
+@Serializable
+data class ClientWindowsActivationEvent(
+  val windowIds: List<Int>,
+) : ClientEvent()
+
+@Serializable
+data class ClientWindowsDeactivationEvent(
+  val windowIds: List<Int>,
+) : ClientEvent()
