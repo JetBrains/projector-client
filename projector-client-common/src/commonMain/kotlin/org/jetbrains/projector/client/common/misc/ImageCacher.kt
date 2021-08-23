@@ -34,7 +34,7 @@ import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientRequestImageDataEvent
 import org.jetbrains.projector.util.logging.Logger
 
-object ImageCacher {
+class ImageCacher {
 
   private data class LivingEntity<out EntityType>(var lastUsageTimestamp: Double, val size: Int, val data: EntityType)
 
@@ -104,7 +104,7 @@ object ImageCacher {
       }
       val offScreenRenderingSurface = UnbufferedRenderingSurface(offScreenCanvas)
 
-      val offScreenCommandProcessor = SingleRenderingSurfaceProcessor(offScreenRenderingSurface)
+      val offScreenCommandProcessor = SingleRenderingSurfaceProcessor(offScreenRenderingSurface, this)
 
       offscreenImages[offscreenTarget.pVolatileImageId] = OffscreenImage(
         width = offscreenTarget.width,

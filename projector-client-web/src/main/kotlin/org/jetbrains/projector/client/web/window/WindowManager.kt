@@ -23,12 +23,13 @@
  */
 package org.jetbrains.projector.client.web.window
 
+import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.state.LafListener
 import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.w3c.dom.HTMLCanvasElement
 
-class WindowManager(private val stateMachine: ClientStateMachine) : Iterable<Window>, LafListener {
+class WindowManager(private val stateMachine: ClientStateMachine, val imageCacher: ImageCacher) : Iterable<Window>, LafListener {
 
   companion object {
     const val zIndexStride = 10
@@ -44,7 +45,7 @@ class WindowManager(private val stateMachine: ClientStateMachine) : Iterable<Win
   fun getTopWindow(x: Int, y: Int): Window? = windows.values.filter { it.isShowing && it.contains(x, y) }.maxByOrNull { it.zIndex }
 
   fun getOrCreate(windowData: WindowData): Window {
-    return windows.getOrPut(windowData.id) { Window(windowData, stateMachine) }
+    return windows.getOrPut(windowData.id) { Window(windowData, stateMachine, imageCacher) }
   }
 
   fun cleanup(presentedWindowIds: Set<Int>) {

@@ -25,7 +25,6 @@ package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
-import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.common.protocol.data.ImageId
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowEvent
@@ -38,7 +37,7 @@ import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLLinkElement
 import kotlin.collections.isNotEmpty
 
-class WindowDataEventsProcessor(private val windowManager: WindowManager) {
+class WindowDataEventsProcessor(internal val windowManager: WindowManager) {
 
   private var excludedWindowIds = emptyList<Int>()
 
@@ -102,7 +101,7 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
 
     val selectedIconId = selectIcon(topmostWindowIconIds)
 
-    val selectedIconUrl = when (val selectedIcon = selectedIconId?.let { ImageCacher.getImageData(it) }) {
+    val selectedIconUrl = when (val selectedIcon = selectedIconId?.let { windowManager.imageCacher.getImageData(it) }) {
       is HTMLCanvasElement -> selectedIcon.toDataURL()
       is HTMLImageElement -> selectedIcon.src
       else -> "pj.svg"

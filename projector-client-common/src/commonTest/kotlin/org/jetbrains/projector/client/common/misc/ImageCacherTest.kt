@@ -39,10 +39,12 @@ class ImageCacherTest {
 
   @Test
   fun getImageDataShouldNotAddImageToRequestIfImageDataIsAlreadyConvertedFromBase64() {
-    ImageCacher.putImageData(imageId, imageData)
+    val imageCacher = ImageCacher()
 
-    ImageCacher.getImageData(imageId)
+    imageCacher.putImageData(imageId, imageData)
 
-    assertEquals(0, ImageCacher.extractImagesToRequest().size)
+    imageCacher.getImageData(imageId)
+
+    assertEquals(0, imageCacher.extractImagesToRequest().size)
   }
 }
