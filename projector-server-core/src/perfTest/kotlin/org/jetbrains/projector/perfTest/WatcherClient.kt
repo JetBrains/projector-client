@@ -23,31 +23,9 @@
  */
 package org.jetbrains.projector.perfTest
 
-import java.io.File
-
-open class PrimitiveClient {
-
-  fun connectWithServer() {
-    TODO("connect to server and do handshake")
-  }
-
-  open fun sendMessageToServer(message: String) {
-    TODO("send json action to server ")
-  }
-
-  fun sendTimeStamp() {
-    TODO("send timestamp to server")
-  }
-
-  fun receiveMessageFromServer() {
-    TODO("receive and process/compare message with pattern")
-  }
-
-  fun parseStringToMessage(actionMessage: String): String {
-    TODO("parse string and return message for send")
-  }
-
-  fun parseFileToMessage(textFile: File): String {
-    TODO("parse text file and return message for send")
+class WatcherClient : PrimitiveClient() {
+  override fun sendMessageToServer(message: String) {
+    super.sendMessageToServer("kek")
+    TODO("can't send key events")
   }
 }

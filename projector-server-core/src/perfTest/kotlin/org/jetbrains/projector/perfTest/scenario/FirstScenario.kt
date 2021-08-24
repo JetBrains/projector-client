@@ -21,33 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.perfTest
+package org.jetbrains.projector.perfTest.scenario
 
-import java.io.File
+object FirstScenario : AbstractScenario() {
 
-open class PrimitiveClient {
+  override fun scenario() {
+    connectToServer()
+    initIde()
+    makeEmptyProject()
 
-  fun connectWithServer() {
-    TODO("connect to server and do handshake")
+    mainWriter.sendMessageToServer("println(\"Hello, World!\")")
+    mainWriter.sendTextFileToServer(testFile)
+    mainWriter.compile()
   }
 
-  open fun sendMessageToServer(message: String) {
-    TODO("send json action to server ")
-  }
-
-  fun sendTimeStamp() {
-    TODO("send timestamp to server")
-  }
-
-  fun receiveMessageFromServer() {
-    TODO("receive and process/compare message with pattern")
-  }
-
-  fun parseStringToMessage(actionMessage: String): String {
-    TODO("parse string and return message for send")
-  }
-
-  fun parseFileToMessage(textFile: File): String {
-    TODO("parse text file and return message for send")
-  }
 }
