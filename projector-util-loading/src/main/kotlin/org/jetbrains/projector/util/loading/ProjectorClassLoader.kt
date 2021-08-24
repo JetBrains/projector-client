@@ -160,8 +160,12 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     return findInClassloaders { it.getResource(name) } ?: super.getResource(name)
   }
 
-  private fun appendToClassPathForInstrumentation(jarPath: String) {
+  public fun addJarSource(jarPath: String) {
     jarFiles += jarPath
+  }
+
+  private fun appendToClassPathForInstrumentation(jarPath: String) {
+    addJarSource(jarPath)
   }
 
   @Suppress("RedundantVisibilityModifier") // public so that `instance` is accessible for additional setup
