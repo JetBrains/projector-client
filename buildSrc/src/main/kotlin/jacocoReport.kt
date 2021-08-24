@@ -26,8 +26,9 @@ import org.gradle.api.Project
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.io.File
 
-public fun JacocoReport.setupReporting(project: Project, moduleName: String, isKotlinJsModule: Boolean = false) {
-  if (isKotlinJsModule) {
+public fun JacocoReport.setupReporting(project: Project, isKotlinMpModule: Boolean = false) {
+  val moduleName = project.name.split("-").joinToString("") { it.capitalize() }
+  if (isKotlinMpModule) {
     dependsOn("jvmTest")
     group = "Reporting"
     description = "Generate Jacoco coverage reports"
@@ -47,7 +48,7 @@ public fun JacocoReport.setupReporting(project: Project, moduleName: String, isK
   }
   reports {
     xml.required.set(true)
-    xml.outputLocation.set(project.file(project.layout.buildDirectory.dir("../../JacocoReports/jacocoReport$moduleName.xml")))
+    xml.outputLocation.set(project.rootProject.file("JacocoReports/jacocoReport$moduleName.xml"))
     csv.required.set(false)
     html.outputLocation.set(project.layout.buildDirectory.dir("jacocoHtml$moduleName"))
   }

@@ -27,12 +27,14 @@ plugins {
   jacoco
 }
 
+val jacocoVersion: String by project
+
 jacoco {
-  toolVersion = "0.8.7"
+  toolVersion = jacocoVersion
 }
 
 tasks.withType<JacocoReport> {
-  setupReporting(project, "ProjectorAgentCommon")
+  setupReporting(project)
 }
 
 tasks.test {
