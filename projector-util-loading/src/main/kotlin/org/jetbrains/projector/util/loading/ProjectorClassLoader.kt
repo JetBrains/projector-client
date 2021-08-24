@@ -38,13 +38,6 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
 
   private val loadMethod = ClassLoader::class.java.getDeclaredMethod("loadClass", String::class.java, Boolean::class.java).apply(Method::unprotect)
 
-  private val myAppClassLoader: ClassLoader by lazy {
-    ClassLoader::class.java
-      .getDeclaredMethod("getBuiltinAppClassLoader")
-      .apply(Method::unprotect)
-      .invoke(null) as ClassLoader
-  }
-
   private val myIdeaLoader: ClassLoader get() = ideaClassLoader ?: myAppClassLoader
 
   private val forceLoadByPlatform = mutableSetOf<String>()
@@ -171,6 +164,19 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     private const val PROJECTOR_AGENT_PACKAGE_PREFIX = "org.jetbrains.projector.agent."
 
     private val logger = Logger<ProjectorClassLoader>()
+
+    private val myAppClassLoader: ClassLoader by lazy {
+      val systemClassLoader = getSystemClassLoader()
+      // check we won't create infinite recursion when loading app classes
+      if (systemClassLoader.javaClass.name != ProjectorClassLoader::class.java.name) {
+        systemClassLoader
+      } else {
+        ClassLoader::class.java
+          .getDeclaredMethod("getBuiltinAppClassLoader")
+          .apply(Method::unprotect)
+          .invoke(null) as ClassLoader
+      }
+    }
 
     private var myInstance: ProjectorClassLoader? = null
 
