@@ -35,7 +35,7 @@ public object ProjectorClassLoaderSetup {
     private set
 
   @Suppress("unused", "RedundantVisibilityModifier") // Called from projector-server, don't trigger linter that doesn't know it
-  public fun initClassLoader(classLoader: ClassLoader): ClassLoader {
+  public fun initClassLoader(classLoader: ClassLoader): ProjectorClassLoader {
     val prjClassLoader = if (classLoader is ProjectorClassLoader) classLoader else ProjectorClassLoader.instance
 
     // accessed in agent to get ide and projector classloaders in platform classloader context
