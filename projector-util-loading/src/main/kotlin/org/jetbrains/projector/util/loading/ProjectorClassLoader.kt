@@ -154,8 +154,12 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     return super.getResourceAsStream(name)
   }
 
-  private fun appendToClassPathForInstrumentation(jarPath: String) {
+  public fun addJarSource(jarPath: String) {
     jarFiles += jarPath
+  }
+
+  private fun appendToClassPathForInstrumentation(jarPath: String) {
+    addJarSource(jarPath)
   }
 
   @Suppress("RedundantVisibilityModifier") // public so that `instance` is accessible for additional setup
