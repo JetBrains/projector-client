@@ -29,15 +29,17 @@ plugins {
   java
 }
 
+val jacocoVersion: String by project
+
 jacoco {
-  toolVersion = "0.8.7"
+  toolVersion = jacocoVersion
 }
 
 val kotlinVersion: String by project
 val serializationVersion: String by project
 
 tasks.withType<JacocoReport> {
-  setupReporting(project, "ProjectorCommon", true)
+  setupReporting(project, isKotlinMpModule = true)
 }
 
 kotlin {

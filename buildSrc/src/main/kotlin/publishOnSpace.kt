@@ -31,7 +31,7 @@ import org.gradle.kotlin.dsl.credentials
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.maven
 
-fun PublishingExtension.publishOnSpace(project: Project, fromComponent: String) {
+public fun PublishingExtension.publishOnSpace(project: Project, fromComponent: String) {
   if (fromComponent == "java") {
     this.publications {
       create<MavenPublication>("maven") {
