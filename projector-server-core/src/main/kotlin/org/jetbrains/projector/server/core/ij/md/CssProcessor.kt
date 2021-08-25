@@ -26,7 +26,6 @@ package org.jetbrains.projector.server.core.ij.md
 import org.jetbrains.projector.util.logging.Logger
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.net.JarURLConnection
 import java.net.URL
 
 internal object CssProcessor {
@@ -40,7 +39,7 @@ internal object CssProcessor {
       if (it.isNullOrEmpty()) return@forEach
 
       try {
-        val connection = URL(it).openConnection() as JarURLConnection
+        val connection = URL(it).openConnection()
 
         val reader = BufferedReader(InputStreamReader(connection.inputStream))
 

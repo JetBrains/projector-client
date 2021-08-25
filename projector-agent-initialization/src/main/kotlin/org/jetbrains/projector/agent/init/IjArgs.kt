@@ -30,8 +30,7 @@ public object IjArgs {
   public const val IJ_CL_PROVIDER_CLASS: String = "ijClProviderClass"
   public const val IJ_CL_PROVIDER_METHOD: String = "ijClProviderMethod"
   public const val PRJ_CL_PROVIDER_METHOD: String = "prjClProviderMethod"
-  public const val MD_PANEL_MAKER_CLASS: String = "mdPanelMakerClass"
-  public const val MD_PANEL_MAKER_METHOD: String = "mdPanelMakerMethod"
+  public const val MD_PANEL_CLASS: String = "mdPanelClass"
 }
 
 public fun Map<String, Any>.toIjArgs(): String {

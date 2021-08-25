@@ -25,7 +25,6 @@ package org.jetbrains.projector.server.core.ij
 
 import org.jetbrains.projector.agent.init.IjArgs
 import org.jetbrains.projector.agent.init.toIjArgs
-import org.jetbrains.projector.server.core.ij.md.MarkdownPanelMaker
 import org.jetbrains.projector.util.agent.copyAgentToTempJarAndAttach
 import org.jetbrains.projector.util.loading.ProjectorClassLoader
 import java.lang.ref.WeakReference
@@ -43,16 +42,15 @@ public object IjInjectorAgentInitializer {
       val ijClProviderClass = IjInjectorAgentClassLoaders::class.java.name
       val ijClProviderMethod = IjInjectorAgentClassLoaders::getIdeClassloader.name
       val prjClProviderMethod = IjInjectorAgentClassLoaders::getProjectorClassloader.name
-      val mdPanelMakerClass = MarkdownPanelMaker::class.java.name
-      val mdPanelMakerMethod = MarkdownPanelMaker::createMarkdownHtmlPanel.name
+      // raw string because it must be loaded with Markdown PluginClassLoader
+      val mdPanelClass = "org.jetbrains.projector.server.core.ij.md.ProjectorMarkdownPanel"
 
       val args = mapOf(
         IjArgs.IS_AGENT to isAgent,
         IjArgs.IJ_CL_PROVIDER_CLASS to ijClProviderClass,
         IjArgs.IJ_CL_PROVIDER_METHOD to ijClProviderMethod,
         IjArgs.PRJ_CL_PROVIDER_METHOD to prjClProviderMethod,
-        IjArgs.MD_PANEL_MAKER_CLASS to mdPanelMakerClass,
-        IjArgs.MD_PANEL_MAKER_METHOD to mdPanelMakerMethod,
+        IjArgs.MD_PANEL_CLASS to mdPanelClass,
       ).toIjArgs()
 
       copyAgentToTempJarAndAttach(

@@ -43,6 +43,8 @@ public object ProjectorClassLoaderSetup {
 
     // to prevent problems caused by loading classes like kotlin.jvm.functions.Function0 by both ProjectorClassLoader and IDE ClassLoader
     prjClassLoader.forceLoadByProjectorClassLoader("com.intellij.openapi.application.ActionsKt")
+    // implements Markdown plugin interface
+    prjClassLoader.forceLoadByProjectorClassLoader("org.jetbrains.projector.server.core.ij.md.ProjectorMarkdownPanel")
 
     invokeWhenIdeaIsInitialized("Init ProjectorClassLoader", onClassLoaderFetched = {
       prjClassLoader.ideaClassLoader = it

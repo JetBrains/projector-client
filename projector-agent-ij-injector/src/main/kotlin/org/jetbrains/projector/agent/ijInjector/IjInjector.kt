@@ -36,8 +36,7 @@ internal object IjInjector {
     val classloadersProviderClassName: String,
     val ideaClassloaderProviderMethodName: String,
     val projectorClassloaderProviderMethodName: String,
-    val markdownPanelMakerClassName: String,
-    val markdownPanelMakerMethodName: String,
+    val markdownPanelClassName: String,
   )
 
   private fun parametersFromArgs(args: Map<String, String>): AgentParameters {
@@ -47,8 +46,7 @@ internal object IjInjector {
       classloadersProviderClassName = args.getValue(IjArgs.IJ_CL_PROVIDER_CLASS),
       ideaClassloaderProviderMethodName = args.getValue(IjArgs.IJ_CL_PROVIDER_METHOD),
       projectorClassloaderProviderMethodName = args.getValue(IjArgs.PRJ_CL_PROVIDER_METHOD),
-      markdownPanelMakerClassName = args.getValue(IjArgs.MD_PANEL_MAKER_CLASS),
-      markdownPanelMakerMethodName = args.getValue(IjArgs.MD_PANEL_MAKER_METHOD),
+      markdownPanelClassName = args.getValue(IjArgs.MD_PANEL_CLASS),
     )
   }
 
