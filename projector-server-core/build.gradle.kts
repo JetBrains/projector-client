@@ -46,6 +46,7 @@ System.setProperty("user.dir", projectDir.toString())
 val coroutinesVersion: String by project
 val dnsjavaVersion: String by project
 val intellijPlatformVersion: String by project
+val intellijMarkdownPluginVersion: String by project
 val javassistVersion: String by project
 val javaWebSocketVersion: String by project
 val jsoupVersion: String by project
@@ -140,6 +141,7 @@ dependencies {
   implementation("org.jsoup:jsoup:$jsoupVersion")
 
   compileOnly("com.jetbrains.intellij.platform:util-class-loader:$intellijPlatformVersion")
+  compileOnly("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion")
 
   testImplementation(kotlin("test", kotlinVersion))
 

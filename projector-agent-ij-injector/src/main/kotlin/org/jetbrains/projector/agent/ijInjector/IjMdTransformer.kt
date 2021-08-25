@@ -28,6 +28,7 @@ import javassist.CtClass
 import org.jetbrains.projector.agent.common.transformation.TransformationResult
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 import org.jetbrains.projector.agent.common.transformation.classForNameOrNull
+import org.jetbrains.projector.util.loading.ProjectorClassLoader
 
 internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
 
@@ -40,7 +41,8 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
 
   override fun getTransformations(parameters: IjInjector.AgentParameters, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> {
 
-    val projectorMarkdownPanel = ProjectorMarkdownPanel(parameters.markdownPanelMakerClassName, parameters.markdownPanelMakerMethodName)
+    val projectorClassLoader = ProjectorClassLoader.instance
+    projectorClassLoader.addPluginLoader("org.intellij.plugins.markdown", classLoader)
 
     return listOf(
       javaFxClass to MdPreviewType.JAVAFX,
@@ -52,7 +54,7 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
       }
       clazz to previewType
     }.associate { (clazz, previewType) ->
-      clazz to { ctClass -> transformMdHtmlPanelProvider(previewType, ctClass, projectorMarkdownPanel) }
+      clazz to { ctClass -> transformMdHtmlPanelProvider(previewType, ctClass, parameters.markdownPanelClassName) }
     }
   }
 
@@ -72,7 +74,7 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     return !parameters.isAgent
   }
 
-  private fun transformMdHtmlPanelProvider(previewType: MdPreviewType, clazz: CtClass, projectorMarkdownPanel: ProjectorMarkdownPanel): ByteArray {
+  private fun transformMdHtmlPanelProvider(previewType: MdPreviewType, clazz: CtClass, projectorMarkdownPanelClass: String): ByteArray {
     clazz
       .getDeclaredMethod("isAvailable")
       .setBody(
@@ -84,33 +86,34 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
         """.trimIndent()
       )
 
-    // todo: use correct className, not hardcoded
     clazz
       .getDeclaredMethod("getProviderInfo")
       .setBody(
         // language=java prefix="class MarkdownHtmlPanelProvider { @NotNull public abstract ProviderInfo getProviderInfo()" suffix="}"
         """
           {
-            final java.lang.String className = org.intellij.plugins.markdown.ui.preview.jcef.JCEFHtmlPanelProvider.class.getName();
-            return new org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanelProvider.ProviderInfo("Projector (${previewType.displayName})", className);
+            return new org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanelProvider.ProviderInfo("Projector (${previewType.displayName})", getClass().getName());
           }
         """.trimIndent()
       )
 
+    @Suppress("rawtypes", "unchecked", "RedundantArrayCreation") // for body injection
     clazz
       .getDeclaredMethod("createHtmlPanel")
       .setBody(
         // language=java prefix="class MarkdownHtmlPanelProvider { @NotNull public abstract MarkdownHtmlPanel createHtmlPanel()" suffix="}"
         """
           {
-            final java.lang.ClassLoader mdClassLoader = org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanel.class.getClassLoader();
+            // we need the version loaded via system lassLoader
+            Class actualPrjClassLoaderClazz = ClassLoader.getSystemClassLoader().loadClass("org.jetbrains.projector.util.loading.ProjectorClassLoader");   
+            ClassLoader actualPrjClassLoader = (ClassLoader) actualPrjClassLoaderClazz
+                .getDeclaredMethod("getInstance", new Class[0])
+                .invoke(null, new Object[0]);
             
-            // We should explicitly create arrays or otherwise javassist won't be able to compile the code
-            //noinspection RedundantArrayCreation
-            final Object panel = Class.forName("${projectorMarkdownPanel.className}")
-              .getDeclaredMethod("${projectorMarkdownPanel.methodName}", new java.lang.Class[] { java.lang.ClassLoader.class })
-              .invoke(null, new java.lang.Object[] { mdClassLoader });
-            return (org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanel) panel;
+            String className = "$projectorMarkdownPanelClass";
+            Class mdPanelClazz = actualPrjClassLoader.loadClass(className);
+
+            return (org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanel) mdPanelClazz.getDeclaredConstructor(new Class[0]).newInstance(new Object[0]);
           }
         """.trimIndent()
       )
@@ -123,6 +126,4 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     JAVAFX("JavaFX WebView"),
     JCEF("JCEF Browser"),
   }
-
-  private data class ProjectorMarkdownPanel(val className: String, val methodName: String)
 }
