@@ -36,6 +36,11 @@ public object ProjectorClassLoaderSetup {
   public fun initClassLoader(classLoader: ClassLoader): ProjectorClassLoader {
     val prjClassLoader = if (classLoader is ProjectorClassLoader) classLoader else ProjectorClassLoader.instance
 
+    // loaded with AppClassLoader in IDE
+    prjClassLoader.forceLoadByPlatform("com.intellij.util.lang.UrlClassLoader")
+    // loaded with AppClassLoader in IDE
+    prjClassLoader.forceLoadByPlatform("com.intellij.util.lang.PathClassLoader")
+
     // to prevent problems caused by loading classes like kotlin.jvm.functions.Function0 by both ProjectorClassLoader and IDE ClassLoader
     prjClassLoader.forceLoadByProjectorClassLoader("com.intellij.openapi.application.ActionsKt")
 
