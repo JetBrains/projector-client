@@ -65,6 +65,13 @@ class MarkdownPanelManager(private val zIndexByWindowIdGetter: (Int) -> Int?, pr
 
         document.body!!.appendChild(this)
 
+        // cancel auto-started load of about:blank in Firefox
+        // https://stackoverflow.com/questions/7828502/cannot-set-document-body-innerhtml-of-iframe-in-firefox
+        contentDocument!!.apply {
+          open()
+          close()
+        }
+
         // adopted from processLinks.js
         contentDocument!!.onclick = { e ->
           var target = e.target.asDynamic()
