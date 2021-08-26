@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
-internal class PanelDelegate {
+internal class PanelDelegate(agentComponent: JComponent?) {
 
   private val logger = Logger<PanelDelegate>()
 
@@ -66,7 +66,8 @@ internal class PanelDelegate {
   var lastScrollOffset = 0
     private set
 
-  private val backingComponent = PanelComponent()
+  private val headlessBackingComponent = PanelComponent()
+  private val backingComponent = agentComponent ?: headlessBackingComponent
 
   private var lastInlineCss: String? = null
   private var lastCssFileUrls: List<String?> = emptyList()
@@ -117,7 +118,7 @@ internal class PanelDelegate {
       appendLine(lastHtml.replace(">", ">\n"))
     }
 
-    backingComponent.setText(componentText)
+    headlessBackingComponent.setText(componentText)
   }
 
   fun setCSS(inlineCss: String?, vararg fileUris: String?) {

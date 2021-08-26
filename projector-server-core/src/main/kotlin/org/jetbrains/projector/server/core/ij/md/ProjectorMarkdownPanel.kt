@@ -36,56 +36,70 @@ import javax.swing.JComponent
  * Accessed in projector-agent-ij-injector/org.jetbrains.projector.agent.ijInjector.MdHtmlPanelProvider via parameter
  */
 @Suppress("unused")
-public class ProjectorMarkdownPanel : MarkdownHtmlPanel {
+public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateClass: String) : MarkdownHtmlPanel {
 
-  private val delegate = PanelDelegate()
+  // we need to create instance even in headless mode as in new versions it starts server which hosts styles
+  private val agentDelegate = Class.forName(agentDelegateClass).getDeclaredConstructor().newInstance() as MarkdownHtmlPanel
+  private val clientDelegate = PanelDelegate(if (isAgent) agentDelegate.component else null)
 
   override fun dispose() {
-    delegate.dispose()
+    agentDelegate.dispose()
+    clientDelegate.dispose()
   }
 
   override fun getComponent(): JComponent {
-    return delegate.getComponent()
+    return if (isAgent)
+      agentDelegate.component
+    else
+      clientDelegate.getComponent()
   }
 
   @Suppress("unused") // deprecated and removed in 2020.3, but is used in previous versions
   public fun setHtml(html: String) {
-    delegate.setHtml(html)
+    agentDelegate.setHtml(html)
+    clientDelegate.setHtml(html)
   }
 
   @Suppress("unused") // deprecated and removed in 2021.1, but is used in previous versions
   public fun setCSS(inlineCss: String?, vararg fileUris: String?) {
-    delegate.setCSS(inlineCss, *fileUris)
+    agentDelegate.setCSS(inlineCss, *fileUris)
+    clientDelegate.setCSS(inlineCss, *fileUris)
   }
 
   @Suppress("unused") // deprecated in 2020.3 and removed in 2021.1, but is used in previous versions
   public fun render() {
-    delegate.render()
+    agentDelegate.render()
+    clientDelegate.render()
   }
 
   override fun setHtml(html: String, initialScrollOffset: Int) {
-    delegate.setHtml(html, initialScrollOffset)
+    agentDelegate.setHtml(html, initialScrollOffset)
+    clientDelegate.setHtml(html, initialScrollOffset)
 
     if (isRenderMethodRemoved) {
-      delegate.setCSS(styleUrls.joinToString(separator = System.lineSeparator()))
-      render()
+      clientDelegate.setCSS(styleUrls.joinToString(separator = System.lineSeparator()))
+      clientDelegate.render()
     }
   }
 
   override fun reloadWithOffset(offset: Int) {
-    // TODO implement
+    agentDelegate.reloadWithOffset(offset)
+    // TODO implement for PanelDelegate
   }
 
   override fun scrollToMarkdownSrcOffset(offset: Int) {
-    delegate.scrollToMarkdownSrcOffset(offset)
+    agentDelegate.scrollToMarkdownSrcOffset(offset)
+    clientDelegate.scrollToMarkdownSrcOffset(offset)
   }
 
   override fun addScrollListener(listener: MarkdownHtmlPanel.ScrollListener?) {
-    // TODO implement
+    agentDelegate.addScrollListener(listener)
+    // TODO implement for PanelDelegate
   }
 
   override fun removeScrollListener(listener: MarkdownHtmlPanel.ScrollListener?) {
-    // TODO implement
+    agentDelegate.removeScrollListener(listener)
+    // TODO implement for PanelDelegate
   }
 
   private companion object {
@@ -108,6 +122,30 @@ public class ProjectorMarkdownPanel : MarkdownHtmlPanel {
       val markdownVersionString = PluginManagerCore.getPlugin(PluginId.getId("org.intellij.plugins.markdown"))!!.version
       val markdownBuildNumber = BuildNumber.fromString(markdownVersionString)!!
       markdownBuildNumber >= buildNumber
+    }
+
+    private val setHtmlMethod by lazy {
+      MarkdownHtmlPanel::class.java.getDeclaredMethod("setHtml", String::class.java)
+    }
+
+    private val setCSSMethod by lazy {
+      MarkdownHtmlPanel::class.java.getDeclaredMethod("setCSS", String::class.java, Array<String>::class.java)
+    }
+
+    private val renderMethod by lazy {
+      MarkdownHtmlPanel::class.java.getDeclaredMethod("render")
+    }
+
+    private fun MarkdownHtmlPanel.setHtml(html: String) {
+      setHtmlMethod.invoke(this, html)
+    }
+
+    private fun MarkdownHtmlPanel.setCSS(inlineCss: String?, vararg fileUris: String?) {
+      setCSSMethod.invoke(this, inlineCss, fileUris)
+    }
+
+    private fun MarkdownHtmlPanel.render() {
+      renderMethod.invoke(this)
     }
   }
 }
