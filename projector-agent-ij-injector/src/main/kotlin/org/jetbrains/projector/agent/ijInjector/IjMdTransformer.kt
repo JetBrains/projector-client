@@ -54,7 +54,7 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
       }
       clazz to previewType
     }.associate { (clazz, previewType) ->
-      clazz to { ctClass -> transformMdHtmlPanelProvider(previewType, ctClass, parameters.markdownPanelClassName) }
+      clazz to { ctClass -> transformMdHtmlPanelProvider(previewType, ctClass, parameters.markdownPanelClassName, parameters.isAgent) }
     }
   }
 
@@ -70,11 +70,12 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     return extensions.filterNotNull().first()::class.java.classLoader
   }
 
-  override fun isTransformerAvailable(parameters: IjInjector.AgentParameters): Boolean {
-    return !parameters.isAgent
-  }
-
-  private fun transformMdHtmlPanelProvider(previewType: MdPreviewType, clazz: CtClass, projectorMarkdownPanelClass: String): ByteArray {
+  private fun transformMdHtmlPanelProvider(
+    previewType: MdPreviewType,
+    clazz: CtClass,
+    projectorMarkdownPanelClass: String,
+    isAgent: Boolean
+  ): ByteArray {
     clazz
       .getDeclaredMethod("isAvailable")
       .setBody(
@@ -112,8 +113,8 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
             
             String className = "$projectorMarkdownPanelClass";
             Class mdPanelClazz = actualPrjClassLoader.loadClass(className);
-
-            return (org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanel) mdPanelClazz.getDeclaredConstructor(new Class[0]).newInstance(new Object[0]);
+            
+            return (org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanel) mdPanelClazz.getDeclaredConstructor(new Class[] { boolean.class, String.class }).newInstance(new Object[] { Boolean.valueOf($isAgent), "${previewType.panelClass}" });
           }
         """.trimIndent()
       )
@@ -121,9 +122,9 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     return clazz.toBytecode()
   }
 
-  private enum class MdPreviewType(val displayName: String) {
+  private enum class MdPreviewType(val displayName: String, val panelClass: String) {
 
-    JAVAFX("JavaFX WebView"),
-    JCEF("JCEF Browser"),
+    JAVAFX("JavaFX WebView", "org.intellij.plugins.markdown.ui.preview.javafx.MarkdownJavaFxHtmlPanel"),
+    JCEF("JCEF Browser", "org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel"),
   }
 }
