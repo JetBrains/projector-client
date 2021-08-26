@@ -72,6 +72,8 @@ class MarkdownPanelManager(private val zIndexByWindowIdGetter: (Int) -> Int?, pr
           close()
         }
 
+        contentDocument!!.oncontextmenu = { false }
+
         // adopted from processLinks.js
         contentDocument!!.onclick = { e ->
           var target = e.target.asDynamic()
