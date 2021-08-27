@@ -256,56 +256,59 @@ class kLowLevelKeyboardTest {
   @Test
   fun shiftedLettersTest() {
     for (i in 'A'..'Z') {
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
     }
   }
 
   @Test
   fun lettersTest() {
     for (i in 'a'..'z') {
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
     }
   }
 
   @Test
   fun symbolsTest() {
     for (i in '!'..'@') {
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
     }
     for (i in '['..'_') {
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
     }
     for (i in '{'..'}') {
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
     }
   }
 
   @Test
   fun qwertzlettersTest() {
     for (i in 'a' .. 'x')
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
   }
   @Test
   fun qwertzShiftedlettersTest() {
     for (i in 'A' .. 'X')
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
   }
 
-  //todo fix this
+  /*todo fix this
+  actual:   KeyEvent[PRESSED,keyCode=521,keyText=+,keyChar=+ (43),keyLocation=STANDARD,modifiersEx=],
+  expected: KeyEvent[PRESSED,keyCode=49,keyText=1,keyChar=+ (43),keyLocation=STANDARD,modifiersEx=],
+   */
   @Ignore
   @Test
   fun qwertzSymbols() {
     var j = 0
     for (i in '!'..'@') {
-      pressKeys(qwertzSymbols[j].toString(), i, qwertzSymbols[j])
+      pressKeys(qwertzSymbols[j].toString(), i, qwertzSymbols[j], null)
       j++
     }
     for (i in '['..'_') {
-      pressKeys(qwertzSymbols[j].toString(), i, qwertzSymbols[j])
+      pressKeys(qwertzSymbols[j].toString(), i, qwertzSymbols[j], null)
       j++
     }
     for (i in '{'..'}') {
-      pressKeys(qwertzSymbols[j].toString(), i, qwertzSymbols[j])
+      pressKeys(qwertzSymbols[j].toString(), i, qwertzSymbols[j], null)
       j++
     }
   }
@@ -313,43 +316,47 @@ class kLowLevelKeyboardTest {
   @Test
   fun azertyLettersTest() {
     for (i in 'b' .. 'l')
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
     for (i in 'n' .. 'p')
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
     for (i in 'r' .. 'v')
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
   }
 
   @Test
   fun azertyShiftedLettersTest() {
     for (i in 'B' .. 'L')
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
     for (i in 'N' .. 'P')
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
     for (i in 'R' .. 'V')
-      pressKeys(i.toString(), i, null)
+      pressKeys(i.toString(), i, null, null)
   }
 
+  /* todo fix this
+  actual:   KeyEvent[PRESSED,keyCode=150,keyText=&,keyChar=& (38),keyLocation=STANDARD,modifiersEx=],
+  expected: KeyEvent[PRESSED,keyCode=49,keyText=1,keyChar=& (38),keyLocation=STANDARD,modifiersEx=],
+   */
   @Ignore
   @Test
   fun azertySymbols() {
     var j = 0
     for (i in '!'..'@') {
-      pressKeys(azertySymbols[j].toString(), i, azertySymbols[j])
+      pressKeys(azertySymbols[j].toString(), i, null, azertySymbols[j])
       j++
     }
     for (i in '['..'_') {
-      pressKeys(azertySymbols[j].toString(), i, azertySymbols[j])
+      pressKeys(azertySymbols[j].toString(), i, null, azertySymbols[j])
       j++
     }
     for (i in '{'..'}') {
-      pressKeys(azertySymbols[j].toString(), i, azertySymbols[j])
+      pressKeys(azertySymbols[j].toString(), i, null, azertySymbols[j])
       j++
     }
   }
 
-  private fun pressKeys(symbol : String, symbolChar: Char, difInputChar: Char?) = test(symbol) {
-    if (symbolChar in 'A'..'Z' || (symbolChar in shiftedSymbols && difInputChar == null) || (difInputChar in qwertzShiftedSymbols || difInputChar in azertyShiftedSymbols))
+  private fun pressKeys(symbol : String, symbolChar: Char, qwertzChar: Char?, azertyChar: Char?) = test(symbol) {
+    if (symbolChar in 'A'..'Z' || (symbolChar in shiftedSymbols && qwertzChar == null && azertyChar == null) || (qwertzChar in qwertzShiftedSymbols || azertyChar in azertyShiftedSymbols))
       keyPress(KeyEvent.VK_SHIFT)
 
     when(symbolChar.lowercaseChar() ) {
@@ -383,7 +390,7 @@ class kLowLevelKeyboardTest {
       ".",">" -> {keyPress(KeyEvent.VK_PERIOD); keyRelease(KeyEvent.VK_PERIOD)}
       "/","?" -> {keyPress(KeyEvent.VK_SLASH); keyRelease(KeyEvent.VK_SLASH)}
     }
-    if (symbolChar in 'A'..'Z' || (symbolChar in shiftedSymbols && difInputChar == null)|| (difInputChar in qwertzShiftedSymbols && difInputChar != null))
+    if (symbolChar in 'A'..'Z' || (symbolChar in shiftedSymbols && qwertzChar == null && azertyChar == null) || (qwertzChar in qwertzShiftedSymbols || azertyChar in azertyShiftedSymbols))
       keyRelease(KeyEvent.VK_SHIFT)
   }
 
