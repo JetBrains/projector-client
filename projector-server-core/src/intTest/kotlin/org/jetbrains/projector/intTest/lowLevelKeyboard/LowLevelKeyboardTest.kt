@@ -53,6 +53,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.awt.event.MouseEvent
 import java.awt.event.WindowEvent
+import java.security.Key
 import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JTextArea
@@ -242,37 +243,113 @@ class kLowLevelKeyboardTest {
     }
   }
 
-  private var shiftedSymbols = arrayOf<Char>('!','@','#','$','%','^','&','*','(',')','_','+','{','}',':','"','|','<','>','?')
+  private var shiftedSymbols = arrayOf<Char>('!','@','#','$','%','^','&','*','(',')','_','+','{','}',':','"','|','<','>','?') //qwerty shifted symbols
+  //all qwertz symbols
+  private var qwertzSymbols = arrayOf<Char>('+','ě','š','č','ř','ž','ý','á','í','é','=','\'','ú',')','ů','§','¨',',','.','-', '1','2','3','4','5','6','7','8','9','0','%','ˇ','/','(','"','!','`','?',':','_')
+  //qwertz shifted symbols
+  private var qwertzShiftedSymbols = arrayOf<Char>('1','2','3','4','5','6','7','8','9','0','%','ˇ','/','(','"','!','`','?',':','_')
+  //all azerty symbols
+  private var azertySymbols = arrayOf<Char>('&','é','"','\'','(','§','è','!','ç','à',')','-','m','ù','`',';',':','=', '1','2','3','4','5','6','7','8','9','0','°','_','¨','*','M','%','£','.','/','+')
+  //azerty shifted symbols
+  private var azertyShiftedSymbols = arrayOf<Char>('1','2','3','4','5','6','7','8','9','0','°','_','¨','*','M','%','£','.','/','+')
 
   @Test
   fun shiftedLettersTest() {
     for (i in 'A'..'Z') {
-      pressKeys(i.toString(), i)
+      pressKeys(i.toString(), i, null)
     }
   }
 
   @Test
   fun lettersTest() {
     for (i in 'a'..'z') {
-      pressKeys(i.toString(), i)
+      pressKeys(i.toString(), i, null)
     }
   }
 
   @Test
   fun symbolsTest() {
     for (i in '!'..'@') {
-      pressKeys(i.toString(), i)
+      pressKeys(i.toString(), i, null)
     }
     for (i in '['..'_') {
-      pressKeys(i.toString(), i)
+      pressKeys(i.toString(), i, null)
     }
     for (i in '{'..'}') {
-      pressKeys(i.toString(), i)
+      pressKeys(i.toString(), i, null)
     }
   }
 
-  private fun pressKeys(symbol : String, symbolChar: Char) = test(symbol) {
-    if (symbolChar in 'A'..'Z' || symbolChar in shiftedSymbols)
+  @Test
+  fun qwertzlettersTest() {
+    for (i in 'a' .. 'x')
+      pressKeys(i.toString(), i, null)
+  }
+  @Test
+  fun qwertzShiftedlettersTest() {
+    for (i in 'A' .. 'X')
+      pressKeys(i.toString(), i, null)
+  }
+
+  //todo fix this
+  @Ignore
+  @Test
+  fun qwertzSymbols() {
+    var j = 0
+    for (i in '!'..'@') {
+      pressKeys(qwertzSymbols[j].toString(), i, qwertzSymbols[j])
+      j++
+    }
+    for (i in '['..'_') {
+      pressKeys(qwertzSymbols[j].toString(), i, qwertzSymbols[j])
+      j++
+    }
+    for (i in '{'..'}') {
+      pressKeys(qwertzSymbols[j].toString(), i, qwertzSymbols[j])
+      j++
+    }
+  }
+
+  @Test
+  fun azertyLettersTest() {
+    for (i in 'b' .. 'l')
+      pressKeys(i.toString(), i, null)
+    for (i in 'n' .. 'p')
+      pressKeys(i.toString(), i, null)
+    for (i in 'r' .. 'v')
+      pressKeys(i.toString(), i, null)
+  }
+
+  @Test
+  fun azertyShiftedLettersTest() {
+    for (i in 'B' .. 'L')
+      pressKeys(i.toString(), i, null)
+    for (i in 'N' .. 'P')
+      pressKeys(i.toString(), i, null)
+    for (i in 'R' .. 'V')
+      pressKeys(i.toString(), i, null)
+  }
+
+  @Ignore
+  @Test
+  fun azertySymbols() {
+    var j = 0
+    for (i in '!'..'@') {
+      pressKeys(azertySymbols[j].toString(), i, azertySymbols[j])
+      j++
+    }
+    for (i in '['..'_') {
+      pressKeys(azertySymbols[j].toString(), i, azertySymbols[j])
+      j++
+    }
+    for (i in '{'..'}') {
+      pressKeys(azertySymbols[j].toString(), i, azertySymbols[j])
+      j++
+    }
+  }
+
+  private fun pressKeys(symbol : String, symbolChar: Char, difInputChar: Char?) = test(symbol) {
+    if (symbolChar in 'A'..'Z' || (symbolChar in shiftedSymbols && difInputChar == null) || (difInputChar in qwertzShiftedSymbols || difInputChar in azertyShiftedSymbols))
       keyPress(KeyEvent.VK_SHIFT)
 
     when(symbolChar.lowercaseChar() ) {
@@ -284,7 +361,7 @@ class kLowLevelKeyboardTest {
       }
     }
 
-    when(symbol) {
+    when(symbolChar.toString()) {
       "1","!" -> {keyPress(KeyEvent.VK_1); keyRelease(KeyEvent.VK_1)}
       "2","@" -> {keyPress(KeyEvent.VK_2); keyRelease(KeyEvent.VK_2)}
       "3","#" -> {keyPress(KeyEvent.VK_3); keyRelease(KeyEvent.VK_3)}
@@ -306,19 +383,46 @@ class kLowLevelKeyboardTest {
       ".",">" -> {keyPress(KeyEvent.VK_PERIOD); keyRelease(KeyEvent.VK_PERIOD)}
       "/","?" -> {keyPress(KeyEvent.VK_SLASH); keyRelease(KeyEvent.VK_SLASH)}
     }
-    if (symbolChar in 'A'..'Z' || symbolChar in shiftedSymbols)
+    if (symbolChar in 'A'..'Z' || (symbolChar in shiftedSymbols && difInputChar == null)|| (difInputChar in qwertzShiftedSymbols && difInputChar != null))
       keyRelease(KeyEvent.VK_SHIFT)
   }
 
-  @Test   //for all qwertz
-  fun qwertzTest() = test("z") {
+  @Test
+  fun qwertzYTest() = test("z") {
     keyPress(KeyEvent.VK_Y)
     keyRelease(KeyEvent.VK_Y)
   }
 
+  @Test
+  fun qwertzZTest() = test("y") {
+    keyPress(KeyEvent.VK_Z)
+    keyRelease(KeyEvent.VK_Z)
+  }
+
+  /*todo fix this
+  actual: KeyEvent[PRESSED,keyCode=521,keyText=+,keyChar=+ (43),keyLocation=STANDARD,modifiersEx=],
+  expected: KeyEvent[PRESSED,keyCode=49,keyText=1,keyChar=+ (43),keyLocation=STANDARD,modifiersEx=],
+   */
   @Ignore
-  @Test   //чешская, словацкая и немецкая
-  fun qwertzDeadKeyTestA() = test("á")
+  @Test
+  fun qwertzSimpleSymbolTest() = test("+") {
+    keyPress(KeyEvent.VK_1)
+    keyRelease(KeyEvent.VK_1)
+  }
+
+
+  /*todo fix this
+  actual:   KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=á (225),keyLocation=UNKNOWN,modifiersEx=]
+            (size: 1)
+
+  expected: KeyEvent[RELEASED,keyCode=61,keyText==,keyChar=' (39),keyLocation=STANDARD,modifiersEx=],
+            KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=á (225),keyLocation=UNKNOWN,modifiersEx=],
+            KeyEvent[RELEASED,keyCode=65,keyText=A,keyChar=a (97),keyLocation=STANDARD,modifiersEx=]
+            (size: 3)
+   */
+  @Ignore
+  @Test
+  fun qwertzDeadKeyTest() = test("á")
   {
     keyPress(KeyEvent.VK_EQUALS)
     keyRelease(KeyEvent.VK_EQUALS)
@@ -326,24 +430,25 @@ class kLowLevelKeyboardTest {
     keyRelease(KeyEvent.VK_A)
   }
 
-  @Ignore
-  @Test   //чешская, словацкая и немецкая
-  fun qwertzDeadKeyTest() = test("''")
-  {
-    keyPress(KeyEvent.VK_EQUALS)
-    keyRelease(KeyEvent.VK_EQUALS)
-    keyPress(KeyEvent.VK_1)
-    keyRelease(KeyEvent.VK_1)
-  }
-
   @Test
-  fun azertyTest() = test("a")
-  {
+  fun azertyTest() = test("a") {
     keyPress(KeyEvent.VK_Q)
     keyRelease(KeyEvent.VK_Q)
   }
 
-  @Ignore // Todo: Fix this
+  /* todo fix this
+  actual:   KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=請 (35531),keyLocation=UNKNOWN,modifiersEx=],
+            KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=問 (21839),keyLocation=UNKNOWN,modifiersEx=]
+            (size: 2)
+
+  expected: KeyEvent[RELEASED,keyCode=81,keyText=Q,keyChar=q (113),keyLocation=STANDARD,modifiersEx=],
+            KeyEvent[RELEASED,keyCode=87,keyText=W,keyChar=w (119),keyLocation=STANDARD,modifiersEx=],
+            KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=請 (35531),keyLocation=UNKNOWN,modifiersEx=],
+            KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=問 (21839),keyLocation=UNKNOWN,modifiersEx=],
+            KeyEvent[RELEASED,keyCode=32,keyText=␣,keyChar=  (32),keyLocation=STANDARD,modifiersEx=]
+            (size: 5)
+   */
+  @Ignore
   @Test
   fun chineseSimpleInputTest() = test("請問") {
     keyPress(KeyEvent.VK_Q)
@@ -375,6 +480,99 @@ class kLowLevelKeyboardTest {
     keyRelease(vk)
     if (shift == 1)
       keyRelease(KeyEvent.VK_SHIFT)
+  }
+
+
+  /*todo fix this
+  actual:   KeyEvent[PRESSED,keyCode=16,keyText=⇧,keyChar=￿ (65535),keyLocation=LEFT,modifiersEx=⇧],
+            KeyEvent[RELEASED,keyCode=16,keyText=⇧,keyChar=￿ (65535),keyLocation=LEFT,modifiersEx=],
+            KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=š (353),keyLocation=UNKNOWN,modifiersEx=]
+            (size: 3)
+
+  expected: KeyEvent[PRESSED,keyCode=16,keyText=⇧,keyChar=￿ (65535),keyLocation=LEFT,modifiersEx=⇧],
+            KeyEvent[PRESSED,keyCode=138,keyText=Dead Caron,keyChar=ˇ (711),keyLocation=UNKNOWN,modifiersEx=⇧],
+            KeyEvent[RELEASED,keyCode=61,keyText==,keyChar=ˇ (711),keyLocation=STANDARD,modifiersEx=⇧],
+            KeyEvent[RELEASED,keyCode=16,keyText=⇧,keyChar=￿ (65535),keyLocation=LEFT,modifiersEx=],
+            KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=š (353),keyLocation=UNKNOWN,modifiersEx=],
+            KeyEvent[RELEASED,keyCode=83,keyText=S,keyChar=s (115),keyLocation=STANDARD,modifiersEx=]
+            (size: 6)
+   */
+  @Ignore
+  @Test
+  fun qwertzShiftedDeadKey() = test("š") {
+    keyPress(KeyEvent.VK_SHIFT)
+    keyPress(KeyEvent.VK_EQUALS)
+    keyRelease(KeyEvent.VK_EQUALS)
+    keyRelease(KeyEvent.VK_SHIFT)
+    keyPress(KeyEvent.VK_S)
+    keyRelease(KeyEvent.VK_S)
+  }
+
+  /*todo fix this
+  actual:   KeyEvent[PRESSED,keyCode=65406,keyText=⌥,keyChar=￿ (65535),keyLocation=RIGHT,modifiersEx=⌥],
+            KeyEvent[RELEASED,keyCode=65406,keyText=⌥,keyChar=￿ (65535),keyLocation=RIGHT,modifiersEx=],
+            KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=à (224),keyLocation=UNKNOWN,modifiersEx=]
+            (size: 3)
+
+  expected: KeyEvent[PRESSED,keyCode=65406,keyText=⌥,keyChar=￿ (65535),keyLocation=RIGHT,modifiersEx=⌥+⌥],
+            KeyEvent[PRESSED,keyCode=128,keyText=Dead Grave,keyChar=` (96),keyLocation=UNKNOWN,modifiersEx=⌥+⌥],
+            KeyEvent[RELEASED,keyCode=192,keyText=`,keyChar=` (96),keyLocation=STANDARD,modifiersEx=⌥+⌥],
+            KeyEvent[RELEASED,keyCode=65406,keyText=⌥,keyChar=￿ (65535),keyLocation=RIGHT,modifiersEx=],
+            KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=à (224),keyLocation=UNKNOWN,modifiersEx=],
+            KeyEvent[RELEASED,keyCode=65,keyText=A,keyChar=a (97),keyLocation=STANDARD,modifiersEx=]
+            (size: 6)
+   */
+  @Ignore
+  @Test
+  fun deadKeyTest() = test("à") {
+    keyPress(KeyEvent.VK_ALT_GRAPH)
+    keyPress(KeyEvent.VK_BACK_QUOTE)
+    keyRelease(KeyEvent.VK_BACK_QUOTE)
+    keyRelease(KeyEvent.VK_ALT_GRAPH)
+    keyPress(KeyEvent.VK_A)
+    keyRelease(KeyEvent.VK_A)
+  }
+
+  /*todo fix this
+  actual:   KeyEvent[... ,modifiersEx=⌥]
+  expected: KeyEvent[... ,modifiersEx=⌥+⌥]
+   */
+  @Ignore
+  @Test
+  fun altGraphTest() = test("å") {
+    keyPress(KeyEvent.VK_ALT_GRAPH)
+    keyPress(KeyEvent.VK_A)
+    keyRelease(KeyEvent.VK_A)
+    keyRelease(KeyEvent.VK_ALT_GRAPH)
+  }
+
+  @Test
+  fun testCtrlD() = test("") {
+    keyPress(KeyEvent.VK_CONTROL)
+    keyPress(KeyEvent.VK_D)
+    keyRelease(KeyEvent.VK_D)
+    keyRelease(KeyEvent.VK_CONTROL)
+  }
+
+  /* todo fix this
+  actual:   KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=ふ (12405),keyLocation=UNKNOWN,modifiersEx=]
+            (size: 1)
+
+  expected: KeyEvent[RELEASED,keyCode=72,keyText=H,keyChar=h (104),keyLocation=STANDARD,modifiersEx=],
+            KeyEvent[RELEASED,keyCode=85,keyText=U,keyChar=u (117),keyLocation=STANDARD,modifiersEx=],
+            KeyEvent[TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=ふ (12405),keyLocation=UNKNOWN,modifiersEx=],
+            KeyEvent[RELEASED,keyCode=10,keyText=⏎,keyChar=(10),keyLocation=STANDARD,modifiersEx=]
+            (size: 4)
+   */
+  @Ignore
+  @Test
+  fun japSimpleTest() = test("ふ") {
+    keyPress(KeyEvent.VK_H)
+    keyRelease(KeyEvent.VK_H)
+    keyPress(KeyEvent.VK_U)
+    keyRelease(KeyEvent.VK_U)
+    keyPress(KeyEvent.VK_ENTER)
+    keyRelease(KeyEvent.VK_ENTER)
   }
 
   @Test
@@ -420,6 +618,7 @@ class kLowLevelKeyboardTest {
     keyPress(KeyEvent.VK_ESCAPE)
     keyRelease(KeyEvent.VK_ESCAPE)
   }
+
 
   @Test
   fun testDelete() = test("") {
