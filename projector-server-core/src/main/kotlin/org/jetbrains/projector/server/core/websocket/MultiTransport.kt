@@ -24,6 +24,7 @@
 package org.jetbrains.projector.server.core.websocket
 
 import org.java_websocket.WebSocket
+import org.jetbrains.projector.server.core.ClientWrapper
 import java.nio.ByteBuffer
 
 public class MultiTransport(private val transports: List<HttpWsTransport>) : HttpWsTransport {
@@ -32,10 +33,19 @@ public class MultiTransport(private val transports: List<HttpWsTransport>) : Htt
 
   override fun start(): Unit = transports.forEach { it.start() }
 
-  override fun stop(timeout: Int): Unit = transports.forEach { it.stop(timeout) }
+  override fun stop(timeoutMs: Int): Unit = transports.forEach { it.stop(timeoutMs) }
 
-  override fun forEachOpenedConnection(action: (client: WebSocket) -> Unit) {
-    transports.forEach { it.forEachOpenedConnection(action) }
+  override fun forEachWsConnection(action: (client: WebSocket) -> Unit) {
+    transports.forEach { it.forEachWsConnection(action) }
+  }
+
+  override val clientCount: Int
+    get() = transports.sumOf { it.clientCount }
+
+  override fun forEachOpenedConnection(action: (client: ClientWrapper) -> Unit) {
+    transports.forEach {
+      it.forEachOpenedConnection(action)
+    }
   }
 
   override fun onError(connection: WebSocket?, e: Exception): Unit = transports.forEach { it.onError(connection, e) }

@@ -30,7 +30,7 @@ import org.jetbrains.projector.util.logging.Logger
 import java.net.InetAddress
 import java.nio.ByteBuffer
 
-public class HttpWsServerBuilder(private val host: InetAddress, private val port: Int): TransportBuilder() {
+public class HttpWsServerBuilder(private val host: InetAddress, private val port: Int): WsTransportBuilder() {
 
   public lateinit var getMainWindows: () -> List<MainWindow>
 

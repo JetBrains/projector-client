@@ -108,11 +108,11 @@ public abstract class HttpWsClient(
     controlWebSocket.connect()
   }
 
-  public override fun stop(timeout: Int) {
+  public override fun stop(timeoutMs: Int) {
     controlWebSocket.close()
   }
 
-  public override fun forEachOpenedConnection(action: (client: WebSocket) -> Unit) {
+  public override fun forEachWsConnection(action: (client: WebSocket) -> Unit) {
     clients.values.forEach {
       action(it)
     }

@@ -21,35 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.server.core.websocket
+package org.jetbrains.projector.server.core
 
-import org.java_websocket.WebSocket
-import org.jetbrains.projector.server.core.ClientWrapper
-import org.jetbrains.projector.server.core.ServerTransport
-import java.nio.ByteBuffer
+import java.net.InetAddress
 
-public interface HttpWsTransport : ServerTransport {
-  public fun forEachWsConnection(action: (client: WebSocket) -> Unit)
+public interface ClientWrapper {
+  public var settings: ClientSettings
 
-  override fun forEachOpenedConnection(action: (client: ClientWrapper) -> Unit) {
-    forEachWsConnection {
-      val wrapper = it.getAttachment<ClientWrapper>() ?: return@forEachWsConnection
-      action(wrapper)
-    }
-  }
-
-  override val clientCount: Int
-    get() {
-      var count = 0
-      forEachWsConnection {
-        count++
-      }
-      return count
-    }
-
-  public fun onError(connection: WebSocket?, e: Exception)
-  public fun onWsOpen(connection: WebSocket)
-  public fun onWsClose(connection: WebSocket)
-  public fun onWsMessage(connection: WebSocket, message: String)
-  public fun onWsMessage(connection: WebSocket, message: ByteBuffer)
+  public fun send(data: ByteArray)
+  public fun disconnect(reason: String)
+  public val requiresConfirmation: Boolean
+  public val confirmationRemoteIp: InetAddress?
+  public val confirmationRemoteName: String
 }

@@ -26,7 +26,7 @@ package org.jetbrains.projector.server.core.websocket
 import org.java_websocket.WebSocket
 import java.nio.ByteBuffer
 
-public class HttpWsClientBuilder(private val relayUrl: String, private val serverId: String) : TransportBuilder() {
+public class HttpWsClientBuilder(private val relayUrl: String, private val serverId: String) : WsTransportBuilder() {
 
   override fun build(): HttpWsClient {
     return object : HttpWsClient(relayUrl, serverId) {

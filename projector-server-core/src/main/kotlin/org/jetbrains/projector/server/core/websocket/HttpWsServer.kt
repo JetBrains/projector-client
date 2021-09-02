@@ -41,7 +41,6 @@ import org.jetbrains.projector.util.logging.Logger
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
-import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -283,11 +282,11 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) : HttpWsTranspo
     webSocketServer.start()
   }
 
-  override fun stop(timeout: Int) {
-    webSocketServer.stop(timeout)
+  override fun stop(timeoutMs: Int) {
+    webSocketServer.stop(timeoutMs)
   }
 
-  override fun forEachOpenedConnection(action: (client: WebSocket) -> Unit) {
+  override fun forEachWsConnection(action: (client: WebSocket) -> Unit) {
     webSocketServer.connections.filter(WebSocket::isOpen).forEach(action)
   }
 
