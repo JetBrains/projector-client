@@ -44,6 +44,10 @@ public object ProjectorClassLoaderSetup {
     prjClassLoader.forceLoadByPlatform(PanelUpdater::class.java.name)
     // without this server not works...
     prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.websocket.")
+    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.ServerTransport")
+    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.ClientWrapper")
+    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.ClientSettings")
+    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.ClientEventHandler")
     // we need only version of this class loaded by platform
     prjClassLoader.forceLoadByPlatform("com.intellij.ide.WindowsCommandLineProcessor")
     // to access ideaClassLoaderInitialized field only from AppClassLoader context

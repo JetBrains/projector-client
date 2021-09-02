@@ -21,17 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.server.core.websocket
+package org.jetbrains.projector.server.core
 
-import org.java_websocket.WebSocket
-import java.nio.ByteBuffer
-
-public abstract class TransportBuilder {
-  public lateinit var onError: (WebSocket?, Exception) -> Unit
-  public lateinit var onWsOpen: (connection: WebSocket) -> Unit
-  public lateinit var onWsClose: (connection: WebSocket) -> Unit
-  public lateinit var onWsMessageString: (connection: WebSocket, message: String) -> Unit
-  public lateinit var onWsMessageByteBuffer: (connection: WebSocket, message: ByteBuffer) -> Unit
-
-  public abstract fun build(): HttpWsTransport
+public interface ClientEventHandler {
+  public fun handleMessage(wrapper: ClientWrapper, message: String)
+  public fun onClientConnected(connection: ClientWrapper)
+  public fun onClientConnectionEnded(connection: ClientWrapper)
+  public fun updateClientsCount()
+  public fun getInitialClientState(address: String?): ClientSettings
 }

@@ -23,13 +23,13 @@
  */
 package org.jetbrains.projector.server.core.websocket
 
-public class MultiTransportBuilder(private val builders: List<TransportBuilder>) : TransportBuilder() {
+public class MultiTransportBuilder(private val builders: List<WsTransportBuilder>) : WsTransportBuilder() {
   override fun build(): HttpWsTransport {
     val transports = builders.map { prepareBuilder(it) }.map { it.build() }
     return MultiTransport(transports)
   }
 
-  private fun prepareBuilder(builder: TransportBuilder) = builder.apply {
+  private fun prepareBuilder(builder: WsTransportBuilder) = builder.apply {
     onError = this@MultiTransportBuilder.onError
     onWsOpen = this@MultiTransportBuilder.onWsOpen
     onWsClose = this@MultiTransportBuilder.onWsClose
