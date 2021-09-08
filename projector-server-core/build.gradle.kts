@@ -36,19 +36,9 @@ kotlin {
   explicitApi()
 }
 
-val jacocoVersion: String by project
+setupJacoco()
 
-jacoco {
-  toolVersion = jacocoVersion
-}
-
-tasks.withType<JacocoReport> {
-  setupReporting(project)
-}
-
-publishing {
-  publishOnSpace(project, "java")
-}
+publishToSpace("java")
 
 val coroutinesVersion: String by project
 val dnsjavaVersion: String by project

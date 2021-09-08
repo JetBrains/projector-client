@@ -27,28 +27,13 @@ plugins {
   jacoco
 }
 
-val jacocoVersion: String by project
-
-jacoco {
-  toolVersion = jacocoVersion
-}
-
-tasks.withType<JacocoReport> {
-  setupReporting(project)
-}
-
-tasks.test {
-  useJUnitPlatform()
-  finalizedBy(tasks.jacocoTestReport)
-}
+setupJacoco()
 
 kotlin {
   explicitApi()
 }
 
-publishing {
-  publishOnSpace(project, "java")
-}
+publishToSpace("java")
 
 val javassistVersion: String by project
 

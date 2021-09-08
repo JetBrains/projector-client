@@ -26,31 +26,30 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.credentials
-import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.maven
+import org.gradle.kotlin.dsl.*
 
-public fun PublishingExtension.publishOnSpace(project: Project, fromComponent: String) {
-  if (fromComponent == "java") {
-    this.publications {
-      create<MavenPublication>("maven") {
-        pom {
-          url.set("https://github.com/JetBrains/projector-client")
-          licenses {
-            license {
-              name.set("MIT Licence")
-              url.set("https://github.com/JetBrains/projector-client/blob/master/LICENSE.txt")
+public fun Project.publishToSpace(fromComponent: String) {
+  configure<PublishingExtension> {
+    if (fromComponent == "java") {
+      publications {
+        create<MavenPublication>("maven") {
+          pom {
+            url.set("https://github.com/JetBrains/projector-client")
+            licenses {
+              license {
+                name.set("MIT Licence")
+                url.set("https://github.com/JetBrains/projector-client/blob/master/LICENSE.txt")
+              }
             }
           }
+          from(project.components[fromComponent])
         }
-        from(project.components[fromComponent])
       }
     }
-  }
-  this.repositories {
-    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") {
-      credentials(PasswordCredentials::class)
+    repositories {
+      maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") {
+        credentials(PasswordCredentials::class)
+      }
     }
   }
 }
