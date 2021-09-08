@@ -28,17 +28,9 @@ plugins {
   java
 }
 
-val jacocoVersion: String by project
-
-jacoco {
-  toolVersion = jacocoVersion
-}
+setupJacoco(isKotlinMpModule = true)
 
 val kotlinVersion: String by project
-
-tasks.withType<JacocoReport> {
-  setupReporting(project, isKotlinMpModule = true)
-}
 
 kotlin {
   js {
@@ -77,6 +69,4 @@ kotlin {
   }
 }
 
-publishing {
-  publishOnSpace(project, "kotlin")
-}
+publishToSpace("kotlin")

@@ -23,15 +23,19 @@
  */
 
 import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.withType
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.io.File
 
-public fun JacocoReport.setupReporting(project: Project, isKotlinMpModule: Boolean = false) {
-  val moduleName = project.name.split("-").joinToString("") { it.capitalize() }
+private fun JacocoReport.setup(project: Project, isKotlinMpModule: Boolean) {
   if (isKotlinMpModule) {
+    // todo: use an official way to setup Kotlin/MP projects
     dependsOn("jvmTest")
-    group = "Reporting"
-    description = "Generate Jacoco coverage reports"
     val coverageSourceDirs = arrayOf(
       "commonMain/src",
       "jvmMain/src"
@@ -40,16 +44,37 @@ public fun JacocoReport.setupReporting(project: Project, isKotlinMpModule: Boole
       .walkBottomUp()
       .toSet()
 
-      classDirectories.setFrom(classFiles)
-      sourceDirectories.setFrom(project.files(coverageSourceDirs))
-      additionalSourceDirs.setFrom(project.files(coverageSourceDirs))
-      executionData
-        .setFrom(project.files("${project.buildDir}/jacoco/jvmTest.exec"))
+    classDirectories.setFrom(classFiles)
+    sourceDirectories.setFrom(project.files(coverageSourceDirs))
+    additionalSourceDirs.setFrom(project.files(coverageSourceDirs))
+    executionData.setFrom(project.files("${project.buildDir}/jacoco/jvmTest.exec"))
   }
+
+  val moduleName = project.name.split("-").joinToString("") { it.capitalize() }
+
   reports {
     xml.required.set(true)
     xml.outputLocation.set(project.rootProject.file("JacocoReports/jacocoReport$moduleName.xml"))
     csv.required.set(false)
     html.outputLocation.set(project.layout.buildDirectory.dir("jacocoHtml$moduleName"))
+  }
+}
+
+public fun Project.setupJacoco(isKotlinMpModule: Boolean = false) {
+  val jacocoVersion: String by this
+
+  configure<JacocoPluginExtension> {
+    toolVersion = jacocoVersion
+  }
+
+  tasks.withType<JacocoReport> {
+    setup(project, isKotlinMpModule)
+  }
+
+  if (!isKotlinMpModule) {
+    tasks.named<Test>("test") {
+      useJUnitPlatform()
+      finalizedBy(tasks.named<JacocoReport>("jacocoTestReport"))
+    }
   }
 }
