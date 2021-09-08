@@ -69,6 +69,7 @@ public class ReadyClientSettings(
   override val connectionMillis: Long,
   override val address: String?,
   public val setUpClientData: SetUpClientData,
+  @Suppress("unused")  // used by server
   public val interestManager: AbstractWindowDrawInterestManager,
   bigCollectionSize: Int?,
 ) : ClientSettings() {
