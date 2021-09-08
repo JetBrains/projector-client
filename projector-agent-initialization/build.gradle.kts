@@ -1,15 +1,17 @@
 plugins {
   kotlin("jvm")
   `maven-publish`
+  jacoco
 }
 
 kotlin {
   explicitApi()
 }
 
-publishing {
-  publishOnSpace(project, "java")
-}
+publishToSpace("java")
+
+setupJacoco()
+
 val kotlinVersion: String by project
 
 dependencies {

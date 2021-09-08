@@ -36,12 +36,9 @@ kotlin {
   explicitApi()
 }
 
-val jacocoVersion: String by project
+setupJacoco()
 
-jacoco {
-  toolVersion = jacocoVersion
-}
-
+publishToSpace("java")
 // set project dir for fix gradle bug with jacoco plugin. https://github.com/gradle/gradle/issues/16841
 System.setProperty("user.dir", projectDir.toString())
 

@@ -28,15 +28,7 @@ plugins {
   jacoco
 }
 
-val jacocoVersion: String by project
-
-jacoco {
-  toolVersion = jacocoVersion
-}
-
-tasks.withType<JacocoReport> {
-  setupReporting(project)
-}
+setupJacoco()
 
 kotlin {
   explicitApi()
@@ -70,9 +62,4 @@ tasks.withType<Jar> {
   exclude("META-INF/versions/9/module-info.class")
 
   from(inline(configurations.runtimeClasspath))
-}
-
-tasks.test {
-  useJUnitPlatform()
-  finalizedBy(tasks.jacocoTestReport)
 }

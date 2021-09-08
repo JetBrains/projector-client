@@ -48,6 +48,4 @@ kotlin {
   }
 }
 
-publishing {
-  publishOnSpace(project, "kotlin")
-}
+publishToSpace("kotlin")
