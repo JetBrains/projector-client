@@ -116,6 +116,19 @@ If you want faster scrolling, you should decrease the value, so for example, the
 !!! bug
     Actually, we want to get rid of this option in the future, determining scrolling speed automatically, synced with the client. More details: [PRJ-272](https://youtrack.jetbrains.com/issue/PRJ-272).
 
+### Disabling WebSocket transport
+
+Name | Type | Default value
+---|---|---
+`ORG_JETBRAINS_PROJECTOR_SERVER_ENABLE_WS_TRANSPORT` | Boolean | `true`
+
+Setting this variable to false will disable the built-in web server and WebSocket transport.  
+Additional transports can be added at runtime via `ProjectorServer.addTransport`
+
+!!! warning
+    With default Projector distribution, this will leave you with no way to connect to it. This option is intended primarily for use with alternative embedding approaches.
+
+
 ## Difference between env vars and system props
 
 The advantage of specifying a system property is that it's not passed to a child process automatically.
