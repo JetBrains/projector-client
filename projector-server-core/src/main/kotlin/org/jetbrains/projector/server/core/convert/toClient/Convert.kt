@@ -154,6 +154,7 @@ public fun Int.toCursorType(): CursorType = when (this) {
   E_RESIZE_CURSOR -> CursorType.E_RESIZE
   HAND_CURSOR -> CursorType.HAND
   MOVE_CURSOR -> CursorType.MOVE
+  CUSTOM_CURSOR -> CursorType.CUSTOM
 
   else -> {
     logger.error { "Int.toCursorType(): Bad cursor id: $this. Returning default." }

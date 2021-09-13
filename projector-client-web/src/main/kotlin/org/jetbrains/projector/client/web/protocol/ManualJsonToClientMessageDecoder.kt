@@ -163,7 +163,8 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
     "k" to CursorType.W_RESIZE,
     "l" to CursorType.E_RESIZE,
     "m" to CursorType.HAND,
-    "n" to CursorType.MOVE
+    "n" to CursorType.MOVE,
+    "o" to CursorType.CUSTOM,
   )
 
   private fun String.toCursorType(): CursorType {

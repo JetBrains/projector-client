@@ -69,4 +69,7 @@ enum class CursorType {
 
   @SerialName("n")
   MOVE,
+
+  @SerialName("o")
+  CUSTOM,
 }

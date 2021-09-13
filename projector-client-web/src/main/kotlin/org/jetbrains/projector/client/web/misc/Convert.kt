@@ -54,6 +54,8 @@ fun CursorType.toJsCursorType(): String = when (this) {
   CursorType.E_RESIZE -> "e-resize"
   CursorType.HAND -> "pointer"
   CursorType.MOVE -> "move"
+  CursorType.CUSTOM -> "none"  // todo: the major use-case of "custom" is to hide the cursor in IDEA,
+  //       so it's correct to use "none" for this, but need to support arbitrary cursors
 }
 
 fun Int.toScrollingMode(): ClientWheelEvent.ScrollingMode = when (this) {
