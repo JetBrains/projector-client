@@ -414,6 +414,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#disabling-websocket-transport" class="md-nav__link">
+    Disabling WebSocket transport
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -781,6 +788,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#disabling-websocket-transport" class="md-nav__link">
+    Disabling WebSocket transport
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -978,6 +992,29 @@ After that, enable SSL on the client-side by adding the <code>wss</code> query p
 <div class="admonition bug">
 <p class="admonition-title">Bug</p>
 <p>Actually, we want to get rid of this option in the future, determining scrolling speed automatically, synced with the client. More details: <a href="https://youtrack.jetbrains.com/issue/PRJ-272">PRJ-272</a>.</p>
+</div>
+<h3 id="disabling-websocket-transport">Disabling WebSocket transport<a class="headerlink" href="#disabling-websocket-transport" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ORG_JETBRAINS_PROJECTOR_SERVER_ENABLE_WS_TRANSPORT</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table>
+<p>Setting this variable to false will disable the built-in web server and WebSocket transport.<br />
+Additional transports can be added at runtime via <code>ProjectorServer.addTransport</code></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>With default Projector distribution, this will leave you with no way to connect to it. This option is intended primarily for use with alternative embedding approaches.</p>
 </div>
 <h2 id="difference-between-env-vars-and-system-props">Difference between env vars and system props<a class="headerlink" href="#difference-between-env-vars-and-system-props" title="Permanent link">&para;</a></h2>
 <p>The advantage of specifying a system property is that it's not passed to a child process automatically.</p>
