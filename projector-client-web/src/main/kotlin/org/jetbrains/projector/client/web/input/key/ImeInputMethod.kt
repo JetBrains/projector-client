@@ -62,7 +62,7 @@ class ImeInputMethod(
       outline = "none"
       color = "transparent"  // remove the caret
       width = "100%"
-      bottom = "-30%"
+      top = "-30%"
       left = "50%"
     }
 
@@ -132,7 +132,6 @@ class ImeInputMethod(
         inputField.style.apply {
           zIndex = "${windowPosition.zIndex + 1}"
           top = "${y}px"
-          removeProperty("bottom")
           left = "${x}px"
           fontSize = "${caretInfoChange.fontSize}px"
           textShadow = "0 0 0 #888"  // use text shadow to set text color to avoid showing caret // todo: set correct color
