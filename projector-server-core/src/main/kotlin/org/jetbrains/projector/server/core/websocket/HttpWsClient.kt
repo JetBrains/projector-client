@@ -75,7 +75,7 @@ public abstract class HttpWsClient(
     }
 
     override fun onMessage(message: String?) {
-      if (message == null || message.isEmpty()) {
+      if (message.isNullOrEmpty()) {
         return
       }
 
