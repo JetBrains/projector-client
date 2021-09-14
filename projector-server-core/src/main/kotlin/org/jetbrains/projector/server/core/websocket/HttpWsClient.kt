@@ -23,13 +23,13 @@
  */
 package org.jetbrains.projector.server.core.websocket
 
-import org.java_websocket.WebSocket
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.handshake.ServerHandshake
 import org.jetbrains.projector.common.protocol.toServer.ClientInControlEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientOutControlEvent
 import org.jetbrains.projector.common.protocol.toServer.KotlinxJsonClientEventSerializer
+import org.jetbrains.projector.server.core.ClientWrapper
 import org.jetbrains.projector.util.logging.Logger
 import java.net.URI
 import java.util.concurrent.locks.ReentrantLock
@@ -112,9 +112,10 @@ public abstract class HttpWsClient(
     controlWebSocket.close()
   }
 
-  public override fun forEachWsConnection(action: (client: WebSocket) -> Unit) {
+  public override fun forEachOpenedConnection(action: (client: ClientWrapper) -> Unit) {
     clients.values.forEach {
-      action(it)
+      val wrapper = it.getAttachment<ClientWrapper>() ?: return@forEachOpenedConnection
+      action(wrapper)
     }
   }
 
