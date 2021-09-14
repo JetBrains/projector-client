@@ -29,21 +29,12 @@ import org.jetbrains.projector.server.core.ServerTransport
 import java.nio.ByteBuffer
 
 public interface HttpWsTransport : ServerTransport {
-  public fun forEachWsConnection(action: (client: WebSocket) -> Unit)
-
-  override fun forEachOpenedConnection(action: (client: ClientWrapper) -> Unit) {
-    forEachWsConnection {
-      val wrapper = it.getAttachment<ClientWrapper>() ?: return@forEachWsConnection
-      action(wrapper)
-    }
-  }
+  override fun forEachOpenedConnection(action: (client: ClientWrapper) -> Unit)
 
   override val clientCount: Int
     get() {
       var count = 0
-      forEachWsConnection {
-        count++
-      }
+      forEachOpenedConnection { count++ }
       return count
     }
 

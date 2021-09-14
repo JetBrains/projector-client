@@ -36,6 +36,7 @@ import org.java_websocket.server.WebSocketServer
 import org.java_websocket.util.Charsetfunctions
 import org.jetbrains.projector.common.protocol.toClient.MainWindow
 import org.jetbrains.projector.common.protocol.toClient.toJson
+import org.jetbrains.projector.server.core.ClientWrapper
 import org.jetbrains.projector.server.core.util.getWildcardHostAddress
 import org.jetbrains.projector.util.logging.Logger
 import java.net.InetAddress
@@ -286,8 +287,11 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) : HttpWsTranspo
     webSocketServer.stop(timeoutMs)
   }
 
-  override fun forEachWsConnection(action: (client: WebSocket) -> Unit) {
-    webSocketServer.connections.filter(WebSocket::isOpen).forEach(action)
+  override fun forEachOpenedConnection(action: (client: ClientWrapper) -> Unit) {
+    webSocketServer.connections.filter(WebSocket::isOpen).forEach {
+      val wrapper = it.getAttachment<ClientWrapper>() ?: return@forEachOpenedConnection
+      action(wrapper)
+    }
   }
 
   public fun setWebSocketFactory(factory: WebSocketServerFactory) {
