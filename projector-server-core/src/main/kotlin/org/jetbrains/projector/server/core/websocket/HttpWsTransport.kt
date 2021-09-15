@@ -29,7 +29,6 @@ import org.jetbrains.projector.server.core.ServerTransport
 import java.nio.ByteBuffer
 
 public interface HttpWsTransport : ServerTransport {
-  override fun forEachOpenedConnection(action: (client: ClientWrapper) -> Unit)
 
   override val clientCount: Int
     get() {
