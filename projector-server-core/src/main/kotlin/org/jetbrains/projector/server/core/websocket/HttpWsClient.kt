@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.server.core.websocket
 
+import org.java_websocket.WebSocket
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.handshake.ServerHandshake
@@ -113,7 +114,7 @@ public abstract class HttpWsClient(
   }
 
   public override fun forEachOpenedConnection(action: (client: ClientWrapper) -> Unit) {
-    clients.values.forEach {
+    clients.values.filter(WebSocket::isOpen).forEach {
       val wrapper = it.getAttachment<ClientWrapper>() ?: return@forEachOpenedConnection
       action(wrapper)
     }
