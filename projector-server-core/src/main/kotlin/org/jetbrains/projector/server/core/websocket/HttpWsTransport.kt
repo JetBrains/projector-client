@@ -24,12 +24,10 @@
 package org.jetbrains.projector.server.core.websocket
 
 import org.java_websocket.WebSocket
-import org.jetbrains.projector.server.core.ClientWrapper
 import org.jetbrains.projector.server.core.ServerTransport
 import java.nio.ByteBuffer
 
 public interface HttpWsTransport : ServerTransport {
-
   override val clientCount: Int
     get() {
       var count = 0
