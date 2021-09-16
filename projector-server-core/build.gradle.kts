@@ -39,16 +39,9 @@ kotlin {
 setupJacoco()
 
 publishToSpace("java")
+
 // set project dir for fix gradle bug with jacoco plugin. https://github.com/gradle/gradle/issues/16841
 System.setProperty("user.dir", projectDir.toString())
-
-tasks.withType<JacocoReport> {
-  setupReporting(project)
-}
-
-publishing {
-  publishOnSpace(project, "java")
-}
 
 val coroutinesVersion: String by project
 val dnsjavaVersion: String by project
