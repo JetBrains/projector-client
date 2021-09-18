@@ -7,3 +7,4 @@ inspections:
       - type: "gradle"
         scopes:
           - "runtime"
+
