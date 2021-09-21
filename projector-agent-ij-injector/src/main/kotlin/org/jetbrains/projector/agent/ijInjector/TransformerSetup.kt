@@ -32,13 +32,40 @@ import java.lang.instrument.Instrumentation
 
 internal interface TransformerSetup {
 
+  /**
+   * Logger to be used for reporting transformation result
+   */
   val logger: Logger
 
+  /**
+   * Maps class to function that is invoked to get transformed class bytecode.
+   * Override this property if your transformations are agnostic of agent parameters and classloader.
+   */
   val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?>
     get() = emptyMap()
 
+  /**
+   * Maps class to function that is invoked to get transformed class bytecode.
+   * Override this method if you need either agent parameters or classloader (returned by [getClassLoader])
+   * to describe transformations.
+   *
+   * @see [getClassLoader]
+   *
+   * @param parameters agent parameters that are passed from server
+   * @param classLoader classloader returned by [getClassLoader] method
+   * @return mapping from class to function that is invoked to get transformed class bytecode
+   */
   fun getTransformations(parameters: IjInjector.AgentParameters, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> = classTransformations
 
+  /**
+   * Classloader that will be passed to [getTransformations] method. This method is useful if you need to transform classes of a plugin.
+   * Classpath of the returned classloader is also used to get bytecode of classes that will be transformed.
+   *
+   * @see [IjMdTransformer.getClassLoader]
+   *
+   * @param parameters agent parameters that are passed from server
+   * @return Classloader that will be passed to [getTransformations] method and used to get bytecode of classes that will be transformed
+   */
   fun getClassLoader(parameters: IjInjector.AgentParameters): ClassLoader? = javaClass.classLoader
 }
 
