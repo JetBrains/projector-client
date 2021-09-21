@@ -45,10 +45,12 @@ internal object IjMdTransformer : TransformerSetup {
     return listOf(
       javaFxClass to MdPreviewType.JAVAFX,
       jcefClass to MdPreviewType.JCEF,
-    ).mapNotNull {
-      val clazz = classForNameOrNull(it.first, classLoader) ?: return@mapNotNull null
-      clazz to it.second
-    }.associate { it.first to { clazz: CtClass -> transformMdHtmlPanelProvider(it.second, clazz, projectorMarkdownPanel) } }
+    ).mapNotNull { (className, previewType) ->
+      val clazz = classForNameOrNull(className, classLoader) ?: return@mapNotNull null
+      clazz to previewType
+    }.associate { (clazz, previewType) ->
+      clazz to { ctClass -> transformMdHtmlPanelProvider(previewType, ctClass, projectorMarkdownPanel) }
+    }
   }
 
   override fun getClassLoader(parameters: IjInjector.AgentParameters): ClassLoader? {
@@ -95,6 +97,8 @@ internal object IjMdTransformer : TransformerSetup {
         """
           {
             final java.lang.ClassLoader mdClassLoader = org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanel.class.getClassLoader();
+            
+            // We should explicitly create arrays or otherwise javassist won't be able to compile the code
             //noinspection RedundantArrayCreation
             final Object panel = Class.forName("${projectorMarkdownPanel.className}")
               .getDeclaredMethod("${projectorMarkdownPanel.methodName}", new java.lang.Class[] { java.lang.ClassLoader.class })

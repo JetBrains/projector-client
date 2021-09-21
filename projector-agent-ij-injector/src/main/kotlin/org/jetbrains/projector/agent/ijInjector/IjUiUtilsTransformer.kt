@@ -47,7 +47,7 @@ internal object IjUiUtilsTransformer : TransformerSetup {
             boolean isPrintableMask = true;
             final java.awt.Toolkit tk = java.awt.Toolkit.getDefaultToolkit();
             if (tk instanceof sun.awt.SunToolkit) {
-              //noinspection deprecation
+              //noinspection deprecation // copied from javax.swing.text.DefaultEditorKit.DefaultKeyTypedAction
               final int mod = $1.getModifiers();
               isPrintableMask = ((sun.awt.SunToolkit) tk).isPrintableCharacterModifiersMask(mod);
             }
