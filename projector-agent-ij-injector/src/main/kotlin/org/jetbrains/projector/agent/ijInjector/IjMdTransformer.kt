@@ -25,7 +25,6 @@ package org.jetbrains.projector.agent.ijInjector
 
 import com.intellij.openapi.extensions.ExtensionPointName
 import javassist.CtClass
-import org.jetbrains.projector.agent.init.IjArgs
 import org.jetbrains.projector.util.logging.Logger
 
 internal object IjMdTransformer : TransformerSetup {
@@ -39,11 +38,9 @@ internal object IjMdTransformer : TransformerSetup {
   // language=java prefix="import " suffix=";"
   private const val jcefClass = "org.intellij.plugins.markdown.ui.preview.jcef.JCEFHtmlPanelProvider"
 
-  override fun getTransformations(utils: IjInjector.Utils, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> {
+  override fun getTransformations(parameters: IjInjector.AgentParameters, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> {
 
-    val mdPanelMakerClass = utils.args.getValue(IjArgs.MD_PANEL_MAKER_CLASS)
-    val mdPanelMakerMethod = utils.args.getValue(IjArgs.MD_PANEL_MAKER_METHOD)
-    val projectorMarkdownPanel = ProjectorMarkdownPanel(mdPanelMakerClass, mdPanelMakerMethod)
+    val projectorMarkdownPanel = ProjectorMarkdownPanel(parameters.markdownPanelMakerClassName, parameters.markdownPanelMakerMethodName)
 
     return listOf(
       javaFxClass to MdPreviewType.JAVAFX,
@@ -54,7 +51,7 @@ internal object IjMdTransformer : TransformerSetup {
     }.associate { it.first to { clazz: CtClass -> transformMdHtmlPanelProvider(it.second, clazz, projectorMarkdownPanel) } }
   }
 
-  override fun getClassLoader(utils: IjInjector.Utils): ClassLoader? {
+  override fun getClassLoader(parameters: IjInjector.AgentParameters): ClassLoader? {
     val extensionPointName = ExtensionPointName.create<Any>(MD_EXTENSION_ID)
     val extensions = try {
       extensionPointName.extensions

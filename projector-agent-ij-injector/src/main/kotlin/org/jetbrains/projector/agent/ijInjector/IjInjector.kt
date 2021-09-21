@@ -28,30 +28,44 @@ import java.lang.instrument.Instrumentation
 
 internal object IjInjector {
 
-  class Utils(
-    val instrumentation: Instrumentation,
-    val args: Map<String, String>,
+  class AgentParameters(
+    val isAgent: Boolean,
+    val classloadersProviderClassName: String,
+    val ideaClassloaderProviderMethodName: String,
+    val projectorClassloaderProviderMethodName: String,
+    val markdownPanelMakerClassName: String,
+    val markdownPanelMakerMethodName: String,
   )
 
-  private fun createUtils(instrumentation: Instrumentation, args: Map<String, String>): Utils {
+  private fun parametersFromArgs(args: Map<String, String>): AgentParameters {
 
-    return Utils(
-      instrumentation = instrumentation,
-      args = args
+    return AgentParameters(
+      isAgent = args[IjArgs.IS_AGENT] == "true",
+      classloadersProviderClassName = args.getValue(IjArgs.IJ_CL_PROVIDER_CLASS),
+      ideaClassloaderProviderMethodName = args.getValue(IjArgs.IJ_CL_PROVIDER_METHOD),
+      projectorClassloaderProviderMethodName = args.getValue(IjArgs.PRJ_CL_PROVIDER_METHOD),
+      markdownPanelMakerClassName = args.getValue(IjArgs.MD_PANEL_MAKER_CLASS),
+      markdownPanelMakerMethodName = args.getValue(IjArgs.MD_PANEL_MAKER_METHOD),
     )
   }
 
   @JvmStatic
   fun agentmain(instrumentation: Instrumentation, args: Map<String, String>) {
-    val utils = createUtils(instrumentation, args)
+    val parameters = parametersFromArgs(args)
 
-    IjLigaturesDisablerTransformer.runTransformations(utils)
-
-    val isAgent = args[IjArgs.IS_AGENT] == "true"
-    if (!isAgent) {  // todo: support variant for agent too
-      IjMdTransformer.runTransformations(utils)
-      IjBrowserUtilTransformer.runTransformations(utils)
-      IjUiUtilsTransformer.runTransformations(utils)
+    // TODO: support same transformers in agent mode too to reach feature parity
+    val transformers = when (parameters.isAgent) {
+      true -> listOf(
+        IjLigaturesDisablerTransformer,
+      )
+      false -> listOf(
+        IjLigaturesDisablerTransformer,
+        IjMdTransformer,
+        IjBrowserUtilTransformer,
+        IjUiUtilsTransformer,
+      )
     }
+
+    transformers.forEach { it.runTransformations(instrumentation, parameters) }
   }
 }

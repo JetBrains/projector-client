@@ -28,6 +28,7 @@ import javassist.CtClass
 import javassist.LoaderClassPath
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.ClassFileTransformer
+import java.lang.instrument.Instrumentation
 
 internal interface TransformerSetup {
 
@@ -36,21 +37,25 @@ internal interface TransformerSetup {
   val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?>
     get() = emptyMap()
 
-  fun getTransformations(utils: IjInjector.Utils, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> = classTransformations
+  fun getTransformations(parameters: IjInjector.AgentParameters, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> = classTransformations
 
-  fun getClassLoader(utils: IjInjector.Utils): ClassLoader? = javaClass.classLoader
+  fun getClassLoader(parameters: IjInjector.AgentParameters): ClassLoader? = javaClass.classLoader
 }
 
-internal fun TransformerSetup.runTransformations(utils: IjInjector.Utils, canRetransform: Boolean = true) {
+internal fun TransformerSetup.runTransformations(
+  instrumentation: Instrumentation,
+  parameters: IjInjector.AgentParameters,
+  canRetransform: Boolean = true,
+) {
 
-  val loader = getClassLoader(utils) ?: return
+  val loader = getClassLoader(parameters) ?: return
 
-  val transformations = getTransformations(utils, loader)
+  val transformations = getTransformations(parameters, loader)
   if (transformations.isEmpty()) return
 
   val transformer = createTransformer(transformations, loader)
 
-  utils.instrumentation.apply {
+  instrumentation.apply {
     addTransformer(transformer, canRetransform)
     retransformClasses(*transformations.keys.toTypedArray())
   }
