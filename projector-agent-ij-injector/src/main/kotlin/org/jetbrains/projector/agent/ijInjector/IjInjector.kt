@@ -28,6 +28,7 @@ import java.lang.instrument.Instrumentation
 
 internal object IjInjector {
 
+  @Suppress("unused") // classloader provider class name and method names are not currently used, but may be in the future
   class AgentParameters(
     val isAgent: Boolean,
     val classloadersProviderClassName: String,
