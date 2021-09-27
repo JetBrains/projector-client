@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.agent.ijInjector
+package org.jetbrains.projector.agent.common.transformation
 
 import javassist.ClassPool
 import javassist.CtClass
@@ -30,7 +30,7 @@ import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
 
 internal class ProjectorClassTransformer(
-  private val setup: TransformerSetup,
+  private val setup: TransformerSetup<*>,
   private val transformations: Map<String, (CtClass) -> ByteArray?>,
   private val classPool: ClassPool,
 ) : ClassFileTransformer {
@@ -57,13 +57,5 @@ internal class ProjectorClassTransformer(
       setup.transformationResultConsumer(TransformationResult.Error(setup, dottedClassName, e))
       null
     }
-  }
-
-  sealed class TransformationResult(val setup: TransformerSetup, val className: String) {
-
-    class Success(setup: TransformerSetup, className: String): TransformationResult(setup, className)
-    class Error(setup: TransformerSetup, className: String, val throwable: Throwable): TransformationResult(setup, className)
-    class Skip(setup: TransformerSetup, className: String, val reason: String): TransformationResult(setup, className)
-
   }
 }

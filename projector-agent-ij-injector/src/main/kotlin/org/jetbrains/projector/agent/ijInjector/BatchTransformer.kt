@@ -23,16 +23,18 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
+import org.jetbrains.projector.agent.common.transformation.TransformationResult
+import org.jetbrains.projector.agent.common.transformation.TransformerSetup
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.Instrumentation
 
-internal class BatchTransformer(private val transformerSetups: List<TransformerSetup>) : TransformerSetup {
+internal class BatchTransformer(private val transformerSetups: List<TransformerSetup<IjInjector.AgentParameters>>) : TransformerSetup<IjInjector.AgentParameters> {
 
-  private val results = mutableListOf<ProjectorClassTransformer.TransformationResult>()
+  private val results = mutableListOf<TransformationResult>()
 
   override val logger: Logger = Logger<BatchTransformer>()
 
-  override var transformationResultConsumer = { transformationResult: ProjectorClassTransformer.TransformationResult ->
+  override var transformationResultConsumer = { transformationResult: TransformationResult ->
     results += transformationResult
   }
 
@@ -55,9 +57,9 @@ internal class BatchTransformer(private val transformerSetups: List<TransformerS
       val transformerName = result.setup.javaClass.simpleName
       val classNames = subMap.getOrPut(transformerName) { mutableSetOf() }
       val classNameAndInfo = when (result) {
-        is ProjectorClassTransformer.TransformationResult.Success -> result.className
-        is ProjectorClassTransformer.TransformationResult.Skip -> "${result.className}. Reason: ${result.reason}"
-        is ProjectorClassTransformer.TransformationResult.Error -> "${result.className}. Message: ${result.throwable.message}"
+        is TransformationResult.Success -> result.className
+        is TransformationResult.Skip -> "${result.className}. Reason: ${result.reason}"
+        is TransformationResult.Error -> "${result.className}. Message: ${result.throwable.message}"
       }
       classNames.add(classNameAndInfo)
     }
@@ -65,7 +67,7 @@ internal class BatchTransformer(private val transformerSetups: List<TransformerS
     map.entries.forEach { (key, value) ->
       val message = "$key: ${value.entries.joinToString(prefix = "[", postfix = "]") { (subKey, subValue) -> "$subKey: ${subValue.joinToString(separator = ";", prefix = "(", postfix = ")") { it }}" }}"
       when (key) {
-        ProjectorClassTransformer.TransformationResult.Error::class.java.simpleName -> logger.error { message }
+        TransformationResult.Error::class.java.simpleName -> logger.error { message }
         else -> logger.debug { message }
       }
     }
