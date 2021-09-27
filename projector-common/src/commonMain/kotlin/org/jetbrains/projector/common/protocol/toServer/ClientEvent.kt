@@ -214,3 +214,13 @@ data class ClientWindowInterestEvent(
   val windowId: Int,
   val isInterested: Boolean
 ): ClientEvent()
+
+@Serializable
+data class ClientWindowsActivationEvent(
+  val windowIds: List<Int>,
+) : ClientEvent()
+
+@Serializable
+data class ClientWindowsDeactivationEvent(
+  val windowIds: List<Int>,
+) : ClientEvent()
