@@ -27,7 +27,7 @@ import com.intellij.openapi.extensions.ExtensionPointName
 import javassist.CtClass
 import org.jetbrains.projector.util.logging.Logger
 
-internal object IjMdTransformer : TransformerSetup {
+internal object IjMdTransformer : TransformerSetupBase() {
 
   override val logger = Logger<IjMdTransformer>()
 
@@ -46,7 +46,10 @@ internal object IjMdTransformer : TransformerSetup {
       javaFxClass to MdPreviewType.JAVAFX,
       jcefClass to MdPreviewType.JCEF,
     ).mapNotNull { (className, previewType) ->
-      val clazz = classForNameOrNull(className, classLoader) ?: return@mapNotNull null
+      val clazz = classForNameOrNull(className, classLoader) ?: run {
+        transformationResultConsumer(ProjectorClassTransformer.TransformationResult.Skip(this, className, "Class not found"))
+        return@mapNotNull null
+      }
       clazz to previewType
     }.associate { (clazz, previewType) ->
       clazz to { ctClass -> transformMdHtmlPanelProvider(previewType, ctClass, projectorMarkdownPanel) }
@@ -63,6 +66,10 @@ internal object IjMdTransformer : TransformerSetup {
     }
 
     return extensions.filterNotNull().first()::class.java.classLoader
+  }
+
+  override fun isTransformerAvailable(parameters: IjInjector.AgentParameters): Boolean {
+    return !parameters.isAgent
   }
 
   private fun transformMdHtmlPanelProvider(previewType: MdPreviewType, clazz: CtClass, projectorMarkdownPanel: ProjectorMarkdownPanel): ByteArray {

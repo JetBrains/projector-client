@@ -27,7 +27,7 @@ import com.intellij.openapi.editor.colors.impl.FontPreferencesImpl
 import javassist.CtClass
 import org.jetbrains.projector.util.logging.Logger
 
-internal object IjLigaturesDisablerTransformer : TransformerSetup {
+internal object IjLigaturesDisablerTransformer : TransformerSetupBase() {
 
   override val logger = Logger<IjLigaturesDisablerTransformer>()
 

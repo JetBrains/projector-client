@@ -27,13 +27,17 @@ import com.intellij.util.ui.UIUtil
 import javassist.CtClass
 import org.jetbrains.projector.util.logging.Logger
 
-internal object IjUiUtilsTransformer : TransformerSetup {
+internal object IjUiUtilsTransformer : TransformerSetupBase() {
 
   override val logger = Logger<IjUiUtilsTransformer>()
 
   override val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
     UIUtil::class.java to ::transformUiUtil,
   )
+
+  override fun isTransformerAvailable(parameters: IjInjector.AgentParameters): Boolean {
+    return !parameters.isAgent
+  }
 
   private fun transformUiUtil(clazz: CtClass): ByteArray {
 
