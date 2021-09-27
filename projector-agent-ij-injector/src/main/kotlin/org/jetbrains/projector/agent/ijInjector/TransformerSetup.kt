@@ -45,6 +45,11 @@ internal interface TransformerSetup {
     get() = emptyMap()
 
   /**
+   * Function to be invoked when transformation finishes.
+   */
+  var transformationResultConsumer: (ProjectorClassTransformer.TransformationResult) -> Unit
+
+  /**
    * Maps class to function that is invoked to get transformed class bytecode.
    * Override this method if you need either agent parameters or classloader (returned by [getClassLoader])
    * to describe transformations.
@@ -67,31 +72,61 @@ internal interface TransformerSetup {
    * @return Classloader that will be passed to [getTransformations] method and used to get bytecode of classes that will be transformed
    */
   fun getClassLoader(parameters: IjInjector.AgentParameters): ClassLoader? = javaClass.classLoader
-}
 
-internal fun TransformerSetup.runTransformations(
-  instrumentation: Instrumentation,
-  parameters: IjInjector.AgentParameters,
-  canRetransform: Boolean = true,
-) {
+  /**
+   * Reports whether transformations of thus transformer are applicable for given parameters
+   *
+   * @param parameters agent parameters that are passed from server
+   * @return true if transformations of thus transformer are applicable for given parameters, false otherwise
+   */
+  fun isTransformerAvailable(parameters: IjInjector.AgentParameters): Boolean = true
 
-  val loader = getClassLoader(parameters) ?: return
+  /**
+   * Runs transformation (returned from [getTransformations]) of this transformer.
+   *
+   * @param instrumentation services needed to instrument Java bytecode
+   * @param parameters agent parameters that are passed from server
+   * @param canRetransform can this transformer's transformations be retransformed (from Java)
+   */
+  fun runTransformations(
+    instrumentation: Instrumentation,
+    parameters: IjInjector.AgentParameters,
+    canRetransform: Boolean = true,
+  ) {
 
-  val transformations = getTransformations(parameters, loader)
-  if (transformations.isEmpty()) return
+    if (!isTransformerAvailable(parameters)) {
+      transformationResultConsumer(ProjectorClassTransformer.TransformationResult.Skip(this, "All classes", "Transformer is not available for provided parameters"))
+      return
+    }
 
-  val transformer = createTransformer(transformations, loader)
+    val loader = getClassLoader(parameters) ?: kotlin.run {
+      transformationResultConsumer(ProjectorClassTransformer.TransformationResult.Skip(this, "All classes", "Classloader is null"))
+      return
+    }
 
-  instrumentation.apply {
-    addTransformer(transformer, canRetransform)
-    retransformClasses(*transformations.keys.toTypedArray())
+    val transformations = getTransformations(parameters, loader)
+    if (transformations.isEmpty()) {
+      transformationResultConsumer(ProjectorClassTransformer.TransformationResult.Skip(this, "All classes", "No transformations found"))
+      return
+    }
+
+    val transformer = createTransformer(transformations, loader)
+
+    instrumentation.apply {
+      addTransformer(transformer, canRetransform)
+      retransformClasses(*transformations.keys.toTypedArray())
+    }
   }
 }
 
-internal fun TransformerSetup.classForNameOrNull(name: String, classLoader: ClassLoader): Class<*>? = try {
+internal abstract class TransformerSetupBase : TransformerSetup {
+
+  override var transformationResultConsumer: (ProjectorClassTransformer.TransformationResult) -> Unit = {}
+}
+
+internal fun classForNameOrNull(name: String, classLoader: ClassLoader): Class<*>? = try {
   Class.forName(name, false, classLoader)
 } catch (e: ClassNotFoundException) {
-  logger.info { "Transformation of class '$name': Class not found" }
   null
 }
 
@@ -103,10 +138,5 @@ private fun TransformerSetup.createTransformer(
   val classNameToTransform = transformations.map { (clazz, transform) -> clazz.name to transform }.toMap()
   val classPool = ClassPool().apply { appendClassPath(LoaderClassPath(classLoader)) }
 
-  return ProjectorClassTransformer(classNameToTransform, classPool) {
-    when (it) {
-      is ProjectorClassTransformer.TransformationResult.Error -> logger.info(it.throwable) { "Transformation of class '${it.className}': Error" }
-      is ProjectorClassTransformer.TransformationResult.Success -> logger.debug { "Transformation of class '${it.className}': Success" }
-    }
-  }
+  return ProjectorClassTransformer(this, classNameToTransform, classPool)
 }

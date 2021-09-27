@@ -30,9 +30,9 @@ import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
 
 internal class ProjectorClassTransformer(
+  private val setup: TransformerSetup,
   private val transformations: Map<String, (CtClass) -> ByteArray?>,
   private val classPool: ClassPool,
-  private val transformationResultConsumer: (TransformationResult) -> Unit,
 ) : ClassFileTransformer {
 
   override fun transform(
@@ -50,19 +50,20 @@ internal class ProjectorClassTransformer(
       val clazz = getClassFromClassfileBuffer(classPool, dottedClassName, classfileBuffer)
       val result = transform.invoke(clazz)
 
-      transformationResultConsumer(TransformationResult.Success(dottedClassName))
+      setup.transformationResultConsumer(TransformationResult.Success(setup, dottedClassName))
       result
     }
     catch (e: Exception) {
-      transformationResultConsumer(TransformationResult.Error(dottedClassName, e))
+      setup.transformationResultConsumer(TransformationResult.Error(setup, dottedClassName, e))
       null
     }
   }
 
-  sealed class TransformationResult(val className: String) {
+  sealed class TransformationResult(val setup: TransformerSetup, val className: String) {
 
-    class Success(className: String): TransformationResult(className)
-    class Error(className: String, val throwable: Throwable): TransformationResult(className)
+    class Success(setup: TransformerSetup, className: String): TransformationResult(setup, className)
+    class Error(setup: TransformerSetup, className: String, val throwable: Throwable): TransformationResult(setup, className)
+    class Skip(setup: TransformerSetup, className: String, val reason: String): TransformationResult(setup, className)
 
   }
 }

@@ -54,18 +54,13 @@ internal object IjInjector {
     val parameters = parametersFromArgs(args)
 
     // TODO: support same transformers in agent mode too to reach feature parity
-    val transformers = when (parameters.isAgent) {
-      true -> listOf(
-        IjLigaturesDisablerTransformer,
-      )
-      false -> listOf(
-        IjLigaturesDisablerTransformer,
-        IjMdTransformer,
-        IjBrowserUtilTransformer,
-        IjUiUtilsTransformer,
-      )
-    }
+    val transformers = listOf(
+      IjLigaturesDisablerTransformer,
+      IjMdTransformer,
+      IjBrowserUtilTransformer,
+      IjUiUtilsTransformer,
+    )
 
-    transformers.forEach { it.runTransformations(instrumentation, parameters) }
+    BatchTransformer(transformers).runTransformations(instrumentation, parameters)
   }
 }

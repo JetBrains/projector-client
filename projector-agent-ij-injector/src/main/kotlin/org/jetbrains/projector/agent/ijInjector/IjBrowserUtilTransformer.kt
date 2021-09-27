@@ -29,13 +29,17 @@ import javassist.CtClass
 import org.jetbrains.projector.agent.common.getDeclaredMethod
 import org.jetbrains.projector.util.logging.Logger
 
-internal object IjBrowserUtilTransformer : TransformerSetup {
+internal object IjBrowserUtilTransformer : TransformerSetupBase() {
 
   override val logger = Logger<IjBrowserUtilTransformer>()
 
   override val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
     BrowserUtil::class.java to ::transformBrowserUtil,
   )
+
+  override fun isTransformerAvailable(parameters: IjInjector.AgentParameters): Boolean {
+    return !parameters.isAgent
+  }
 
   private fun transformBrowserUtil(clazz: CtClass): ByteArray {
 
