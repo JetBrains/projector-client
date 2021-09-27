@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.agent.ijInjector
+package org.jetbrains.projector.agent.common.transformation
 
 import javassist.ClassPool
 import javassist.CtClass
@@ -30,24 +30,24 @@ import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.ClassFileTransformer
 import java.lang.instrument.Instrumentation
 
-internal interface TransformerSetup {
+public interface TransformerSetup<P> {
 
   /**
    * Logger to be used for reporting transformation result
    */
-  val logger: Logger
+  public val logger: Logger
 
   /**
    * Maps class to function that is invoked to get transformed class bytecode.
    * Override this property if your transformations are agnostic of agent parameters and classloader.
    */
-  val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?>
+  public val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?>
     get() = emptyMap()
 
   /**
    * Function to be invoked when transformation finishes.
    */
-  var transformationResultConsumer: (ProjectorClassTransformer.TransformationResult) -> Unit
+  public var transformationResultConsumer: (TransformationResult) -> Unit
 
   /**
    * Maps class to function that is invoked to get transformed class bytecode.
@@ -60,18 +60,16 @@ internal interface TransformerSetup {
    * @param classLoader classloader returned by [getClassLoader] method
    * @return mapping from class to function that is invoked to get transformed class bytecode
    */
-  fun getTransformations(parameters: IjInjector.AgentParameters, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> = classTransformations
+  public fun getTransformations(parameters: P, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> = classTransformations
 
   /**
    * Classloader that will be passed to [getTransformations] method. This method is useful if you need to transform classes of a plugin.
    * Classpath of the returned classloader is also used to get bytecode of classes that will be transformed.
    *
-   * @see [IjMdTransformer.getClassLoader]
-   *
    * @param parameters agent parameters that are passed from server
    * @return Classloader that will be passed to [getTransformations] method and used to get bytecode of classes that will be transformed
    */
-  fun getClassLoader(parameters: IjInjector.AgentParameters): ClassLoader? = javaClass.classLoader
+  public fun getClassLoader(parameters: P): ClassLoader? = javaClass.classLoader
 
   /**
    * Reports whether transformations of thus transformer are applicable for given parameters
@@ -79,7 +77,7 @@ internal interface TransformerSetup {
    * @param parameters agent parameters that are passed from server
    * @return true if transformations of thus transformer are applicable for given parameters, false otherwise
    */
-  fun isTransformerAvailable(parameters: IjInjector.AgentParameters): Boolean = true
+  public fun isTransformerAvailable(parameters: P): Boolean = true
 
   /**
    * Runs transformation (returned from [getTransformations]) of this transformer.
@@ -88,25 +86,25 @@ internal interface TransformerSetup {
    * @param parameters agent parameters that are passed from server
    * @param canRetransform can this transformer's transformations be retransformed (from Java)
    */
-  fun runTransformations(
+  public fun runTransformations(
     instrumentation: Instrumentation,
-    parameters: IjInjector.AgentParameters,
+    parameters: P,
     canRetransform: Boolean = true,
   ) {
 
     if (!isTransformerAvailable(parameters)) {
-      transformationResultConsumer(ProjectorClassTransformer.TransformationResult.Skip(this, "All classes", "Transformer is not available for provided parameters"))
+      transformationResultConsumer(TransformationResult.Skip(this, "All classes", "Transformer is not available for provided parameters"))
       return
     }
 
     val loader = getClassLoader(parameters) ?: kotlin.run {
-      transformationResultConsumer(ProjectorClassTransformer.TransformationResult.Skip(this, "All classes", "Classloader is null"))
+      transformationResultConsumer(TransformationResult.Skip(this, "All classes", "Classloader is null"))
       return
     }
 
     val transformations = getTransformations(parameters, loader)
     if (transformations.isEmpty()) {
-      transformationResultConsumer(ProjectorClassTransformer.TransformationResult.Skip(this, "All classes", "No transformations found"))
+      transformationResultConsumer(TransformationResult.Skip(this, "All classes", "No transformations found"))
       return
     }
 
@@ -119,18 +117,18 @@ internal interface TransformerSetup {
   }
 }
 
-internal abstract class TransformerSetupBase : TransformerSetup {
+public abstract class TransformerSetupBase<P> : TransformerSetup<P> {
 
-  override var transformationResultConsumer: (ProjectorClassTransformer.TransformationResult) -> Unit = {}
+  override var transformationResultConsumer: (TransformationResult) -> Unit = {}
 }
 
-internal fun classForNameOrNull(name: String, classLoader: ClassLoader): Class<*>? = try {
+public fun classForNameOrNull(name: String, classLoader: ClassLoader): Class<*>? = try {
   Class.forName(name, false, classLoader)
 } catch (e: ClassNotFoundException) {
   null
 }
 
-private fun TransformerSetup.createTransformer(
+private fun TransformerSetup<*>.createTransformer(
   transformations: Map<Class<*>, (CtClass) -> ByteArray?>,
   classLoader: ClassLoader,
 ): ClassFileTransformer {

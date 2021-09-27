@@ -27,9 +27,10 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.project.Project
 import javassist.CtClass
 import org.jetbrains.projector.agent.common.getDeclaredMethod
+import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 import org.jetbrains.projector.util.logging.Logger
 
-internal object IjBrowserUtilTransformer : TransformerSetupBase() {
+internal object IjBrowserUtilTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
 
   override val logger = Logger<IjBrowserUtilTransformer>()
 

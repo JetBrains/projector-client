@@ -21,24 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("jvm")
-  `maven-publish`
-  jacoco
-}
+package org.jetbrains.projector.agent.common.transformation
 
-setupJacoco()
+public sealed class TransformationResult(
+  public val setup: TransformerSetup<*>,
+  public val className: String,
+) {
 
-kotlin {
-  explicitApi()
-}
+  public class Success(setup: TransformerSetup<*>, className: String): TransformationResult(setup, className)
+  public class Error(setup: TransformerSetup<*>, className: String, public val throwable: Throwable): TransformationResult(setup, className)
+  public class Skip(setup: TransformerSetup<*>, className: String, public val reason: String): TransformationResult(setup, className)
 
-publishToSpace("java")
-
-val javassistVersion: String by project
-
-dependencies {
-  implementation(project(":projector-util-logging"))
-  implementation("org.javassist:javassist:$javassistVersion")
-  testImplementation(kotlin("test"))
 }

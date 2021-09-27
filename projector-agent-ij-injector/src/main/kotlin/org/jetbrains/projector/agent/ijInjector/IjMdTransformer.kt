@@ -25,9 +25,12 @@ package org.jetbrains.projector.agent.ijInjector
 
 import com.intellij.openapi.extensions.ExtensionPointName
 import javassist.CtClass
+import org.jetbrains.projector.agent.common.transformation.TransformationResult
+import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
+import org.jetbrains.projector.agent.common.transformation.classForNameOrNull
 import org.jetbrains.projector.util.logging.Logger
 
-internal object IjMdTransformer : TransformerSetupBase() {
+internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
 
   override val logger = Logger<IjMdTransformer>()
 
@@ -47,7 +50,7 @@ internal object IjMdTransformer : TransformerSetupBase() {
       jcefClass to MdPreviewType.JCEF,
     ).mapNotNull { (className, previewType) ->
       val clazz = classForNameOrNull(className, classLoader) ?: run {
-        transformationResultConsumer(ProjectorClassTransformer.TransformationResult.Skip(this, className, "Class not found"))
+        transformationResultConsumer(TransformationResult.Skip(this, className, "Class not found"))
         return@mapNotNull null
       }
       clazz to previewType
