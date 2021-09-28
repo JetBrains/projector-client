@@ -26,6 +26,7 @@ package org.jetbrains.projector.common.protocol.toServer
 import kotlinx.serialization.Serializable
 import org.jetbrains.projector.common.protocol.data.*
 import org.jetbrains.projector.common.protocol.handshake.DisplayDescription
+import org.jetbrains.projector.common.protocol.toClient.data.idea.SelectionInfo
 
 enum class ResizeDirection {
   NW,
@@ -130,6 +131,16 @@ data class ClientKeyPressEvent(
   val timeStamp: Int,
   val char: Char,
   val modifiers: Set<KeyModifier>,
+) : ClientEvent()
+
+@Suppress("unused") // it is actually used in org.jetbrains.projector.client.web.state.ClientState, but Qodana doesn't see it...
+@Serializable
+data class ClientSpeculativeKeyPressEvent(
+  val originalEvent: ClientKeyPressEvent,
+  val requestId: Int,
+  val editorId: Int,
+  val offset: Int,
+  val selectionInfo: SelectionInfo?,
 ) : ClientEvent()
 
 @Serializable

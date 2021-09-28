@@ -132,6 +132,12 @@ data class ServerCaretInfoChangedEvent(
       val verticalScrollBarWidth: Int,
       @SerialName("i")
       val textColor: Int,
+      @SerialName("j")
+      val backgroundColor: Int,
+      @SerialName("k")
+      val editorScrolled: Point,
+      @SerialName("l")
+      val editorId: Int,
     ) : CaretInfoChange()
   }
 }
@@ -240,4 +246,17 @@ data class ServerWindowColorsEvent(
     @SerialName("f")
     val windowHeaderInactiveText: PaintValue.Color,
   )
+}
+
+@Serializable
+sealed class SpeculativeEvent : ServerEvent() {
+
+  @Suppress("unused") // it is actually used in org.jetbrains.projector.client.web.ServerEventsProcessor, but Qodana doesn't see it...
+  @Serializable
+  @SerialName("q")
+  data class SpeculativeStringDrawnEvent(
+    @SerialName("a")
+    val operationId: Int,
+  ) : SpeculativeEvent()
+
 }

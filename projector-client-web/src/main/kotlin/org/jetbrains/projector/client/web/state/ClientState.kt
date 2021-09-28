@@ -500,10 +500,15 @@ sealed class ClientState {
       }
 
       is ClientAction.AddEvent -> {
-        val event = action.event
+        var event = action.event
 
         if (event is ClientKeyPressEvent) {
-          typing.addEventChar(event)
+          val drawingResult = typing.addEventChar(event)
+          if (drawingResult is Typing.DrawingResult.Drawn) {
+            event = ClientSpeculativeKeyPressEvent(
+              event, drawingResult.operationId, drawingResult.editorId, drawingResult.virtualOffset, drawingResult.selection)
+
+          }
         }
 
         eventsToSend.add(event)

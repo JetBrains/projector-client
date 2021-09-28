@@ -68,6 +68,8 @@ Name | Type | Default value | Description
 `cacheSize` | Int | `5M` | Set size of cache for images in Chars.
 `blockClosing` | Boolean | `true` | Enable blocking of accidental closing of the web page
 `relayServerId` | String? | Not present | Identifier of Projector server to connect to for relay connection. Warning: Static files must be accessed via https when relay is used.
+`typingClearStrategy` | String | `server` | Sets strategy of removing speculative symbols: <br/> `server` - symbol is removed when server sends back validation of its insertion in the text; <br/> `position` - symbols are removed when a new string is painted at the position of those symbols (faster, but may be inaccurate); <br/> `naive` - ALL symbols are removed when any new string is painted (legacy variant).
+`hideOnSpeculative` | Boolean | `false` | Hide main window canvas when speculative symbols are typed and not removed yet.
 
 ## Shortcuts
 - `Ctrl + F10` prints statistics to the browser console. Example:  
