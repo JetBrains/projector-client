@@ -72,10 +72,6 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
   private fun mustBeLoadedByOurselves(name: String): Boolean = forceLoadByOurselves.any { name.startsWith(it) }
   private fun mustBeLoadedByIdea(name: String): Boolean = forceLoadByIdea.any { name.startsWith(it) }
 
-  private fun isProjectorAgentClass(name: String): Boolean = name.startsWith(PROJECTOR_AGENT_PACKAGE_PREFIX)
-  private fun isProjectorClass(name: String): Boolean = name.startsWith(PROJECTOR_PACKAGE_PREFIX) && name != javaClass.name
-  private fun isIntellijClass(name: String): Boolean = name.startsWith(INTELLIJ_PACKAGE_PREFIX) || (name.startsWith(JETBRAINS_PACKAGE_PREFIX) && !isProjectorClass(name))
-
   override fun loadClass(name: String, resolve: Boolean): Class<*> {
     synchronized(getClassLoadingLock(name)) {
 
@@ -83,22 +79,10 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
       if (found != null) return found
 
       return when {
-        mustBeLoadedByPlatform(name) -> myAppClassLoader.loadClass(name, resolve)
-        isProjectorClass(name) -> {
-
-          if (isProjectorAgentClass(name)) {
-            try {
-              loadProjectorAgentClass(name, resolve)
-            } catch (e: ClassNotFoundException) {
-              loadProjectorClass(name, resolve)
-            }
-          } else {
-            loadProjectorClass(name, resolve)
-          }
-        }
         mustBeLoadedByOurselves(name) -> defineClass(name, resolve, ::getResourceAsStream)
+        mustBeLoadedByPlatform(name) -> myAppClassLoader.loadClass(name, resolve)
         isIntellijClass(name) || mustBeLoadedByIdea(name) -> myIdeaLoader.loadClass(name, resolve)
-        else -> myAppClassLoader.loadClass(name, resolve)
+        else -> redefineClassIfNeeded(name, resolve)
       }
     }
   }
@@ -110,8 +94,6 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
   }
 
   private fun String.toClassFileName() = "${replace('.', '/')}.class"
-
-  private fun loadProjectorClass(name: String, resolve: Boolean): Class<*> = defineClass(name, resolve, myAppClassLoader::getResourceAsStream)
 
   private fun loadProjectorAgentClass(name: String, resolve: Boolean): Class<*> {
     return defineClass(name, resolve) { classFileName ->
@@ -137,6 +119,26 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
     }
 
     return clazz
+  }
+
+  private fun redefineClassIfNeeded(name: String, resolve: Boolean): Class<*> {
+    val appClass = myAppClassLoader.loadClass(name, resolve)
+    val loadingSetup = appClass.getAnnotation(UseProjectorLoader::class.java) ?: return appClass
+    val scope = if (loadingSetup.attachPackage) "${appClass.packageName}." else appClass.name
+    return when (loadingSetup.loader) {
+      ActualLoader.PLATFORM -> {
+        forceLoadByPlatform(scope)
+        myAppClassLoader.loadClass(name, resolve)
+      }
+      ActualLoader.IDE -> {
+        forceLoadByIdea(scope)
+        myIdeaLoader.loadClass(name, resolve)
+      }
+      ActualLoader.PROJECTOR -> {
+        forceLoadByProjectorClassLoader(scope)
+        defineClass(name, resolve, ::getResourceAsStream)
+      }
+    }
   }
 
   private fun <T> findInClassloaders(transform: (ClassLoader) -> T?): T? {
@@ -188,6 +190,19 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
 
     @Suppress("RedundantVisibilityModifier") // public to be accessible for additional setup
     @JvmStatic
-    public val instance: ProjectorClassLoader get() = myInstance ?: ProjectorClassLoader()
+    public val instance: ProjectorClassLoader
+      get() = myInstance ?: ProjectorClassLoader()
+
+    private fun isProjectorClass(name: String): Boolean = name.startsWith(PROJECTOR_PACKAGE_PREFIX)
+                                                          && name != ProjectorClassLoader::class.java.name
+
+    private fun isIntellijClass(name: String): Boolean = name.startsWith(INTELLIJ_PACKAGE_PREFIX)
+                                                         || (name.startsWith(JETBRAINS_PACKAGE_PREFIX) && !isProjectorClass(name))
+  }
+
+  public enum class ActualLoader {
+    PLATFORM,
+    IDE,
+    PROJECTOR,
   }
 }

@@ -24,8 +24,10 @@
 package org.jetbrains.projector.agent.ijInjector
 
 import org.jetbrains.projector.agent.init.IjArgs
+import org.jetbrains.projector.util.loading.UseProjectorLoader
 import java.lang.instrument.Instrumentation
 
+@UseProjectorLoader(attachPackage = true)
 internal object IjInjector {
 
   @Suppress("unused") // classloader provider class name and method names are not currently used, but may be in the future

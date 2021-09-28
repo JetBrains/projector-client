@@ -21,48 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import org.gradle.jvm.tasks.Jar
+package org.jetbrains.projector.util.loading
 
-plugins {
-  kotlin("jvm")
-  jacoco
-}
-
-setupJacoco()
-
-kotlin {
-  explicitApi()
-}
-
-val javassistVersion: String by project
-val intellijPlatformVersion: String by project
-
-dependencies {
-  implementation(project(":projector-agent-common"))
-  implementation(project(":projector-agent-initialization"))
-  implementation(project(":projector-util-loading"))
-  implementation(project(":projector-util-logging"))
-  implementation("org.javassist:javassist:$javassistVersion")
-
-  compileOnly("com.jetbrains.intellij.platform:editor-ex:$intellijPlatformVersion")
-  compileOnly("com.jetbrains.intellij.platform:ide:$intellijPlatformVersion")
-  compileOnly("com.jetbrains.intellij.platform:util-ui:$intellijPlatformVersion")
-
-  testImplementation(kotlin("test"))
-}
-
-val agentClass = "org.jetbrains.projector.agent.ijInjector.IjInjectorAgent"
-
-tasks.withType<Jar> {
-  manifest {
-    attributes(
-      "Can-Redefine-Classes" to true,
-      "Can-Retransform-Classes" to true,
-      "Agent-Class" to agentClass
-    )
-  }
-
-  exclude("META-INF/versions/9/module-info.class")
-
-  from(inline(configurations.runtimeClasspath))
-}
+/**
+ * Annotation to mark classes that should be loaded by one of [ProjectorClassLoader] underlying ClassLoaders.
+ * You should also mark all classes in which marked one is instantiated, and go on up to the place where some class
+ * is loaded by ProjectorClassLoader for this annotation to make effect
+ * (alternatively you can specify those classes in projector-server/org.jetbrains.projector.server.core.classloader.ProjectorClassLoaderSetup).
+ *
+ * @param loader classloader which will actually load the class
+ * @param attachPackage whether only marked class (and its inner classes) should be loaded by ProjectorClassLoader or the whole package
+ */
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FILE)
+public annotation class UseProjectorLoader(
+  val loader: ProjectorClassLoader.ActualLoader = ProjectorClassLoader.ActualLoader.PROJECTOR,
+  val attachPackage: Boolean = false,
+)
