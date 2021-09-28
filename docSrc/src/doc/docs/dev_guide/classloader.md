@@ -5,14 +5,18 @@
 
 Default AppClassLoader of Projector Server doesn't know anything about JB IDE and so cannot load its classes as they were loaded by different classloader. Similar, IDE ClassLoader doesn't know anything about Projector classes (and can be gathered only after IDE startup). 
 
-The idea behind ProjectorClassLoader is simple - delegate classloading to the right classloader. If classname belongs to Projector, we get bytecode via AppClassLoader and define class ourselves (so that other classes could also be loaded via ProjectorClassLoader). If we think classname determines a class from Intellij Platform then we should load it via IDE ClassLoader. If the classname belongs neither to Projector classes nor to Intellij Platform, then we just fall back to load it via AppClassLoader. 
+The idea behind ProjectorClassLoader is simple - delegate classloading to the right classloader. If we think classname determines a class from Intellij Platform then we should load it via IDE ClassLoader. If not, then we fall back to load it via AppClassLoader. 
 
-However, sometimes we need to load specific class or a set of classes using another classloader. That's where methods `forceLoadByPlatform` and `forceLoadByProjectorClassLoader` come into play. 
+To specify how classes should be loaded with ProjectorClassLoader you need to call one of the `forceLoadBy*` methods: 
 
 Method Name                         | ClassLoader for specified class(es)
 ---                                 | ---
 `forceLoadByPlatform`               | AppClassLoader 
 `forceLoadByProjectorClassLoader`   | ProjectorClassLoader (gather bytecode from any of AppClassLoader or IDE ClassLoader and then define class ourselves) 
+`forceLoadByIdea` | IDE ClassLoader (PathClassloader or UrlClassLoader, depending on IDE version)
+
+!!! note 
+    Another way to specify ClassLoader for class is to apply `UseProjectorLoader` annotation.
 
 ## Initializing ProjectorClassLoader
 To initialize ProjectorClassLoader, call function 
