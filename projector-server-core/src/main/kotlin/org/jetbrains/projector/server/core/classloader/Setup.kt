@@ -23,9 +23,7 @@
  */
 package org.jetbrains.projector.server.core.classloader
 
-import org.jetbrains.projector.server.core.ij.IjInjectorAgentInitializer
 import org.jetbrains.projector.server.core.ij.invokeWhenIdeaIsInitialized
-import org.jetbrains.projector.server.core.ij.md.PanelUpdater
 import org.jetbrains.projector.util.loading.ProjectorClassLoader
 
 @Suppress("RedundantVisibilityModifier") // Accessed in projector-server, don't trigger linter that doesn't know it
@@ -37,21 +35,6 @@ public object ProjectorClassLoaderSetup {
   @Suppress("unused", "RedundantVisibilityModifier") // Called from projector-server, don't trigger linter that doesn't know it
   public fun initClassLoader(classLoader: ClassLoader): ProjectorClassLoader {
     val prjClassLoader = if (classLoader is ProjectorClassLoader) classLoader else ProjectorClassLoader.instance
-
-    // accessed in agent to get ide and projector classloaders in platform classloader context
-    prjClassLoader.forceLoadByPlatform(IjInjectorAgentInitializer.IjInjectorAgentClassLoaders::class.java.name)
-    // accessed in client side markdown previewer in platform classloader context
-    prjClassLoader.forceLoadByPlatform(PanelUpdater::class.java.name)
-    // without this server not works...
-    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.websocket.")
-    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.ServerTransport")
-    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.ClientWrapper")
-    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.ClientSettings")
-    prjClassLoader.forceLoadByPlatform("org.jetbrains.projector.server.core.ClientEventHandler")
-    // we need only version of this class loaded by platform
-    prjClassLoader.forceLoadByPlatform("com.intellij.ide.WindowsCommandLineProcessor")
-    // to access ideaClassLoaderInitialized field only from AppClassLoader context
-    prjClassLoader.forceLoadByPlatform(ProjectorClassLoaderSetup::class.java.name)
 
     // to prevent problems caused by loading classes like kotlin.jvm.functions.Function0 by both ProjectorClassLoader and IDE ClassLoader
     prjClassLoader.forceLoadByProjectorClassLoader("com.intellij.openapi.application.ActionsKt")

@@ -27,14 +27,16 @@ import org.jetbrains.projector.agent.init.IjArgs
 import org.jetbrains.projector.agent.init.toIjArgs
 import org.jetbrains.projector.server.core.ij.md.MarkdownPanelMaker
 import org.jetbrains.projector.util.agent.copyAgentToTempJarAndAttach
+import org.jetbrains.projector.util.loading.ProjectorClassLoader
 import java.lang.ref.WeakReference
 
+@Suppress("unused") // Used in projector-server
 public object IjInjectorAgentInitializer {
 
   @Suppress("unused") // Called from projector-server, don't trigger linter that doesn't know it
   @OptIn(ExperimentalStdlibApi::class)
   public fun init(isAgent: Boolean) {
-    IjInjectorAgentClassLoaders.prjClassLoader = WeakReference(javaClass.classLoader)
+    IjInjectorAgentClassLoaders.prjClassLoader = WeakReference(ProjectorClassLoader.instance)
     invokeWhenIdeaIsInitialized("attach IJ injector agent") { ideClassLoader ->
       IjInjectorAgentClassLoaders.ijClassLoader = WeakReference(ideClassLoader)
 
