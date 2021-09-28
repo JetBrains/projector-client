@@ -133,6 +133,7 @@ data class ClientKeyPressEvent(
   val modifiers: Set<KeyModifier>,
 ) : ClientEvent()
 
+@Suppress("unused") // it is actually used in org.jetbrains.projector.client.web.state.ClientState, but Qodana doesn't see it...
 @Serializable
 data class ClientSpeculativeKeyPressEvent(
   val originalEvent: ClientKeyPressEvent,

@@ -251,6 +251,7 @@ data class ServerWindowColorsEvent(
 @Serializable
 sealed class SpeculativeEvent : ServerEvent() {
 
+  @Suppress("unused") // it is actually used in org.jetbrains.projector.client.web.ServerEventsProcessor, but Qodana doesn't see it...
   @Serializable
   @SerialName("q")
   data class SpeculativeStringDrawnEvent(
