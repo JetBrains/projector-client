@@ -74,6 +74,10 @@ class ImeInputMethod(
       focusInputField()  // make keyboard int tests work in Chromium
     }
 
+    window.addEventListener("focus", {
+      focusInputField()
+    })
+
     addEventListener("compositionstart", handler::handleEvent)
     addEventListener("compositionend", handler::handleEvent)
     onkeydown = handler::handleEvent
