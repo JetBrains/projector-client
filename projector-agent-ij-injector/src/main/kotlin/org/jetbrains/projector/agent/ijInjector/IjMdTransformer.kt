@@ -24,6 +24,7 @@
 package org.jetbrains.projector.agent.ijInjector
 
 import com.intellij.openapi.extensions.ExtensionPointName
+import com.intellij.ui.jcef.JBCefApp
 import javassist.CtClass
 import org.jetbrains.projector.agent.common.transformation.TransformationResult
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
@@ -36,10 +37,14 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
 
   // language=java prefix="import " suffix=";"
   private const val javaFxClass = "org.intellij.plugins.markdown.ui.preview.javafx.JavaFxHtmlPanelProvider"
+
   // language=java prefix="import " suffix=";"
   private const val jcefClass = "org.intellij.plugins.markdown.ui.preview.jcef.JCEFHtmlPanelProvider"
 
-  override fun getTransformations(parameters: IjInjector.AgentParameters, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> {
+  override fun getTransformations(
+    parameters: IjInjector.AgentParameters,
+    classLoader: ClassLoader,
+  ): Map<Class<*>, (CtClass) -> ByteArray?> {
 
     val projectorClassLoader = ProjectorClassLoader.instance
     projectorClassLoader.addPluginLoader("org.intellij.plugins.markdown", classLoader)
@@ -74,15 +79,23 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     previewType: MdPreviewType,
     clazz: CtClass,
     projectorMarkdownPanelClass: String,
-    isAgent: Boolean
+    isAgent: Boolean,
   ): ByteArray {
+
+    val availabilityInfo = when (previewType.isAvailable()) {
+      // language=java prefix="class Dummy { var t = " suffix="; }"
+      true -> "org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanelProvider.AvailabilityInfo.AVAILABLE"
+      // language=java prefix="class Dummy { var t = " suffix="; }"
+      false -> "org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanelProvider.AvailabilityInfo.UNAVAILABLE"
+    }
+
     clazz
       .getDeclaredMethod("isAvailable")
       .setBody(
         // language=java prefix="class MarkdownHtmlPanelProvider { @NotNull public abstract AvailabilityInfo isAvailable()" suffix="}"
         """
           {
-            return org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanelProvider.AvailabilityInfo.AVAILABLE;
+            return ${availabilityInfo};
           }
         """.trimIndent()
       )
@@ -124,7 +137,28 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
 
   private enum class MdPreviewType(val displayName: String, val panelClass: String) {
 
-    JAVAFX("JavaFX WebView", "org.intellij.plugins.markdown.ui.preview.javafx.MarkdownJavaFxHtmlPanel"),
-    JCEF("JCEF Browser", "org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel"),
+    JAVAFX("JavaFX WebView", "org.intellij.plugins.markdown.ui.preview.javafx.MarkdownJavaFxHtmlPanel") {
+      override fun isAvailable(): Boolean {
+        try {
+          Class.forName("javafx.scene.web.WebView", false, javaClass.classLoader)
+          return true
+        } catch (ignored: ClassNotFoundException) {
+        }
+
+        return false
+      }
+    },
+    JCEF("JCEF Browser", "org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel") {
+      override fun isAvailable(): Boolean = if (JBCefApp.isSupported()) {
+        try {
+          JBCefApp.getInstance()
+          true
+        } catch (e: IllegalStateException) {
+          false
+        }
+      } else false
+    };
+
+    abstract fun isAvailable(): Boolean
   }
 }
