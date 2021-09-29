@@ -26,3 +26,7 @@ package org.jetbrains.projector.server.core.util
 public fun getProperty(propName: String): String? {
   return System.getProperty(propName) ?: System.getenv(propName)
 }
+
+public fun getProperty(propName: String, defaultValue: String): String {
+  return getProperty(propName) ?: defaultValue
+}
