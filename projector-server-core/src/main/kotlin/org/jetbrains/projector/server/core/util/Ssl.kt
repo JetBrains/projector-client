@@ -42,7 +42,7 @@ public const val SSL_STORE_PASSWORD: String = "STORE_PASSWORD"
 public const val SSL_KEY_PASSWORD: String = "KEY_PASSWORD"
 
 public fun setSsl(setWebSocketFactory: (WebSocketServerFactory) -> Unit): String? {
-  val sslPropertiesFilePath = getProperty(SSL_ENV_NAME) ?: return null
+  val sslPropertiesFilePath = getOption(SSL_ENV_NAME) ?: return null
 
   try {
     val properties = Properties().apply {
