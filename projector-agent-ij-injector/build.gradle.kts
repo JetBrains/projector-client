@@ -36,6 +36,8 @@ kotlin {
 
 val javassistVersion: String by project
 val intellijPlatformVersion: String by project
+val intellijMarkdownPluginVersion: String by project
+val intellijJcefVersion: String by project
 
 dependencies {
   implementation(project(":projector-agent-common"))
@@ -47,6 +49,9 @@ dependencies {
   compileOnly("com.jetbrains.intellij.platform:editor-ex:$intellijPlatformVersion")
   compileOnly("com.jetbrains.intellij.platform:ide:$intellijPlatformVersion")
   compileOnly("com.jetbrains.intellij.platform:util-ui:$intellijPlatformVersion")
+
+  compileOnly("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion")
+  compileOnly("org.jetbrains.intellij.deps.jcef:jcef:$intellijJcefVersion")
 
   testImplementation(kotlin("test"))
 }
