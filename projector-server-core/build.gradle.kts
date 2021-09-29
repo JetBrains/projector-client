@@ -125,8 +125,7 @@ val integrationTest = task<Test>("integrationTest") {
   finalizedBy(tasks.jacocoTestReport)
 }
 
-// todo: understand why it doesn't work on CI (https://github.com/JetBrains/projector-client/runs/1045863376)
-//tasks.check { dependsOn(integrationTest) }
+tasks.check { dependsOn(integrationTest) }
 
 dependencies {
   api(project(":projector-common"))

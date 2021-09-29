@@ -12,6 +12,7 @@ jobs:
 
     runs-on: ${{matrix.os}}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
@@ -26,7 +27,7 @@ jobs:
         run: ./gradlew clean
       - name: gradle check
         run: |
-          ./gradlew check build
+          ./gradlew -Dselenide.headless=true check
           ./gradlew :projector-server-core:jacocoTestReport
           ./gradlew :projector-common:jacocoTestReport
           ./gradlew :projector-agent-common:jacocoTestReport
