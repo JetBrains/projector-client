@@ -415,8 +415,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#disabling-websocket-transport" class="md-nav__link">
-    Disabling WebSocket transport
+  <a href="#disabling-websocket-server" class="md-nav__link">
+    Disabling WebSocket server
   </a>
   
 </li>
@@ -789,8 +789,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#disabling-websocket-transport" class="md-nav__link">
-    Disabling WebSocket transport
+  <a href="#disabling-websocket-server" class="md-nav__link">
+    Disabling WebSocket server
   </a>
   
 </li>
@@ -993,7 +993,7 @@ After that, enable SSL on the client-side by adding the <code>wss</code> query p
 <p class="admonition-title">Bug</p>
 <p>Actually, we want to get rid of this option in the future, determining scrolling speed automatically, synced with the client. More details: <a href="https://youtrack.jetbrains.com/issue/PRJ-272">PRJ-272</a>.</p>
 </div>
-<h3 id="disabling-websocket-transport">Disabling WebSocket transport<a class="headerlink" href="#disabling-websocket-transport" title="Permanent link">&para;</a></h3>
+<h3 id="disabling-websocket-server">Disabling WebSocket server<a class="headerlink" href="#disabling-websocket-server" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -1004,13 +1004,13 @@ After that, enable SSL on the client-side by adding the <code>wss</code> query p
 </thead>
 <tbody>
 <tr>
-<td><code>ORG_JETBRAINS_PROJECTOR_SERVER_ENABLE_WS_TRANSPORT</code></td>
+<td><code>ORG_JETBRAINS_PROJECTOR_SERVER_ENABLE_WS_SERVER</code></td>
 <td>Boolean</td>
 <td><code>true</code></td>
 </tr>
 </tbody>
 </table>
-<p>Setting this variable to false will disable the built-in web server and WebSocket transport.<br />
+<p>Setting this option to <code>false</code> will disable the built-in WebSocket server.<br />
 Additional transports can be added at runtime via <code>ProjectorServer.addTransport</code></p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
