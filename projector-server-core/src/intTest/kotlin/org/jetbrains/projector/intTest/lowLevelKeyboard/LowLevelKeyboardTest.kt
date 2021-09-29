@@ -121,6 +121,10 @@ class LowLevelKeyboardTest {
       val modifiersEx = KeyEvent.getModifiersExText(it.modifiersEx)
       "KeyEvent[$type,keyCode=${it.keyCode},keyText=$keyText,keyChar=${it.keyChar} (${it.keyChar.code}),keyLocation=$location,modifiersEx=$modifiersEx]"
     } + " (size: $size)"
+
+    private fun waitABit() {
+      runBlocking { delay(100) }
+    }
   }
 
   @BeforeEach
@@ -146,7 +150,7 @@ class LowLevelKeyboardTest {
 
       input(robot)
 
-      runBlocking { delay(100) }
+      waitABit()
       robot.waitForIdle()
 
       val allEvents = mutableListOf<Any>()
@@ -190,7 +194,7 @@ class LowLevelKeyboardTest {
 
         frame.isVisible = true
 
-        runBlocking { delay(100) }
+        waitABit()
 
         if (OS.MAC.isCurrentOs) {
           // switch windows manually
@@ -198,12 +202,12 @@ class LowLevelKeyboardTest {
           robot.mousePress(MouseEvent.BUTTON1_DOWN_MASK)
           robot.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK)
 
-          runBlocking { delay(100) }
+          waitABit()
         }
 
         input(robot)
 
-        runBlocking { delay(100) }
+        waitABit()
         robot.waitForIdle()
 
         if (OS.MAC.isCurrentOs) {
@@ -212,7 +216,7 @@ class LowLevelKeyboardTest {
           robot.mousePress(MouseEvent.BUTTON1_DOWN_MASK)
           robot.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK)
 
-          runBlocking { delay(100) }
+          waitABit()
         }
 
         assertNotEquals(0, expectedEvents.size, "No expected events received (actual key events size: ${keyEvents.size})...")
