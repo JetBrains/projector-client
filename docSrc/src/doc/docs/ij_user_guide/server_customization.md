@@ -116,13 +116,13 @@ If you want faster scrolling, you should decrease the value, so for example, the
 !!! bug
     Actually, we want to get rid of this option in the future, determining scrolling speed automatically, synced with the client. More details: [PRJ-272](https://youtrack.jetbrains.com/issue/PRJ-272).
 
-### Disabling WebSocket transport
+### Disabling WebSocket server
 
 Name | Type | Default value
 ---|---|---
-`ORG_JETBRAINS_PROJECTOR_SERVER_ENABLE_WS_TRANSPORT` | Boolean | `true`
+`ORG_JETBRAINS_PROJECTOR_SERVER_ENABLE_WS_SERVER` | Boolean | `true`
 
-Setting this variable to false will disable the built-in web server and WebSocket transport.  
+Setting this option to `false` will disable the built-in WebSocket server.  
 Additional transports can be added at runtime via `ProjectorServer.addTransport`
 
 !!! warning
