@@ -27,7 +27,7 @@ jobs:
         run: ./gradlew clean
       - name: gradle check
         run: |
-          ./gradlew -Dselenide.headless=true check
+          ./gradlew check :projector-server-core:integrationTest  --tests "org.jetbrains.projector.intTest.headless.*" -Dselenide.headless=true
           ./gradlew :projector-server-core:jacocoTestReport
           ./gradlew :projector-common:jacocoTestReport
           ./gradlew :projector-agent-common:jacocoTestReport

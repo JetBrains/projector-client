@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.intTest
+package org.jetbrains.projector.intTest.headless
 
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.WebSockets

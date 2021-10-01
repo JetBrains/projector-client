@@ -21,22 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.intTest.keyboard
+package org.jetbrains.projector.intTest.headless.keyboard
 
 import org.openqa.selenium.Keys
-import kotlin.test.Ignore
-import kotlin.test.Test
 
-class MobileKeyboardTest : AbstractKeyboardTest("mobile") {
+class LegacyKeyboardTest : AbstractKeyboardTest("legacy") {
 
   override fun input(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
-    activateMobileKeyboard()
-    inputWithMobileButtons(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
-  }
-
-  @Test
-  @Ignore("need to somehow determine on the client that exactly numpad5 is sent, not plain5")
-  override fun testNumpadWithNumLock() {
-    // todo
+    inputOnDesktop(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
   }
 }

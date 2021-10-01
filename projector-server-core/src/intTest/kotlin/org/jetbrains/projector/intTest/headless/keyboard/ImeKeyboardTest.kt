@@ -21,40 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.intTest.keyboard
+package org.jetbrains.projector.intTest.headless.keyboard
 
-import com.codeborne.selenide.Selenide.element
 import org.openqa.selenium.Keys
 
-fun activateMobileKeyboard() {
-  element("#toggleInput").click()
-}
+class ImeKeyboardTest : AbstractKeyboardTest("ime") {
 
-fun inputWithMobileButtons(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
-  if (ctrl) {
-    element("#toggleCtrl").click()
-  }
-  if (shift) {
-    element("#toggleShift").click()
-  }
-
-  if (keysToSend.isNotEmpty()) {
-    element("body").sendKeys(*keysToSend)
-  }
-
-  if (esc) {
-    element("#pressEsc").click()
-  }
-  if (f != null) {
-    val fId = f.ordinal - Keys.F1.ordinal + 1
-    element("#toggleFunctionalKeys").click()
-    element("#pressF$fId").click()
-  }
-
-  if (shift) {
-    element("#toggleShift").click()
-  }
-  if (ctrl) {
-    element("#toggleCtrl").click()
+  override fun input(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
+    inputOnDesktop(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
   }
 }

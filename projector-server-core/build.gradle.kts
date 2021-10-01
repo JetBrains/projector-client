@@ -125,7 +125,7 @@ val integrationTest = task<Test>("integrationTest") {
   finalizedBy(tasks.jacocoTestReport)
 }
 
-tasks.check { dependsOn(integrationTest) }
+//tasks.check { dependsOn(integrationTest) }
 
 dependencies {
   api(project(":projector-common"))
