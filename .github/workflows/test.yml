@@ -8,26 +8,82 @@ on:
     branches: [master]
 
 jobs:
-  test:
-
-    runs-on: ${{matrix.os}}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-
+  test-linux:
+    runs-on: ubuntu-latest
     steps:
+      - uses: browser-actions/setup-chrome@latest
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
-      - name: set up JDK
+      - name: Setup Java
         uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - name: gradle clean
-        run: ./gradlew clean
-      - name: gradle check
+      - name: Clean
+        run: gradle clean
+      - name: Run Tests
         run: |
-          ./gradlew check :projector-server-core:integrationTest  --tests "org.jetbrains.projector.intTest.headless.*" -Dselenide.headless=true
+          sudo apt-get install numlockx xdotool
+          export CHROME_BIN=/$(which chromium)
+          export DISPLAY=:99.0
+          Xvfb -ac :99 -screen 0 1920x1080x16 &
+          ./gradlew check
+          ./gradlew :projector-server-core:jacocoTestReport
+          ./gradlew :projector-common:jacocoTestReport
+          ./gradlew :projector-agent-common:jacocoTestReport
+          ./gradlew :projector-agent-ij-injector:jacocoTestReport
+          ./gradlew :projector-client-common:jacocoTestReport
+          ./gradlew :projector-util-agent:jacocoTestReport
+          ./gradlew :projector-client-web:browserTest
+      - name: test coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./JacocoReports/
+
+  test-mac-os:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gradle/wrapper-validation-action@v1
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - name: Clean
+        run: gradle clean
+      - name: Run tests
+        run: |
+          export CHROME_BIN=$(which chrome)
+          ./gradlew check
+          ./gradlew :projector-server-core:jacocoTestReport
+          ./gradlew :projector-common:jacocoTestReport
+          ./gradlew :projector-agent-common:jacocoTestReport
+          ./gradlew :projector-agent-ij-injector:jacocoTestReport
+          ./gradlew :projector-client-common:jacocoTestReport
+          ./gradlew :projector-util-agent:jacocoTestReport
+          ./gradlew :projector-client-web:browserTest
+      - name: test coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./JacocoReports/
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: browser-actions/setup-chrome@latest
+      - uses: actions/checkout@v2
+      - uses: gradle/wrapper-validation-action@v1
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - name: Clean
+        run: gradle clean
+      - name: Run tests
+        run: |
+          $Env:CHROME_BIN = 'c:\hostedtoolcache\windows\chromium\latest\x64\chrome.exe'
+          ./gradlew check
           ./gradlew :projector-server-core:jacocoTestReport
           ./gradlew :projector-common:jacocoTestReport
           ./gradlew :projector-agent-common:jacocoTestReport
