@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.intTest.keyboard
+package org.jetbrains.projector.intTest.headless.keyboard
 
 import org.openqa.selenium.Keys
 
-class LegacyKeyboardTest : AbstractKeyboardTest("legacy") {
+class MobileOnlyButtonsKeyboardTest : AbstractKeyboardTest("mobileOnlyButtons") {
 
   override fun input(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
-    inputOnDesktop(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
+    inputWithMobileButtons(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
   }
 }

@@ -21,11 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.intTest
+package org.jetbrains.projector.intTest.headless
 
 import com.codeborne.selenide.Selenide
 import com.codeborne.selenide.Selenide.confirm
 import com.codeborne.selenide.WebDriverRunner
+import org.jetbrains.projector.intTest.ConnectionUtil
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.TimeoutException
 import org.openqa.selenium.support.ui.ExpectedConditions

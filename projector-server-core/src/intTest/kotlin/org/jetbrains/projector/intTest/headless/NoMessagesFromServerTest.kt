@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.intTest
+package org.jetbrains.projector.intTest.headless
 
 import com.codeborne.selenide.Condition.*
 import com.codeborne.selenide.Configuration

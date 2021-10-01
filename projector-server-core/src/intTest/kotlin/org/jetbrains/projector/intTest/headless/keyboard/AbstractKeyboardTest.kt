@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.intTest.keyboard
+package org.jetbrains.projector.intTest.headless.keyboard
 
 import com.codeborne.selenide.Condition.appear
 import com.codeborne.selenide.Selenide.element
@@ -70,7 +70,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
       assertEquals(id, actual.id)
       assertEquals(keyCode, actual.keyCode)
       // keyText is generated from keyCode so no need to compare it
-      assertEquals(keyChar, actual.keyChar, "expected int: ${keyChar.toInt()} but was int: ${actual.keyChar.toInt()}")
+      assertEquals(keyChar, actual.keyChar, "expected int: ${keyChar.code} but was int: ${actual.keyChar.code}")
       keyLocation?.let { assertEquals(it, actual.keyLocation) }
       ?: loggerFactory("checkEvent").info { "Skipping keyLocation check for $actual" }
       if (modifiersEx >= 0) {
