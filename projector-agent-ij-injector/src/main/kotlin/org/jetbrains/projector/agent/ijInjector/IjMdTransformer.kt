@@ -28,11 +28,8 @@ import javassist.CtClass
 import org.jetbrains.projector.agent.common.transformation.TransformationResult
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 import org.jetbrains.projector.agent.common.transformation.classForNameOrNull
-import org.jetbrains.projector.util.logging.Logger
 
 internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
-
-  override val logger = Logger<IjMdTransformer>()
 
   private const val MD_EXTENSION_ID = "org.intellij.markdown.html.panel.provider"
 
@@ -59,12 +56,12 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     }
   }
 
-  override fun getClassLoader(parameters: IjInjector.AgentParameters): ClassLoader? {
+  override fun getClassLoader(parameters: IjInjector.AgentParameters, nullReasonConsumer: (String) -> Unit): ClassLoader? {
     val extensionPointName = ExtensionPointName.create<Any>(MD_EXTENSION_ID)
     val extensions = try {
       extensionPointName.extensions
     } catch (e: IllegalArgumentException) {
-      logger.debug { "Markdown plugin is not installed. Skip the transform" }
+      nullReasonConsumer("Markdown plugin is disabled")
       return null
     }
 

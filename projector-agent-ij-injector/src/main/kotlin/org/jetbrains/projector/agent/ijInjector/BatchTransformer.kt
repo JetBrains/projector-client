@@ -32,7 +32,7 @@ internal class BatchTransformer(private val transformerSetups: List<TransformerS
 
   private val results = mutableListOf<TransformationResult>()
 
-  override val logger: Logger = Logger<BatchTransformer>()
+  private val logger: Logger = Logger<BatchTransformer>()
 
   override var transformationResultConsumer = { transformationResult: TransformationResult ->
     results += transformationResult

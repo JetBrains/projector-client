@@ -26,16 +26,10 @@ package org.jetbrains.projector.agent.common.transformation
 import javassist.ClassPool
 import javassist.CtClass
 import javassist.LoaderClassPath
-import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.ClassFileTransformer
 import java.lang.instrument.Instrumentation
 
 public interface TransformerSetup<P> {
-
-  /**
-   * Logger to be used for reporting transformation result
-   */
-  public val logger: Logger
 
   /**
    * Maps class to function that is invoked to get transformed class bytecode.
@@ -67,6 +61,16 @@ public interface TransformerSetup<P> {
    * Classpath of the returned classloader is also used to get bytecode of classes that will be transformed.
    *
    * @param parameters agent parameters that are passed from server
+   * @param nullReasonConsumer pass a reason why you return null
+   * @return Classloader that will be passed to [getTransformations] method and used to get bytecode of classes that will be transformed
+   */
+  public fun getClassLoader(parameters: P, nullReasonConsumer: (String) -> Unit): ClassLoader? = getClassLoader(parameters)
+
+  /**
+   * Classloader that will be passed to [getTransformations] method. This method is useful if you need to transform classes of a plugin.
+   * Classpath of the returned classloader is also used to get bytecode of classes that will be transformed.
+   *
+   * @param parameters agent parameters that are passed from server
    * @return Classloader that will be passed to [getTransformations] method and used to get bytecode of classes that will be transformed
    */
   public fun getClassLoader(parameters: P): ClassLoader? = javaClass.classLoader
@@ -92,19 +96,29 @@ public interface TransformerSetup<P> {
     canRetransform: Boolean = true,
   ) {
 
+    fun skipAllClasses(reason: String) {
+      transformationResultConsumer(TransformationResult.Skip(this, "All classes", reason))
+    }
+
     if (!isTransformerAvailable(parameters)) {
-      transformationResultConsumer(TransformationResult.Skip(this, "All classes", "Transformer is not available for provided parameters"))
+      skipAllClasses("Transformer is not available for provided parameters")
       return
     }
 
-    val loader = getClassLoader(parameters) ?: kotlin.run {
-      transformationResultConsumer(TransformationResult.Skip(this, "All classes", "Classloader is null"))
+    var reasonProvided = false
+    val loader = getClassLoader(parameters) { reason ->
+      reasonProvided = true
+      skipAllClasses(reason)
+    } ?: kotlin.run {
+      if (!reasonProvided) {
+        skipAllClasses("Classloader is null")
+      }
       return
     }
 
     val transformations = getTransformations(parameters, loader)
     if (transformations.isEmpty()) {
-      transformationResultConsumer(TransformationResult.Skip(this, "All classes", "No transformations found"))
+      skipAllClasses("No transformations found")
       return
     }
 

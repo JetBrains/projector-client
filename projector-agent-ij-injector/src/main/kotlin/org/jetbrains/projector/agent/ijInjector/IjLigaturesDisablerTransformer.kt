@@ -26,11 +26,8 @@ package org.jetbrains.projector.agent.ijInjector
 import com.intellij.openapi.editor.colors.impl.FontPreferencesImpl
 import javassist.CtClass
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
-import org.jetbrains.projector.util.logging.Logger
 
 internal object IjLigaturesDisablerTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
-
-  override val logger = Logger<IjLigaturesDisablerTransformer>()
 
   override val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
     FontPreferencesImpl::class.java to ::transformFontPrefs,

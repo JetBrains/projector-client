@@ -28,11 +28,8 @@ import com.intellij.openapi.project.Project
 import javassist.CtClass
 import org.jetbrains.projector.agent.common.getDeclaredMethod
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
-import org.jetbrains.projector.util.logging.Logger
 
 internal object IjBrowserUtilTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
-
-  override val logger = Logger<IjBrowserUtilTransformer>()
 
   override val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
     BrowserUtil::class.java to ::transformBrowserUtil,

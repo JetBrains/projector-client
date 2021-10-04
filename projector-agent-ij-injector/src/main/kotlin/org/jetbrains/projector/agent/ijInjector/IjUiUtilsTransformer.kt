@@ -26,11 +26,8 @@ package org.jetbrains.projector.agent.ijInjector
 import com.intellij.util.ui.UIUtil
 import javassist.CtClass
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
-import org.jetbrains.projector.util.logging.Logger
 
 internal object IjUiUtilsTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
-
-  override val logger = Logger<IjUiUtilsTransformer>()
 
   override val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
     UIUtil::class.java to ::transformUiUtil,
