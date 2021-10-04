@@ -614,8 +614,8 @@
 <p>Allows loading classes from Projector, Projector agent and Intellij Platform without the use of reflection</p>
 </div>
 <p>Default AppClassLoader of Projector Server doesn't know anything about JB IDE and so cannot load its classes as they were loaded by different classloader. Similar, IDE ClassLoader doesn't know anything about Projector classes (and can be gathered only after IDE startup). </p>
-<p>The idea behind ProjectorClassLoader is simple - delegate classloading to the right classloader. If classname belongs to Projector, we get bytecode via AppClassLoader and define class ourselves (so that other classes could also be loaded via ProjectorClassLoader). If we think classname determines a class from Intellij Platform then we should load it via IDE ClassLoader. If the classname belongs neither to Projector classes nor to Intellij Platform, then we just fall back to load it via AppClassLoader. </p>
-<p>However, sometimes we need to load specific class or a set of classes using another classloader. That's where methods <code>forceLoadByPlatform</code> and <code>forceLoadByProjectorClassLoader</code> come into play. </p>
+<p>The idea behind ProjectorClassLoader is simple - delegate classloading to the right classloader. If we think classname determines a class from Intellij Platform then we should load it via IDE ClassLoader. If not, then we fall back to load it via AppClassLoader. </p>
+<p>To specify how classes should be loaded with ProjectorClassLoader you need to call one of the <code>forceLoadBy*</code> methods: </p>
 <table>
 <thead>
 <tr>
@@ -632,8 +632,16 @@
 <td><code>forceLoadByProjectorClassLoader</code></td>
 <td>ProjectorClassLoader (gather bytecode from any of AppClassLoader or IDE ClassLoader and then define class ourselves)</td>
 </tr>
+<tr>
+<td><code>forceLoadByIdea</code></td>
+<td>IDE ClassLoader (PathClassloader or UrlClassLoader, depending on IDE version)</td>
+</tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Another way to specify ClassLoader for class is to apply <code>UseProjectorLoader</code> annotation.</p>
+</div>
 <h2 id="initializing-projectorclassloader">Initializing ProjectorClassLoader<a class="headerlink" href="#initializing-projectorclassloader" title="Permanent link">&para;</a></h2>
 <p>To initialize ProjectorClassLoader, call function 
 <div class="highlight"><pre><span></span><code><span class="k">package</span> <span class="nn">org.jetbrains.projector.server.core.classloader</span>
