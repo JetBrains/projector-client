@@ -21,12 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package `org,jetbrains`.projector.agent.common
+package org.jetbrains.projector.agent.common
 
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class MiskTest {
+class MiscTest {
   @Test
   fun `empty test for coverage building`() {
     assertTrue(true)
