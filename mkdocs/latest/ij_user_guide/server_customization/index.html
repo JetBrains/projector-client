@@ -421,6 +421,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#disabling-ide-and-plugins-updates" class="md-nav__link">
+    Disabling IDE and plugins updates
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -795,6 +802,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#disabling-ide-and-plugins-updates" class="md-nav__link">
+    Disabling IDE and plugins updates
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1016,6 +1030,24 @@ Additional transports can be added at runtime via <code>ProjectorServer.addTrans
 <p class="admonition-title">Warning</p>
 <p>With default Projector distribution, this will leave you with no way to connect to it. This option is intended primarily for use with alternative embedding approaches.</p>
 </div>
+<h3 id="disabling-ide-and-plugins-updates">Disabling IDE and plugins updates<a class="headerlink" href="#disabling-ide-and-plugins-updates" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ORG_JETBRAINS_PROJECTOR_SERVER_DISABLE_IDEA_UPDATES</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table>
+<p>Setting this option to <code>false</code> will enable the platform and plugins updates.</p>
 <h2 id="difference-between-env-vars-and-system-props">Difference between env vars and system props<a class="headerlink" href="#difference-between-env-vars-and-system-props" title="Permanent link">&para;</a></h2>
 <p>The advantage of specifying a system property is that it's not passed to a child process automatically.</p>
 <p>So, for example, passwords won't be passed to a child process: this is more secure, and also it makes Projector development inside Projector easier.</p>
