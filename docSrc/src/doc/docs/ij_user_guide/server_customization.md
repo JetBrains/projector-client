@@ -128,6 +128,14 @@ Additional transports can be added at runtime via `ProjectorServer.addTransport`
 !!! warning
     With default Projector distribution, this will leave you with no way to connect to it. This option is intended primarily for use with alternative embedding approaches.
 
+### Disabling IDE and plugins updates
+
+Name | Type | Default value
+---|---|---
+`ORG_JETBRAINS_PROJECTOR_SERVER_DISABLE_IDEA_UPDATES` | Boolean | `true`
+
+Setting this option to `false` will enable the platform and plugins updates.
+
 
 ## Difference between env vars and system props
 
