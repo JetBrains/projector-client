@@ -289,7 +289,7 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) : HttpWsTranspo
 
   override fun forEachOpenedConnection(action: (client: ClientWrapper) -> Unit) {
     webSocketServer.connections.filter(WebSocket::isOpen).forEach {
-      val wrapper = it.getAttachment<ClientWrapper>() ?: return@forEachOpenedConnection
+      val wrapper = it.getAttachment<Any?>() as? ClientWrapper ?: return@forEachOpenedConnection
       action(wrapper)
     }
   }
