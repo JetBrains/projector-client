@@ -194,7 +194,6 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
       get() = myInstance ?: ProjectorClassLoader()
 
     private fun isProjectorClass(name: String): Boolean = name.startsWith(PROJECTOR_PACKAGE_PREFIX)
-                                                          && name != ProjectorClassLoader::class.java.name
 
     private fun isIntellijClass(name: String): Boolean = name.startsWith(INTELLIJ_PACKAGE_PREFIX)
                                                          || (name.startsWith(JETBRAINS_PACKAGE_PREFIX) && !isProjectorClass(name))
