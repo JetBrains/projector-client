@@ -39,41 +39,41 @@ import javax.swing.JComponent
 public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateClass: String) : MarkdownHtmlPanel {
 
   // we need to create instance even in headless mode as in new versions it starts server which hosts styles
-  private val agentDelegate = Class.forName(agentDelegateClass).getDeclaredConstructor().newInstance() as MarkdownHtmlPanel
-  private val clientDelegate = PanelDelegate(if (isAgent) agentDelegate.component else null)
+  private val agentDelegate: MarkdownHtmlPanel? = if (isAgent) createNativeMarkdownPanel(agentDelegateClass) else null
+  private val clientDelegate = PanelDelegate(if (isAgent) agentDelegate?.component else null)
 
   override fun dispose() {
-    agentDelegate.dispose()
+    agentDelegate?.dispose()
     clientDelegate.dispose()
   }
 
   override fun getComponent(): JComponent {
     return if (isAgent)
-      agentDelegate.component
+      agentDelegate!!.component // assume agentDelegate is non-null in agent mode
     else
       clientDelegate.getComponent()
   }
 
   @Suppress("unused") // deprecated and removed in 2020.3, but is used in previous versions
   public fun setHtml(html: String) {
-    agentDelegate.setHtml(html)
+    agentDelegate?.setHtml(html)
     clientDelegate.setHtml(html)
   }
 
   @Suppress("unused") // deprecated and removed in 2021.1, but is used in previous versions
   public fun setCSS(inlineCss: String?, vararg fileUris: String?) {
-    agentDelegate.setCSS(inlineCss, *fileUris)
+    agentDelegate?.setCSS(inlineCss, *fileUris)
     clientDelegate.setCSS(inlineCss, *fileUris)
   }
 
   @Suppress("unused") // deprecated in 2020.3 and removed in 2021.1, but is used in previous versions
   public fun render() {
-    agentDelegate.render()
+    agentDelegate?.render()
     clientDelegate.render()
   }
 
   override fun setHtml(html: String, initialScrollOffset: Int) {
-    agentDelegate.setHtml(html, initialScrollOffset)
+    agentDelegate?.setHtml(html, initialScrollOffset)
     clientDelegate.setHtml(html, initialScrollOffset)
 
     if (isRenderMethodRemoved) {
@@ -83,22 +83,22 @@ public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateC
   }
 
   override fun reloadWithOffset(offset: Int) {
-    agentDelegate.reloadWithOffset(offset)
+    agentDelegate?.reloadWithOffset(offset)
     // TODO implement for PanelDelegate
   }
 
   override fun scrollToMarkdownSrcOffset(offset: Int) {
-    agentDelegate.scrollToMarkdownSrcOffset(offset)
+    agentDelegate?.scrollToMarkdownSrcOffset(offset)
     clientDelegate.scrollToMarkdownSrcOffset(offset)
   }
 
   override fun addScrollListener(listener: MarkdownHtmlPanel.ScrollListener?) {
-    agentDelegate.addScrollListener(listener)
+    agentDelegate?.addScrollListener(listener)
     // TODO implement for PanelDelegate
   }
 
   override fun removeScrollListener(listener: MarkdownHtmlPanel.ScrollListener?) {
-    agentDelegate.removeScrollListener(listener)
+    agentDelegate?.removeScrollListener(listener)
     // TODO implement for PanelDelegate
   }
 
@@ -146,6 +146,15 @@ public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateC
 
     private fun MarkdownHtmlPanel.render() {
       renderMethod.invoke(this)
+    }
+
+    private fun createNativeMarkdownPanel(className: String): MarkdownHtmlPanel? {
+      return try {
+        Class.forName(className).getDeclaredConstructor().newInstance() as? MarkdownHtmlPanel
+      } catch (e: Exception) {
+        logger.error(e) { "Exception during instantiating MarkdownHtmlPanel of type $className" }
+        null
+      }
     }
   }
 }
