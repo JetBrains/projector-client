@@ -82,7 +82,7 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     isAgent: Boolean,
   ): ByteArray {
 
-    val availabilityInfo = when (previewType.isAvailable()) {
+    val availabilityInfo = when (!isAgent || previewType.isAvailable()) {
       // language=java prefix="class Dummy { var t = " suffix="; }"
       true -> "org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanelProvider.AvailabilityInfo.AVAILABLE"
       // language=java prefix="class Dummy { var t = " suffix="; }"
