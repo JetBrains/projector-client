@@ -23,7 +23,10 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.extensions.ExtensionPointName
+import com.intellij.openapi.extensions.PluginId
+import com.intellij.openapi.util.BuildNumber
 import com.intellij.ui.jcef.JBCefApp
 import javassist.CtClass
 import org.jetbrains.projector.agent.common.transformation.TransformationResult
@@ -41,6 +44,9 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
   // language=java prefix="import " suffix=";"
   private const val jcefClass = "org.intellij.plugins.markdown.ui.preview.jcef.JCEFHtmlPanelProvider"
 
+  // language=java prefix="import " suffix=";"
+  private const val previewFileEditorClass = "org.intellij.plugins.markdown.ui.preview.MarkdownPreviewFileEditor"
+
   override fun getTransformations(
     parameters: IjInjector.AgentParameters,
     classLoader: ClassLoader,
@@ -49,7 +55,9 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     val projectorClassLoader = ProjectorClassLoader.instance
     projectorClassLoader.addPluginLoader("org.intellij.plugins.markdown", classLoader)
 
-    return listOf(
+    val transformations = mutableMapOf<Class<*>, (CtClass) -> ByteArray?>()
+
+    transformations += listOf(
       javaFxClass to MdPreviewType.JAVAFX,
       jcefClass to MdPreviewType.JCEF,
     ).mapNotNull { (className, previewType) ->
@@ -61,6 +69,13 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     }.associate { (clazz, previewType) ->
       clazz to { ctClass -> transformMdHtmlPanelProvider(previewType, ctClass, parameters.markdownPanelClassName, parameters.isAgent) }
     }
+
+    if (!parameters.isAgent && isPreviewCheckIsBrokenInHeadless()) {
+      val previewFileEditor = Class.forName(previewFileEditorClass, false, classLoader)
+      transformations[previewFileEditor] = ::fixMarkdownPreviewNPE
+    }
+
+    return transformations
   }
 
   override fun getClassLoader(parameters: IjInjector.AgentParameters, nullReasonConsumer: (String) -> Unit): ClassLoader? {
@@ -73,6 +88,45 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     }
 
     return extensions.filterNotNull().first()::class.java.classLoader
+  }
+
+  private fun isPreviewCheckIsBrokenInHeadless(): Boolean {
+    val buildNumberMin = BuildNumber.fromString("201.0")!!
+    val buildNumberFixed = BuildNumber.fromString("212.0")!!
+    val markdownVersionString = PluginManagerCore.getPlugin(PluginId.getId("org.intellij.plugins.markdown"))!!.version
+    val markdownBuildNumber = BuildNumber.fromString(markdownVersionString)!!
+    return markdownBuildNumber >= buildNumberMin && markdownBuildNumber < buildNumberFixed
+  }
+
+  private fun fixMarkdownPreviewNPE(previewFileEditorClazz: CtClass): ByteArray {
+
+    @Suppress("deprecation") // copied from Markdown plugin 212
+    previewFileEditorClazz
+      .getDeclaredMethod("isPreviewShown")
+      .setBody(
+        // language=java prefix="class MarkdownPreviewFileEditor { private static boolean isPreviewShown(@NotNull com.intellij.openapi.project.Project $1, @NotNull com.intellij.openapi.vfs.VirtualFile $2)" suffix="}"
+        """
+          {
+            org.intellij.plugins.markdown.ui.preview.MarkdownSplitEditorProvider provider = 
+              com.intellij.openapi.fileEditor.FileEditorProvider
+                .EP_FILE_EDITOR_PROVIDER
+                .findExtension(org.intellij.plugins.markdown.ui.preview.MarkdownSplitEditorProvider.class);
+            if (provider == null) {
+              return true;
+            }
+        
+            com.intellij.openapi.fileEditor.FileEditorState state = com.intellij.openapi.fileEditor.impl.EditorHistoryManager.getInstance($1).getState($2, provider);
+            if (!(state instanceof org.intellij.plugins.markdown.ui.split.SplitFileEditor.MyFileEditorState)) {
+              return true;
+            }
+        
+            String layout = ((org.intellij.plugins.markdown.ui.split.SplitFileEditor.MyFileEditorState)state).getSplitLayout();
+            return layout == null || !layout.equals("FIRST");
+          }
+        """.trimIndent()
+      )
+
+    return previewFileEditorClazz.toBytecode()
   }
 
   private fun transformMdHtmlPanelProvider(

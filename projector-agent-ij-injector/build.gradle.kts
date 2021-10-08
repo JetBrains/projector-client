@@ -46,8 +46,7 @@ dependencies {
   implementation(project(":projector-util-logging"))
   implementation("org.javassist:javassist:$javassistVersion")
 
-  compileOnly("com.jetbrains.intellij.platform:editor-ex:$intellijPlatformVersion")
-  compileOnly("com.jetbrains.intellij.platform:ide:$intellijPlatformVersion")
+  compileOnly("com.jetbrains.intellij.platform:ide-impl:$intellijPlatformVersion")
   compileOnly("com.jetbrains.intellij.platform:util-ui:$intellijPlatformVersion")
 
   compileOnly("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion")
