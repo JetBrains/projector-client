@@ -73,6 +73,7 @@ nav:
       - Running remote app – servers: ij_user_guide/running.md
       - Accessing remote app – clients: ij_user_guide/accessing.md
       - Customizing servers: ij_user_guide/server_customization.md
+      - Android: ij_user_guide/android.md
   - User guide – other Swing apps:
       - Arbitrary Swing app: swing_user_guide/arbitrary.md
   - Developer guide:
