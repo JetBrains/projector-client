@@ -21,7 +21,7 @@ In recent versions of Intellij or Android Studio based on 2021 you can disable t
 
 On older versions of Intellij and Android studio you need to terminate the adb process on the server prior to initiating the SSH connection with port forwarding to enable a consistent experience with a stable connection.
 
-`ssh <hostname> "killall adb" ; ssh R5037:127.0.0.1:5037 <hostname>`
+`ssh <hostname> "killall adb" ; ssh -R5037:127.0.0.1:5037 <hostname>`
 
 
 ## Helper functions to establish a stable connection with multiplexing.
