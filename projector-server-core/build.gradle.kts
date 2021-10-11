@@ -144,6 +144,9 @@ dependencies {
   compileOnly("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion")
 
   testImplementation(kotlin("test", kotlinVersion))
+  testImplementation("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion") {
+    exclude("com.jetbrains.rd")
+  }
 
   intTestImplementation("com.codeborne:selenide:$selenideVersion")
   intTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
