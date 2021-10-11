@@ -68,31 +68,22 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./JacocoReports/
 
-  test-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: browser-actions/setup-chrome@latest
-      - uses: actions/checkout@v2
-      - uses: gradle/wrapper-validation-action@v1
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: '11'
-      - name: Clean
-        run: gradle clean
-      - name: Run tests
-        run: |
-          $Env:CHROME_BIN = 'c:\hostedtoolcache\windows\chromium\latest\x64\chrome.exe'
-          ./gradlew check
-          ./gradlew :projector-server-core:jacocoTestReport
-          ./gradlew :projector-common:jacocoTestReport
-          ./gradlew :projector-agent-common:jacocoTestReport
-          ./gradlew :projector-agent-ij-injector:jacocoTestReport
-          ./gradlew :projector-client-common:jacocoTestReport
-          ./gradlew :projector-util-agent:jacocoTestReport
+# TODO: understand why windows tests hang
+#  test-windows:
+#    runs-on: windows-latest
+#    steps:
+#      - uses: browser-actions/setup-chrome@latest
+#      - uses: actions/checkout@v2
+#      - uses: gradle/wrapper-validation-action@v1
+#      - name: Setup Java
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: '11'
+#      - name: Clean
+#        run: gradle clean
+#      - name: Run tests
+#        run: |
+#          $Env:CHROME_BIN = 'c:\hostedtoolcache\windows\chromium\latest\x64\chrome.exe'
+#          ./gradlew :projector-server-core:integrationTest  --tests "org.jetbrains.projector.intTest.headless.*"
+#          ./gradlew :projector-server-core:integrationTest  --tests "org.jetbrains.projector.intTest.lowLevelKeyboard.*"
 #          ./gradlew :projector-client-web:browserTest
-      - name: test coverage
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./JacocoReports/

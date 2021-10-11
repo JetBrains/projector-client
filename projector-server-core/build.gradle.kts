@@ -124,7 +124,7 @@ val integrationTest = task<Test>("integrationTest") {
   }
   finalizedBy(tasks.jacocoTestReport)
 }
-// todo: low level tests don't work on CI
+
 tasks.check { dependsOn(integrationTest) }
 
 dependencies {

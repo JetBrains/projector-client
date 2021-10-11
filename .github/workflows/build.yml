@@ -23,7 +23,7 @@ jobs:
         with:
           java-version: '11'
       - run: ./gradlew clean
-      - run: ./gradlew build
+      - run: ./gradlew build -x check
 
   build-launcher-linux:
 
