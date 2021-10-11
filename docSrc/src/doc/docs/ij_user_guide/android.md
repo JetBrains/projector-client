@@ -15,7 +15,7 @@ However IntelliJ aggresively tries to start ADB independently by default, and th
 
 In recent versions of IntelliJ or Android Studio based on 2021 you can disable the management of ADB under File -> Settings -> Build, Execution, Deployment -> Debugger -> Android server lifecycle management by switching the setting to "use existing manually managed port"
 
-![](/assets/images/adb_settings.png)
+![](../../assets/images/adb_settings.png)
 
 ## IntelliJ 2020
 
