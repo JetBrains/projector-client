@@ -647,7 +647,7 @@
 <p>However IntelliJ aggresively tries to start ADB independently by default, and this can cause a conflict in port forwarding which causes this to fail. This becomes more pronounced in introducing instability with IntelliJ and Projector are ran persistently on the server as a daemon.</p>
 <h2 id="intellij-2021-or-later">IntelliJ 2021 or later<a class="headerlink" href="#intellij-2021-or-later" title="Permanent link">&para;</a></h2>
 <p>In recent versions of IntelliJ or Android Studio based on 2021 you can disable the management of ADB under File -&gt; Settings -&gt; Build, Execution, Deployment -&gt; Debugger -&gt; Android server lifecycle management by switching the setting to "use existing manually managed port"</p>
-<p><img alt="" src="/assets/images/adb_settings.png" /></p>
+<p><img alt="" src="../../assets/images/adb_settings.png" /></p>
 <h2 id="intellij-2020">IntelliJ 2020<a class="headerlink" href="#intellij-2020" title="Permanent link">&para;</a></h2>
 <p>On older versions of IntelliJ and Android studio you need to terminate the adb process on the server prior to initiating the SSH connection with port forwarding to enable a consistent experience with a stable connection.</p>
 <p><code>ssh &lt;hostname&gt; "killall adb" ; ssh -R5037:127.0.0.1:5037 &lt;hostname&gt;</code></p>
