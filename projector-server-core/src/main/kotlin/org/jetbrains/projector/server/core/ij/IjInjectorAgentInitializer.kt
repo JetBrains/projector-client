@@ -32,6 +32,9 @@ import java.lang.ref.WeakReference
 @Suppress("unused") // Used in projector-server
 public object IjInjectorAgentInitializer {
 
+  // raw string because it must be loaded with Markdown PluginClassLoader
+  internal const val MD_PANEL_CLASS_NAME = "org.jetbrains.projector.server.core.ij.md.ProjectorMarkdownPanel"
+
   @Suppress("unused") // Called from projector-server, don't trigger linter that doesn't know it
   @OptIn(ExperimentalStdlibApi::class)
   public fun init(isAgent: Boolean) {
@@ -42,15 +45,13 @@ public object IjInjectorAgentInitializer {
       val ijClProviderClass = IjInjectorAgentClassLoaders::class.java.name
       val ijClProviderMethod = IjInjectorAgentClassLoaders::getIdeClassloader.name
       val prjClProviderMethod = IjInjectorAgentClassLoaders::getProjectorClassloader.name
-      // raw string because it must be loaded with Markdown PluginClassLoader
-      val mdPanelClass = "org.jetbrains.projector.server.core.ij.md.ProjectorMarkdownPanel"
 
       val args = mapOf(
         IjArgs.IS_AGENT to isAgent,
         IjArgs.IJ_CL_PROVIDER_CLASS to ijClProviderClass,
         IjArgs.IJ_CL_PROVIDER_METHOD to ijClProviderMethod,
         IjArgs.PRJ_CL_PROVIDER_METHOD to prjClProviderMethod,
-        IjArgs.MD_PANEL_CLASS to mdPanelClass,
+        IjArgs.MD_PANEL_CLASS to MD_PANEL_CLASS_NAME,
       ).toIjArgs()
 
       copyAgentToTempJarAndAttach(
