@@ -45,17 +45,17 @@ class WindowManager(private val stateMachine: ClientStateMachine, val imageCache
     window.onfocus = ::onActivated
   }
 
-  private fun getVisibleWindows(): List<Window> {
-    return windows.values.filter { it.isShowing }
-  }
+  private val visibleWindows get() = windows.values.filter { it.isShowing }
 
-  private fun onActivated(event: FocusEvent) {
-    val windowIds = getVisibleWindows().map { it.id }
+  // todo: remove SUPPRESS after KT-8112 is implemented or KTIJ-15401 is solved in some other way
+  private fun onActivated(@Suppress("UNUSED_PARAMETER") event: FocusEvent) {
+    val windowIds = visibleWindows.map { it.id }
     stateMachine.fire(ClientAction.AddEvent(ClientWindowsActivationEvent(windowIds)))
   }
 
-  private fun onDeactivated(event: FocusEvent) {
-    val windowIds = getVisibleWindows().map { it.id }
+  // todo: remove SUPPRESS after KT-8112 is implemented or KTIJ-15401 is solved in some other way
+  private fun onDeactivated(@Suppress("UNUSED_PARAMETER") event: FocusEvent) {
+    val windowIds = visibleWindows.map { it.id }
     stateMachine.fire(ClientAction.AddEvent(ClientWindowsDeactivationEvent(windowIds)))
   }
 
