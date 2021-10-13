@@ -25,7 +25,6 @@ package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
 import kotlinx.dom.addClass
-import org.jetbrains.projector.client.common.DrawEvent
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.DomCanvas
 import org.jetbrains.projector.client.common.canvas.buffering.DoubleBufferedRenderingSurface
@@ -59,9 +58,6 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   val id = windowData.id
 
-  val pendingDrawEvents = ArrayDeque<DrawEvent>()
-  val newDrawEvents = ArrayDeque<DrawEvent>()
-
   var title: String? = null
     set(value) {
       field = value
@@ -91,7 +87,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   private var headerHeight: Double = 0.0
   private val border = WindowBorder(windowData.resizable)
 
-  private val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface, imageCacher)
+  val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface, imageCacher)
 
   override var bounds: CommonRectangle = CommonRectangle(0.0, 0.0, 0.0, 0.0)
     set(value) {
@@ -232,6 +228,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
         clientBounds.width,
         headerHeight * userScalingRatio
       )
+      header!!.draw()
     }
 
     border.bounds = CommonRectangle(
@@ -259,31 +256,6 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
     canvas.remove()
     border.dispose()
     header?.dispose()
-  }
-
-  fun drawPendingEvents() {
-    if (pendingDrawEvents.isNotEmpty()) {
-      commandProcessor.processPending(pendingDrawEvents)
-      renderingSurface.flush()
-    }
-    header?.draw()  // todo: do we need to draw it every time?
-  }
-
-  fun drawNewEvents() {
-    val firstUnsuccessful = commandProcessor.processNew(newDrawEvents)
-    renderingSurface.flush()
-    header?.draw()  // todo: do we need to draw it every time?
-
-    if (pendingDrawEvents.isNotEmpty()) {
-      pendingDrawEvents.addAll(newDrawEvents)
-    }
-    else if (firstUnsuccessful != null) {
-      if (pendingDrawEvents.isNotEmpty()) {
-        console.error("Non empty pendingDrawEvents are handled by another branch, aren't they? This branch works only for empty.")
-      }
-      pendingDrawEvents.addAll(newDrawEvents.subList(firstUnsuccessful, newDrawEvents.size))
-    }
-    newDrawEvents.clear()
   }
 
   companion object {

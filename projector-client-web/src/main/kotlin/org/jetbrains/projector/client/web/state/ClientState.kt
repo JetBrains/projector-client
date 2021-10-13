@@ -34,6 +34,7 @@ import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.protocol.KotlinxJsonToClientHandshakeDecoder
 import org.jetbrains.projector.client.common.protocol.KotlinxJsonToServerHandshakeEncoder
+import org.jetbrains.projector.client.web.RenderingQueue
 import org.jetbrains.projector.client.web.ServerEventsProcessor
 import org.jetbrains.projector.client.web.WindowSizeController
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
@@ -341,15 +342,17 @@ sealed class ClientState {
 
     private val windowDataEventsProcessor = WindowDataEventsProcessor(windowManager)
 
-    private var drawPendingEvents = GlobalScope.launch {
+    private val renderingQueue = RenderingQueue(windowManager)
+
+    private val drawPendingEvents = GlobalScope.launch {
       // redraw windows in case any missing images are loaded now
       while (true) {
-        windowDataEventsProcessor.drawPendingEvents()
+        renderingQueue.drawPendingEvents()
         delay(ParamsProvider.REPAINT_INTERVAL_MS.toLong())
       }
     }
 
-    private val serverEventsProcessor = ServerEventsProcessor(windowDataEventsProcessor)
+    private val serverEventsProcessor = ServerEventsProcessor(windowManager, windowDataEventsProcessor, renderingQueue)
 
     private val messagingPolicy = (
       ParamsProvider.FLUSH_DELAY

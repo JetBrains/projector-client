@@ -34,26 +34,11 @@ import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
 
-class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface, private val imageCacher: ImageCacher) {
+class SingleRenderingSurfaceProcessor(private val renderingSurface: RenderingSurface, private val imageCacher: ImageCacher) {
 
   private val renderer = Renderer(renderingSurface)
 
-  private val stateSaver = StateSaver(renderer, renderingSurface)
-
-  fun processPending(drawEvents: ArrayDeque<DrawEvent>) {
-    stateSaver.restoreIfNeeded()
-
-    val firstUnsuccessful = processNew(drawEvents)
-
-    if (firstUnsuccessful == null) {
-      drawEvents.clear()
-    }
-    else {
-      repeat(firstUnsuccessful) {
-        drawEvents.removeFirst()
-      }
-    }
-  }
+  val stateSaver = StateSaver(renderer, renderingSurface)
 
   fun processNew(drawEvents: Iterable<DrawEvent>): Int? {
     var firstUnsuccessful: Int? = null
@@ -68,6 +53,10 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface, privat
     }
 
     return firstUnsuccessful
+  }
+
+  fun flush() {
+    renderingSurface.flush()
   }
 
   private fun handleDrawEvent(command: DrawEvent): Boolean {
@@ -219,7 +208,7 @@ class SingleRenderingSurfaceProcessor(renderingSurface: RenderingSurface, privat
     return success
   }
 
-  private class StateSaver(private val renderer: Renderer, private val renderingSurface: RenderingSurface) {
+  class StateSaver(private val renderer: Renderer, private val renderingSurface: RenderingSurface) {
 
     private var lastSuccessfulState: LastSuccessfulState? = null
 

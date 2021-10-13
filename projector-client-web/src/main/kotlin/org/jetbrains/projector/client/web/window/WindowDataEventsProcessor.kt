@@ -24,28 +24,20 @@
 package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
-import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.common.protocol.data.ImageId
-import org.jetbrains.projector.common.protocol.toClient.ServerWindowEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowSetChangedEvent
 import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
-import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLLinkElement
 import kotlin.collections.isNotEmpty
 
-class WindowDataEventsProcessor(internal val windowManager: WindowManager) {
+class WindowDataEventsProcessor(private val windowManager: WindowManager) {
 
-  private var excludedWindowIds = emptyList<Int>()
-
-  fun drawPendingEvents() {
-    synchronized(windowManager) {
-      windowManager.forEach(Window::drawPendingEvents)
-    }
-  }
+  var excludedWindowIds = emptyList<Int>()
+    private set
 
   fun onClose() {
     process(ServerWindowSetChangedEvent(emptyList()))
@@ -60,7 +52,7 @@ class WindowDataEventsProcessor(internal val windowManager: WindowManager) {
         .sortedBy(WindowData::id)
         .filterIndexed { index, _ -> index != selectedId }
     }
-    excludedWindowIds = excludedWindows.map(WindowData::id)
+    excludedWindowIds = excludedWindows.map(WindowData::id)  // todo: try to use ClientWindowInterestEvent instead of filtering on client
     val presentedWindows = windowDataEvents.windowDataList.subtract(excludedWindows)
 
     removeAbsentWindows(presentedWindows)
@@ -117,28 +109,6 @@ class WindowDataEventsProcessor(internal val windowManager: WindowManager) {
     document.head!!.appendChild(link)
   }
 
-  fun draw(windowId: Int, commands: List<ServerWindowEvent>) {
-    if (windowId in excludedWindowIds) {
-      return
-    }
-
-    synchronized(windowManager) {
-      val window = windowManager[windowId]
-
-      if (window == null) {
-        logger.error { "Skipping nonexistent window: $windowId" }
-        return
-      }
-
-      val newEvents = commands.shrinkByPaintEvents()
-
-      if (newEvents.isNotEmpty()) {
-        window.newDrawEvents.addAll(newEvents)
-        window.drawNewEvents()
-      }
-    }
-  }
-
   private fun removeAbsentWindows(presentedWindows: Iterable<WindowData>) {
     val presentedWindowIds = presentedWindows.map(WindowData::id).toSet()
 
@@ -154,7 +124,6 @@ class WindowDataEventsProcessor(internal val windowManager: WindowManager) {
   }
 
   companion object {
-    private val logger = Logger<WindowDataEventsProcessor>()
     private const val DEFAULT_TITLE = "Projector"
   }
 }

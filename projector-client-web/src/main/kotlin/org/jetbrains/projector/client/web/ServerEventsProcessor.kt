@@ -24,7 +24,6 @@
 package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
-import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.electron.isElectron
 import org.jetbrains.projector.client.web.input.InputController
@@ -33,16 +32,22 @@ import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
 import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
+import org.jetbrains.projector.client.web.window.WindowManager
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.url.URL
 
-class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEventsProcessor) {
+class ServerEventsProcessor(
+  private val windowManager: WindowManager,
+  private val windowDataEventsProcessor: WindowDataEventsProcessor,
+  private val renderingQueue: RenderingQueue,
+) {
 
-  @OptIn(ExperimentalStdlibApi::class)
-  fun process(commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager,
-              inputController: InputController) {
+  fun process(
+    commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager,
+    inputController: InputController,
+  ) {
     val drawCommandsEvents = mutableListOf<ServerDrawCommandsEvent>()
 
     commands.forEach { command ->
@@ -54,7 +59,7 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
 
         is ServerDrawCommandsEvent -> drawCommandsEvents.add(command)
 
-        is ServerImageDataReplyEvent -> windowDataEventsProcessor.windowManager.imageCacher.putImageData(
+        is ServerImageDataReplyEvent -> windowManager.imageCacher.putImageData(
           command.imageId,
           command.imageData,
         )
@@ -89,32 +94,18 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
       }
     }
 
+    drawCommandsEvents.removeAll {
+      val target = it.target as? ServerDrawCommandsEvent.Target.Onscreen ?: return@removeAll false
+      target.windowId in windowDataEventsProcessor.excludedWindowIds
+    }
+
     // todo: determine the moment better
     if (drawCommandsEvents.any { it.drawEvents.any { drawEvent -> drawEvent is ServerDrawStringEvent } }) {
       typing.removeSpeculativeImage()
     }
 
-    drawCommandsEvents.sortWith(drawingOrderComparator)
-
-    drawCommandsEvents.forEach { event ->
-      Do exhaustive when (val target = event.target) {
-        is ServerDrawCommandsEvent.Target.Onscreen -> windowDataEventsProcessor.draw(target.windowId, event.drawEvents)
-
-        is ServerDrawCommandsEvent.Target.Offscreen -> {
-          val offscreenProcessor = windowDataEventsProcessor.windowManager.imageCacher.getOffscreenProcessor(target)
-
-          val drawEvents = event.drawEvents.shrinkByPaintEvents()
-
-          val firstUnsuccessful = offscreenProcessor.processNew(drawEvents)
-          if (firstUnsuccessful != null) {
-            // todo: remember unsuccessful events and redraw pending ones as for windows
-            logger.error { "Encountered unsuccessful drawing for an offscreen surface ${target.pVolatileImageId}, skipping" }
-          }
-
-          windowDataEventsProcessor.drawPendingEvents()
-        }
-      }
-    }
+    renderingQueue.add(drawCommandsEvents)
+    renderingQueue.drawNewEvents()
   }
 
   fun onResized() {
@@ -129,24 +120,5 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
   companion object {
 
     private val logger = Logger<ServerEventsProcessor>()
-
-    // todo: sorting is added only as a hacky temporary workaround for PRJ-20.
-    //       Please see commit description for details how this should be fixed
-    private val drawingOrderComparator = compareBy<ServerDrawCommandsEvent>(
-      // render offscreen surfaces first
-      {
-        when (it.target) {
-          is ServerDrawCommandsEvent.Target.Offscreen -> 0
-          is ServerDrawCommandsEvent.Target.Onscreen -> 1
-        }
-      },
-      // render older surfaces last
-      {
-        when (val target = it.target) {
-          is ServerDrawCommandsEvent.Target.Offscreen -> -target.pVolatileImageId
-          is ServerDrawCommandsEvent.Target.Onscreen -> -target.windowId
-        }
-      },
-    )
   }
 }
