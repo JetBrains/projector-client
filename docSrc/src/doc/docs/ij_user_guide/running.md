@@ -35,6 +35,12 @@ We have a sample Docker script that allows you to generate Docker images contain
 
 You can find instructions in the corresponding repo: <https://github.com/JetBrains/projector-docker>.
 
+### DockerHub
+
+To _DockerHub_ presented only the latest version of the projector (the version from the last commit on the master branch is being built) with different versions of IDE. Tags distributed on DockerHub as follows:
+ - `:latest` is latest tested version of IDE and latest projector version;
+ - `:Y.M.P` Year Minor Patch version of IDE, like projector-webstorm:2020.3.3, and latest version of projector.
+
 ## IDE Plugin
 
 Another way of running Projector is in **GUI** mode. To perform this with JetBrains IDEs, we have a plugin for IDEs. You need to install the plugin. After that, the plugin will provide controls to start the screen sharing. This can be useful when you have a workstation with GUI, but need to have an option to leave the workplace and resume the work remotely. With IDE plugin that supports GUI, you don't need to restart already opened IDE.
