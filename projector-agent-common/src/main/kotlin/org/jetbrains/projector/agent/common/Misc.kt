@@ -21,11 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+@file:UseProjectorLoader
+
 package org.jetbrains.projector.agent.common
 
 import javassist.*
+import org.jetbrains.projector.util.loading.UseProjectorLoader
 
-public fun getClassFromClassfileBuffer(pool: ClassPool, className: String, classfileBuffer: ByteArray): CtClass {
+internal fun getClassFromClassfileBuffer(pool: ClassPool, className: String, classfileBuffer: ByteArray): CtClass {
   pool.insertClassPath(ByteArrayClassPath(className, classfileBuffer))
   return pool.get(className).apply(CtClass::defrost)
 }

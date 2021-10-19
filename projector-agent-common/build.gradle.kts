@@ -38,6 +38,7 @@ publishToSpace("java")
 val javassistVersion: String by project
 
 dependencies {
+  implementation(project(":projector-util-loading"))
   implementation("org.javassist:javassist:$javassistVersion")
   testImplementation(kotlin("test"))
 }
