@@ -63,9 +63,7 @@ dependencies {
 
 version = "1.0.0"  // todo: npm doesn't support versions like "1.0-SNAPSHOT"
 
-val isWindows = DefaultNativePlatform.getCurrentOperatingSystem().isWindows
-
-val npmCommand = when (isWindows) {
+val npmCommand = when (DefaultNativePlatform.getCurrentOperatingSystem().isWindows) {
   true -> listOf("cmd.exe", "/C", "npm.cmd")
   false -> listOf("npm")
 }
@@ -133,79 +131,56 @@ val packagerCommand = npmCommand + listOf(
   appName
 )
 
-val packageDarwinX64 by tasks.creating(Exec::class) {
-  group = "dist"
-  dependsOn(initDistEnvironment)
-  workingDir(project.file(distDir))
-  commandLine(packagerCommand + listOf("--platform=darwin", "--arch=x64"))
-}
+fun getPackageTaskName(platform: String, arch: String) = "package${platform.capitalize()}${arch.capitalize()}"
+fun getPackageZipTaskName(platform: String, arch: String) = "packageZip${platform.capitalize()}${arch.capitalize()}"
 
-val packageLinuxX64 by tasks.creating(Exec::class) {
-  group = "dist"
-  dependsOn(initDistEnvironment)
-  workingDir(project.file(distDir))
-  commandLine(packagerCommand + listOf("--platform=linux", "--arch=x64"))
-  doLast {
-    if (!isWindows) {
-      exec {
-        commandLine(
-          "chmod",
-          "+x",
-          project.file("$electronOutDir/$appName-linux-x64/$appName").absolutePath
-        )
-      }
-    }
+fun Task.createPackageTask(platform: String, arch: String, configuration: Exec.() -> Unit = {}): Task {
+
+  val packageTaskName = getPackageTaskName(platform, arch)
+
+  return task<Exec>(packageTaskName) {
+    group = this@createPackageTask.group ?: throw IllegalStateException("Grouping task of $packageTaskName group name is not defined")
+    dependsOn(initDistEnvironment)
+    workingDir(project.file(distDir))
+    commandLine(packagerCommand + listOf("--platform=$platform", "--arch=$arch"))
+    configuration()
+    this@createPackageTask.dependsOn(this)
   }
 }
 
-val packageWin32X64 by tasks.creating(Exec::class) {
-  group = "dist"
-  dependsOn(initDistEnvironment)
-  workingDir(project.file(distDir))
-  commandLine(packagerCommand + listOf("--platform=win32", "--arch=x64"))
+fun Task.createPackageZipTask(platform: String, arch: String, configuration: Zip.() -> Unit = {}): Task {
+
+  val packageZipTaskName = getPackageZipTaskName(platform, arch)
+  val packageTaskName = getPackageTaskName(platform, arch)
+
+  return task<Zip>(packageZipTaskName) {
+    group = this@createPackageZipTask.group ?: throw IllegalStateException("Grouping task of $packageZipTaskName group name is not defined")
+    dependsOn(packageTaskName)
+    val targetName = "$appName-$platform-$arch"
+    from(project.file(electronOutDir)) {
+      include("$targetName/**")
+    }
+    archiveFileName.set("$targetName.zip")
+    destinationDirectory.set(project.file(electronOutDir))
+    configuration()
+    this@createPackageZipTask.dependsOn(this)
+  }
 }
+
+val platformArchPairs = listOf(
+  "darwin" to "x64",
+  "linux"  to "x64",
+  "win32"  to "x64",
+)
 
 tasks.create("dist") {
   group = "dist"
-  dependsOn(packageDarwinX64, packageLinuxX64, packageWin32X64)
-}
-
-val packageZipDarwinX64 by tasks.creating(Zip::class) {
-  group = "dist"
-  dependsOn(packageDarwinX64)
-  val targetName = "$appName-darwin-x64"
-  from(project.file(electronOutDir)) {
-    include("$targetName/**")
-  }
-  archiveFileName.set("$targetName.zip")
-  destinationDirectory.set(project.file(electronOutDir))
-}
-
-val packageZipLinuxX64 by tasks.creating(Zip::class) {
-  group = "dist"
-  dependsOn(packageLinuxX64)
-  val targetName = "$appName-linux-x64"
-  from(project.file(electronOutDir)) {
-    include("$targetName/**")
-  }
-  archiveFileName.set("$targetName.zip")
-  destinationDirectory.set(project.file(electronOutDir))
-}
-
-val packageZipWin32X64 by tasks.creating(Zip::class) {
-  group = "dist"
-  dependsOn(packageWin32X64)
-  val targetName = "$appName-win32-x64"
-  from(project.file(electronOutDir)) {
-    include("$targetName/**")
-  }
-  archiveFileName.set("$targetName.zip")
-  destinationDirectory.set(project.file(electronOutDir))
+  platformArchPairs.forEach { (platform, arch) -> createPackageTask(platform, arch) }
 }
 
 tasks.create("distZip") {
   group = "dist"
-  dependsOn(packageZipDarwinX64, packageZipLinuxX64, packageZipWin32X64)
+  platformArchPairs.forEach { (platform, arch) -> createPackageZipTask(platform, arch) }
 }
 
 tasks.create<Exec>("electronProductionRun") {
