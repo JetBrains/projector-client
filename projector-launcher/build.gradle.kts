@@ -87,10 +87,8 @@ val generateDistPackageJson by tasks.creating(Task::class) {
         "electron-packager" to "electron-packager"
       ),
       "devDependencies" to mapOf(
+        "electron" to electronVersion,
         "electron-packager" to electronPackagerVersion
-      ),
-      "dependencies" to mapOf(
-        "electron" to electronVersion
       ),
       "keywords" to listOf(
         "projector",
