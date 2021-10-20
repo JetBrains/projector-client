@@ -79,7 +79,7 @@ class ElectronApp(val url: String) {
             }
         """
 
-    var preloadPath = path.normalize(path.join(__dirname, "../assets/js/preload.js"))
+    val preloadPath = path.normalize(path.join(__dirname, "./assets/js/preload.js"))
     this.mainWindow = BrowserWindow(js(windowOptions)(workAreaSize.width, workAreaSize.height, preloadPath))
 
     if (process.platform.unsafeCast<String>().lowercase() !in setOf("win32", "darwin")) {
