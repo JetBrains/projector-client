@@ -3,24 +3,24 @@ profile:
   name: qodana.starter
 include:
   - name: Reformat
-inspections:
-  LicenseAudit:
-    rules:
-      - key:
-          - "PROPRIETARY-LICENSE"
-        prohibited:
-          - "Apache-2.0"
-        allowed:
-          - "MIT"
-
-    dependencyScopes:
-      - type: "gradle"
-        scopes:
-          - "runtime"
-
-  CloneFinder:
-    failThreshold: 100
-      licenseRules:
-          - source: MIT
-            target: ISC
-            compatible: true
+#inspections:
+#  LicenseAudit:
+#    rules:
+#      - key:
+#          - "PROPRIETARY-LICENSE"
+#        prohibited:
+#          - "Apache-2.0"
+#        allowed:
+#          - "MIT"
+#
+#    dependencyScopes:
+#      - type: "gradle"
+#        scopes:
+#          - "runtime"
+#
+#  CloneFinder:
+#    failThreshold: 100
+#      licenseRules:
+#          - source: MIT
+#            target: ISC
+#            compatible: true
