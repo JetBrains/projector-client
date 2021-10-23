@@ -11,7 +11,6 @@ inspections:
         prohibited:
           - "Apache-2.0"
         allowed:
-          - "GPL-2.0-with-classpath-exception"
           - "MIT"
 
     dependencyScopes:
@@ -22,6 +21,6 @@ inspections:
   CloneFinder:
     failThreshold: 100
       licenseRules:
-          - source: GPL-2.0-with-classpath-exception
+          - source: MIT
             target: ISC
             compatible: true
