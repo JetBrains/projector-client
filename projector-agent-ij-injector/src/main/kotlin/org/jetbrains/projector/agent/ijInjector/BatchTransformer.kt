@@ -65,7 +65,7 @@ internal class BatchTransformer(private val transformerSetups: List<TransformerS
     }
 
     map.entries.forEach { (key, value) ->
-      val message = "$key: ${value.entries.joinToString(prefix = "[", postfix = "]") { (subKey, subValue) -> "$subKey: ${subValue.joinToString(separator = ";", prefix = "(", postfix = ")") { it }}" }}"
+      val message = "$key: ${value.entries.joinToString(prefix = "[", postfix = "]") { (subKey, subValue) -> "$subKey: ${subValue.joinToString(separator = "; ", prefix = "(", postfix = ")") { it }}" }}"
       when (key) {
         TransformationResult.Error::class.java.simpleName -> logger.error { message }
         else -> logger.debug { message }
