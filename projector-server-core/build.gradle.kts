@@ -130,7 +130,7 @@ val integrationTest = task<Test>("integrationTest") {
 
 dependencies {
   api(project(":projector-common"))
-  implementation(project(":projector-agent-initialization"))
+  implementation(project(":projector-ij-common"))
   implementation(project(":projector-util-agent"))
   implementation(project(":projector-util-loading"))
   implementation(project(":projector-util-logging"))
