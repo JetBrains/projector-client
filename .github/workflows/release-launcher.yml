@@ -43,6 +43,15 @@ jobs:
           asset_path: projector-launcher/build/electronOut/projector-darwin-x64.zip
           asset_name: projector-darwin-x64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
           asset_content_type: application/zip
+      - name: Upload Release Asset (darwin-arm64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: projector-launcher/build/electronOut/projector-darwin-arm64.zip
+          asset_name: projector-darwin-arm64-${{ steps.tag_name.outputs.SOURCE_TAG }}.zip
+          asset_content_type: application/zip
       - name: Upload Release Asset (linux-x64)
         uses: actions/upload-release-asset@v1
         env:
