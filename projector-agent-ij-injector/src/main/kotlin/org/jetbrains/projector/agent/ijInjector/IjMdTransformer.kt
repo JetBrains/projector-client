@@ -24,7 +24,6 @@
 package org.jetbrains.projector.agent.ijInjector
 
 import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.util.BuildNumber
 import com.intellij.ui.jcef.JBCefApp
@@ -32,11 +31,10 @@ import javassist.CtClass
 import org.jetbrains.projector.agent.common.transformation.TransformationResult
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 import org.jetbrains.projector.agent.common.transformation.classForNameOrNull
+import org.jetbrains.projector.ij.md.markdownPlugin
 import org.jetbrains.projector.util.loading.ProjectorClassLoader
 
 internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
-
-  private const val MD_EXTENSION_ID = "org.intellij.markdown.html.panel.provider"
 
   // language=java prefix="import " suffix=";"
   private const val javaFxClass = "org.intellij.plugins.markdown.ui.preview.javafx.JavaFxHtmlPanelProvider"
@@ -78,16 +76,19 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
     return transformations
   }
 
-  override fun getClassLoader(parameters: IjInjector.AgentParameters, nullReasonConsumer: (String) -> Unit): ClassLoader? {
-    val extensionPointName = ExtensionPointName.create<Any>(MD_EXTENSION_ID)
-    val extensions = try {
-      extensionPointName.extensions
-    } catch (e: IllegalArgumentException) {
-      nullReasonConsumer("Markdown plugin is disabled")
-      return null
+  override fun isTransformerAvailable(parameters: IjInjector.AgentParameters, unavailableReasonConsumer: (String) -> Unit): Boolean {
+    val reason = when {
+      markdownPlugin == null -> "Markdown plugin is not installed"
+      !markdownPlugin!!.isEnabled -> "Markdown plugin is disabled"
+      else -> return true
     }
 
-    return extensions.filterNotNull().first()::class.java.classLoader
+    unavailableReasonConsumer(reason)
+    return false
+  }
+
+  override fun getClassLoader(parameters: IjInjector.AgentParameters): ClassLoader {
+    return markdownPlugin!!.pluginClassLoader
   }
 
   private fun isPreviewCheckIsBrokenInHeadless(): Boolean {

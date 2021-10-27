@@ -61,19 +61,9 @@ public interface TransformerSetup<P> {
    * Classpath of the returned classloader is also used to get bytecode of classes that will be transformed.
    *
    * @param parameters agent parameters that are passed from server
-   * @param nullReasonConsumer pass a reason why you return null
    * @return Classloader that will be passed to [getTransformations] method and used to get bytecode of classes that will be transformed
    */
-  public fun getClassLoader(parameters: P, nullReasonConsumer: (String) -> Unit): ClassLoader? = getClassLoader(parameters)
-
-  /**
-   * Classloader that will be passed to [getTransformations] method. This method is useful if you need to transform classes of a plugin.
-   * Classpath of the returned classloader is also used to get bytecode of classes that will be transformed.
-   *
-   * @param parameters agent parameters that are passed from server
-   * @return Classloader that will be passed to [getTransformations] method and used to get bytecode of classes that will be transformed
-   */
-  public fun getClassLoader(parameters: P): ClassLoader? = javaClass.classLoader
+  public fun getClassLoader(parameters: P): ClassLoader = javaClass.classLoader
 
   /**
    * Reports whether transformations of thus transformer are applicable for given parameters
@@ -82,6 +72,15 @@ public interface TransformerSetup<P> {
    * @return true if transformations of thus transformer are applicable for given parameters, false otherwise
    */
   public fun isTransformerAvailable(parameters: P): Boolean = true
+
+  /**
+   * Reports whether transformations of thus transformer are applicable for given parameters
+   *
+   * @param parameters agent parameters that are passed from server
+   * @param unavailableReasonConsumer pass a reason why you return false. Only last passed value is used
+   * @return true if transformations of thus transformer are applicable for given parameters, false otherwise
+   */
+  public fun isTransformerAvailable(parameters: P, unavailableReasonConsumer: (String) -> Unit): Boolean = isTransformerAvailable(parameters)
 
   /**
    * Runs transformation (returned from [getTransformations]) of this transformer.
@@ -100,21 +99,18 @@ public interface TransformerSetup<P> {
       transformationResultConsumer(TransformationResult.Skip(this, "All classes", reason))
     }
 
-    if (!isTransformerAvailable(parameters)) {
-      skipAllClasses("Transformer is not available for provided parameters")
+    var unsupportedReason: String? = null
+    fun unsupportedReasonSaver(reason: String) {
+      unsupportedReason = reason
+    }
+
+    if (!isTransformerAvailable(parameters, ::unsupportedReasonSaver)) {
+      val reason = unsupportedReason ?: "Transformer is not available for provided parameters or environment setup"
+      skipAllClasses(reason)
       return
     }
 
-    var reasonProvided = false
-    val loader = getClassLoader(parameters) { reason ->
-      reasonProvided = true
-      skipAllClasses(reason)
-    } ?: kotlin.run {
-      if (!reasonProvided) {
-        skipAllClasses("Classloader is null")
-      }
-      return
-    }
+    val loader = getClassLoader(parameters)
 
     val transformations = getTransformations(parameters, loader)
     if (transformations.isEmpty()) {

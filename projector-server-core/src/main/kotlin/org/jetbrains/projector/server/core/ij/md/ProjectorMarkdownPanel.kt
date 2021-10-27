@@ -23,12 +23,11 @@
  */
 package org.jetbrains.projector.server.core.ij.md
 
-import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.util.BuildNumber
 import org.intellij.plugins.markdown.extensions.MarkdownConfigurableExtension
 import org.intellij.plugins.markdown.extensions.jcef.MarkdownJCEFPreviewExtension
 import org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanel
+import org.jetbrains.projector.ij.md.markdownPlugin
 import org.jetbrains.projector.util.logging.Logger
 import javax.swing.JComponent
 
@@ -118,8 +117,7 @@ public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateC
 
     private val isRenderMethodRemoved by lazy {
       val buildNumber = BuildNumber.fromString("203.0")!!
-      val markdownVersionString = PluginManagerCore.getPlugin(PluginId.getId("org.intellij.plugins.markdown"))!!.version
-      val markdownBuildNumber = BuildNumber.fromString(markdownVersionString)!!
+      val markdownBuildNumber = BuildNumber.fromString(markdownPlugin!!.version)!!
       markdownBuildNumber >= buildNumber
     }
 
