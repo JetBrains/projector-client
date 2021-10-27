@@ -139,7 +139,7 @@ fun Task.createPackageTask(platform: String, arch: String, configuration: Exec.(
   val packageTaskName = getPackageTaskName(platform, arch)
 
   return task<Exec>(packageTaskName) {
-    group = this@createPackageTask.group ?: throw IllegalStateException("Grouping task of $packageTaskName group name is not defined")
+    group = checkNotNull(this@createPackageTask.group) { "Grouping task of $packageTaskName group name is not defined" }
     dependsOn(initDistEnvironment)
     workingDir(project.file(distDir))
     commandLine(packagerCommand + listOf("--platform=$platform", "--arch=$arch"))
@@ -154,7 +154,7 @@ fun Task.createPackageZipTask(platform: String, arch: String, configuration: Zip
   val packageTaskName = getPackageTaskName(platform, arch)
 
   return task<Zip>(packageZipTaskName) {
-    group = this@createPackageZipTask.group ?: throw IllegalStateException("Grouping task of $packageZipTaskName group name is not defined")
+    group = checkNotNull(this@createPackageZipTask.group) { "Grouping task of $packageZipTaskName group name is not defined" }
     dependsOn(packageTaskName)
     val targetName = "$appName-$platform-$arch"
     from(project.file(electronOutDir)) {
