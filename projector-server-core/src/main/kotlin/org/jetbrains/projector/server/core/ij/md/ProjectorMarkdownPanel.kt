@@ -38,7 +38,6 @@ import javax.swing.JComponent
 @Suppress("unused")
 public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateClass: String) : MarkdownHtmlPanel {
 
-  // we need to create instance even in headless mode as in new versions it starts server which hosts styles
   private val agentDelegate: MarkdownHtmlPanel? = if (isAgent) createNativeMarkdownPanel(agentDelegateClass) else null
   private val clientDelegate = PanelDelegate(if (isAgent) agentDelegate?.component else null)
 
