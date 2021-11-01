@@ -41,9 +41,15 @@ internal object IjFastNodeCellRendererTransformer : TransformerSetupBase<IjInjec
   )
 
   override fun isTransformerAvailable(parameters: IjInjector.AgentParameters): Boolean {
-    if (parameters.isAgent) return false // problem only occurs on headless environment
+    /**
+     * TODO recheck agent mode
+     * There was a problem (https://youtrack.jetbrains.com/issue/PRJ-663#focus=Comments-27-5145284.0-0),
+     * but then disappeared (https://github.com/JetBrains/projector-client/pull/96#discussion_r740151481)
+     * Also, if you remove the check, then in agent mode there will be NPE and graphical artifacts
+     */
+    if (parameters.isAgent) return false
     return try {
-      Class.forName(FAST_NODE_RENDERER_CLASS_NAME)
+      Class.forName(FAST_NODE_RENDERER_CLASS_NAME) // this class is not available in Idea Community
       true
     } catch (t: Throwable) {
       false
