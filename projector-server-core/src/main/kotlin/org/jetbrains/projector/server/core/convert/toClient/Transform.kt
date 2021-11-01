@@ -26,8 +26,10 @@ package org.jetbrains.projector.server.core.convert.toClient
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.jetbrains.projector.common.protocol.toClient.*
+import org.jetbrains.projector.util.logging.Logger
 import java.awt.geom.AffineTransform
 import java.awt.geom.Rectangle2D
+import kotlin.reflect.KMutableProperty1
 
 public fun <E> extractData(iterable: MutableIterable<E>): List<E> {
   val answer = mutableListOf<E>()
@@ -76,92 +78,100 @@ private fun ServerPaintRectEvent.isVisible(clip: ServerSetClipEvent?, tx: Server
   return strBounds.isVisible(clip, tx)
 }
 
-public fun List<List<ServerWindowEvent>>.convertToSimpleList(): List<ServerWindowEvent> {
-  val answer = mutableListOf<ServerWindowEvent>()
-
+private class TargetState {
   var lastCompositeEvent: ServerSetCompositeEvent? = null
   var lastClipEvent: ServerSetClipEvent? = null
   var lastTransformEvent: ServerSetTransformEvent? = null
   var lastFontEvent: ServerSetFontEvent? = null
   var lastSetPaintEvent: ServerSetPaintEvent? = null
   var lastStrokeEvent: ServerSetStrokeEvent? = null
+}
 
-  this.forEach { packedEvents ->
-    packedEvents.forEach innerLoop@{ event ->
+private fun <T : ServerWindowStateEvent?> MutableCollection<ServerWindowEvent>.addIfNeeded(
+  property: KMutableProperty1<TargetState, T>,
+  actualState: TargetState,
+  requestedState: TargetState,
+) {
+  val actualValue = property.get(actualState)
+  val requestedValue = property.get(requestedState)
+
+  if (actualValue != requestedValue) {
+    property.set(actualState, requestedValue)
+    requestedValue?.let { add(it) }
+  }
+}
+
+public fun Iterable<Pair<ServerDrawCommandsEvent.Target, List<ServerWindowEvent>>>.shrinkEvents(): List<ServerDrawCommandsEvent> {
+  val actualStates = mutableMapOf<ServerDrawCommandsEvent.Target, TargetState>()
+  val requestedStates = mutableMapOf<ServerDrawCommandsEvent.Target, TargetState>()
+
+  val withoutUnneededStates = mutableListOf<ServerDrawCommandsEvent>()
+
+  this.forEach { (target, events) ->
+    val actualState = actualStates.getOrPut(target) { TargetState() }
+    val requestedState = requestedStates.getOrPut(target) { TargetState() }
+
+    events.forEach { event ->
       Do exhaustive when (event) {
         is ServerWindowStateEvent -> Do exhaustive when (event) {
-          is ServerSetCompositeEvent -> if (event == lastCompositeEvent) {
-            Unit
-          }
-          else {
-            lastCompositeEvent = event
-            answer.add(event)
-          }
-
-          is ServerSetClipEvent -> if (event == lastClipEvent) {
-            Unit
-          }
-          else {
-            lastClipEvent = event
-            answer.add(event)
-          }
-
-          is ServerSetTransformEvent -> if (event == lastTransformEvent) {
-            Unit
-          }
-          else {
-            lastTransformEvent = event
-            answer.add(event)
-          }
-
-          is ServerSetPaintEvent -> if (event == lastSetPaintEvent) {
-            Unit
-          }
-          else {
-            lastSetPaintEvent = event
-            answer.add(event)
-          }
-
-          is ServerSetFontEvent -> if (event == lastFontEvent) {
-            Unit
-          }
-          else {
-            lastFontEvent = event
-            answer.add(event)
-          }
-
-          is ServerSetStrokeEvent -> if (event == lastStrokeEvent) {
-            Unit
-          }
-          else {
-            lastStrokeEvent = event
-            answer.add(event)
-          }
-
-          is ServerWindowToDoStateEvent -> answer.add(event)
+          is ServerSetCompositeEvent -> requestedState.lastCompositeEvent = event
+          is ServerSetClipEvent -> requestedState.lastClipEvent = event
+          is ServerSetTransformEvent -> requestedState.lastTransformEvent = event
+          is ServerSetPaintEvent -> requestedState.lastSetPaintEvent = event
+          is ServerSetFontEvent -> requestedState.lastFontEvent = event
+          is ServerSetStrokeEvent -> requestedState.lastStrokeEvent = event
+          is ServerWindowToDoStateEvent -> logger.info { "Skipping unsupported state event: $event" }
         }
 
         is ServerWindowPaintEvent -> {
           val visible = when (event) {
-            is ServerDrawStringEvent -> event.isVisible(lastFontEvent, lastClipEvent, lastTransformEvent)
-            is ServerPaintRectEvent -> event.isVisible(lastClipEvent, lastTransformEvent)
-            else -> true
+            is ServerDrawStringEvent -> with(requestedState) { event.isVisible(lastFontEvent, lastClipEvent, lastTransformEvent) }
+            is ServerPaintRectEvent -> with(requestedState) { event.isVisible(lastClipEvent, lastTransformEvent) }
+            else -> true  // such visibility check isn't supported yet
           }
 
           if (visible) {
-            answer.add(event)
+            val eventsToAdd = mutableListOf<ServerWindowEvent>()
+
+            eventsToAdd.addIfNeeded(TargetState::lastCompositeEvent, actualState, requestedState)
+            eventsToAdd.addIfNeeded(TargetState::lastClipEvent, actualState, requestedState)
+            eventsToAdd.addIfNeeded(TargetState::lastTransformEvent, actualState, requestedState)
+            eventsToAdd.addIfNeeded(TargetState::lastFontEvent, actualState, requestedState)
+            eventsToAdd.addIfNeeded(TargetState::lastSetPaintEvent, actualState, requestedState)
+            eventsToAdd.addIfNeeded(TargetState::lastStrokeEvent, actualState, requestedState)
+            eventsToAdd.add(event)
+
+            withoutUnneededStates.add(ServerDrawCommandsEvent(target, eventsToAdd))
           }
-          else {
-            Unit
-          }
+
+          @Suppress("RedundantUnitExpression")  // needed for exhaustive when
+          Unit
         }
       }
     }
   }
 
-  while (answer.isNotEmpty() && answer.last() is ServerWindowStateEvent) {
-    answer.removeLast()
+  val shrunk = mutableListOf<ServerDrawCommandsEvent>()
+  var lastTarget: ServerDrawCommandsEvent.Target? = null
+  val lastEvents = mutableListOf<ServerWindowEvent>()
+
+  fun flush(target: ServerDrawCommandsEvent.Target) {
+    shrunk.add(ServerDrawCommandsEvent(target, lastEvents.toList()))
+    lastEvents.clear()
   }
 
-  return answer
+  withoutUnneededStates.forEach { (target, events) ->
+    if (target != lastTarget) {
+      lastTarget?.let { flush(it) }
+      lastTarget = target
+    }
+
+    lastEvents.addAll(events)
+  }
+
+  lastTarget?.let { flush(it) }
+
+  return shrunk
 }
+
+private val logger = Logger("TransformKt")
