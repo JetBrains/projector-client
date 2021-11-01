@@ -25,8 +25,8 @@ package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
-import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
+import org.jetbrains.projector.client.web.electron.isElectron
 import org.jetbrains.projector.client.web.input.InputController
 import org.jetbrains.projector.client.web.misc.PingStatistics
 import org.jetbrains.projector.client.web.speculative.Typing
@@ -135,14 +135,24 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
       url.protocol = window.location.protocol
     }
 
-    val popUpWindow = window.open(url.href, "_blank")
+    val popUpWindow = try {
+      window.open(url.href, "_blank")
+    } catch (t: Throwable) {
+      null
+    }
 
     if (popUpWindow != null) {
       popUpWindow.focus()  // browser has allowed it to be opened
-    }
-    else {
+    } else if (isUrlOpeningBlocked(url)) {
       window.alert("To open $link, please allow popups for this website")  // browser has blocked it
+    } else {
+      logger.info { "Link wasn't handled" }
     }
+  }
+
+  private fun isUrlOpeningBlocked(url: URL): Boolean {
+    return !isElectron() // electron doesn't block opening url
+           && url.protocol != "file:" // local file won't be opened in browser
   }
 
   companion object {
