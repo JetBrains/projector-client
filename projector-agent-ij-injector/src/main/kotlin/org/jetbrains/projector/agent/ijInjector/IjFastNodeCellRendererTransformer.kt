@@ -73,7 +73,7 @@ internal object IjFastNodeCellRendererTransformer : TransformerSetupBase<IjInjec
     }
 
     companion object {
-      private const val DOUBLE_BUFFERING_METHOD_NAME = "setDoubleBufferingEnabled"
+      private val DOUBLE_BUFFERING_METHOD_NAME = RepaintManager::setDoubleBufferingEnabled.name
     }
   }
 
