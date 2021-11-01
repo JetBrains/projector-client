@@ -210,15 +210,15 @@ sealed class ServerMarkdownEvent : ServerEvent() {
     @SerialName("b")
     val scrollOffset: Int,
   ) : ServerMarkdownEvent()
-
-  // todo: move out of MD events: it's used not just in MD now
-  @Serializable
-  @SerialName("o")
-  data class ServerMarkdownBrowseUriEvent(
-    @SerialName("a")
-    val link: String,
-  ) : ServerMarkdownEvent()
 }
+
+@Suppress("unused") //used in client-web/org.jetbrains.projector.client.web.ServerEventsProcessor and at server side
+@Serializable
+@SerialName("o")
+data class ServerBrowseUriEvent(
+  @SerialName("a")
+  val link: String,
+) : ServerEvent()
 
 @Serializable
 @SerialName("p")

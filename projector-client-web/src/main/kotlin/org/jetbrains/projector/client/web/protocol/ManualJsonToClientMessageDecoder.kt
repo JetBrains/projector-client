@@ -65,7 +65,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "l" -> ServerMarkdownEvent.ServerMarkdownSetHtmlEvent(content["a"] as Int, content["b"] as String)
       "m" -> ServerMarkdownEvent.ServerMarkdownSetCssEvent(content["a"] as Int, content["b"] as String)
       "n" -> ServerMarkdownEvent.ServerMarkdownScrollEvent(content["a"] as Int, content["b"] as Int)
-      "o" -> ServerMarkdownEvent.ServerMarkdownBrowseUriEvent(content["a"] as String)
+      "o" -> ServerBrowseUriEvent(content["a"] as String)
       "p" -> ServerWindowColorsEvent(content["a"].unsafeCast<Json>().toColorsStorage())
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }
