@@ -26,9 +26,9 @@
 
 package org.jetbrains.projector.ij.md
 
+import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.openapi.extensions.PluginDescriptor
 import com.intellij.openapi.extensions.PluginId
 import org.jetbrains.projector.util.loading.UseProjectorLoader
 
-public val markdownPlugin: PluginDescriptor? by lazy { PluginManagerCore.getPlugin(PluginId.getId("org.intellij.plugins.markdown")) }
+public val markdownPlugin: IdeaPluginDescriptor? by lazy { PluginManagerCore.getPlugin(PluginId.getId("org.intellij.plugins.markdown")) }
