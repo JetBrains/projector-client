@@ -77,8 +77,9 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           is ServerMarkdownEvent.ServerMarkdownSetHtmlEvent -> markdownPanelManager.setHtml(command.panelId, command.html)
           is ServerMarkdownEvent.ServerMarkdownSetCssEvent -> markdownPanelManager.setCss(command.panelId, command.css)
           is ServerMarkdownEvent.ServerMarkdownScrollEvent -> markdownPanelManager.scroll(command.panelId, command.scrollOffset)
-          is ServerMarkdownEvent.ServerMarkdownBrowseUriEvent -> browseUri(command.link)
         }
+
+        is ServerBrowseUriEvent -> browseUri(command.link)
 
         is ServerWindowColorsEvent -> {
           ProjectorUI.setColors(command.colors)
