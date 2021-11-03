@@ -2,7 +2,17 @@
 
 Notable changes to this project are documented in this file.
 
-## 1.0.1
+# Unreleased
+
+## Added
+
+- MacOS ARM build.
+
+## Fixed
+
+- Crash on Linux with glibc 2.34.
+
+# 1.0.1
 
 ## Fixed
 
