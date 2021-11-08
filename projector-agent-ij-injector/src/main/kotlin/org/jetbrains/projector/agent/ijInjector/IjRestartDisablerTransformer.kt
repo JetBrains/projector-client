@@ -33,6 +33,8 @@ internal object IjRestartDisablerTransformer : TransformerSetupBase<IjInjector.A
     Restarter::class.java to IjRestartDisablerTransformer::transformRestart,
   )
 
+  override fun isTransformerAvailable(parameters: IjInjector.AgentParameters) = !parameters.isAgent
+
   private fun transformRestart(clazz: CtClass): ByteArray {
     clazz
       .getDeclaredMethod("isSupported")
