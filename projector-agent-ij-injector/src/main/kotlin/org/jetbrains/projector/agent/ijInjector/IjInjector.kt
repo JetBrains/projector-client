@@ -61,6 +61,7 @@ internal object IjInjector {
       IjBrowserUtilTransformer,
       IjUiUtilsTransformer,
       IjFastNodeCellRendererTransformer,
+      IjRestartDisablerTransformer,
     )
 
     BatchTransformer(transformers).runTransformations(instrumentation, parameters)
