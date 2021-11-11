@@ -1,6 +1,5 @@
 {
   "background_color": "gray",
-  "theme_color": "green",
   "description": "Projector client for accessing Swing apps",
   "display": "fullscreen",
   "icons": [
