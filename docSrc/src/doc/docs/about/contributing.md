@@ -43,7 +43,9 @@ When we are looking for an answer from a reporter, we will change the state to `
 
 Sometimes we place tickets to `Backlog` meaning that the task will be solved without the priority queue, hopefully soon.
 
-When a ticket is marked as gray and strikethrough, it means it's closed.
+`Obsolete` – if we reproduced it before but now it's not reproducible for some unknown reason. `Can't reproduce` – if we try to reproduce it but can't.
+
+When a ticket is marked as gray and strikethrough, it means it's closed and no work from the team regarding it will be done until an extra request.
 
 ### Ticket activity settings
 
