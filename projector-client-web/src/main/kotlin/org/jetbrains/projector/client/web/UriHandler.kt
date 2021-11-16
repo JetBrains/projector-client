@@ -21,33 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web.electron
+package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
-import org.jetbrains.projector.client.web.externalDeclarartion.process
+import org.jetbrains.projector.client.web.electron.isElectron
+import org.w3c.dom.url.URL
 
-// adopted from https://github.com/cheton/is-electron
-internal fun isElectron(): Boolean {
-  // Renderer process
-  if (isDefined(window) && jsTypeOf(window.process) == "object" && window.process.type == "renderer") {
-    return true
+object UriHandler {
+
+  fun browse(link: String) {
+    val url = URL(link)
+
+    if(url.hostname == "localhost" || url.hostname == "127.0.0.1" || url.host == "::1") {
+      url.hostname = window.location.hostname
+      url.protocol = window.location.protocol
+    }
+
+    if (isElectron()) { // electron doesn't block opening url
+      window.open(url.href, "_blank")
+      return
+    }
+
+    // local file cannot be opened in browser
+    if (url.protocol == "file:") return // TODO: handle opening of a file. Easier to do this on the server side
+
+    val popUpWindow = window.open(url.href, "_blank")
+
+    if (popUpWindow != null) {
+      popUpWindow.focus()  // browser has allowed it to be opened
+    } else {
+      window.alert("To open $link, please allow popups for this website")  // browser has blocked it
+    }
   }
 
-  // Main process
-  if (isDefined(process) && jsTypeOf(process.versions) == "object" && jsBoolean(process.versions.electron)) {
-    return true
-  }
-
-  // Detect the user agent when the `nodeIntegration` option is set to true
-  if (jsTypeOf(window.navigator) == "object" && jsTypeOf(window.navigator.userAgent) == "string" && window.navigator.userAgent.contains("Electron")) {
-    return true
-  }
-
-  return false
 }
-
-@Suppress("NOTHING_TO_INLINE", "UNUSED_PARAMETER")
-private inline fun jsBoolean(expression: Any?): Boolean = js("Boolean(expression)") as Boolean
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun isDefined(obj: Any?): Boolean = jsTypeOf(obj) != "undefined"

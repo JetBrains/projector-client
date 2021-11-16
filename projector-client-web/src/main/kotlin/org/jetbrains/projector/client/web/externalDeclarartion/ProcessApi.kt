@@ -21,33 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web.electron
+package org.jetbrains.projector.client.web.externalDeclarartion
 
-import kotlinx.browser.window
-import org.jetbrains.projector.client.web.externalDeclarartion.process
+import org.w3c.dom.Window
 
-// adopted from https://github.com/cheton/is-electron
-internal fun isElectron(): Boolean {
-  // Renderer process
-  if (isDefined(window) && jsTypeOf(window.process) == "object" && window.process.type == "renderer") {
-    return true
-  }
+// exposed from Electron (see https://www.electronjs.org/docs/latest/api/process)
+external val process: Process
 
-  // Main process
-  if (isDefined(process) && jsTypeOf(process.versions) == "object" && jsBoolean(process.versions.electron)) {
-    return true
-  }
+external interface Process {
 
-  // Detect the user agent when the `nodeIntegration` option is set to true
-  if (jsTypeOf(window.navigator) == "object" && jsTypeOf(window.navigator.userAgent) == "string" && window.navigator.userAgent.contains("Electron")) {
-    return true
-  }
+  val versions: Versions
 
-  return false
+  val type: String
 }
 
-@Suppress("NOTHING_TO_INLINE", "UNUSED_PARAMETER")
-private inline fun jsBoolean(expression: Any?): Boolean = js("Boolean(expression)") as Boolean
+external interface Versions {
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun isDefined(obj: Any?): Boolean = jsTypeOf(obj) != "undefined"
+  val electron: String
+}
+
+// exposed from Electron (see https://www.electronjs.org/docs/latest/api/process)
+inline val Window.process: Process
+  get() = asDynamic().process.unsafeCast<Process>()
+
+

@@ -212,7 +212,6 @@ sealed class ServerMarkdownEvent : ServerEvent() {
   ) : ServerMarkdownEvent()
 }
 
-@Suppress("unused") //used in client-web/org.jetbrains.projector.client.web.ServerEventsProcessor and at server side
 @Serializable
 @SerialName("o")
 data class ServerBrowseUriEvent(
