@@ -79,7 +79,7 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
           is ServerMarkdownEvent.ServerMarkdownScrollEvent -> markdownPanelManager.scroll(command.panelId, command.scrollOffset)
         }
 
-        is ServerBrowseUriEvent -> browseUri(command.link)
+        is ServerBrowseUriEvent -> UriHandler.browse(command.link)
 
         is ServerWindowColorsEvent -> {
           ProjectorUI.setColors(command.colors)
@@ -124,35 +124,6 @@ class ServerEventsProcessor(private val windowDataEventsProcessor: WindowDataEve
   private fun handleServerClipboardChange(event: ServerClipboardEvent) {
     window.navigator.clipboard.writeText(event.stringContent)
       .catch { logger.error { "Error writing clipboard: $it" } }
-  }
-
-
-  private fun browseUri(link: String) {
-    val url = URL(link)
-
-    if(url.hostname == "localhost" || url.hostname == "127.0.0.1" || url.host == "::1") {
-      url.hostname = window.location.hostname
-      url.protocol = window.location.protocol
-    }
-
-    val popUpWindow = try {
-      window.open(url.href, "_blank")
-    } catch (t: Throwable) {
-      null
-    }
-
-    if (popUpWindow != null) {
-      popUpWindow.focus()  // browser has allowed it to be opened
-    } else if (isUrlOpeningBlocked(url)) {
-      window.alert("To open $link, please allow popups for this website")  // browser has blocked it
-    } else {
-      logger.info { "Link wasn't handled" }
-    }
-  }
-
-  private fun isUrlOpeningBlocked(url: URL): Boolean {
-    return !isElectron() // electron doesn't block opening url
-           && url.protocol != "file:" // local file won't be opened in browser
   }
 
   companion object {
