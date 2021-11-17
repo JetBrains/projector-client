@@ -26,6 +26,7 @@ package org.jetbrains.projector.server.core.ij
 import org.jetbrains.projector.agent.init.IjArgs
 import org.jetbrains.projector.agent.init.toIjArgs
 import org.jetbrains.projector.util.agent.copyAgentToTempJarAndAttach
+import org.jetbrains.projector.util.loading.state.invokeWhenIdeaIsAtState
 
 @Suppress("unused") // Used in projector-server
 public object IjInjectorAgentInitializer {
@@ -36,7 +37,7 @@ public object IjInjectorAgentInitializer {
   @Suppress("unused") // Called from projector-server, don't trigger linter that doesn't know it
   @OptIn(ExperimentalStdlibApi::class)
   public fun init(isAgent: Boolean) {
-    invokeWhenIdeaIsInitialized("attach IJ injector agent") {
+    invokeWhenIdeaIsAtState("attach IJ injector agent") {
 
       val args = mapOf(
         IjArgs.IS_AGENT to isAgent,
