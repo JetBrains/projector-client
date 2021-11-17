@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019-2022 JetBrains s.r.o.
+ * Copyright (c) 2019-2021 JetBrains s.r.o.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,28 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.server.core.ij
+package org.jetbrains.projector.agent.ijInjector
 
-import org.jetbrains.projector.agent.init.IjArgs
-import org.jetbrains.projector.agent.init.toIjArgs
-import org.jetbrains.projector.util.agent.copyAgentToTempJarAndAttach
+import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
+import org.jetbrains.projector.util.loading.state.IdeaState
 
-@Suppress("unused") // Used in projector-server
-public object IjInjectorAgentInitializer {
+internal abstract class IdeaTransformerSetup<P>() : TransformerSetupBase<P>() {
 
-  // raw string because it must be loaded with Markdown PluginClassLoader
-  internal const val MD_PANEL_CLASS_NAME = "org.jetbrains.projector.server.core.ij.md.ProjectorMarkdownPanel"
+  internal open val loadingState: IdeaState?
+    get() = IdeaState.CONFIGURATION_STORE_INITIALIZED
 
-  @Suppress("unused") // Called from projector-server, don't trigger linter that doesn't know it
-  public fun init(isAgent: Boolean) {
-    val args = mapOf(
-      IjArgs.IS_AGENT to isAgent,
-      IjArgs.MD_PANEL_CLASS to MD_PANEL_CLASS_NAME,
-    ).toIjArgs()
-
-    copyAgentToTempJarAndAttach(
-      agentJar = this::class.java.getResourceAsStream("/projector-agent/projector-agent-ij-injector.jar")!!,
-      args = args,
-    )
-  }
 }

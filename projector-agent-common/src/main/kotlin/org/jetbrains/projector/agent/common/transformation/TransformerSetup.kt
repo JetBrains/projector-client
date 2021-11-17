@@ -32,16 +32,17 @@ import java.lang.instrument.Instrumentation
 public interface TransformerSetup<P> {
 
   /**
-   * Maps class to function that is invoked to get transformed class bytecode.
-   * Override this property if your transformations are agnostic of agent parameters and classloader.
-   */
-  public val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?>
-    get() = emptyMap()
-
-  /**
    * Function to be invoked when transformation finishes.
    */
   public var transformationResultConsumer: (TransformationResult) -> Unit
+
+  /**
+   * Maps class to function that is invoked to get transformed class bytecode.
+   * Override this method if your transformations are agnostic of agent parameters and classloader.
+   *
+   * @return mapping from class to function that is invoked to get transformed class bytecode
+   */
+  public fun getTransformations(): Map<Class<*>, (CtClass) -> ByteArray?> = emptyMap()
 
   /**
    * Maps class to function that is invoked to get transformed class bytecode.
@@ -54,7 +55,7 @@ public interface TransformerSetup<P> {
    * @param classLoader classloader returned by [getClassLoader] method
    * @return mapping from class to function that is invoked to get transformed class bytecode
    */
-  public fun getTransformations(parameters: P, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> = classTransformations
+  public fun getTransformations(parameters: P, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> = getTransformations()
 
   /**
    * Classloader that will be passed to [getTransformations] method. This method is useful if you need to transform classes of a plugin.

@@ -58,6 +58,6 @@ internal object IjInjector {
       IjRestartDisablerTransformer,
     )
 
-    BatchTransformer(transformers).runTransformations(instrumentation, parameters)
+    ProjectorBatchTransformer(transformers).runTransformations(instrumentation, parameters)
   }
 }
