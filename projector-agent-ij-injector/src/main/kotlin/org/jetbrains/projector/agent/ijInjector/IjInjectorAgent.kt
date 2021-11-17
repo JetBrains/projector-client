@@ -23,8 +23,8 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
-import org.jetbrains.projector.agent.init.IjArgs
 import org.jetbrains.projector.agent.init.toArgsMap
+import org.jetbrains.projector.util.loading.ProjectorClassLoader
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.Instrumentation
 
@@ -39,12 +39,6 @@ public object IjInjectorAgent {
 
     val argsMap = args.toArgsMap()
 
-    val ijClProviderClass = argsMap.getValue(IjArgs.IJ_CL_PROVIDER_CLASS)
-    val prjClProviderMethod = argsMap.getValue(IjArgs.PRJ_CL_PROVIDER_METHOD)
-
-    // obtain the instance of ProjectorClassLoader used by Projector Server
-    val prjCl = Class.forName(ijClProviderClass).getDeclaredMethod(prjClProviderMethod).invoke(null) as ClassLoader
-
     /**
      * AppClassLoader doesn't know any classes outside of Projector code base, so we need ProjectorClassLoader
      * to reference Intellij Platform classes in agent. But firstly we need to load some class with our ProjectorClassLoader,
@@ -52,7 +46,7 @@ public object IjInjectorAgent {
      *
      * [org.jetbrains.projector.agent.ijInjector.IjInjector]
      */
-    val injectorClazz = Class.forName("${javaClass.packageName}.IjInjector", false, prjCl)
+    val injectorClazz = Class.forName("${javaClass.packageName}.IjInjector", false, ProjectorClassLoader.instance)
 
     /**
      * [org.jetbrains.projector.agent.ijInjector.IjInjector.agentmain]

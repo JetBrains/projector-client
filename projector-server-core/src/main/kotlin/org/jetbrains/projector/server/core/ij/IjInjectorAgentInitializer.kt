@@ -26,8 +26,6 @@ package org.jetbrains.projector.server.core.ij
 import org.jetbrains.projector.agent.init.IjArgs
 import org.jetbrains.projector.agent.init.toIjArgs
 import org.jetbrains.projector.util.agent.copyAgentToTempJarAndAttach
-import org.jetbrains.projector.util.loading.ProjectorClassLoader
-import java.lang.ref.WeakReference
 
 @Suppress("unused") // Used in projector-server
 public object IjInjectorAgentInitializer {
@@ -38,19 +36,10 @@ public object IjInjectorAgentInitializer {
   @Suppress("unused") // Called from projector-server, don't trigger linter that doesn't know it
   @OptIn(ExperimentalStdlibApi::class)
   public fun init(isAgent: Boolean) {
-    IjInjectorAgentClassLoaders.prjClassLoader = WeakReference(ProjectorClassLoader.instance)
-    invokeWhenIdeaIsInitialized("attach IJ injector agent") { ideClassLoader ->
-      IjInjectorAgentClassLoaders.ijClassLoader = WeakReference(ideClassLoader)
-
-      val ijClProviderClass = IjInjectorAgentClassLoaders::class.java.name
-      val ijClProviderMethod = IjInjectorAgentClassLoaders::getIdeClassloader.name
-      val prjClProviderMethod = IjInjectorAgentClassLoaders::getProjectorClassloader.name
+    invokeWhenIdeaIsInitialized("attach IJ injector agent") {
 
       val args = mapOf(
         IjArgs.IS_AGENT to isAgent,
-        IjArgs.IJ_CL_PROVIDER_CLASS to ijClProviderClass,
-        IjArgs.IJ_CL_PROVIDER_METHOD to ijClProviderMethod,
-        IjArgs.PRJ_CL_PROVIDER_METHOD to prjClProviderMethod,
         IjArgs.MD_PANEL_CLASS to MD_PANEL_CLASS_NAME,
       ).toIjArgs()
 
@@ -58,26 +47,6 @@ public object IjInjectorAgentInitializer {
         agentJar = this::class.java.getResourceAsStream("/projector-agent/projector-agent-ij-injector.jar")!!,
         args = args,
       )
-    }
-  }
-
-  @Suppress("RedundantVisibilityModifier") // loaded via AppClassLoader to be accessible in agent (that's why it's public)
-  public object IjInjectorAgentClassLoaders {
-
-    internal lateinit var ijClassLoader: WeakReference<ClassLoader>
-
-    internal lateinit var prjClassLoader: WeakReference<ClassLoader>
-
-    @Suppress("RedundantVisibilityModifier") // public to be accessible in agent
-    @JvmStatic
-    public fun getIdeClassloader(): ClassLoader? {
-      return ijClassLoader.get()
-    }
-
-    @Suppress("RedundantVisibilityModifier") // public to be accessible in agent
-    @JvmStatic
-    public fun getProjectorClassloader(): ClassLoader? {
-      return prjClassLoader.get()
     }
   }
 }

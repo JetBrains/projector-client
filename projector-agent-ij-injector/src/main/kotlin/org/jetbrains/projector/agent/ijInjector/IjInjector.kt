@@ -33,9 +33,6 @@ internal object IjInjector {
   @Suppress("unused") // classloader provider class name and method names are not currently used, but may be in the future
   class AgentParameters(
     val isAgent: Boolean,
-    val classloadersProviderClassName: String,
-    val ideaClassloaderProviderMethodName: String,
-    val projectorClassloaderProviderMethodName: String,
     val markdownPanelClassName: String,
   )
 
@@ -43,9 +40,6 @@ internal object IjInjector {
 
     return AgentParameters(
       isAgent = args[IjArgs.IS_AGENT] == "true",
-      classloadersProviderClassName = args.getValue(IjArgs.IJ_CL_PROVIDER_CLASS),
-      ideaClassloaderProviderMethodName = args.getValue(IjArgs.IJ_CL_PROVIDER_METHOD),
-      projectorClassloaderProviderMethodName = args.getValue(IjArgs.PRJ_CL_PROVIDER_METHOD),
       markdownPanelClassName = args.getValue(IjArgs.MD_PANEL_CLASS),
     )
   }
