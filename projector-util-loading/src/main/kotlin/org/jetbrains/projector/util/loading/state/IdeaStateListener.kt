@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019-2022 JetBrains s.r.o.
+ * Copyright (c) 2019-2021 JetBrains s.r.o.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("jvm")
-  `maven-publish`
-  jacoco
-}
+package org.jetbrains.projector.util.loading.state
 
-setupJacoco()
+import org.jetbrains.projector.util.loading.UseProjectorLoader
 
-kotlin {
-  explicitApi()
-}
+@UseProjectorLoader
+public fun interface IdeaStateListener {
 
-publishToSpace("java")
+  /**
+   * Function to be invoked when state occurred.
+   *
+   * @return true to remove listener after function execution, false otherwise
+   */
+  public fun onStateOccurred(state: IdeaState): Boolean
 
-val intellijPlatformVersion: String by project
-
-dependencies {
-  api(project(":projector-util-logging"))
-
-  compileOnly("com.jetbrains.intellij.platform:bootstrap:$intellijPlatformVersion")
-  compileOnly("com.jetbrains.intellij.platform:util-diagnostic:$intellijPlatformVersion")
-
-  testImplementation(kotlin("test"))
 }

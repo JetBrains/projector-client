@@ -27,6 +27,7 @@ import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import org.jetbrains.projector.common.protocol.data.UserKeymap
 import org.jetbrains.projector.util.loading.UseProjectorLoader
+import org.jetbrains.projector.util.loading.state.invokeWhenIdeaIsAtState
 import org.jetbrains.projector.util.logging.Logger
 import javax.swing.SwingUtilities
 
@@ -42,7 +43,7 @@ public object KeymapSetter {
   }
 
   public fun setKeymap(keymap: UserKeymap) {
-    invokeWhenIdeaIsInitialized("set keymap to match user's OS ($keymap)") {
+    invokeWhenIdeaIsAtState("set keymap to match user's OS ($keymap)") {
       SwingUtilities.invokeLater {
         // it should be done on EDT
         val keymapManagerExInstance = KeymapManagerEx.getInstanceEx()

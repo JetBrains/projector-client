@@ -21,10 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.server.core.classloader
+package org.jetbrains.projector.util.loading
 
-import org.jetbrains.projector.server.core.ij.invokeWhenIdeaIsInitialized
-import org.jetbrains.projector.util.loading.ProjectorClassLoader
+import com.intellij.ide.WindowsCommandLineProcessor
+import org.jetbrains.projector.util.loading.state.IdeaState
+import org.jetbrains.projector.util.loading.state.invokeWhenIdeaIsAtState
+import java.lang.reflect.Method
 
 @Suppress("RedundantVisibilityModifier") // Accessed in projector-server, don't trigger linter that doesn't know it
 public object ProjectorClassLoaderSetup {
@@ -46,11 +48,30 @@ public object ProjectorClassLoaderSetup {
     // implements Markdown plugin interface
     prjClassLoader.forceLoadByProjectorClassLoader("org.jetbrains.projector.server.core.ij.md.ProjectorMarkdownPanel")
 
-    invokeWhenIdeaIsInitialized("Init ProjectorClassLoader", onClassLoaderFetched = {
-      prjClassLoader.ideaClassLoader = it
+    val onIdeClassloaderInstantiated = Runnable {
+      prjClassLoader.ideaClassLoader = WindowsCommandLineProcessor.ourMainRunnerClass.classLoader
       ideaClassLoaderInitialized = true
-    })
+    }
+
+    prjClassLoader
+      .loadClass("${this::class.java.name}\$IdeaStateUtils")
+      .getDeclaredMethod("invokeWhenIdeClassLoaderInstantiated", String::class.java, Runnable::class.java)
+      .apply(Method::unprotect)
+      .invoke(null, "Init ProjectorClassLoader", onIdeClassloaderInstantiated)
 
     return prjClassLoader
+  }
+
+  @Suppress("unused") // used via reflection
+  @UseProjectorLoader
+  private object IdeaStateUtils {
+
+    @JvmStatic
+    private fun invokeWhenIdeClassLoaderInstantiated(
+      purpose: String?,
+      onIdeClassloaderInstantiated: Runnable,
+    ) {
+      invokeWhenIdeaIsAtState(purpose, IdeaState.IDE_CLASSLOADER_INSTANTIATED) { onIdeClassloaderInstantiated.run() }
+    }
   }
 }
