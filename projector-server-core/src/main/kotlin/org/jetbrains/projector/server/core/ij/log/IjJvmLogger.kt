@@ -23,35 +23,24 @@
  */
 package org.jetbrains.projector.server.core.ij.log
 
+import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.logging.Logger
 
 // todo: check for IDEA Logger settings and suppress disabled log levels
-internal class IjJvmLogger(ideaClassLoader: ClassLoader, tag: String) : Logger {
+@UseProjectorLoader
+internal class IjJvmLogger(tag: String) : Logger {
 
-  private val loggerClass = Class.forName("com.intellij.openapi.diagnostic.Logger", false, ideaClassLoader)
-
-  private val logger = loggerClass
-    .getDeclaredMethod("getInstance", String::class.java)
-    .invoke(null, tag)
-
-  private val errorMethod = loggerClass
-    .getDeclaredMethod("error", String::class.java, Throwable::class.java)
-
-  private val infoMethod = loggerClass
-    .getDeclaredMethod("info", String::class.java, Throwable::class.java)
-
-  private val debugMethod = loggerClass
-    .getDeclaredMethod("debug", String::class.java, Throwable::class.java)
+  private val logger = com.intellij.openapi.diagnostic.Logger.getInstance(tag)
 
   override fun error(t: Throwable?, lazyMessage: () -> String) {
-    errorMethod.invoke(logger, lazyMessage(), t)
+    logger.error(lazyMessage(), t)
   }
 
   override fun info(t: Throwable?, lazyMessage: () -> String) {
-    infoMethod.invoke(logger, lazyMessage(), t)
+    logger.info(lazyMessage(), t)
   }
 
   override fun debug(t: Throwable?, lazyMessage: () -> String) {
-    debugMethod.invoke(logger, lazyMessage(), t)
+    logger.debug(lazyMessage(), t)
   }
 }

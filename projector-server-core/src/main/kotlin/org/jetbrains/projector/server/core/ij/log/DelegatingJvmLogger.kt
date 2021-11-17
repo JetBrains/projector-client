@@ -25,13 +25,15 @@ package org.jetbrains.projector.server.core.ij.log
 
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.server.core.ij.invokeWhenIdeaIsInitialized
+import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.logging.ConsoleJvmLogger
 import org.jetbrains.projector.util.logging.Logger
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 
-// todo: make it internal after moving ProjectorServer to this repo
+// todo: make it internal after moving ProjectorServer to this
+@UseProjectorLoader
 public class DelegatingJvmLogger(tag: String) : Logger {
 
   private var ideaLoggerState: IdeaLoggerState = IdeaLoggerState.WaitingIdeaLoggerState()
@@ -43,16 +45,16 @@ public class DelegatingJvmLogger(tag: String) : Logger {
   init {
     invokeWhenIdeaIsInitialized(
       "get IJ Logger",
-      onNoIdeaFound = fun() {
+      onNoIdeaFound = {
         ideaLoggerStateLock.write {
           ideaLoggerState = IdeaLoggerState.NoIj
         }
       },
-      onInitialized = fun(ideaClassLoader: ClassLoader) {
+      onInitialized = {
         ideaLoggerStateLock.write {
           val notLoggedEvents = (ideaLoggerState as IdeaLoggerState.WaitingIdeaLoggerState).notLoggedEvents
 
-          val initializedIdeaLoggerState = IdeaLoggerState.InitializedIdeaLoggerState(ideaClassLoader, tag)
+          val initializedIdeaLoggerState = IdeaLoggerState.InitializedIdeaLoggerState(tag)
 
           notLoggedEvents.forEach {
             Do exhaustive when (it) {
@@ -134,9 +136,9 @@ public class DelegatingJvmLogger(tag: String) : Logger {
         val notLoggedEvents = ArrayDeque<LoggingEvent>()
       }
 
-      class InitializedIdeaLoggerState(ideaClassLoader: ClassLoader, tag: String) : IdeaLoggerState() {
+      class InitializedIdeaLoggerState(tag: String) : IdeaLoggerState() {
 
-        val ijJvmLogger: Logger = IjJvmLogger(ideaClassLoader, tag)
+        val ijJvmLogger: Logger = IjJvmLogger(tag)
       }
 
       object NoIj : IdeaLoggerState()

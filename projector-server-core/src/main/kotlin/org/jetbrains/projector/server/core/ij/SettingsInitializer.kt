@@ -23,21 +23,19 @@
  */
 package org.jetbrains.projector.server.core.ij
 
-import org.jetbrains.projector.util.loading.unprotect
+import com.intellij.ide.ui.AntialiasingType
+import com.intellij.ide.ui.UISettings
+import com.intellij.util.ui.AATextInfo
+import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.logging.Logger
 import java.awt.RenderingHints
 import javax.swing.UIManager
 
+@UseProjectorLoader
 public object SettingsInitializer {
 
-  private fun getIdeaComponentAntiAliasing(ideaClassLoader: ClassLoader): Any? {
-    // this can't be run before IDEA's settings initialization
-    val aaTextInfo = Class.forName("com.intellij.ide.ui.AntialiasingType", false, ideaClassLoader)
-      .getDeclaredMethod("getAAHintForSwingComponent")
-      .invoke(null)
-
-    return aaTextInfo::class.java.getDeclaredField("aaHint").get(aaTextInfo)
-  }
+  // this can't be run before IDEA's settings initialization
+  private val ideaComponentAntiAliasing get() = (AntialiasingType.getAAHintForSwingComponent() as? AATextInfo)?.aaHint
 
   private fun setDefaultComponentTextAa(aaHint: Any?) {
     // this can't be run before IDEA initialization too:
@@ -46,13 +44,9 @@ public object SettingsInitializer {
     UIManager.put(RenderingHints.KEY_TEXT_ANTIALIASING, aaHint)
   }
 
-  private fun fixComponentAntiAliasing(ideaClassLoader: ClassLoader, defaultAa: Any?) {
+  private fun fixComponentAntiAliasing(defaultAa: Any?) {
     val aaHint = try {
       // todo: we do this only once so this won't work if a user changes AA settings in IDEA
-      val ideaComponentAntiAliasing = getIdeaComponentAntiAliasing(ideaClassLoader)
-
-      logger.debug { "Found IDEA aa: $ideaComponentAntiAliasing" }
-
       ideaComponentAntiAliasing
     }
     catch (t: Throwable) {
@@ -64,33 +58,18 @@ public object SettingsInitializer {
     setDefaultComponentTextAa(aaHint)
   }
 
-  private fun disableSmoothScrolling(ideaClassLoader: ClassLoader) {
-    val uiSettingsClass = Class.forName("com.intellij.ide.ui.UISettings", false, ideaClassLoader)
-
-    val uiSettings = uiSettingsClass
-      .getDeclaredMethod("getInstanceOrNull")
-      .invoke(null)
-
-    val uiSettingsState = uiSettingsClass
-      .getDeclaredField("state").let {
-        it.unprotect()
-
-        it.get(uiSettings)
-      }
-
-    Class.forName("com.intellij.ide.ui.UISettingsState", false, ideaClassLoader)
-      .getDeclaredMethod("setSmoothScrolling", Boolean::class.java)
-      .invoke(uiSettingsState, false)
+  private fun disableSmoothScrolling() {
+    UISettings.instanceOrNull?.state?.smoothScrolling = false
   }
 
-  private fun onIdeaInitialization(ideaClassLoader: ClassLoader, defaultAa: Any?) {
-    fixComponentAntiAliasing(ideaClassLoader, defaultAa)
-    disableSmoothScrolling(ideaClassLoader)
+  private fun onIdeaInitialization(defaultAa: Any?) {
+    fixComponentAntiAliasing(defaultAa)
+    disableSmoothScrolling()
   }
 
   public fun addTaskToInitializeIdea(defaultAa: Any?) {
     invokeWhenIdeaIsInitialized("initialize IDEA: fix AA and disable smooth scrolling (at start)") {
-      onIdeaInitialization(it, defaultAa)
+      onIdeaInitialization(defaultAa)
     }
   }
 

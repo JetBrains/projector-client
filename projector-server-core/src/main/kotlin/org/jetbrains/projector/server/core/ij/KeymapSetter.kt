@@ -23,55 +23,35 @@
  */
 package org.jetbrains.projector.server.core.ij
 
+import com.intellij.openapi.keymap.KeymapManager
+import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import org.jetbrains.projector.common.protocol.data.UserKeymap
+import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.logging.Logger
 import javax.swing.SwingUtilities
 
+@UseProjectorLoader
 public object KeymapSetter {
 
   private val logger = Logger<KeymapSetter>()
 
   private fun UserKeymap.toKeyMapManagerFieldName() = when (this) {
-    UserKeymap.WINDOWS -> "X_WINDOW_KEYMAP"
-    UserKeymap.MAC -> "MAC_OS_X_10_5_PLUS_KEYMAP"
-    UserKeymap.LINUX -> "GNOME_KEYMAP"
+    UserKeymap.WINDOWS -> KeymapManager.X_WINDOW_KEYMAP
+    UserKeymap.MAC -> KeymapManager.MAC_OS_X_10_5_PLUS_KEYMAP
+    UserKeymap.LINUX -> KeymapManager.GNOME_KEYMAP
   }
 
   public fun setKeymap(keymap: UserKeymap) {
-    invokeWhenIdeaIsInitialized("set keymap to match user's OS ($keymap)") { ideaClassLoader ->
+    invokeWhenIdeaIsInitialized("set keymap to match user's OS ($keymap)") {
       SwingUtilities.invokeLater {
         // it should be done on EDT
-        val keymapManagerClass = Class.forName("com.intellij.openapi.keymap.KeymapManager", false, ideaClassLoader)
-
-        val userKeymapName = keymapManagerClass
-          .getDeclaredField(keymap.toKeyMapManagerFieldName())
-          .get(null) as String
-
-        val keymapManagerExClass = Class.forName("com.intellij.openapi.keymap.ex.KeymapManagerEx", false, ideaClassLoader)
-
-        val keymapManagerExInstance = keymapManagerExClass
-          .getDeclaredMethod("getInstanceEx")
-          .invoke(null)
-
-        if (keymapManagerExInstance == null) {
-          logger.error { "getInstanceEx() == null - skipping setting keymap" }
-          return@invokeLater
-        }
-
-        val keymapInstance = keymapManagerClass
-          .getDeclaredMethod("getKeymap", String::class.java)
-          .invoke(keymapManagerExInstance, userKeymapName)
-
-        if (keymapInstance == null) {
+        val keymapManagerExInstance = KeymapManagerEx.getInstanceEx()
+        val userKeymapName = keymap.toKeyMapManagerFieldName()
+        val keymapInstance = keymapManagerExInstance.getKeymap(userKeymapName) ?: run {
           logger.error { "getKeymap($userKeymapName) == null - skipping setting keymap" }
           return@invokeLater
         }
-
-        val keymapClass = Class.forName("com.intellij.openapi.keymap.Keymap", false, ideaClassLoader)
-
-        keymapManagerExClass
-          .getDeclaredMethod("setActiveKeymap", keymapClass)
-          .invoke(keymapManagerExInstance, keymapInstance)
+        keymapManagerExInstance.activeKeymap = keymapInstance
       }
     }
   }

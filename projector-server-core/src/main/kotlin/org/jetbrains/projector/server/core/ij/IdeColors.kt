@@ -23,18 +23,22 @@
  */
 package org.jetbrains.projector.server.core.ij
 
+import com.intellij.application.subscribe
+import com.intellij.ide.ui.LafManagerListener
+import com.intellij.util.ui.JBUI.CurrentTheme.Label.foreground
+import com.intellij.util.ui.JBUI.CurrentTheme.Popup.headerBackground
+import com.intellij.util.ui.JBUI.CurrentTheme.Popup.borderColor
 import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowColorsEvent
+import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.logging.Logger
-import java.awt.Color
-import java.lang.reflect.InvocationHandler
-import java.lang.reflect.Proxy
 
 /**
  * Class retrieves color info from IDE settings.
  * Subscribe on LafManager and update colors on LAF change.
  * Calls provided in constructor onColorsChanged action on LAF change.
  */
+@UseProjectorLoader
 public class IdeColors(private val onColorsChanged: (ServerWindowColorsEvent.ColorsStorage) -> Unit) {
 
   private val logger = Logger<IdeColors>()
@@ -43,56 +47,34 @@ public class IdeColors(private val onColorsChanged: (ServerWindowColorsEvent.Col
     private set
 
   init {
-    invokeWhenIdeaIsInitialized("Getting IDE colors") { ideaClassLoader ->
-      getColors(ideaClassLoader)?.let {
-        colors = it
-        onColorsChanged(it)
-      }
-      subscribeToIdeLafManager(ideaClassLoader)
+    invokeWhenIdeaIsInitialized("Getting IDE colors") {
+      subscribeToIdeLafManager()
     }
   }
 
-  private fun subscribeToIdeLafManager(ideaClassLoader: ClassLoader) {
+  private fun subscribeToIdeLafManager() {
     try {
-      val lafManagerClass = Class.forName("com.intellij.ide.ui.LafManager", false, ideaClassLoader)
-      val lafManagerListenerClass = Class.forName("com.intellij.ide.ui.LafManagerListener", false, ideaClassLoader)
-
-      val obj = InvocationHandler { _, method, _ ->
-        if (method.declaringClass == lafManagerListenerClass && method.name == "lookAndFeelChanged") {
-          getColors(ideaClassLoader)?.let {
-            colors = it
-            onColorsChanged(it)
-          }
+      LafManagerListener.TOPIC.subscribe(null, LafManagerListener {
+        readColors()?.let {
+          colors = it
+          onColorsChanged(it)
         }
-        null
-      }
-
-      val proxy = Proxy.newProxyInstance(ideaClassLoader, arrayOf(lafManagerListenerClass), obj) as Proxy
-
-      val lafManagerInstance = lafManagerClass.getDeclaredMethod("getInstance").invoke(null)
-      lafManagerClass.getDeclaredMethod("addLafManagerListener", lafManagerListenerClass).invoke(lafManagerInstance, proxy)
+      })
     }
     catch (e: Exception) {
       logger.error(e) { "Failed to subscribe to IDE LAF manager." }
     }
   }
 
-  private fun getColors(ideaClassLoader: ClassLoader): ServerWindowColorsEvent.ColorsStorage? {
+  private fun readColors(): ServerWindowColorsEvent.ColorsStorage? {
     try {
-      val popupClass = Class.forName("com.intellij.util.ui.JBUI\$CurrentTheme\$Popup", false, ideaClassLoader)
+      val windowHeaderActiveBackground = PaintValue.Color(headerBackground(true).rgb)
+      val windowHeaderInactiveBackground = PaintValue.Color(headerBackground(false).rgb)
 
-      val headerBackgroundMethod = popupClass.getDeclaredMethod("headerBackground", Boolean::class.java)
-      val windowHeaderActiveBackground = PaintValue.Color((headerBackgroundMethod.invoke(null, true) as Color).rgb)
-      val windowHeaderInactiveBackground = PaintValue.Color((headerBackgroundMethod.invoke(null, false) as Color).rgb)
+      val windowActiveBorder = PaintValue.Color(borderColor(true).rgb)
+      val windowInactiveBorder = PaintValue.Color(borderColor(false).rgb)
 
-      val borderColorMethod = popupClass.getDeclaredMethod("borderColor", Boolean::class.java)
-      val windowActiveBorder = PaintValue.Color((borderColorMethod.invoke(null, true) as Color).rgb)
-      val windowInactiveBorder = PaintValue.Color((borderColorMethod.invoke(null, false) as Color).rgb)
-
-      val labelClass = Class.forName("com.intellij.util.ui.JBUI\$CurrentTheme\$Label", false, ideaClassLoader)
-
-      val labelForegroundMethod = labelClass.getDeclaredMethod("foreground")
-      val windowHeaderActiveText = PaintValue.Color((labelForegroundMethod.invoke(null) as Color).rgb)
+      val windowHeaderActiveText = PaintValue.Color(foreground().rgb)
       val windowHeaderInactiveText = windowHeaderActiveText
 
       return ServerWindowColorsEvent.ColorsStorage(
