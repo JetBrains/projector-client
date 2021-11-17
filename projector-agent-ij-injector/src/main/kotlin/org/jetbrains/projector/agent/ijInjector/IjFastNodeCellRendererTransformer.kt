@@ -32,11 +32,11 @@ import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 import javax.swing.RepaintManager
 
 // TODO remove after https://youtrack.jetbrains.com/issue/PRJ-22 is fixed
-internal object IjFastNodeCellRendererTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
+internal object IjFastNodeCellRendererTransformer : IdeaTransformerSetup<IjInjector.AgentParameters>() {
 
   private const val FAST_NODE_RENDERER_CLASS_NAME = "com.intellij.openapi.graph.impl.view.FastNodeCellRendererPainter"
 
-  override val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?> get() = mapOf(
+  override fun getTransformations(): Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
     Class.forName(FAST_NODE_RENDERER_CLASS_NAME) to ::transformFastRenderer
   )
 

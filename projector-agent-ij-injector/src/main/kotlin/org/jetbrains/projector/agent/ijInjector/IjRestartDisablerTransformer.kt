@@ -27,9 +27,9 @@ import com.intellij.util.Restarter
 import javassist.CtClass
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 
-internal object IjRestartDisablerTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
+internal object IjRestartDisablerTransformer : IdeaTransformerSetup<IjInjector.AgentParameters>() {
 
-  override val classTransformations: Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
+  override fun getTransformations(): Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
     Restarter::class.java to IjRestartDisablerTransformer::transformRestart,
   )
 
