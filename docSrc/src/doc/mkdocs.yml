@@ -28,6 +28,8 @@ extra:
     - icon: fontawesome/brands/github
       # TODO: rename to "projector"?
       link: https://github.com/JetBrains/projector-client
+    - icon: fontawesome/brands/telegram-plane
+      link: https://t.me/JBProjector
     - icon: fontawesome/brands/twitter
       link: 'https://twitter.com/ProjectorJB'
     - icon: fontawesome/solid/globe
