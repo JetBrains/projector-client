@@ -17,9 +17,13 @@ If your server is located remotely, just use the corresponding host address inst
 
 ### Latest client
 
-The latest client is always available at our site: <https://projector.jetbrains.com/client/?host=HOST&port=PORT>. So this variant is useful if you want to check out the recent update in the client.
+The latest client is always available at our site: <https://projector.jetbrains.com/client/latest/?host=HOST&port=PORT>. So this variant is useful if you want to check out the recent update in the client.
 
-You should set `HOST` and `PORT` matching your server. For the previous example, it will be <https://projector.jetbrains.com/client/?host=localhost&port=9999>.
+Also, you can select the stable version of the client by replacing the field `latest` with the number of the stable version, starting from `v1.4.0`.
+
+For example, _projector.jetbrains.com/client/**v1.4.0**/?host=HOST&port=PORT_.
+
+You should set `HOST` and `PORT` matching your server. For the previous example, it will be <https://projector.jetbrains.com/client/latest/?host=localhost&port=9999>.
 
 !!! info "Secure connection is required for the latest client"
     Your server must be secure when using the latest client because our domain is secure itself. Before connection, make sure that your browser trusts the certificate you use on your server (in this case, connection via the bundled client should succeed). For more info, read [below](#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page).
