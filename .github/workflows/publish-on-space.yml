@@ -2,7 +2,7 @@ name: Publish on Space
 
 on:
   push:
-    branches: [ master, publish_* ]
+    branches: [ masaster, publish_* ]
 
 jobs:
   publish:

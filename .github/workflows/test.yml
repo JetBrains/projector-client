@@ -1,8 +1,8 @@
 name: Tests
 
 on:
-  push:
-    branches: [master]
+#  push:
+#    branches: [master]
   pull_request:
     types: [ assigned, opened, synchronize, reopened ]
     branches: [master]
