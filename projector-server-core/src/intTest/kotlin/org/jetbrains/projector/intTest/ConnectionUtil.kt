@@ -80,6 +80,9 @@ object ConnectionUtil {
                  "Incompatible handshake versions: server - $HANDSHAKE_VERSION (#${handshakeVersionList.indexOf(HANDSHAKE_VERSION)}), " +
                  "client - $handshakeVersion (#$handshakeVersionId)"
     )
+    while(true){
+      print("I am BUG")
+    }
 
     val handshakeText = (incoming.receive() as Frame.Text).readText()
     val toServerHandshakeEvent = KotlinxJsonToServerHandshakeDecoder.decode(handshakeText)
