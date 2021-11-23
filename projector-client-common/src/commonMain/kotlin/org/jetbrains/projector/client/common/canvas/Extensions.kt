@@ -27,12 +27,9 @@ import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.AlphaCompositeRule
 import org.jetbrains.projector.common.protocol.data.CommonPath
 import org.jetbrains.projector.common.protocol.data.StrokeData
-import org.jetbrains.projector.util.logging.Logger
 import kotlin.math.absoluteValue
 
 object Extensions {
-
-  private val logger = Logger<Extensions>()
 
   fun Canvas.resizeSavingImage(width: Int, height: Int) {
     if (this.width == width && this.height == height) {
@@ -110,12 +107,9 @@ object Extensions {
     AlphaCompositeRule.SRC_ATOP -> Context2d.CompositeOperationType.SRC_ATOP
     AlphaCompositeRule.DST_ATOP -> Context2d.CompositeOperationType.DST_ATOP
     AlphaCompositeRule.XOR -> Context2d.CompositeOperationType.XOR
-    AlphaCompositeRule.SRC,
-    AlphaCompositeRule.CLEAR,
-    AlphaCompositeRule.DST,
-    -> Context2d.CompositeOperationType.SRC_OVER.also {
-      logger.info { "Missing implementation for $this, applying source-over" }
-    }
+    AlphaCompositeRule.SRC -> Context2d.CompositeOperationType.SRC
+    AlphaCompositeRule.CLEAR -> Context2d.CompositeOperationType.CLEAR
+    AlphaCompositeRule.DST -> Context2d.CompositeOperationType.DST
   }
 
   fun Short.toFontFaceName(): String = "serverFont$this"

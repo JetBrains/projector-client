@@ -129,6 +129,9 @@ interface Context2d {
     SRC_ATOP,
     DST_ATOP,
     XOR,
+    SRC,
+    CLEAR,
+    DST
   }
 
   /**
