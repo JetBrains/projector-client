@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.common.misc
 
+import org.jetbrains.projector.client.common.canvas.DummyCanvasFactory
 import org.jetbrains.projector.common.protocol.data.ImageData
 import org.jetbrains.projector.common.protocol.data.ImageId
 import kotlin.test.Test
@@ -39,7 +40,7 @@ class ImageCacherTest {
 
   @Test
   fun getImageDataShouldNotAddImageToRequestIfImageDataIsAlreadyConvertedFromBase64() {
-    val imageCacher = ImageCacher()
+    val imageCacher = ImageCacher(DummyCanvasFactory)
 
     imageCacher.putImageData(imageId, imageData)
 

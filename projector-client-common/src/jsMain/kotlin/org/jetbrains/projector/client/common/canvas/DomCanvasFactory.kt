@@ -29,19 +29,19 @@ import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.Image
 
-actual object CanvasFactory {
-  actual fun create(): Canvas {
+object DomCanvasFactory : CanvasFactory {
+  override fun create(): Canvas {
     return DomCanvas(document.createElement("canvas") as HTMLCanvasElement)
   }
 
-  actual fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit) {
+  override fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit) {
     Image().apply {
       src = "data:image/png;base64,${pngBase64}"
       onload = { onLoad(DomCanvas.DomImageSource(this)) }
     }
   }
 
-  actual fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit) {
+  override fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit) {
     createEmptyImage()
       .run(DomCanvas::DomImageSource)
       .run(onLoad)

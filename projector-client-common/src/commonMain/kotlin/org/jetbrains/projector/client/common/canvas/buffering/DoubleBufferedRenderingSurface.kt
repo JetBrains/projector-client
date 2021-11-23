@@ -27,7 +27,7 @@ import org.jetbrains.projector.client.common.canvas.Canvas
 import org.jetbrains.projector.client.common.canvas.CanvasFactory
 import org.jetbrains.projector.client.common.canvas.Extensions.resizeSavingImage
 
-class DoubleBufferedRenderingSurface(private val target: Canvas) : RenderingSurface {
+class DoubleBufferedRenderingSurface(private val canvasFactory: CanvasFactory, private val target: Canvas) : RenderingSurface {
 
   override var scalingRatio: Double = 1.0
 
@@ -48,7 +48,7 @@ class DoubleBufferedRenderingSurface(private val target: Canvas) : RenderingSurf
   }
 
   private fun createBuffer(): Canvas {
-    return CanvasFactory.create()
+    return canvasFactory.create()
       .apply {
         width = target.width
         height = target.height

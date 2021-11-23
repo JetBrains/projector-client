@@ -34,7 +34,7 @@ import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientRequestImageDataEvent
 import org.jetbrains.projector.util.logging.Logger
 
-class ImageCacher {
+class ImageCacher(private val canvasFactory: CanvasFactory) {
 
   private data class LivingEntity<out EntityType>(var lastUsageTimestamp: Double, val size: Int, val data: EntityType)
 
@@ -98,7 +98,7 @@ class ImageCacher {
     val image = offscreenImages[offscreenTarget.pVolatileImageId]
 
     if (image == null || image.width != offscreenTarget.width || image.height != offscreenTarget.height) {
-      val offScreenCanvas = CanvasFactory.create().apply {
+      val offScreenCanvas = canvasFactory.create().apply {
         width = offscreenTarget.width
         height = offscreenTarget.height
       }
@@ -136,11 +136,11 @@ class ImageCacher {
     }
 
     Do exhaustive when (imageData) {
-      is ImageData.PngBase64 -> CanvasFactory.createImageSource(imageData.pngBase64, ::onLoad)
+      is ImageData.PngBase64 -> canvasFactory.createImageSource(imageData.pngBase64, ::onLoad)
 
       is ImageData.Empty -> {
         logger.info { "Empty image received for $imageId" }
-        CanvasFactory.createEmptyImageSource(::onLoad)
+        canvasFactory.createEmptyImageSource(::onLoad)
       }
     }
   }

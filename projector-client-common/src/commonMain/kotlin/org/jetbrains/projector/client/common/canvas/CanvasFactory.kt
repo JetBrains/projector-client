@@ -23,8 +23,27 @@
  */
 package org.jetbrains.projector.client.common.canvas
 
-expect object CanvasFactory {
+interface CanvasFactory {
   fun create(): Canvas
   fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit)
   fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit)
+}
+
+object DummyCanvasFactory : CanvasFactory {
+  private class DummyCanvas: Canvas {
+    override val context2d: Context2d
+      get() = error("DummyCanvas has no context2d")
+    override var width: Int = 1
+    override var height: Int = 1
+    override val imageSource = DummyImageSource()
+    override fun takeSnapshot() = DummyImageSource()
+  }
+
+  private class DummyImageSource : Canvas.Snapshot {
+    override fun isEmpty() = true
+  }
+
+  override fun create(): Canvas = DummyCanvas()
+  override fun createImageSource(pngBase64: String, onLoad: (Canvas.ImageSource) -> Unit) = onLoad(DummyImageSource())
+  override fun createEmptyImageSource(onLoad: (Canvas.ImageSource) -> Unit) = onLoad(DummyImageSource())
 }
