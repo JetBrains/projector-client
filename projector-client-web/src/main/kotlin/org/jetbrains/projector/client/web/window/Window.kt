@@ -27,6 +27,7 @@ import kotlinx.browser.document
 import kotlinx.dom.addClass
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.DomCanvas
+import org.jetbrains.projector.client.common.canvas.DomCanvasFactory
 import org.jetbrains.projector.client.common.canvas.buffering.DoubleBufferedRenderingSurface
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
 import org.jetbrains.projector.client.common.misc.ImageCacher
@@ -260,7 +261,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
 
   companion object {
     fun createRenderingSurface(canvas: HTMLCanvasElement) = when (ParamsProvider.DOUBLE_BUFFERING) {
-      true -> DoubleBufferedRenderingSurface(DomCanvas(canvas))
+      true -> DoubleBufferedRenderingSurface(DomCanvasFactory, DomCanvas(canvas))
       false -> UnbufferedRenderingSurface(DomCanvas(canvas))
     }
   }

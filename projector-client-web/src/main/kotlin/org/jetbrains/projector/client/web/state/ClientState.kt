@@ -29,6 +29,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.projector.client.common.canvas.DomCanvasFactory
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
@@ -315,7 +316,7 @@ sealed class ClientState {
           decompressor = decompressor,
           compressor = compressor,
           layers = layers,
-          ImageCacher()
+          ImageCacher(DomCanvasFactory)
         )
       }
 
