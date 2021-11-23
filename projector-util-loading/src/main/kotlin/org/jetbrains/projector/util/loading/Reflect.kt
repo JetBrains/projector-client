@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.util.loading
 
+import java.lang.invoke.MethodHandles
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
@@ -31,10 +32,12 @@ import java.lang.reflect.Modifier
 public fun Field.unprotect() {
   isAccessible = true
 
-  Field::class.java.getDeclaredField("modifiers").apply {
-    isAccessible = true
-    setInt(this@unprotect, this@unprotect.modifiers and Modifier.FINAL.inv())
-  }
+  val modifiersHandle = MethodHandles
+    .privateLookupIn(Field::class.java, MethodHandles.lookup())
+    .findVarHandle(Field::class.java, "modifiers", Int::class.java)
+
+  val newValue = this.modifiers and Modifier.FINAL.inv()
+  modifiersHandle.set(this, newValue)
 }
 
 @Suppress("RedundantVisibilityModifier") // used in other modules

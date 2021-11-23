@@ -23,12 +23,41 @@
  */
 package org.jetbrains.projector.util.loading
 
+import java.lang.reflect.Modifier
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class DummyTest {
+class ReflectionTest {
+
+  private class TestClass {
+    @Suppress("unused")
+    private val unprotectMe = 0
+    @Suppress("unused")
+    private var unprotectMeToo = 0
+  }
+
   @Test
-  fun `dummy test for coverage building`() {
-    assertTrue(true)
+  fun testFieldUnprotectFinal() {
+    runFieldUnprotectTest("unprotectMe", true)
+  }
+
+  @Test
+  fun testFieldUnprotectNonFinal() {
+    runFieldUnprotectTest("unprotectMeToo", false)
+  }
+
+  private fun runFieldUnprotectTest(fieldName: String, isFinalByDefault: Boolean) {
+    val field = TestClass::class.java.getDeclaredField(fieldName)
+    val classInstance = TestClass()
+
+    assertFalse(field.canAccess(classInstance))
+    assertEquals(isFinalByDefault, Modifier.isFinal(field.modifiers))
+
+    field.unprotect()
+
+    assertTrue(field.canAccess(classInstance))
+    assertFalse(Modifier.isFinal(field.modifiers))
   }
 }
