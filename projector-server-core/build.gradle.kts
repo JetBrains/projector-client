@@ -140,12 +140,21 @@ dependencies {
   implementation("dnsjava:dnsjava:$dnsjavaVersion")
   implementation("org.jsoup:jsoup:$jsoupVersion")
 
+  compileOnly("com.jetbrains.intellij.platform:ide-impl:$intellijPlatformVersion")
   compileOnly("com.jetbrains.intellij.platform:util-class-loader:$intellijPlatformVersion")
-  compileOnly("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion")
+  compileOnly("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion") {
+    exclude(group = "ai.grazie.utils")
+      .exclude(group = "ai.grazie.nlp")
+      .exclude(group = "ai.grazie.spell")
+      .exclude(group = "com.jetbrains.infra")
+  }
 
   testImplementation(kotlin("test", kotlinVersion))
   testImplementation("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion") {
-    exclude("com.jetbrains.rd")
+    exclude(group = "ai.grazie.utils")
+      .exclude(group = "ai.grazie.nlp")
+      .exclude(group = "ai.grazie.spell")
+      .exclude(group = "com.jetbrains.infra")
   }
 
   intTestImplementation("com.codeborne:selenide:$selenideVersion")
