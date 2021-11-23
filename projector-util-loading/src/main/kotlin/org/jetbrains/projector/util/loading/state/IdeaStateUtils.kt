@@ -39,19 +39,17 @@ private val logger = Logger("IdeState")
  *
  * To check whether IDE classes available, use [IdeaState.isIdeAttached]
  *
+ * @receiver IDEA state at which function will be executed
  * @param purpose               purpose of state querying, used for logging
- * @param state                 IDEA state at which function will be executed
  * @param onStateOccurred       function invoked when target state occurred
  */
-public fun invokeWhenIdeaIsAtState(
+public fun IdeaState.whenOccurred(
   purpose: String?,
-  state: IdeaState = IdeaState.CONFIGURATION_STORE_INITIALIZED,
   onStateOccurred: () -> Unit,
 ) {
-  val listener = IdeaTargetStateListener(state, onStateOccurred)
+  val listener = IdeaTargetStateListener(this, onStateOccurred)
   registerStateListener(purpose, listener)
 }
-
 /**
  * Registers listener to be invoked on state change.
  * Listener function will be invoked immediately on the current thread for already occurred states.
@@ -80,7 +78,10 @@ public fun registerStateListener(purpose: String?, listener: IdeaStateListener) 
     } else {
       repeat(startingStateOrdinal) { i ->
         val state = IdeaState.values()[i]
-        if (listener.onStateOccurred(state)) return
+        if (listener.onStateOccurred(state)) {
+          logJobDone(purpose)
+          return
+        }
       }
     }
     listeners.add(IdeaStateListenerWithPurpose(purpose, listener))
@@ -106,9 +107,7 @@ private fun runListenerThread() {
             if (state.isOccurred) {
               listeners.removeIf {
                 withCondition(it.onStateOccurred(state)) {
-                  if (it.purpose != null) {
-                    logger.debug { "\"${it.purpose}\" is done" }
-                  }
+                  logJobDone(it.purpose)
                 }
               }
               startingStateOrdinal = i + 1
@@ -127,6 +126,12 @@ private fun runListenerThread() {
         break
       }
     }
+  }
+}
+
+private fun logJobDone(purpose: String?) {
+  if (purpose != null) {
+    logger.debug { "\"$purpose\" is done" }
   }
 }
 

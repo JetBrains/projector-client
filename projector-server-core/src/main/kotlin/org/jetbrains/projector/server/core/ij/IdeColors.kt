@@ -31,7 +31,8 @@ import com.intellij.util.ui.JBUI.CurrentTheme.Popup.borderColor
 import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowColorsEvent
 import org.jetbrains.projector.util.loading.UseProjectorLoader
-import org.jetbrains.projector.util.loading.state.invokeWhenIdeaIsAtState
+import org.jetbrains.projector.util.loading.state.IdeaState
+import org.jetbrains.projector.util.loading.state.whenOccurred
 import org.jetbrains.projector.util.logging.Logger
 
 /**
@@ -48,7 +49,7 @@ public class IdeColors(private val onColorsChanged: (ServerWindowColorsEvent.Col
     private set
 
   init {
-    invokeWhenIdeaIsAtState("Getting IDE colors") {
+    IdeaState.CONFIGURATION_STORE_INITIALIZED.whenOccurred("Getting IDE colors") {
       subscribeToIdeLafManager()
     }
   }

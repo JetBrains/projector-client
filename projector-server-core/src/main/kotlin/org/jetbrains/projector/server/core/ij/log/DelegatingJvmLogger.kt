@@ -24,9 +24,9 @@
 package org.jetbrains.projector.server.core.ij.log
 
 import org.jetbrains.projector.common.misc.Do
-import org.jetbrains.projector.util.loading.state.invokeWhenIdeaIsAtState
 import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.loading.state.IdeaState
+import org.jetbrains.projector.util.loading.state.whenOccurred
 import org.jetbrains.projector.util.logging.ConsoleJvmLogger
 import org.jetbrains.projector.util.logging.Logger
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -45,7 +45,7 @@ public class DelegatingJvmLogger(tag: String) : Logger {
 
   init {
     if (IdeaState.isIdeAttached) {
-      invokeWhenIdeaIsAtState(null, IdeaState.BOOTSTRAP) {
+      IdeaState.BOOTSTRAP.whenOccurred(purpose = null) {
         ideaLoggerStateLock.write {
           val notLoggedEvents = (ideaLoggerState as IdeaLoggerState.WaitingIdeaLoggerState).notLoggedEvents
 

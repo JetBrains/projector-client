@@ -25,7 +25,7 @@ package org.jetbrains.projector.util.loading
 
 import com.intellij.ide.WindowsCommandLineProcessor
 import org.jetbrains.projector.util.loading.state.IdeaState
-import org.jetbrains.projector.util.loading.state.invokeWhenIdeaIsAtState
+import org.jetbrains.projector.util.loading.state.whenOccurred
 import java.lang.reflect.Method
 
 @Suppress("RedundantVisibilityModifier") // Accessed in projector-server, don't trigger linter that doesn't know it
@@ -71,7 +71,7 @@ public object ProjectorClassLoaderSetup {
       purpose: String?,
       onIdeClassloaderInstantiated: Runnable,
     ) {
-      invokeWhenIdeaIsAtState(purpose, IdeaState.IDE_CLASSLOADER_INSTANTIATED) { onIdeClassloaderInstantiated.run() }
+      IdeaState.IDE_CLASSLOADER_INSTANTIATED.whenOccurred(purpose) { onIdeClassloaderInstantiated.run() }
     }
   }
 }
