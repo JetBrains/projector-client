@@ -31,6 +31,7 @@ import org.jetbrains.projector.client.common.canvas.PaintColor.SolidColor
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.data.PathSegment
 import org.jetbrains.projector.common.protocol.data.Point
+import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.*
 
 internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) : Context2d {
@@ -90,6 +91,12 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
       CompositeOperationType.SRC_ATOP -> "source-atop"
       CompositeOperationType.DST_ATOP -> "destination-atop"
       CompositeOperationType.XOR -> "xor"
+      CompositeOperationType.SRC,
+      CompositeOperationType.CLEAR,
+      CompositeOperationType.DST
+      -> "source-over".also {
+        logger.info { "Missing implementation for $this, applying source-over" }
+      }
     }
   }
 
@@ -326,6 +333,8 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
   }
 
   companion object {
+    private val logger = Logger<DomContext2d>()
+
     fun CanvasPath.moveBy(segments: List<PathSegment>) {
       segments.forEach {
         Do exhaustive when (it) {
