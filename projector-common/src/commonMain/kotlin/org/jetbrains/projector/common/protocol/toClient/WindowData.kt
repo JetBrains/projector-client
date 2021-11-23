@@ -41,6 +41,22 @@ enum class WindowType {
   IDEA_WINDOW
 }
 
+// unlike WindowType, this is intended to always be the lowest inheritor of Window that's useful for clientside purposes
+@Serializable
+enum class WindowClass {
+  @SerialName("a")
+  OTHER,
+
+  @SerialName("b")
+  FRAME,
+
+  @SerialName("c")
+  DIALOG,
+
+  @SerialName("d")
+  JWINDOW
+}
+
 @Serializable
 data class WindowData(
   @SerialName("a")
@@ -79,4 +95,12 @@ data class WindowData(
    */
   @SerialName("l")
   val headerHeight: Int? = null,
+  @SerialName("m")
+  val windowClass: WindowClass = WindowClass.OTHER,
+  @SerialName("n")
+  val autoRequestFocus: Boolean = false,
+  @SerialName("o")
+  val isAlwaysOnTop: Boolean = false,
+  @SerialName("p")
+  val parentId: Int? = null,
 )

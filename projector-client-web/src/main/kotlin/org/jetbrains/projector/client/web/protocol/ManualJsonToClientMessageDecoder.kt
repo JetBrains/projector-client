@@ -137,7 +137,11 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       this["i"] as Boolean,
       this["j"] as Boolean,
       (this["k"] as String).toWindowType(),
-      this["l"] as Int?
+      this["l"] as Int?,
+      (this["m"] as String).toWindowClass(),
+      this["n"] as Boolean,
+      this["o"] as Boolean,
+      this["p"] as Int?
     )
   }
 
@@ -147,6 +151,16 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "b" -> WindowType.POPUP
       "c" -> WindowType.IDEA_WINDOW
       else -> throw IllegalArgumentException("Unsupported window type: $this")
+    }
+  }
+
+  private fun String.toWindowClass(): WindowClass {
+    return when (this) {
+      "a" -> WindowClass.OTHER
+      "b" -> WindowClass.FRAME
+      "c" -> WindowClass.DIALOG
+      "d" -> WindowClass.JWINDOW
+      else -> throw IllegalArgumentException("Unsupported window class: $this")
     }
   }
 
