@@ -49,7 +49,7 @@ Name | Type | Default value | Description
 ---|---|---|---
 `clipping` | Presence | Not present | Show borders of clipping areas via red and blue lines.
 `logUnsupportedEvents` | Presence | Not present | Log unsupported events received from server to browser console.
-`doubleBuffering` | Presence | Not present | Enable double buffering for every single message from server.
+`doubleBuffering` | Boolean | `true` | Enable double buffering for rendering to on-screen surfaces.
 `enableCompression` | Presence | Not present | Use compression for sending and receiving WebSocket messages.
 `toClientFormat` | String | `jsonManual` | Sets format of data from server to client: `json`, `jsonManual`, `protoBuf`.
 `imageTtl` | Double | `60_000.0` | Set caching time of unused images in ms.

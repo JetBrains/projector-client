@@ -54,6 +54,7 @@ actual object ParamsProvider {
     "projector.jetbrains.com" -> ""
     else -> getCurrentPath()
   }
+  private const val DEFAULT_DOUBLE_BUFFERING = true
   private val DEFAULT_TO_CLIENT_FORMAT: ToClientFormat = ToClientFormat.KOTLINX_JSON_MANUAL
   private const val DEFAULT_IMAGE_TTL = 60_000.0  // in ms
   private const val DEFAULT_FLUSH_DELAY = 1
@@ -111,7 +112,7 @@ actual object ParamsProvider {
       PORT = searchParams.get("port") ?: if (ENABLE_RELAY) protocolPort() else DEFAULT_PORT
       PATH = searchParams.get("path") ?: DEFAULT_PATH
       LOG_UNSUPPORTED_EVENTS = searchParams.has("logUnsupportedEvents")
-      DOUBLE_BUFFERING = searchParams.has("doubleBuffering")
+      DOUBLE_BUFFERING = searchParams.get("doubleBuffering")?.toBoolean() ?: DEFAULT_DOUBLE_BUFFERING
       ENABLE_COMPRESSION = searchParams.has("enableCompression")
       TO_CLIENT_FORMAT = when (searchParams.get("toClientFormat")) {
         "json" -> ToClientFormat.KOTLINX_JSON
