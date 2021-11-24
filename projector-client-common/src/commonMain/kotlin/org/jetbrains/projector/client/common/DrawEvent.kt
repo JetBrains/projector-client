@@ -26,7 +26,11 @@ package org.jetbrains.projector.client.common
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowPaintEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowStateEvent
 
-data class DrawEvent(
+sealed interface DrawEvent
+
+data class StateAndPaint(
   val prerequisites: List<ServerWindowStateEvent>,
   val paintEvent: ServerWindowPaintEvent,
-)
+) : DrawEvent
+
+object FlushSurface : DrawEvent

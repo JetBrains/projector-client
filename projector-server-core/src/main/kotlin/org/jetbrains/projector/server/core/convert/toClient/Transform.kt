@@ -147,6 +147,8 @@ public fun Iterable<Pair<ServerDrawCommandsEvent.Target, List<ServerWindowEvent>
           @Suppress("RedundantUnitExpression")  // needed for exhaustive when
           Unit
         }
+
+        is Flush -> withoutUnneededStates.add(ServerDrawCommandsEvent(target, listOf(Flush)))
       }
     }
   }
