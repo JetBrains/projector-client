@@ -55,157 +55,160 @@ class SingleRenderingSurfaceProcessor(private val renderingSurface: RenderingSur
     return firstUnsuccessful
   }
 
-  fun flush() {
-    renderingSurface.flush()
-  }
-
-  private fun handleDrawEvent(command: DrawEvent): Boolean {
-    command.prerequisites.forEach {
-      Do exhaustive when (it) {
-        is ServerSetCompositeEvent -> renderer.setComposite(it.composite)
-
-        is ServerSetPaintEvent -> it.paint.let { paintValue ->
-          when (paintValue) {
-            is PaintValue.Color -> renderer.setColor(paintValue.argb)
-
-            is PaintValue.Gradient -> renderer.setGradientPaint(
-              p1 = paintValue.p1,
-              p2 = paintValue.p2,
-              color1 = paintValue.argb1,
-              color2 = paintValue.argb2
-            )
-
-            is PaintValue.Unknown -> logUnsupportedCommand(it)
-          }
-        }
-
-        is ServerSetClipEvent -> renderer.setClip(it.shape)
-
-        is ServerSetFontEvent -> renderer.setFont(it.fontId, it.fontSize, it.ligaturesOn)
-
-        is ServerSetStrokeEvent -> renderer.setStroke(it.strokeData)
-
-        is ServerSetTransformEvent -> renderer.setTransform(it.tx)
-
-        is ServerWindowToDoStateEvent -> logUnsupportedCommand(it)
-      }
+  private fun handleDrawEvent(command: DrawEvent): Boolean = when (command) {
+    is FlushSurface -> {
+      renderingSurface.flush()
+      HANDLING_SUCCEED
     }
 
-    var success = true
+    is StateAndPaint -> {
+      command.prerequisites.forEach {
+        Do exhaustive when (it) {
+          is ServerSetCompositeEvent -> renderer.setComposite(it.composite)
 
-    with(command.paintEvent) {
-      Do exhaustive when (this) {
-        is ServerDrawLineEvent -> renderer.drawLine(
-          x1 = x1.toDouble(),
-          y1 = y1.toDouble(),
-          x2 = x2.toDouble(),
-          y2 = y2.toDouble()
-        )
+          is ServerSetPaintEvent -> it.paint.let { paintValue ->
+            when (paintValue) {
+              is PaintValue.Color -> renderer.setColor(paintValue.argb)
 
-        is ServerDrawStringEvent -> renderer.drawString(
-          string = str,
-          x = x,
-          y = y,
-          desiredWidth = desiredWidth
-        )
+              is PaintValue.Gradient -> renderer.setGradientPaint(
+                p1 = paintValue.p1,
+                p2 = paintValue.p2,
+                color1 = paintValue.argb1,
+                color2 = paintValue.argb2
+              )
 
-        is ServerPaintRectEvent -> renderer.paintRect(
-          paintType = paintType,
-          x = x,
-          y = y,
-          width = width,
-          height = height
-        )
-
-        is ServerPaintRoundRectEvent -> renderer.paintRoundRect(
-          paintType = paintType,
-          x = x.toDouble(),
-          y = y.toDouble(),
-          w = width.toDouble(),
-          h = height.toDouble(),
-          r1 = arcWidth.toDouble(),
-          r2 = arcHeight.toDouble()
-        )
-
-        is ServerDrawImageEvent -> {
-          val image = imageCacher.getImageData(imageId)
-
-          if (image == null) {
-            success = false
-          }
-          else {
-            val info = imageEventInfo
-
-            Do exhaustive when (info) {
-              is ImageEventInfo.Ds -> {
-                // todo: manage bgcolor
-                val dw = info.dx2 - info.dx1
-                val dh = info.dy2 - info.dy1
-                val sw = info.sx2 - info.sx1
-                val sh = info.sy2 - info.sy1
-
-                renderer.drawImage(
-                  image = image,
-                  dx = info.dx1.toDouble(),
-                  dy = info.dy1.toDouble(),
-                  dw = dw.toDouble(),
-                  dh = dh.toDouble(),
-                  sx = info.sx1.toDouble(),
-                  sy = info.sy1.toDouble(),
-                  sw = sw.toDouble(),
-                  sh = sh.toDouble()
-                )
-              }
-
-              is ImageEventInfo.Xy -> {
-                // todo: manage bgcolor
-                renderer.drawImage(image, info.x.toDouble(), info.y.toDouble())
-              }
-
-              is ImageEventInfo.XyWh -> {
-                // todo: manage bgcolor
-                renderer.drawImage(
-                  image = image,
-                  x = info.x.toDouble(),
-                  y = info.y.toDouble(),
-                  width = info.width.toDouble(),
-                  height = info.height.toDouble()
-                )
-              }
-
-              is ImageEventInfo.Transformed -> renderer.drawImage(image, info.tx)
+              is PaintValue.Unknown -> logUnsupportedCommand(it)
             }
           }
+
+          is ServerSetClipEvent -> renderer.setClip(it.shape)
+
+          is ServerSetFontEvent -> renderer.setFont(it.fontId, it.fontSize, it.ligaturesOn)
+
+          is ServerSetStrokeEvent -> renderer.setStroke(it.strokeData)
+
+          is ServerSetTransformEvent -> renderer.setTransform(it.tx)
+
+          is ServerWindowToDoStateEvent -> logUnsupportedCommand(it)
         }
-
-        is ServerPaintPathEvent -> renderer.paintPath(paintType, path)
-
-        is ServerPaintOvalEvent -> renderer.paintOval(
-          paintType = paintType,
-          x = x.toDouble(),
-          y = y.toDouble(),
-          width = width.toDouble(),
-          height = height.toDouble()
-        )
-
-        is ServerPaintPolygonEvent -> renderer.paintPolygon(paintType, points)
-
-        is ServerDrawPolylineEvent -> renderer.drawPolyline(points)
-
-        is ServerCopyAreaEvent -> renderer.copyArea(
-          x = x.toDouble(),
-          y = y.toDouble(),
-          width = width.toDouble(),
-          height = height.toDouble(),
-          dx = dx.toDouble(),
-          dy = dy.toDouble()
-        )
-
-        is ServerWindowToDoPaintEvent -> logUnsupportedCommand(this)
       }
-    }
 
-    return success
+      var handlingResult = HANDLING_SUCCEED
+
+      with(command.paintEvent) {
+        Do exhaustive when (this) {
+          is ServerDrawLineEvent -> renderer.drawLine(
+            x1 = x1.toDouble(),
+            y1 = y1.toDouble(),
+            x2 = x2.toDouble(),
+            y2 = y2.toDouble()
+          )
+
+          is ServerDrawStringEvent -> renderer.drawString(
+            string = str,
+            x = x,
+            y = y,
+            desiredWidth = desiredWidth
+          )
+
+          is ServerPaintRectEvent -> renderer.paintRect(
+            paintType = paintType,
+            x = x,
+            y = y,
+            width = width,
+            height = height
+          )
+
+          is ServerPaintRoundRectEvent -> renderer.paintRoundRect(
+            paintType = paintType,
+            x = x.toDouble(),
+            y = y.toDouble(),
+            w = width.toDouble(),
+            h = height.toDouble(),
+            r1 = arcWidth.toDouble(),
+            r2 = arcHeight.toDouble()
+          )
+
+          is ServerDrawImageEvent -> {
+            val image = imageCacher.getImageData(imageId)
+
+            if (image == null) {
+              handlingResult = HANDLING_FAILED
+            }
+            else {
+              val info = imageEventInfo
+
+              Do exhaustive when (info) {
+                is ImageEventInfo.Ds -> {
+                  // todo: manage bgcolor
+                  val dw = info.dx2 - info.dx1
+                  val dh = info.dy2 - info.dy1
+                  val sw = info.sx2 - info.sx1
+                  val sh = info.sy2 - info.sy1
+
+                  renderer.drawImage(
+                    image = image,
+                    dx = info.dx1.toDouble(),
+                    dy = info.dy1.toDouble(),
+                    dw = dw.toDouble(),
+                    dh = dh.toDouble(),
+                    sx = info.sx1.toDouble(),
+                    sy = info.sy1.toDouble(),
+                    sw = sw.toDouble(),
+                    sh = sh.toDouble()
+                  )
+                }
+
+                is ImageEventInfo.Xy -> {
+                  // todo: manage bgcolor
+                  renderer.drawImage(image, info.x.toDouble(), info.y.toDouble())
+                }
+
+                is ImageEventInfo.XyWh -> {
+                  // todo: manage bgcolor
+                  renderer.drawImage(
+                    image = image,
+                    x = info.x.toDouble(),
+                    y = info.y.toDouble(),
+                    width = info.width.toDouble(),
+                    height = info.height.toDouble()
+                  )
+                }
+
+                is ImageEventInfo.Transformed -> renderer.drawImage(image, info.tx)
+              }
+            }
+          }
+
+          is ServerPaintPathEvent -> renderer.paintPath(paintType, path)
+
+          is ServerPaintOvalEvent -> renderer.paintOval(
+            paintType = paintType,
+            x = x.toDouble(),
+            y = y.toDouble(),
+            width = width.toDouble(),
+            height = height.toDouble()
+          )
+
+          is ServerPaintPolygonEvent -> renderer.paintPolygon(paintType, points)
+
+          is ServerDrawPolylineEvent -> renderer.drawPolyline(points)
+
+          is ServerCopyAreaEvent -> renderer.copyArea(
+            x = x.toDouble(),
+            y = y.toDouble(),
+            width = width.toDouble(),
+            height = height.toDouble(),
+            dx = dx.toDouble(),
+            dy = dy.toDouble()
+          )
+
+          is ServerWindowToDoPaintEvent -> logUnsupportedCommand(this)
+        }
+      }
+
+      handlingResult
+    }
   }
 
   class StateSaver(private val renderer: Renderer, private val renderingSurface: RenderingSurface) {
@@ -239,6 +242,9 @@ class SingleRenderingSurfaceProcessor(private val renderingSurface: RenderingSur
 
     private val logger = Logger<SingleRenderingSurfaceProcessor>()
 
+    private const val HANDLING_SUCCEED = true
+    private const val HANDLING_FAILED = false
+
     private fun logUnsupportedCommand(command: ServerWindowEvent) {
       if (ParamsProvider.LOG_UNSUPPORTED_EVENTS) {
         logger.debug { "Unsupported: $command" }
@@ -255,9 +261,11 @@ class SingleRenderingSurfaceProcessor(private val renderingSurface: RenderingSur
           is ServerWindowStateEvent -> prerequisites.add(it)
 
           is ServerWindowPaintEvent -> {
-            result.add(DrawEvent(prerequisites, it))
+            result.add(StateAndPaint(prerequisites, it))
             prerequisites = mutableListOf()
           }
+
+          is Flush -> result.add(FlushSurface)
         }
       }
 

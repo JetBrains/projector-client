@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.server.core.convert
 
+import org.jetbrains.projector.common.protocol.toClient.Flush
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawStringEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerSetFontEvent
@@ -136,6 +137,82 @@ class ToClientTransformShrinkEvents {
         listOf(
           ServerSetFontEvent(10, 120),
           ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+        ),
+      ),
+    )
+    assertEquals(expected, actual)
+  }
+
+  @Test
+  fun testFlush() {
+    // flush shouldn't be skipped
+
+    val initial = listOf(
+      ServerDrawCommandsEvent.Target.Onscreen(1) to listOf(
+        ServerSetFontEvent(10, 12),
+        ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+      ),
+      ServerDrawCommandsEvent.Target.Onscreen(2) to listOf(
+      ),
+      ServerDrawCommandsEvent.Target.Onscreen(1) to listOf(
+        Flush,
+      ),
+      ServerDrawCommandsEvent.Target.Onscreen(2) to listOf(
+        Flush,
+      ),
+      ServerDrawCommandsEvent.Target.Onscreen(3) to listOf(
+        ServerSetFontEvent(10, 12),
+        ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+      ),
+      ServerDrawCommandsEvent.Target.Onscreen(1) to listOf(
+        Flush,
+      ),
+      ServerDrawCommandsEvent.Target.Onscreen(2) to listOf(
+        Flush,
+      ),
+      ServerDrawCommandsEvent.Target.Onscreen(3) to listOf(
+        Flush,
+      ),
+    )
+    val actual = initial.shrinkEvents()
+    val expected = listOf(
+      ServerDrawCommandsEvent(
+        ServerDrawCommandsEvent.Target.Onscreen(1),
+        listOf(
+          ServerSetFontEvent(10, 12),
+          ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+          Flush,
+        ),
+      ),
+      ServerDrawCommandsEvent(
+        ServerDrawCommandsEvent.Target.Onscreen(2),
+        listOf(
+          Flush,
+        ),
+      ),
+      ServerDrawCommandsEvent(
+        ServerDrawCommandsEvent.Target.Onscreen(3),
+        listOf(
+          ServerSetFontEvent(10, 12),
+          ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+        ),
+      ),
+      ServerDrawCommandsEvent(
+        ServerDrawCommandsEvent.Target.Onscreen(1),
+        listOf(
+          Flush,
+        ),
+      ),
+      ServerDrawCommandsEvent(
+        ServerDrawCommandsEvent.Target.Onscreen(2),
+        listOf(
+          Flush,
+        ),
+      ),
+      ServerDrawCommandsEvent(
+        ServerDrawCommandsEvent.Target.Onscreen(3),
+        listOf(
+          Flush,
         ),
       ),
     )

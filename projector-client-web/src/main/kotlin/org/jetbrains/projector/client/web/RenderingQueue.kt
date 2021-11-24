@@ -61,7 +61,6 @@ class RenderingQueue(private val windowManager: WindowManager) {
       val commandProcessor = shrunk.target.getCommandProcessor() ?: return@forEach
 
       val firstUnsuccessful = commandProcessor.processNew(shrunk.events)
-      commandProcessor.flush()
 
       if (pendingDrawEvents.isNotEmpty()) {
         pendingDrawEvents.add(shrunk)
@@ -91,7 +90,6 @@ class RenderingQueue(private val windowManager: WindowManager) {
       val commandProcessor = shrunk.target.getCommandProcessor() ?: return@forEachIndexed
 
       val firstUnsuccessfulItem = commandProcessor.processNew(shrunk.events)
-      commandProcessor.flush()
 
       if (firstUnsuccessful == null && firstUnsuccessfulItem != null) {
         firstUnsuccessful = i to firstUnsuccessfulItem

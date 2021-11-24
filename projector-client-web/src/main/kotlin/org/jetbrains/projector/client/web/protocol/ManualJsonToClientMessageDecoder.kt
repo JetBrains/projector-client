@@ -276,6 +276,8 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
 
       "t" -> ServerSetUnknownStrokeEvent(content["a"] as String)
 
+      "u" -> Flush
+
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }
   }

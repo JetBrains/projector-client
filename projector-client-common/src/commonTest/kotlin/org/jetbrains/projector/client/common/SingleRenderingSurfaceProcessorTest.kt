@@ -41,11 +41,11 @@ class SingleRenderingSurfaceProcessorTest {
     )
     val actual = initial.shrinkByPaintEvents()
     val expected = listOf(
-      DrawEvent(
+      StateAndPaint(
         prerequisites = emptyList(),
         paintEvent = ServerDrawLineEvent(0, 1, 2, 3),
       ),
-      DrawEvent(
+      StateAndPaint(
         prerequisites = emptyList(),
         paintEvent = ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
       ),
@@ -65,14 +65,14 @@ class SingleRenderingSurfaceProcessorTest {
     )
     val actual = initial.shrinkByPaintEvents()
     val expected = listOf(
-      DrawEvent(
+      StateAndPaint(
         prerequisites = listOf(
           ServerSetPaintEvent(PaintValue.Color(0x1234_5678)),
           ServerSetFontEvent(2, 12),
         ),
         paintEvent = ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
       ),
-      DrawEvent(
+      StateAndPaint(
         prerequisites = listOf(
           ServerSetPaintEvent(PaintValue.Color(0x5678_1234)),
           ServerSetCompositeEvent(CommonAlphaComposite(AlphaCompositeRule.SRC, 1f)),

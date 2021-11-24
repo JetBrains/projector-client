@@ -247,3 +247,7 @@ data class ServerSetUnknownStrokeEvent(
   @SerialName("a")
   val className: String,
 ) : ServerWindowToDoStateEvent()
+
+@Serializable
+@SerialName("u")
+object Flush : ServerWindowEvent()
