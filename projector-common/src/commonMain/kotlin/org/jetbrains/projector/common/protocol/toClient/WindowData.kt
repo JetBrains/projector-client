@@ -54,7 +54,7 @@ enum class WindowClass {
   DIALOG,
 
   @SerialName("d")
-  JWINDOW
+  JWINDOW,
 }
 
 @Serializable

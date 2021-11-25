@@ -131,7 +131,7 @@ interface Context2d {
     XOR,
     SRC,
     CLEAR,
-    DST
+    DST,
   }
 
   /**

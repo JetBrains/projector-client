@@ -93,7 +93,7 @@ internal class DomContext2d(private val myContext2d: CanvasRenderingContext2D) :
       CompositeOperationType.XOR -> "xor"
       CompositeOperationType.SRC,
       CompositeOperationType.CLEAR,
-      CompositeOperationType.DST
+      CompositeOperationType.DST,
       -> "source-over".also {
         logger.info { "Missing implementation for $this, applying source-over" }
       }

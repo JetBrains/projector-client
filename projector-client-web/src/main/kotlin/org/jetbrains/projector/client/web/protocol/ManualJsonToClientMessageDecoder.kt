@@ -141,7 +141,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       (this["m"] as String).toWindowClass(),
       this["n"] as Boolean,
       this["o"] as Boolean,
-      this["p"] as Int?
+      this["p"] as Int?,
     )
   }
 
