@@ -98,7 +98,7 @@ data class WindowData(
   @SerialName("m")
   val windowClass: WindowClass = WindowClass.OTHER,
   @SerialName("n")
-  val autoRequestFocus: Boolean = false,
+  val isAutoRequestFocus: Boolean = false,
   @SerialName("o")
   val isAlwaysOnTop: Boolean = false,
   @SerialName("p")
