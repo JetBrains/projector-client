@@ -23,7 +23,6 @@
  */
 package org.jetbrains.projector.client.common.misc
 
-import org.jetbrains.projector.client.common.canvas.DummyCanvasFactory
 import org.jetbrains.projector.common.protocol.data.ImageData
 import org.jetbrains.projector.common.protocol.data.ImageId
 import kotlin.test.Test
