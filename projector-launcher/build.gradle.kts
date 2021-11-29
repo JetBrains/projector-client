@@ -24,9 +24,11 @@
 import com.google.gson.GsonBuilder
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackCssMode.EXTRACT
+import org.paleozogt.gradle.zip.SymZip
 
 plugins {
   kotlin("js")
+  id( "org.paleozogt.symzip")
 }
 
 val bootstrapVersion: String by project
@@ -146,12 +148,12 @@ fun Task.createPackageTask(platform: String, arch: String, configuration: Exec.(
   }
 }
 
-fun Task.createPackageZipTask(platform: String, arch: String, configuration: Zip.() -> Unit = {}): Task {
+fun Task.createPackageZipTask(platform: String, arch: String, configuration: SymZip.() -> Unit = {}): Task {
 
   val packageZipTaskName = getPackageZipTaskName(platform, arch)
   val packageTaskName = getPackageTaskName(platform, arch)
 
-  return task<Zip>(packageZipTaskName) {
+  return task<SymZip>(packageZipTaskName) {
     group = checkNotNull(this@createPackageZipTask.group) { "Grouping task of $packageZipTaskName group name is not defined" }
     dependsOn(packageTaskName)
     val targetName = "$appName-$platform-$arch"
