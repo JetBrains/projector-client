@@ -31,6 +31,7 @@ public fun List<ServerEvent>.distinctUpdatedOnscreenSurfaces(): List<ServerDrawC
   .asSequence()
   .filterIsInstance<ServerDrawCommandsEvent>()
   .mapNotNull { (target, commands) -> (target as? ServerDrawCommandsEvent.Target.Onscreen)?.let { target to commands } }
+  // asReversed: optimization. We expect that the last element is ServerWindowPaintEvent most of the time:
   .filter { (_, commands) -> commands.asReversed().any { it is ServerWindowPaintEvent } }
   .map { (target, _) -> target }
   .distinct()
