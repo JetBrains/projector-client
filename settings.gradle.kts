@@ -24,6 +24,7 @@
 pluginManagement {
   val gradleMkdocsPluginVersion: String by settings
   val kotlinVersion: String by settings
+  val symZipVersion: String by settings
 
   //todo: refactoring to make it look more elegant
   buildscript {
@@ -31,7 +32,7 @@ pluginManagement {
       mavenCentral()
     }
     dependencies {
-      classpath("org.paleozogt:symzip-plugin:0.10.1")
+      classpath("org.paleozogt:symzip-plugin:$symZipVersion")
     }
   }
 
@@ -41,7 +42,7 @@ pluginManagement {
     kotlin("jvm") version kotlinVersion apply false
     kotlin("plugin.serialization") version kotlinVersion apply false
     id("ru.vyarus.mkdocs") version gradleMkdocsPluginVersion apply false
-    id( "org.paleozogt.symzip") version "0.10.1" apply false
+    id("org.paleozogt.symzip") version symZipVersion apply false
   }
 }
 
