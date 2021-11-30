@@ -28,7 +28,7 @@ import org.paleozogt.gradle.zip.SymZip
 
 plugins {
   kotlin("js")
-  id( "org.paleozogt.symzip")
+  id("org.paleozogt.symzip")
 }
 
 val bootstrapVersion: String by project
@@ -148,7 +148,7 @@ fun Task.createPackageTask(platform: String, arch: String, configuration: Exec.(
   }
 }
 
-fun Task.createPackageZipTask(platform: String, arch: String, configuration: SymZip.() -> Unit = {}): Task {
+fun Task.createPackageZipTask(platform: String, arch: String): Task {
 
   val packageZipTaskName = getPackageZipTaskName(platform, arch)
   val packageTaskName = getPackageTaskName(platform, arch)
@@ -162,7 +162,6 @@ fun Task.createPackageZipTask(platform: String, arch: String, configuration: Sym
     }
     archiveFileName.set("$targetName.zip")
     destinationDirectory.set(project.file(electronOutDir))
-    configuration()
     this@createPackageZipTask.dependsOn(this)
   }
 }

@@ -26,7 +26,6 @@ pluginManagement {
   val kotlinVersion: String by settings
   val symZipVersion: String by settings
 
-  //todo: refactoring to make it look more elegant
   buildscript {
     repositories {
       mavenCentral()
