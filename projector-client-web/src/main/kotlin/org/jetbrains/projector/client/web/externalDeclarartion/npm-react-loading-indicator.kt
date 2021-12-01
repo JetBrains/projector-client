@@ -26,13 +26,13 @@
 
 package org.jetbrains.projector.client.web.externalDeclarartion
 
-import react.RClass
-import react.RProps
+import react.ComponentClass
+import react.Props
 
 @JsName("default")
-external val loadingIndicator: RClass<LoadingIndicatorProps>
+external val loadingIndicator: ComponentClass<LoadingIndicatorProps>
 
-external interface LoadingIndicatorProps : RProps {
+external interface LoadingIndicatorProps : Props {
 
   var color: Color
   var segments: Int

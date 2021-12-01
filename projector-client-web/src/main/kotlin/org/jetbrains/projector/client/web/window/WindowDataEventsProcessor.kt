@@ -57,16 +57,14 @@ class WindowDataEventsProcessor(private val windowManager: WebWindowManager) {
 
     removeAbsentWindows(presentedWindows)
 
-    synchronized(windowManager) {
-      presentedWindows.forEach { event ->
-        val window = windowManager.getOrCreate(event)
+    presentedWindows.forEach { event ->
+      val window = windowManager.getOrCreate(event)
 
-        event.cursorType?.let { window.cursorType = it }
-        window.title = event.title
-        window.isShowing = event.isShowing
-        window.bounds = event.bounds
-        window.zIndex = (event.zOrder - presentedWindows.size) * WebWindowManager.zIndexStride
-      }
+      event.cursorType?.let { window.cursorType = it }
+      window.title = event.title
+      window.isShowing = event.isShowing
+      window.bounds = event.bounds
+      window.zIndex = (event.zOrder - presentedWindows.size) * WebWindowManager.zIndexStride
     }
 
     setTitle(presentedWindows)
@@ -112,15 +110,11 @@ class WindowDataEventsProcessor(private val windowManager: WebWindowManager) {
   private fun removeAbsentWindows(presentedWindows: Iterable<WindowData>) {
     val presentedWindowIds = presentedWindows.map(WindowData::id).toSet()
 
-    synchronized(windowManager) {
-      windowManager.cleanup(presentedWindowIds)
-    }
+    windowManager.cleanup(presentedWindowIds)
   }
 
   fun onResized() {
-    synchronized(windowManager) {
-      windowManager.forEach(WebWindow::applyBounds)
-    }
+    windowManager.forEach(WebWindow::applyBounds)
   }
 
   companion object {
