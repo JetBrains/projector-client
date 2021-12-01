@@ -28,6 +28,8 @@ plugins {
 }
 
 val coroutinesVersion: String by project
+val istanbulInstrumenterLoaderVersion: String by project
+val karmaCoverageIstanbulReporter: String by project
 val inlineStylePrefixerVersion: String by project
 val kotlinReactVersion: String by project
 val kotlinStyledComponentsVersion: String by project
@@ -52,8 +54,8 @@ dependencies {
   implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$kotlinStyledComponentsVersion")
   implementation(npm("radium", radiumVersion))
   implementation(npm("react-loading-indicator", reactLoadingIndicatorVersion))
-  implementation(npm("istanbul-instrumenter-loader", "3.0.1"))
-  implementation(npm("karma-coverage-istanbul-reporter", "3.0.3"))
+  implementation(npm("istanbul-instrumenter-loader", istanbulInstrumenterLoaderVersion))
+  implementation(npm("karma-coverage-istanbul-reporter", karmaCoverageIstanbulReporter))
 
   testImplementation(kotlin("test", kotlinVersion))
 }

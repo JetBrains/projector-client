@@ -29,6 +29,7 @@ import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.handshake.ServerHandshake
 import org.jetbrains.projector.common.protocol.toServer.ClientInControlEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientOutControlEvent
+import org.jetbrains.projector.common.protocol.toServer.GreetingControlEvent
 import org.jetbrains.projector.common.protocol.toServer.KotlinxJsonClientEventSerializer
 import org.jetbrains.projector.server.core.ClientWrapper
 import org.jetbrains.projector.util.logging.Logger
@@ -83,6 +84,7 @@ public abstract class HttpWsClient(
       when (val event = KotlinxJsonClientEventSerializer.deserializeFromRelay(message)) {
         is ClientInControlEvent -> addClient(event.id)
         is ClientOutControlEvent -> removeClient(event.id)
+        is GreetingControlEvent -> {}
       }
     }
 

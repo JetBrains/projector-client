@@ -26,20 +26,17 @@ package org.jetbrains.projector.client.web.ui
 import kotlinx.css.*
 import org.jetbrains.projector.client.web.externalDeclarartion.loadingIndicator
 import org.jetbrains.projector.client.web.externalDeclarartion.styleRoot
-import react.RBuilder
-import react.RComponent
-import react.RProps
-import react.RState
+import react.*
 import styled.css
 import styled.styledH1
 import styled.styledSpan
 
-external interface ReconnectionMessageProps : RProps {
+external interface ReconnectionMessageProps : Props {
 
   var message: String?
 }
 
-class ReconnectionMessage : RComponent<ReconnectionMessageProps, RState>() {
+class ReconnectionMessage : RComponent<ReconnectionMessageProps, State>() {
 
   override fun RBuilder.render() {
     props.message?.let { message ->

@@ -47,7 +47,6 @@ import org.jetbrains.projector.client.web.misc.*
 import org.jetbrains.projector.client.web.protocol.SupportedTypesProvider
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.ui.ReconnectionMessage
-import org.jetbrains.projector.client.web.ui.ReconnectionMessageProps
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
 import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.client.web.window.WebWindowManager
@@ -66,6 +65,7 @@ import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import react.createElement
 import react.dom.render
+import react.react
 import kotlin.math.roundToInt
 
 sealed class ClientState {
@@ -110,7 +110,7 @@ sealed class ClientState {
       }
 
       val reconnectionMessageUpdater = { newMessage: String? ->
-        val reconnectionMessage = createElement(ReconnectionMessage::class.js, jsObject<ReconnectionMessageProps> {
+        val reconnectionMessage = createElement(ReconnectionMessage::class.react, jsObject {
           this.message = newMessage
         })
         render(reconnectionMessage, reloadingMessageLayer)

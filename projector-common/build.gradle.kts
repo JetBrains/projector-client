@@ -38,11 +38,13 @@ kotlin {
   js {
     browser()
   }
-  jvm()
+  jvm {
+    withJava()
+  }
 
   sourceSets {
     all {
-      languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+      languageSettings.optIn("kotlin.RequiresOptIn")
     }
 
     val commonMain by getting {

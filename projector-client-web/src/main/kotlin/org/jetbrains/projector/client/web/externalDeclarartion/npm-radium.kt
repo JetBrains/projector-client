@@ -26,8 +26,8 @@
 
 package org.jetbrains.projector.client.web.externalDeclarartion
 
-import react.RClass
-import react.RProps
+import react.ComponentClass
+import react.Props
 
 @JsName("StyleRoot")
-external val styleRoot: RClass<RProps>
+external val styleRoot: ComponentClass<Props>
