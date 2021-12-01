@@ -88,7 +88,7 @@ internal object IjMdTransformer : TransformerSetupBase<IjInjector.AgentParameter
   }
 
   override fun getClassLoader(parameters: IjInjector.AgentParameters): ClassLoader {
-    return markdownPlugin!!.pluginClassLoader
+    return markdownPlugin!!.pluginClassLoader!!
   }
 
   private fun isPreviewCheckIsBrokenInHeadless(): Boolean {
