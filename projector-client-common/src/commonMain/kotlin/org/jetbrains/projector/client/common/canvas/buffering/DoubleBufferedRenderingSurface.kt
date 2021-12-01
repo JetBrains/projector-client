@@ -29,7 +29,7 @@ import org.jetbrains.projector.client.common.canvas.Context2d
 import org.jetbrains.projector.client.common.canvas.Context2dStateOperations
 import org.jetbrains.projector.client.common.canvas.Extensions.resizeSavingImage
 
-class DoubleBufferedRenderingSurface(private val bufferCanvasFactory: CanvasFactory, private val target: Canvas) : RenderingSurface {
+class DoubleBufferedRenderingSurface(bufferCanvasFactory: CanvasFactory, private val target: Canvas) : RenderingSurface {
 
   override var scalingRatio: Double = 1.0
 
