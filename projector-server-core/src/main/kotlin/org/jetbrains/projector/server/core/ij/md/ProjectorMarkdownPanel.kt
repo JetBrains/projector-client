@@ -24,11 +24,13 @@
 package org.jetbrains.projector.server.core.ij.md
 
 import com.intellij.openapi.util.BuildNumber
+import com.intellij.openapi.util.Disposer
+import org.intellij.plugins.markdown.extensions.MarkdownBrowserPreviewExtension
 import org.intellij.plugins.markdown.extensions.MarkdownConfigurableExtension
-import org.intellij.plugins.markdown.extensions.jcef.MarkdownJCEFPreviewExtension
 import org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanel
 import org.jetbrains.projector.ij.md.markdownPlugin
 import org.jetbrains.projector.util.logging.Logger
+import java.nio.file.Path
 import javax.swing.JComponent
 
 /**
@@ -39,6 +41,22 @@ public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateC
 
   private val agentDelegate: MarkdownHtmlPanel? = if (isAgent) createNativeMarkdownPanel(agentDelegateClass) else null
   private val clientDelegate = PanelDelegate(if (isAgent) agentDelegate?.component else null)
+
+  private var currentExtensions = emptyList<MarkdownBrowserPreviewExtension>()
+
+  // Adopted from org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel
+  private fun reloadExtensions() {
+    if (!isNewExtensionsHandling) return
+
+    currentExtensions.forEach(Disposer::dispose)
+    currentExtensions = MarkdownBrowserPreviewExtension.Provider.all
+      .mapNotNull { it.createBrowserExtension(this) }
+      .prepared()
+  }
+
+  init {
+    reloadExtensions()
+  }
 
   override fun dispose() {
     agentDelegate?.dispose()
@@ -80,13 +98,23 @@ public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateC
     }
   }
 
+  override fun setHtml(html: String, initialScrollOffset: Int, documentPath: Path?) {
+    setHtml(html, initialScrollOffset) // TODO support documentPath
+  }
+
   override fun reloadWithOffset(offset: Int) {
+    reloadExtensions()
     agentDelegate?.reloadWithOffset(offset)
     // TODO implement for PanelDelegate
   }
 
-  override fun scrollToMarkdownSrcOffset(offset: Int) {
-    agentDelegate?.scrollToMarkdownSrcOffset(offset)
+  override fun scrollToMarkdownSrcOffset(offset: Int, smooth: Boolean) {
+    agentDelegate?.scrollToMarkdownSrcOffset(offset, smooth)
+    clientDelegate.scrollToMarkdownSrcOffset(offset) // TODO implement smooth scroll for PanelDelegate
+  }
+
+  public fun scrollToMarkdownSrcOffset(offset: Int) {
+    agentDelegate?.scrollToMarkdownSrcOffset(offset, false)
     clientDelegate.scrollToMarkdownSrcOffset(offset)
   }
 
@@ -103,22 +131,28 @@ public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateC
   private companion object {
     val logger = Logger<ProjectorMarkdownPanel>()
 
-    private val markdownExtensions
-      get() = MarkdownJCEFPreviewExtension.all.filter {
-        if (it is MarkdownConfigurableExtension) it.isEnabled else true
-      }
+    private val oldMarkdownExtensions
+      @Suppress("UNCHECKED_CAST")
+      get() = (oldAllExtensionsMethod.invoke(null) as List<MarkdownBrowserPreviewExtension>).prepared()
 
-    private val styleUrls
+    private val ProjectorMarkdownPanel.markdownExtensions
+      get() = if (isNewExtensionsHandling) currentExtensions else oldMarkdownExtensions
+
+    private val ProjectorMarkdownPanel.styleUrls
       get() = markdownExtensions.flatMap { extension ->
         extension.styles.mapNotNull { style ->
           extension.resourceProvider.loadResource(style)?.content?.let { String(it) }
         }
       }
 
-    private val isRenderMethodRemoved by lazy {
-      val buildNumber = BuildNumber.fromString("203.0")!!
+    private val isRenderMethodRemoved by lazy { isMarkdownVersionAtLeast("203.0") }
+
+    private val isNewExtensionsHandling by lazy { isMarkdownVersionAtLeast("213.0") }
+
+    private fun isMarkdownVersionAtLeast(version: String): Boolean {
+      val buildNumber = BuildNumber.fromString(version)!!
       val markdownBuildNumber = BuildNumber.fromString(markdownPlugin!!.version)!!
-      markdownBuildNumber >= buildNumber
+      return markdownBuildNumber >= buildNumber
     }
 
     private val setHtmlMethod by lazy {
@@ -133,6 +167,11 @@ public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateC
       MarkdownHtmlPanel::class.java.getDeclaredMethod("render")
     }
 
+    private val oldAllExtensionsMethod by lazy {
+      val jcefPreviewExtensionClass = Class.forName("org.intellij.plugins.markdown.extensions.jcef.MarkdownJCEFPreviewExtension")
+      jcefPreviewExtensionClass.getDeclaredMethod("getAll")
+    }
+
     private fun MarkdownHtmlPanel.setHtml(html: String) {
       setHtmlMethod.invoke(this, html)
     }
@@ -144,6 +183,9 @@ public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateC
     private fun MarkdownHtmlPanel.render() {
       renderMethod.invoke(this)
     }
+
+    private fun List<MarkdownBrowserPreviewExtension>.prepared(): List<MarkdownBrowserPreviewExtension> =
+      filter { (it as? MarkdownConfigurableExtension)?.isEnabled ?: true }.sorted()
 
     private fun createNativeMarkdownPanel(className: String): MarkdownHtmlPanel? {
       return try {
