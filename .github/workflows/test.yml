@@ -33,7 +33,7 @@ jobs:
           ./gradlew :projector-agent-ij-injector:jacocoTestReport
           ./gradlew :projector-client-common:jacocoTestReport
           ./gradlew :projector-util-agent:jacocoTestReport
-          ./gradlew :projector-client-web:browserTest
+#          ./gradlew :projector-client-web:browserTest
       - name: test coverage
         uses: codecov/codecov-action@v1
         with:
