@@ -32,6 +32,7 @@ import org.jetbrains.projector.client.common.canvas.buffering.DoubleBufferedRend
 import org.jetbrains.projector.client.common.canvas.buffering.UnbufferedRenderingSurface
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
+import org.jetbrains.projector.client.common.window.Window
 import org.jetbrains.projector.client.web.misc.toDisplayType
 import org.jetbrains.projector.client.web.misc.toJsCursorType
 import org.jetbrains.projector.client.web.state.ClientAction
@@ -55,7 +56,7 @@ interface Positionable {
   val zIndex: Int
 }
 
-class Window(windowData: WindowData, private val stateMachine: ClientStateMachine, imageCacher: ImageCacher) : LafListener, Positionable {
+class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMachine, imageCacher: ImageCacher) : Window, LafListener, Positionable {
 
   val id = windowData.id
 
@@ -88,7 +89,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
   private var headerHeight: Double = 0.0
   private val border = WindowBorder(windowData.resizable)
 
-  val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface, imageCacher)
+  override val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface, imageCacher)
 
   override var bounds: CommonRectangle = CommonRectangle(0.0, 0.0, 0.0, 0.0)
     set(value) {

@@ -34,7 +34,7 @@ import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLLinkElement
 import kotlin.collections.isNotEmpty
 
-class WindowDataEventsProcessor(private val windowManager: WindowManager) {
+class WindowDataEventsProcessor(private val windowManager: WebWindowManager) {
 
   var excludedWindowIds = emptyList<Int>()
     private set
@@ -65,7 +65,7 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
         window.title = event.title
         window.isShowing = event.isShowing
         window.bounds = event.bounds
-        window.zIndex = (event.zOrder - presentedWindows.size) * WindowManager.zIndexStride
+        window.zIndex = (event.zOrder - presentedWindows.size) * WebWindowManager.zIndexStride
       }
     }
 
@@ -119,7 +119,7 @@ class WindowDataEventsProcessor(private val windowManager: WindowManager) {
 
   fun onResized() {
     synchronized(windowManager) {
-      windowManager.forEach(Window::applyBounds)
+      windowManager.forEach(WebWindow::applyBounds)
     }
   }
 

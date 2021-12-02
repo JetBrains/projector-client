@@ -25,6 +25,7 @@ package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ImageCacher
+import org.jetbrains.projector.client.common.window.WindowManager
 import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.state.LafListener
@@ -34,7 +35,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientWindowsDeactivatio
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.FocusEvent
 
-class WindowManager(private val stateMachine: ClientStateMachine, val imageCacher: ImageCacher) : Iterable<Window>, LafListener {
+class WebWindowManager(private val stateMachine: ClientStateMachine, override val imageCacher: ImageCacher) : WindowManager<WebWindow>, LafListener {
 
   companion object {
     const val zIndexStride = 10
@@ -59,17 +60,17 @@ class WindowManager(private val stateMachine: ClientStateMachine, val imageCache
     stateMachine.fire(ClientAction.AddEvent(ClientWindowsDeactivationEvent(windowIds)))
   }
 
-  private val windows = mutableMapOf<Int, Window>()
+  private val windows = mutableMapOf<Int, WebWindow>()
 
   fun getWindowCanvas(windowId: Int): HTMLCanvasElement? = windows[windowId]?.canvas
 
   fun getWindowZIndex(windowId: Int): Int? = windows[windowId]?.zIndex
 
   /** Returns topmost visible window, containing point. Contain check includes window header and borders.  */
-  fun getTopWindow(x: Int, y: Int): Window? = windows.values.filter { it.isShowing && it.contains(x, y) }.maxByOrNull { it.zIndex }
+  fun getTopWindow(x: Int, y: Int): WebWindow? = windows.values.filter { it.isShowing && it.contains(x, y) }.maxByOrNull { it.zIndex }
 
-  fun getOrCreate(windowData: WindowData): Window {
-    return windows.getOrPut(windowData.id) { Window(windowData, stateMachine, imageCacher) }
+  fun getOrCreate(windowData: WindowData): WebWindow {
+    return windows.getOrPut(windowData.id) { WebWindow(windowData, stateMachine, imageCacher) }
   }
 
   fun cleanup(presentedWindowIds: Set<Int>) {
@@ -88,11 +89,11 @@ class WindowManager(private val stateMachine: ClientStateMachine, val imageCache
     windows.forEach { it.value.lookAndFeelChanged() }
   }
 
-  operator fun get(windowId: Int): Window? = windows[windowId]
+  override operator fun get(windowId: Int): WebWindow? = windows[windowId]
 
-  override fun iterator(): Iterator<Window> = windows.values.iterator()
+  override fun iterator(): Iterator<WebWindow> = windows.values.iterator()
 
-  fun bringToFront(window: Window) {
+  fun bringToFront(window: WebWindow) {
     val topWindow = windows.maxByOrNull { it.value.zIndex }?.value ?: return
     if (topWindow == window) {
       return
