@@ -49,7 +49,7 @@ class WindowHeader(var title: String? = null) : DragEventsInterceptor, LafListen
 
   private val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
   private val style = canvas.style
-  private val headerRenderingSurface = Window.createRenderingSurface(canvas)
+  private val headerRenderingSurface = WebWindow.createRenderingSurface(canvas)
 
   private var dragStarted = false
   private var lastPoint = Point(-1.0, -1.0)

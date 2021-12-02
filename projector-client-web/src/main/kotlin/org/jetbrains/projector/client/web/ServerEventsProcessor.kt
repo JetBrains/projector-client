@@ -24,22 +24,21 @@
 package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
+import org.jetbrains.projector.client.common.RenderingQueue
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
-import org.jetbrains.projector.client.web.electron.isElectron
 import org.jetbrains.projector.client.web.input.InputController
 import org.jetbrains.projector.client.web.misc.PingStatistics
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
 import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
-import org.jetbrains.projector.client.web.window.WindowManager
+import org.jetbrains.projector.client.web.window.WebWindowManager
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
-import org.w3c.dom.url.URL
 
 class ServerEventsProcessor(
-  private val windowManager: WindowManager,
+  private val windowManager: WebWindowManager,
   private val windowDataEventsProcessor: WindowDataEventsProcessor,
   private val renderingQueue: RenderingQueue,
 ) {

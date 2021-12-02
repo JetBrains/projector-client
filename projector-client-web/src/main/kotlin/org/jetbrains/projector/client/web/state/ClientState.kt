@@ -35,7 +35,7 @@ import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.protocol.KotlinxJsonToClientHandshakeDecoder
 import org.jetbrains.projector.client.common.protocol.KotlinxJsonToServerHandshakeEncoder
-import org.jetbrains.projector.client.web.RenderingQueue
+import org.jetbrains.projector.client.common.RenderingQueue
 import org.jetbrains.projector.client.web.ServerEventsProcessor
 import org.jetbrains.projector.client.web.WindowSizeController
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
@@ -50,7 +50,7 @@ import org.jetbrains.projector.client.web.ui.ReconnectionMessage
 import org.jetbrains.projector.client.web.ui.ReconnectionMessageProps
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
 import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
-import org.jetbrains.projector.client.web.window.WindowManager
+import org.jetbrains.projector.client.web.window.WebWindowManager
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.MessageDecoder
 import org.jetbrains.projector.common.protocol.MessageEncoder
@@ -339,7 +339,7 @@ sealed class ClientState {
 
     private val eventsToSend = mutableListOf<ClientEvent>(ClientSetKeymapEvent(nativeKeymap))
 
-    private val windowManager = WindowManager(stateMachine, imageCacher)
+    private val windowManager = WebWindowManager(stateMachine, imageCacher)
 
     private val windowDataEventsProcessor = WindowDataEventsProcessor(windowManager)
 

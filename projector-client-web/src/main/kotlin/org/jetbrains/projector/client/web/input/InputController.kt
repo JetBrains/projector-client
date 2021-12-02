@@ -34,7 +34,7 @@ import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.window.DragEventsInterceptor
 import org.jetbrains.projector.client.web.window.Positionable
-import org.jetbrains.projector.client.web.window.WindowManager
+import org.jetbrains.projector.client.web.window.WebWindowManager
 import org.jetbrains.projector.common.protocol.toClient.ServerCaretInfoChangedEvent
 import org.jetbrains.projector.common.protocol.toServer.*
 import org.w3c.dom.TouchEvent
@@ -49,7 +49,7 @@ import kotlin.math.roundToInt
 class InputController(
   private val openingTimeStamp: Int,
   private val stateMachine: ClientStateMachine,
-  private val windowManager: WindowManager,
+  private val windowManager: WebWindowManager,
   windowPositionByIdGetter: (windowId: Int) -> Positionable?,
 ) {
 

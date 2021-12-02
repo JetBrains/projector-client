@@ -21,16 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web
+package org.jetbrains.projector.client.common
 
-import org.jetbrains.projector.client.common.DrawEvent
-import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
-import org.jetbrains.projector.client.web.window.WindowManager
+import org.jetbrains.projector.client.common.window.WindowManager
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.util.logging.Logger
 
-class RenderingQueue(private val windowManager: WindowManager) {
+class RenderingQueue(private val windowManager: WindowManager<*>) {
 
   private val pendingDrawEvents = ArrayDeque<ShrunkDrawEvents>()
   private val newDrawEvents = ArrayDeque<ShrunkDrawEvents>()
