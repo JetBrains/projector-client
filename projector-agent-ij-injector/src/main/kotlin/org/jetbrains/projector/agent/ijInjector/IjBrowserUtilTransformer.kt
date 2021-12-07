@@ -47,7 +47,8 @@ internal object IjBrowserUtilTransformer : IdeTransformerSetup<IjInjector.AgentP
         // language=java prefix="class BrowserUtil { public static void browse(@NotNull String $1)" suffix="}"
         """
           {
-            java.awt.Desktop.getDesktop().browse(new java.net.URI($1));
+            java.net.URI uri = com.intellij.openapi.vfs.VfsUtil.toUri($1);
+            java.awt.Desktop.getDesktop().browse(uri);
           }
         """.trimIndent()
       )
@@ -58,7 +59,8 @@ internal object IjBrowserUtilTransformer : IdeTransformerSetup<IjInjector.AgentP
         // language=java prefix="class BrowserUtil { public static void browse(@NotNull String $1, @Nullable Project $2)" suffix="}"
         """
           {
-            java.awt.Desktop.getDesktop().browse(new java.net.URI($1));
+            java.net.URI uri = com.intellij.openapi.vfs.VfsUtil.toUri($1);
+            java.awt.Desktop.getDesktop().browse(uri);
           }
         """.trimIndent()
       )
