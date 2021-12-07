@@ -36,7 +36,6 @@ import io.ktor.websocket.DefaultWebSocketServerSession
 import io.ktor.websocket.WebSockets
 import io.ktor.websocket.webSocket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.receiveOrNull
 import org.jetbrains.projector.common.protocol.data.FontDataHolder
 import org.jetbrains.projector.common.protocol.data.TtfFontData
 import org.jetbrains.projector.common.protocol.handshake.*
@@ -126,7 +125,7 @@ object ConnectionUtil {
     }
 
     val receiver: suspend () -> ToServerMessageType? = receiver@{
-      val received = incoming.receiveOrNull() ?: return@receiver null
+      val received = incoming.receiveCatching().getOrNull() ?: return@receiver null
       val events = toServerDecoder.decode(toServerDecompressor.decompress((received as Frame.Text).readText()))
 
       val answer = mutableListOf<ClientEvent>()
