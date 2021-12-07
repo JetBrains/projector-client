@@ -140,10 +140,11 @@ dependencies {
   implementation("org.jsoup:jsoup:$jsoupVersion")
 
   fun ModuleDependency.setupMarkdownDependency() {
+    // These dependencies cannot be resolved as I cannot find the repository they are located in
     exclude(group = "ai.grazie.utils")
-      .exclude(group = "ai.grazie.nlp")
-      .exclude(group = "ai.grazie.spell")
-      .exclude(group = "com.jetbrains.infra")
+    exclude(group = "ai.grazie.nlp")
+    exclude(group = "ai.grazie.spell")
+    exclude(group = "com.jetbrains.infra")
   }
 
   compileOnly("com.jetbrains.intellij.platform:ide-impl:$intellijPlatformVersion")
