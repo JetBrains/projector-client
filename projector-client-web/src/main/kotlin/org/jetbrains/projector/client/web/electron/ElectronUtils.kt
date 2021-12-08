@@ -25,6 +25,8 @@ package org.jetbrains.projector.client.web.electron
 
 import kotlinx.browser.window
 import org.jetbrains.projector.client.web.externalDeclarartion.process
+import org.jetbrains.projector.client.web.misc.isDefined
+import org.jetbrains.projector.client.web.misc.jsBoolean
 
 // adopted from https://github.com/cheton/is-electron
 internal fun isElectron(): Boolean {
@@ -50,9 +52,3 @@ internal fun isElectron(): Boolean {
 
   return false
 }
-
-@Suppress("NOTHING_TO_INLINE", "UNUSED_PARAMETER")
-private inline fun jsBoolean(expression: Any?): Boolean = js("Boolean(expression)") as Boolean
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun isDefined(obj: Any?): Boolean = jsTypeOf(obj) != "undefined"

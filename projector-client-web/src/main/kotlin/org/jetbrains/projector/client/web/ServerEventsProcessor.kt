@@ -23,11 +23,13 @@
  */
 package org.jetbrains.projector.client.web
 
+import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.projector.client.common.RenderingQueue
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.input.InputController
 import org.jetbrains.projector.client.web.misc.PingStatistics
+import org.jetbrains.projector.client.web.misc.isDefined
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
@@ -36,6 +38,7 @@ import org.jetbrains.projector.client.web.window.WebWindowManager
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.toClient.*
 import org.jetbrains.projector.util.logging.Logger
+import org.w3c.dom.clipboard.ClipboardEvent
 
 class ServerEventsProcessor(
   private val windowManager: WebWindowManager,
@@ -112,8 +115,12 @@ class ServerEventsProcessor(
   }
 
   private fun handleServerClipboardChange(event: ServerClipboardEvent) {
-    window.navigator.clipboard.writeText(event.stringContent)
-      .catch { logger.error { "Error writing clipboard: $it" } }
+    if (isDefined(window.navigator.clipboard)) {
+      window.navigator.clipboard.writeText(event.stringContent)
+        .catch { logger.error { "Error writing clipboard: $it" } }
+    } else {
+      window.prompt("Copy text on next line manually:", event.stringContent)
+    }
   }
 
   companion object {
