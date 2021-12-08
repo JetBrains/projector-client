@@ -47,3 +47,9 @@ fun Boolean.toDisplayType(): String = when (this) {
   true -> "block"
   false -> "none"
 }
+
+@Suppress("NOTHING_TO_INLINE", "UNUSED_PARAMETER")
+inline fun jsBoolean(expression: Any?): Boolean = js("Boolean(expression)") as Boolean
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun isDefined(obj: Any?): Boolean = jsTypeOf(obj) != "undefined"
