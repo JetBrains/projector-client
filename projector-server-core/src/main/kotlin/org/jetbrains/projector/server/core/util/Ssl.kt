@@ -41,6 +41,8 @@ public const val SSL_FILE_PATH: String = "FILE_PATH"
 public const val SSL_STORE_PASSWORD: String = "STORE_PASSWORD"
 public const val SSL_KEY_PASSWORD: String = "KEY_PASSWORD"
 
+public fun Properties.getOrThrow(key: String) : String = requireNotNull(this.getProperty(key)) { "Can't find $key in properties file" }
+
 public fun setSsl(setWebSocketFactory: (WebSocketServerFactory) -> Unit): String? {
   val sslPropertiesFilePath = getOption(SSL_ENV_NAME) ?: return null
 
@@ -49,14 +51,12 @@ public fun setSsl(setWebSocketFactory: (WebSocketServerFactory) -> Unit): String
       load(FileInputStream(sslPropertiesFilePath))
     }
 
-    fun Properties.getOrThrow(key: String) = requireNotNull(this.getProperty(key)) { "Can't find $key in properties file" }
-
-    val storetype = properties.getOrThrow(SSL_STORE_TYPE)
+    val storeType = properties.getOrThrow(SSL_STORE_TYPE)
     val filePath = properties.getOrThrow(SSL_FILE_PATH)
     val storePassword = properties.getOrThrow(SSL_STORE_PASSWORD)
     val keyPassword = properties.getOrThrow(SSL_KEY_PASSWORD)
 
-    val keyStore = KeyStore.getInstance(storetype).apply {
+    val keyStore = KeyStore.getInstance(storeType).apply {
       load(FileInputStream(filePath), storePassword.toCharArray())
     }
 
