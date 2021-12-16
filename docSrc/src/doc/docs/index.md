@@ -4,7 +4,11 @@
 
 Projector is a technology to run and access Swing GUI applications remotely.
 
-Here you can find Projector documentation. Use the navigation menu to move between pages.
+Here you can find Projector documentation. Use the navigation menu to move between pages. Here is the short overview:
+
+* **User guide** is for those who want to understand the ways Projector can be applied e.g. how to set it up and run.
+* **Developer guide** is for those who want to understand how Projector works e.g. for developers and contributors.
+* **About** unifies some miscellaneous info.
 
 ## The state of the Projector
 
