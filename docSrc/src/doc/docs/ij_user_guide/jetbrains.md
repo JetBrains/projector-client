@@ -41,13 +41,17 @@ As for the client-side, just open the URL (something like [https://127.0.0.1:888
 
 Currently, you can use a web browser to connect to the IDE. The experience is very similar to using any interactive website. You can use a fullscreen mode in your browser to achieve an almost desktop-like experience.
 
+We also have an Electron-based app (`projector-launcher`) that wraps a web page and can run Projector Web Client.
+
 If there is a demand from users, in the next stages we may build separate native applications.
 
 ## Server-side
 
-You can use the Projector as a set of Docker images, or as a standalone distribution. A standalone distribution is currently available for GNU/Linux hosts only.
+You can use the Projector as a set of Docker images (`projector-docker`), or as a standalone distribution (`projector-installer`). A standalone distribution is currently available for GNU/Linux hosts only.
 
 Dockerfiles are public and Open Source, so you can verify them with your security team.
+
+Also, we have the third way to run Projector: via Projector IDE Plugin (`projector-plugin`).
 
 ## VPN and SSH tunnels
 
