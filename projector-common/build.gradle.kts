@@ -35,7 +35,7 @@ val kotlinVersion: String by project
 val serializationVersion: String by project
 
 kotlin {
-  js {
+  js(IR) {
     browser()
   }
   jvm {
