@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.client.web
 
+@JsExport
 fun onLoad() {
   Application().apply {
     start()

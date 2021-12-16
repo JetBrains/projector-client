@@ -33,7 +33,7 @@ setupJacoco(isKotlinMpModule = true)
 val kotlinVersion: String by project
 
 kotlin {
-  js {
+  js(IR) {
     browser()
   }
 

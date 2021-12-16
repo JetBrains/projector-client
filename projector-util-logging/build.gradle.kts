@@ -31,7 +31,7 @@ val kotlinVersion: String by project
 kotlin {
   explicitApi()
 
-  js {
+  js(IR) {
     browser()
   }
   jvm()
