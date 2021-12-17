@@ -41,27 +41,40 @@ public const val SSL_FILE_PATH: String = "FILE_PATH"
 public const val SSL_STORE_PASSWORD: String = "STORE_PASSWORD"
 public const val SSL_KEY_PASSWORD: String = "KEY_PASSWORD"
 
-public fun Properties.getOrThrow(key: String) : String = requireNotNull(this.getProperty(key)) { "Can't find $key in properties file" }
+public data class SSLProperties(
+  val storeType: String,
+  val filePath: String,
+  val storePassword: String,
+  val keyPassword: String,
+)
+
+public fun loadSSLProperties(path: String): SSLProperties {
+  fun Properties.getOrThrow(key: String) : String = requireNotNull(this.getProperty(key)) { "Can't find $key in properties file" }
+
+  val props = Properties().apply {
+    load(FileInputStream(path))
+  }
+
+  return SSLProperties(
+    storeType = props.getOrThrow(SSL_STORE_TYPE),
+    filePath = props.getOrThrow(SSL_FILE_PATH),
+    storePassword = props.getOrThrow(SSL_STORE_PASSWORD),
+    keyPassword = props.getOrThrow(SSL_KEY_PASSWORD)
+  )
+}
 
 public fun setSsl(setWebSocketFactory: (WebSocketServerFactory) -> Unit): String? {
   val sslPropertiesFilePath = getOption(SSL_ENV_NAME) ?: return null
 
   try {
-    val properties = Properties().apply {
-      load(FileInputStream(sslPropertiesFilePath))
-    }
+    val sslProperties = loadSSLProperties(sslPropertiesFilePath)
 
-    val storeType = properties.getOrThrow(SSL_STORE_TYPE)
-    val filePath = properties.getOrThrow(SSL_FILE_PATH)
-    val storePassword = properties.getOrThrow(SSL_STORE_PASSWORD)
-    val keyPassword = properties.getOrThrow(SSL_KEY_PASSWORD)
-
-    val keyStore = KeyStore.getInstance(storeType).apply {
-      load(FileInputStream(filePath), storePassword.toCharArray())
+    val keyStore = KeyStore.getInstance(sslProperties.storeType).apply {
+      load(FileInputStream(sslProperties.filePath), sslProperties.storePassword.toCharArray())
     }
 
     val keyManagerFactory = KeyManagerFactory.getInstance("SunX509").apply {
-      init(keyStore, keyPassword.toCharArray())
+      init(keyStore, sslProperties.keyPassword.toCharArray())
     }
 
     val trustManagerFactory = TrustManagerFactory.getInstance("SunX509").apply {
