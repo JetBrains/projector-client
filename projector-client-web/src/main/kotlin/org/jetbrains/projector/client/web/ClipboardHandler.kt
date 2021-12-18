@@ -26,6 +26,7 @@ package org.jetbrains.projector.client.web
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.projector.client.web.misc.isDefined
+import org.jetbrains.projector.client.web.misc.isElectron
 import org.jetbrains.projector.client.web.misc.isGecko
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLTextAreaElement
@@ -90,7 +91,12 @@ object ClipboardHandler {
   private fun askUserToCopyClipboardManually(textToCopy: String, vararg reasons: String) {
     val message = "A clipboard change on the server detected but can't synchronize your clipboard with it automatically " +
                   "(reasons: ${reasons.joinToString("; ")}). Please copy text on next line manually:"
-    window.prompt(message, textToCopy)
+
+    if (!isElectron()) { // TODO window.prompt is not available in electron
+      window.prompt(message, textToCopy)
+    } else {
+      logger.debug { "Cannot handle clipboard change event" }
+    }
   }
 
 }
