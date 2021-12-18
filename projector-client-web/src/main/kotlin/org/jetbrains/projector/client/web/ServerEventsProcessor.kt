@@ -23,22 +23,17 @@
  */
 package org.jetbrains.projector.client.web
 
-import kotlinx.browser.document
-import kotlinx.browser.window
 import org.jetbrains.projector.client.common.RenderingQueue
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.input.InputController
-import org.jetbrains.projector.client.web.misc.PingStatistics
-import org.jetbrains.projector.client.web.misc.isDefined
+import org.jetbrains.projector.client.web.misc.*
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
-import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.client.web.window.WebWindowManager
+import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.toClient.*
-import org.jetbrains.projector.util.logging.Logger
-import org.w3c.dom.clipboard.ClipboardEvent
 
 class ServerEventsProcessor(
   private val windowManager: WebWindowManager,
@@ -71,7 +66,7 @@ class ServerEventsProcessor(
           inputController.handleCaretInfoChange(command.data)
         }
 
-        is ServerClipboardEvent -> handleServerClipboardChange(command)
+        is ServerClipboardEvent -> ClipboardHandler.copyText(command.stringContent)
 
         is ServerPingReplyEvent -> pingStatistics.onPingReply(command)
 
@@ -114,17 +109,4 @@ class ServerEventsProcessor(
     windowDataEventsProcessor.onResized()
   }
 
-  private fun handleServerClipboardChange(event: ServerClipboardEvent) {
-    if (isDefined(window.navigator.clipboard)) {
-      window.navigator.clipboard.writeText(event.stringContent)
-        .catch { logger.error { "Error writing clipboard: $it" } }
-    } else {
-      window.prompt("Copy text on next line manually:", event.stringContent)
-    }
-  }
-
-  companion object {
-
-    private val logger = Logger<ServerEventsProcessor>()
-  }
 }

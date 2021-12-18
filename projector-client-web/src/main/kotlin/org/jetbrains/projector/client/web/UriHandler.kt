@@ -24,7 +24,7 @@
 package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
-import org.jetbrains.projector.client.web.electron.isElectron
+import org.jetbrains.projector.client.web.misc.isElectron
 import org.w3c.dom.url.URL
 
 object UriHandler {
