@@ -67,7 +67,7 @@ Unfortunately, we can't just continuously get clipboard data from [`window.navig
 
 It's vice versa: when your clipboard is changed on the server side, the client needs to apply the change on its side.
 
-We set the clipboard on the client side via [`window.navigator.clipboard`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard) when client is opened using HTTPS or on localhost. If client is opened in insecure context or doesn't support Async Clipboard API we show prompt so that you can manually copy new contents of server clipboard.
+We set the clipboard on the client side via [`window.navigator.clipboard`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard) when client is opened using HTTPS or on localhost. If client is opened in insecure context or doesn't support Async Clipboard API we fall back to `document.execCommand("copy")`. If it also didn't work out then we show prompt so that you can manually copy new contents of server clipboard.
 
 We can't use ["copy" listener](https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event) because when this event is generated, we don't have a message from the server with actual clipboard data yet. Also, this method won't work if you click a "copy" button in your application.
 
