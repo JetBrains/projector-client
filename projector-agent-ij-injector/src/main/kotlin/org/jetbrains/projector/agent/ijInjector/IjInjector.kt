@@ -50,6 +50,7 @@ internal object IjInjector {
 
     // TODO: support same transformers in agent mode too to reach feature parity
     val transformers = listOf(
+      IjAwtTransformer,
       IjLigaturesDisablerTransformer,
       IjMdTransformer,
       IjBrowserUtilTransformer,
