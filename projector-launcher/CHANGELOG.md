@@ -2,6 +2,12 @@
 
 Notable changes to this project are documented in this file.
 
+# Unreleased
+
+## Added
+
+- Open DevTools by passing `--dev` flag
+
 # 1.0.2
 
 ## Added

@@ -35,6 +35,10 @@ fun main() {
     url = ""
   }
 
+  if (argv.contains("--dev")) {
+    GlobalSettings.DEVELOPER_TOOLS_ENABLED = true
+  }
+
   console.log("URL: $url")
   val eapp = ElectronApp(url)
   eapp.start()
