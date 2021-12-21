@@ -53,6 +53,12 @@ enum class KeyModifier {
   REPEAT,
 }
 
+enum class ClientNotificationType {
+  INFORMATION,
+  WARNING,
+  ERROR,
+}
+
 @Serializable
 sealed class ClientEvent
 
@@ -225,4 +231,11 @@ data class ClientWindowsActivationEvent(
 @Serializable
 data class ClientWindowsDeactivationEvent(
   val windowIds: List<Int>,
+) : ClientEvent()
+
+@Serializable
+data class ClientNotificationEvent(
+  val title: String,
+  val message: String,
+  val notificationType: ClientNotificationType,
 ) : ClientEvent()

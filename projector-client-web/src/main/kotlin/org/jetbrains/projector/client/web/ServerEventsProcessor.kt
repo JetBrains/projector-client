@@ -28,6 +28,8 @@ import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.input.InputController
 import org.jetbrains.projector.client.web.misc.*
 import org.jetbrains.projector.client.web.speculative.Typing
+import org.jetbrains.projector.client.web.state.ClientAction
+import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
 import org.jetbrains.projector.client.web.window.WebWindowManager
@@ -39,7 +41,10 @@ class ServerEventsProcessor(
   private val windowManager: WebWindowManager,
   private val windowDataEventsProcessor: WindowDataEventsProcessor,
   private val renderingQueue: RenderingQueue,
+  private val stateMachine: ClientStateMachine,
 ) {
+
+  private val clipboardHandler = ClipboardHandler { stateMachine.fire(ClientAction.AddEvent(it)) }
 
   fun process(
     commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager,
@@ -66,7 +71,7 @@ class ServerEventsProcessor(
           inputController.handleCaretInfoChange(command.data)
         }
 
-        is ServerClipboardEvent -> ClipboardHandler.copyText(command.stringContent)
+        is ServerClipboardEvent -> clipboardHandler.copyText(command.stringContent)
 
         is ServerPingReplyEvent -> pingStatistics.onPingReply(command)
 

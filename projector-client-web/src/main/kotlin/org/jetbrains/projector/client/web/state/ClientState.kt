@@ -356,7 +356,7 @@ sealed class ClientState {
       }
     }
 
-    private val serverEventsProcessor = ServerEventsProcessor(windowManager, windowDataEventsProcessor, renderingQueue)
+    private val serverEventsProcessor = ServerEventsProcessor(windowManager, windowDataEventsProcessor, renderingQueue, stateMachine)
 
     private val messagingPolicy = (
       ParamsProvider.FLUSH_DELAY

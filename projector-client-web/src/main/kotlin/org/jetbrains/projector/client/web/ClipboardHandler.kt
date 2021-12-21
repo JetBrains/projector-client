@@ -28,10 +28,12 @@ import kotlinx.browser.window
 import org.jetbrains.projector.client.web.misc.isDefined
 import org.jetbrains.projector.client.web.misc.isElectron
 import org.jetbrains.projector.client.web.misc.isGecko
+import org.jetbrains.projector.common.protocol.toServer.ClientNotificationEvent
+import org.jetbrains.projector.common.protocol.toServer.ClientNotificationType
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLTextAreaElement
 
-object ClipboardHandler {
+class ClipboardHandler(private val onCopyFailed: (ClientNotificationEvent) -> Unit) {
 
   private val logger = Logger<ClipboardHandler>()
 
@@ -92,10 +94,13 @@ object ClipboardHandler {
     val message = "A clipboard change on the server detected but can't synchronize your clipboard with it automatically " +
                   "(reasons: ${reasons.joinToString("; ")}). Please copy text on next line manually:"
 
-    if (!isElectron()) { // TODO window.prompt is not available in electron
-      window.prompt(message, textToCopy)
+    if (isElectron()) { // TODO window.prompt is not available in electron
+      val title = "Copying failed"
+      val notificationMessage = "Copying is not currently supported in insecure context in Projector launcher"
+      val type = ClientNotificationType.ERROR
+      onCopyFailed(ClientNotificationEvent(title, notificationMessage, type))
     } else {
-      logger.debug { "Cannot handle clipboard change event" }
+      window.prompt(message, textToCopy)
     }
   }
 
