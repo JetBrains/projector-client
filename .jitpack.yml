@@ -1,1 +1,4 @@
 jdk: openjdk11
+
+install:
+  - ./gradlew clean build -x check
