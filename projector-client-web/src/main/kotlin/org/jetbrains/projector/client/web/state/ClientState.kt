@@ -23,7 +23,7 @@
  */
 package org.jetbrains.projector.client.web.state
 
-import kotlinext.js.jsObject
+import kotlinext.js.jso
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
@@ -110,7 +110,7 @@ sealed class ClientState {
       }
 
       val reconnectionMessageUpdater = { newMessage: String? ->
-        val reconnectionMessage = createElement(ReconnectionMessage::class.react, jsObject {
+        val reconnectionMessage = createElement(ReconnectionMessage::class.react, jso {
           this.message = newMessage
         })
         render(reconnectionMessage, reloadingMessageLayer)
