@@ -1,4 +1,4 @@
 jdk: openjdk11
 
 install:
-  - ./gradlew clean build -x check
+  - ./gradlew clean -Pgroup=$GROUP -Pversion=$VERSION build -xcheck publishToMavenLocal
