@@ -28,7 +28,6 @@ plugins {
 }
 
 val coroutinesVersion: String by project
-val inlineStylePrefixerVersion: String by project
 val istanbulInstrumenterLoaderVersion: String by project
 val karmaCoverageIstanbulReporter: String by project
 val kotlinReactVersion: String by project

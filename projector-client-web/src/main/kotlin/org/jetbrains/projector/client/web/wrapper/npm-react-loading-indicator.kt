@@ -23,11 +23,11 @@
  */
 package org.jetbrains.projector.client.web.wrapper
 
-import kotlinext.js.jsObject
+import kotlinext.js.jso
 import org.jetbrains.projector.client.web.externalDeclarartion.Color
 
 @Suppress("FunctionName")
-fun Color(red: Int, green: Int, blue: Int, alpha: Double) = jsObject<Color> {
+fun Color(red: Int, green: Int, blue: Int, alpha: Double) = jso<Color> {
   this.red = red
   this.green = green
   this.blue = blue
