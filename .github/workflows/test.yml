@@ -40,33 +40,34 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./JacocoReports/
 
-  test-mac-os:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: gradle/wrapper-validation-action@v1
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: '11'
-      - name: Clean
-        run: gradle clean
-      - name: Run tests
-        run: |
-          export CHROME_BIN=$(which chrome)
-          ./gradlew check
-          ./gradlew :projector-server-core:jacocoTestReport
-          ./gradlew :projector-common:jacocoTestReport
-          ./gradlew :projector-agent-common:jacocoTestReport
-          ./gradlew :projector-agent-ij-injector:jacocoTestReport
-          ./gradlew :projector-client-common:jacocoTestReport
-          ./gradlew :projector-util-agent:jacocoTestReport
-#          ./gradlew :projector-client-web:browserTest
-      - name: test coverage
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./JacocoReports/
+# TODO: fix integration tests
+#  test-mac-os:
+#    runs-on: macos-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: gradle/wrapper-validation-action@v1
+#      - name: Setup Java
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: '11'
+#      - name: Clean
+#        run: gradle clean
+#      - name: Run tests
+#        run: |
+#          export CHROME_BIN=$(which chrome)
+#          ./gradlew check
+#          ./gradlew :projector-server-core:jacocoTestReport
+#          ./gradlew :projector-common:jacocoTestReport
+#          ./gradlew :projector-agent-common:jacocoTestReport
+#          ./gradlew :projector-agent-ij-injector:jacocoTestReport
+#          ./gradlew :projector-client-common:jacocoTestReport
+#          ./gradlew :projector-util-agent:jacocoTestReport
+##          ./gradlew :projector-client-web:browserTest
+#      - name: test coverage
+#        uses: codecov/codecov-action@v1
+#        with:
+#          token: ${{ secrets.CODECOV_TOKEN }}
+#          directory: ./JacocoReports/
 
 # TODO: understand why windows tests hang
 #  test-windows:
