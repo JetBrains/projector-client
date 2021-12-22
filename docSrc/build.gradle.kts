@@ -25,15 +25,9 @@ plugins {
   id("ru.vyarus.mkdocs")
 }
 
-python {
-  // ru.vyarus.mkdocs uses quite old versions by default so need to override them:
-  pip("pymdown-extensions:8.1")
-  pip("mkdocs-material:6.2.3")
-  pip("Pygments:2.7.3")
-}
-
 mkdocs {
   // todo: need to support versions:
   publish.docPath = "latest"
   publish.rootRedirect = true
+  strict = false
 }
