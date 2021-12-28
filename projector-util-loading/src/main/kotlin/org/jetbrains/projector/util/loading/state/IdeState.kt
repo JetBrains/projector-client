@@ -41,8 +41,7 @@ public enum class IdeState {
   CONFIGURATION_STORE_INITIALIZED,
   COMPONENTS_LOADED,
   APP_STARTED,
-  PROJECT_OPENED,
-  INDEXING_FINISHED;
+  PROJECT_OPENED;
 
   public val asLoadingState: LoadingState
     get() = when (this) {
@@ -53,7 +52,6 @@ public enum class IdeState {
       COMPONENTS_LOADED -> LoadingState.COMPONENTS_LOADED
       APP_STARTED -> LoadingState.APP_STARTED
       PROJECT_OPENED -> LoadingState.PROJECT_OPENED
-      INDEXING_FINISHED -> LoadingState.INDEXING_FINISHED
       else -> throw IllegalStateException("IdeaState $name doesn't have backing com.intellij.diagnostic.LoadingState instance")
     }
 

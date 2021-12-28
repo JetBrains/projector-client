@@ -42,7 +42,7 @@ dependencies {
   api(project(":projector-util-logging"))
 
   compileOnly("com.jetbrains.intellij.platform:bootstrap:$intellijPlatformVersion")
-  compileOnly("com.jetbrains.intellij.platform:util-diagnostic:$intellijPlatformVersion")
+  compileOnly("com.jetbrains.intellij.platform:util-base:$intellijPlatformVersion")
 
   testImplementation(kotlin("test"))
 }
