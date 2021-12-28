@@ -32,6 +32,7 @@ import org.jetbrains.projector.agent.common.transformation.TransformationResult
 import org.jetbrains.projector.agent.common.transformation.classForNameOrNull
 import org.jetbrains.projector.ij.md.markdownPlugin
 import org.jetbrains.projector.util.loading.ProjectorClassLoader
+import org.jetbrains.projector.util.loading.state.IdeState
 
 internal object IjMdTransformer : IdeTransformerSetup<IjInjector.AgentParameters>() {
 
@@ -43,6 +44,9 @@ internal object IjMdTransformer : IdeTransformerSetup<IjInjector.AgentParameters
 
   // language=java prefix="import " suffix=";"
   private const val previewFileEditorClass = "org.intellij.plugins.markdown.ui.preview.MarkdownPreviewFileEditor"
+
+  override val loadingState: IdeState
+    get() = IdeState.CONFIGURATION_STORE_INITIALIZED
 
   override fun getTransformations(
     parameters: IjInjector.AgentParameters,
