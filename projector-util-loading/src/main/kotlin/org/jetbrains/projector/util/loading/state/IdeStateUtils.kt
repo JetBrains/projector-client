@@ -25,6 +25,8 @@
 
 package org.jetbrains.projector.util.loading.state
 
+import org.jetbrains.projector.common.misc.rangeTo
+import org.jetbrains.projector.common.misc.until
 import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.logging.Logger
 import java.util.concurrent.locks.ReentrantLock
@@ -37,28 +39,28 @@ private val logger = Logger("IdeState")
  * Invokes given function when IDEA is at certain loading state.
  * Function will be invoked immediately if the state already occurred
  *
- * To check whether IDE classes available, use [IdeaState.isIdeAttached]
+ * To check whether IDE classes available, use [IdeState.isIdeAttached]
  *
  * @receiver IDEA state at which function will be executed
- * @param purpose               purpose of state querying, used for logging
+ * @param purpose               purpose of state querying, used for logging. Pass `null` to disable logging
  * @param onStateOccurred       function invoked when target state occurred
  */
-public fun IdeaState.whenOccurred(
+public fun IdeState.whenOccurred(
   purpose: String?,
   onStateOccurred: () -> Unit,
 ) {
-  val listener = IdeaTargetStateListener(this, onStateOccurred)
+  val listener = IdeTargetStateListener(this, onStateOccurred)
   registerStateListener(purpose, listener)
 }
 /**
  * Registers listener to be invoked on state change.
  * Listener function will be invoked immediately on the current thread for already occurred states.
  *
- * @param purpose               purpose of state querying, used for logging
+ * @param purpose               purpose of state querying, used for logging. Pass `null` to disable logging
  * @param listener              listener to register
  */
-public fun registerStateListener(purpose: String?, listener: IdeaStateListener) {
-  if (!IdeaState.isIdeAttached) {
+public fun registerStateListener(purpose: String?, listener: IdeStateListener) {
+  if (!IdeState.isIdeAttached) {
     if (purpose != null) {
       logger.info { "Can't $purpose. It's OK if you don't run an IntelliJ platform based app." }
     }
@@ -76,41 +78,39 @@ public fun registerStateListener(purpose: String?, listener: IdeaStateListener) 
       listenerThreadStarted = true
       runListenerThread()
     } else {
-      repeat(startingStateOrdinal) { i ->
-        val state = IdeaState.values()[i]
+      for (state in IdeState.values().first() until startingState) {
         if (listener.onStateOccurred(state)) {
           logJobDone(purpose)
           return
         }
       }
     }
-    listeners.add(IdeaStateListenerWithPurpose(purpose, listener))
+    listeners.add(IdeStateListenerWithPurpose(purpose, listener))
     condition.signal()
   }
 }
 
 private val lock = ReentrantLock()
 private val condition = lock.newCondition()
-private val listeners = mutableSetOf<IdeaStateListenerWithPurpose>()
+private val listeners = mutableSetOf<IdeStateListenerWithPurpose>()
 
-private var startingStateOrdinal = 0
+private var startingState = IdeState.values().first()
 private var listenerThreadStarted = false
 
 private fun runListenerThread() {
-  thread(isDaemon = true) {
+  thread {
     while (true) {
       try {
         lock.withLock {
 
-          for (i in startingStateOrdinal until IdeaState.values().size) {
-            val state = IdeaState.values()[i]
+          for (state in startingState..IdeState.values().last()) {
             if (state.isOccurred) {
               listeners.removeIf {
                 withCondition(it.onStateOccurred(state)) {
                   logJobDone(it.purpose)
                 }
               }
-              startingStateOrdinal = i + 1
+              startingState = IdeState.values()[state.ordinal + 1]
             } else { // if state is not occurred yet, then all next didn't occur as well
               break
             }
@@ -120,10 +120,11 @@ private fun runListenerThread() {
             condition.await()
           }
         }
+
+        Thread.sleep(5)
       }
       catch (t: Throwable) {
         t.printStackTrace()
-        break
       }
     }
   }
@@ -141,12 +142,12 @@ private inline fun withCondition(condition: Boolean, action: () -> Unit): Boolea
 }
 
 @UseProjectorLoader
-private class IdeaTargetStateListener(
-  private val targetState: IdeaState,
+private class IdeTargetStateListener(
+  private val targetState: IdeState,
   private val onStateOccurred: () -> Unit,
-) : IdeaStateListener {
+) : IdeStateListener {
 
-  override fun onStateOccurred(state: IdeaState): Boolean {
+  override fun onStateOccurred(state: IdeState): Boolean {
     if (state == targetState) {
       onStateOccurred()
       return true
@@ -157,7 +158,7 @@ private class IdeaTargetStateListener(
 }
 
 @UseProjectorLoader
-private class IdeaStateListenerWithPurpose(
+private class IdeStateListenerWithPurpose(
   val purpose: String?,
-  private val listener: IdeaStateListener,
-) : IdeaStateListener by listener
+  private val listener: IdeStateListener,
+) : IdeStateListener by listener

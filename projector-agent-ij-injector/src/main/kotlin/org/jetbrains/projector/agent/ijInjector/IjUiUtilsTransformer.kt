@@ -25,9 +25,8 @@ package org.jetbrains.projector.agent.ijInjector
 
 import com.intellij.util.ui.UIUtil
 import javassist.CtClass
-import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 
-internal object IjUiUtilsTransformer : IdeaTransformerSetup<IjInjector.AgentParameters>() {
+internal object IjUiUtilsTransformer : IdeTransformerSetup<IjInjector.AgentParameters>() {
 
   override fun getTransformations(): Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
     UIUtil::class.java to ::transformUiUtil,

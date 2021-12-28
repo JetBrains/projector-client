@@ -27,7 +27,7 @@ import com.intellij.ide.ui.AntialiasingType
 import com.intellij.ide.ui.UISettings
 import com.intellij.util.ui.AATextInfo
 import org.jetbrains.projector.util.loading.UseProjectorLoader
-import org.jetbrains.projector.util.loading.state.IdeaState
+import org.jetbrains.projector.util.loading.state.IdeState
 import org.jetbrains.projector.util.loading.state.whenOccurred
 import org.jetbrains.projector.util.logging.Logger
 import java.awt.RenderingHints
@@ -70,7 +70,7 @@ public object SettingsInitializer {
   }
 
   public fun addTaskToInitializeIdea(defaultAa: Any?) {
-    IdeaState.CONFIGURATION_STORE_INITIALIZED.whenOccurred("initialize IDEA: fix AA and disable smooth scrolling (at start)") {
+    IdeState.CONFIGURATION_STORE_INITIALIZED.whenOccurred("initialize IDEA: fix AA and disable smooth scrolling (at start)") {
       onIdeaInitialization(defaultAa)
     }
   }

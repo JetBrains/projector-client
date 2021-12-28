@@ -28,11 +28,10 @@ import javassist.CtClass
 import javassist.LoaderClassPath
 import javassist.expr.ExprEditor
 import javassist.expr.MethodCall
-import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 import javax.swing.RepaintManager
 
 // TODO remove after https://youtrack.jetbrains.com/issue/PRJ-22 is fixed
-internal object IjFastNodeCellRendererTransformer : IdeaTransformerSetup<IjInjector.AgentParameters>() {
+internal object IjFastNodeCellRendererTransformer : IdeTransformerSetup<IjInjector.AgentParameters>() {
 
   private const val FAST_NODE_RENDERER_CLASS_NAME = "com.intellij.openapi.graph.impl.view.FastNodeCellRendererPainter"
 

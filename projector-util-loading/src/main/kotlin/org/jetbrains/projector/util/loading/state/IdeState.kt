@@ -32,7 +32,7 @@ import org.jetbrains.projector.util.loading.UseProjectorLoader
  * Mirrors states from com.intellij.diagnostic.LoadingState and introduces some helper ones
  */
 @UseProjectorLoader
-public enum class IdeaState {
+public enum class IdeState {
   IDE_CLASSLOADER_INSTANTIATED, // Helper state to indicate whether IDE classloader can be fetched
   IDE_CLASSLOADER_FETCHED, // Helper state to indicate whether IDE classes can be used (IDE classloader is fetched by ProjectorClassLoader)
   BOOTSTRAP,

@@ -24,14 +24,13 @@
 package org.jetbrains.projector.agent.ijInjector
 
 import org.jetbrains.projector.agent.common.transformation.BatchTransformer
-import org.jetbrains.projector.util.loading.state.IdeaState
+import org.jetbrains.projector.util.loading.state.IdeState
 import org.jetbrains.projector.util.loading.state.registerStateListener
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.Instrumentation
-import kotlin.concurrent.thread
 
-internal class ProjectorBatchTransformer(transformerSetups: List<IdeaTransformerSetup<IjInjector.AgentParameters>>) : 
-  BatchTransformer<IjInjector.AgentParameters, IdeaTransformerSetup<IjInjector.AgentParameters>>(transformerSetups) {
+internal class ProjectorBatchTransformer(transformerSetups: List<IdeTransformerSetup<IjInjector.AgentParameters>>) :
+  BatchTransformer<IjInjector.AgentParameters, IdeTransformerSetup<IjInjector.AgentParameters>>(transformerSetups) {
 
   override val logger: Logger = Logger<ProjectorBatchTransformer>()
 
@@ -43,7 +42,7 @@ internal class ProjectorBatchTransformer(transformerSetups: List<IdeaTransformer
 
     val groups = transformerSetups.groupBy { it.loadingState }.toMutableMap()
 
-    fun runForState(state: IdeaState?): Boolean {
+    fun runForState(state: IdeState?): Boolean {
       val transformers = groups[state] ?: return groups.isEmpty()
       transformers.forEach { it.runTransformations(instrumentation, parameters, canRetransform) }
       groups.remove(state)
@@ -55,7 +54,7 @@ internal class ProjectorBatchTransformer(transformerSetups: List<IdeaTransformer
     registerStateListener(null) { runForState(it) }
   }
 
-  private fun logResults(state: IdeaState?) {
+  private fun logResults(state: IdeState?) {
     logResults("(State: ${state?.name ?: "Initial"})")
     results.clear()
   }
