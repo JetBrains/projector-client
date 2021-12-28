@@ -78,7 +78,15 @@ public fun registerStateListener(purpose: String?, listener: IdeStateListener) {
       listenerThreadStarted = true
       runListenerThread()
     } else {
-      for (state in IdeState.values().first() until startingState) {
+
+      val startWith = startingState
+      val stateRange = if (startWith == null) {
+        IdeState.values().toList()
+      } else {
+        IdeState.values().first() until startWith
+      }
+
+      for (state in stateRange) {
         if (listener.onStateOccurred(state)) {
           logJobDone(purpose)
           return
@@ -94,25 +102,31 @@ private val lock = ReentrantLock()
 private val condition = lock.newCondition()
 private val listeners = mutableSetOf<IdeStateListenerWithPurpose>()
 
-private var startingState = IdeState.values().first()
+private var startingState: IdeState? = IdeState.values().first()
 private var listenerThreadStarted = false
 
 private fun runListenerThread() {
   thread {
-    while (true) {
+    threadLoop@ while (true) {
       try {
+        val beginWith = startingState ?: break@threadLoop
         lock.withLock {
-
-          for (state in startingState..IdeState.values().last()) {
+          iterationLoop@ for (state in beginWith..IdeState.values().last()) {
             if (state.isOccurred) {
               listeners.removeIf {
                 withCondition(it.onStateOccurred(state)) {
                   logJobDone(it.purpose)
                 }
               }
-              startingState = IdeState.values()[state.ordinal + 1]
+
+              startingState = if (state.ordinal != IdeState.values().size - 1) { // not last
+                IdeState.values()[state.ordinal + 1]
+              } else {
+                null
+              }
+
             } else { // if state is not occurred yet, then all next didn't occur as well
-              break
+              break@iterationLoop
             }
           }
 
