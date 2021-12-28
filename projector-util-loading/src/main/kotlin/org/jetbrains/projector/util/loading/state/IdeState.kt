@@ -67,7 +67,6 @@ public enum class IdeState {
       WindowsCommandLineProcessor.ourMainRunnerClass
       true
     } catch (t: Throwable) {
-      t.printStackTrace()
       false
     }
 
