@@ -37,7 +37,7 @@ private val logger = Logger("IdeState")
 
 /**
  * Invokes given function when IDEA is at certain loading state.
- * Function will be invoked immediately if the state already occurred
+ * Function will be invoked immediately on the **current thread** if the state already occurred
  *
  * To check whether IDE classes available, use [IdeState.isIdeAttached]
  *
@@ -54,7 +54,7 @@ public fun IdeState.whenOccurred(
 }
 /**
  * Registers listener to be invoked on state change.
- * Listener function will be invoked immediately on the current thread for already occurred states.
+ * Listener function will be invoked immediately on the **current thread** for already occurred states.
  *
  * @param purpose               purpose of state querying, used for logging. Pass `null` to disable logging
  * @param listener              listener to register

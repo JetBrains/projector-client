@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
+import kotlinx.coroutines.*
 import org.jetbrains.projector.agent.common.transformation.BatchTransformer
 import org.jetbrains.projector.util.loading.state.IdeState
 import org.jetbrains.projector.util.loading.state.registerStateListener
@@ -34,6 +35,9 @@ internal class ProjectorBatchTransformer(transformerSetups: List<IdeTransformerS
 
   override val logger: Logger = Logger<ProjectorBatchTransformer>()
 
+  @OptIn(DelicateCoroutinesApi::class)
+  private val scope = CoroutineScope(newSingleThreadContext("transformer"))
+
   override fun runTransformations(
     instrumentation: Instrumentation,
     parameters: IjInjector.AgentParameters,
@@ -44,9 +48,13 @@ internal class ProjectorBatchTransformer(transformerSetups: List<IdeTransformerS
 
     fun runForState(state: IdeState?): Boolean {
       val transformers = groups[state] ?: return groups.isEmpty()
-      transformers.forEach { it.runTransformations(instrumentation, parameters, canRetransform) }
+
+      scope.launch { // run on another thread to prevent hanging
+        transformers.forEach { it.runTransformations(instrumentation, parameters, canRetransform) }
+        logResults(state)
+      }
+
       groups.remove(state)
-      logResults(state)
       return groups.isEmpty()
     }
 

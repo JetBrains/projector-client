@@ -34,6 +34,7 @@ kotlin {
   explicitApi()
 }
 
+val coroutinesVersion: String by project
 val javassistVersion: String by project
 val intellijPlatformVersion: String by project
 val intellijMarkdownPluginVersion: String by project
@@ -45,6 +46,7 @@ dependencies {
   implementation(project(":projector-util-loading"))
   implementation(project(":projector-util-logging"))
   implementation("org.javassist:javassist:$javassistVersion")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
   compileOnly("com.jetbrains.intellij.platform:ide-impl:$intellijPlatformVersion")
   compileOnly("com.jetbrains.intellij.platform:util-ui:$intellijPlatformVersion")
