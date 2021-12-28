@@ -26,7 +26,7 @@ package org.jetbrains.projector.agent.ijInjector
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 import org.jetbrains.projector.util.loading.state.IdeaState
 
-internal abstract class IdeaTransformerSetup<P>() : TransformerSetupBase<P>() {
+internal abstract class IdeaTransformerSetup<Params>() : TransformerSetupBase<Params>() {
 
   internal open val loadingState: IdeaState?
     get() = IdeaState.CONFIGURATION_STORE_INITIALIZED

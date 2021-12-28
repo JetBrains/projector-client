@@ -29,7 +29,7 @@ import javassist.LoaderClassPath
 import java.lang.instrument.ClassFileTransformer
 import java.lang.instrument.Instrumentation
 
-public interface TransformerSetup<P> {
+public interface TransformerSetup<Params> {
 
   /**
    * Function to be invoked when transformation finishes.
@@ -55,7 +55,7 @@ public interface TransformerSetup<P> {
    * @param classLoader classloader returned by [getClassLoader] method
    * @return mapping from class to function that is invoked to get transformed class bytecode
    */
-  public fun getTransformations(parameters: P, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> = getTransformations()
+  public fun getTransformations(parameters: Params, classLoader: ClassLoader): Map<Class<*>, (CtClass) -> ByteArray?> = getTransformations()
 
   /**
    * Classloader that will be passed to [getTransformations] method. This method is useful if you need to transform classes of a plugin.
@@ -64,7 +64,7 @@ public interface TransformerSetup<P> {
    * @param parameters agent parameters that are passed from server
    * @return Classloader that will be passed to [getTransformations] method and used to get bytecode of classes that will be transformed
    */
-  public fun getClassLoader(parameters: P): ClassLoader = javaClass.classLoader
+  public fun getClassLoader(parameters: Params): ClassLoader = javaClass.classLoader
 
   /**
    * Reports whether transformations of thus transformer are applicable for given parameters
@@ -72,7 +72,7 @@ public interface TransformerSetup<P> {
    * @param parameters agent parameters that are passed from server
    * @return true if transformations of thus transformer are applicable for given parameters, false otherwise
    */
-  public fun isTransformerAvailable(parameters: P): Boolean = true
+  public fun isTransformerAvailable(parameters: Params): Boolean = true
 
   /**
    * Reports whether transformations of thus transformer are applicable for given parameters
@@ -81,7 +81,7 @@ public interface TransformerSetup<P> {
    * @param unavailableReasonConsumer pass a reason why you return false. Only last passed value is used
    * @return true if transformations of thus transformer are applicable for given parameters, false otherwise
    */
-  public fun isTransformerAvailable(parameters: P, unavailableReasonConsumer: (String) -> Unit): Boolean = isTransformerAvailable(parameters)
+  public fun isTransformerAvailable(parameters: Params, unavailableReasonConsumer: (String) -> Unit): Boolean = isTransformerAvailable(parameters)
 
   /**
    * Runs transformation (returned from [getTransformations]) of this transformer.
@@ -92,7 +92,7 @@ public interface TransformerSetup<P> {
    */
   public fun runTransformations(
     instrumentation: Instrumentation,
-    parameters: P,
+    parameters: Params,
     canRetransform: Boolean = true,
   ) {
 
@@ -128,7 +128,7 @@ public interface TransformerSetup<P> {
   }
 }
 
-public abstract class TransformerSetupBase<P> : TransformerSetup<P> {
+public abstract class TransformerSetupBase<Params> : TransformerSetup<Params> {
 
   override var transformationResultConsumer: (TransformationResult) -> Unit = {}
 }

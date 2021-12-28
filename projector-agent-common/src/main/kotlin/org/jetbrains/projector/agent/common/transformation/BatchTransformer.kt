@@ -26,13 +26,13 @@ package org.jetbrains.projector.agent.common.transformation
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.Instrumentation
 
-public open class BatchTransformer<P, T: TransformerSetup<P>>(protected val transformerSetups: List<T>) : TransformerSetup<P> {
+public open class BatchTransformer<Params, Transformer: TransformerSetup<Params>>(protected val transformerSetups: List<Transformer>) : TransformerSetup<Params> {
 
   protected val results: MutableList<TransformationResult> = mutableListOf()
 
-  protected open val logger: Logger = Logger<BatchTransformer<P, T>>()
+  protected open val logger: Logger = Logger<BatchTransformer<Params, Transformer>>()
 
-  override var transformationResultConsumer: (TransformationResult) -> Unit = { transformationResult: TransformationResult ->
+  final override var transformationResultConsumer: (TransformationResult) -> Unit = { transformationResult: TransformationResult ->
     results += transformationResult
   }
 
@@ -42,7 +42,7 @@ public open class BatchTransformer<P, T: TransformerSetup<P>>(protected val tran
 
   override fun runTransformations(
     instrumentation: Instrumentation,
-    parameters: P,
+    parameters: Params,
     canRetransform: Boolean,
   ) {
     transformerSetups.forEach { it.runTransformations(instrumentation, parameters, canRetransform) }
