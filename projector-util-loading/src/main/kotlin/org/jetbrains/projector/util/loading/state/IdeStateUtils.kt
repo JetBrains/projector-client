@@ -138,7 +138,7 @@ private fun runListenerThread() {
         Thread.sleep(5)
       }
       catch (t: Throwable) {
-        t.printStackTrace()
+        logger.error(t) { "Error in IDE state listener thread" }
       }
     }
   }
