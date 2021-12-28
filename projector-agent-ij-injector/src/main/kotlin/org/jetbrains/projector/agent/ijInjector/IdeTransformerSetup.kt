@@ -29,6 +29,6 @@ import org.jetbrains.projector.util.loading.state.IdeState
 internal abstract class IdeTransformerSetup<Params>() : TransformerSetupBase<Params>() {
 
   internal open val loadingState: IdeState?
-    get() = IdeState.CONFIGURATION_STORE_INITIALIZED
+    get() = IdeState.IDE_CLASSLOADER_FETCHED
 
 }
