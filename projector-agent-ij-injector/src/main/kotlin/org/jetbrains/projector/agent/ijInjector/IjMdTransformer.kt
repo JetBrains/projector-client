@@ -33,7 +33,7 @@ import org.jetbrains.projector.agent.common.transformation.classForNameOrNull
 import org.jetbrains.projector.ij.md.markdownPlugin
 import org.jetbrains.projector.util.loading.ProjectorClassLoader
 
-internal object IjMdTransformer : IdeaTransformerSetup<IjInjector.AgentParameters>() {
+internal object IjMdTransformer : IdeTransformerSetup<IjInjector.AgentParameters>() {
 
   // language=java prefix="import " suffix=";"
   private const val javaFxClass = "org.intellij.plugins.markdown.ui.preview.javafx.JavaFxHtmlPanelProvider"

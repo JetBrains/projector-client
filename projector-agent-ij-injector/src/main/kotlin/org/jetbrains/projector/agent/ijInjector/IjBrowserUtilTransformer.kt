@@ -29,7 +29,7 @@ import javassist.CtClass
 import org.jetbrains.projector.agent.common.getDeclaredMethod
 import java.net.URI
 
-internal object IjBrowserUtilTransformer : IdeaTransformerSetup<IjInjector.AgentParameters>() {
+internal object IjBrowserUtilTransformer : IdeTransformerSetup<IjInjector.AgentParameters>() {
 
   override fun getTransformations(): Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
     BrowserUtil::class.java to ::transformBrowserUtil,

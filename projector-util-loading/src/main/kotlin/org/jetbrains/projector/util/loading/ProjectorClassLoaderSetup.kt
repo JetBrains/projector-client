@@ -24,7 +24,7 @@
 package org.jetbrains.projector.util.loading
 
 import com.intellij.ide.WindowsCommandLineProcessor
-import org.jetbrains.projector.util.loading.state.IdeaState
+import org.jetbrains.projector.util.loading.state.IdeState
 import org.jetbrains.projector.util.loading.state.whenOccurred
 import java.lang.reflect.Method
 
@@ -71,7 +71,7 @@ public object ProjectorClassLoaderSetup {
       purpose: String?,
       onIdeClassloaderInstantiated: Runnable,
     ) {
-      IdeaState.IDE_CLASSLOADER_INSTANTIATED.whenOccurred(purpose) { onIdeClassloaderInstantiated.run() }
+      IdeState.IDE_CLASSLOADER_INSTANTIATED.whenOccurred(purpose) { onIdeClassloaderInstantiated.run() }
     }
   }
 }

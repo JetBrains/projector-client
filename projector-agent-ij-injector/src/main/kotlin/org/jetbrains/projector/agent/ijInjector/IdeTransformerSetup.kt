@@ -21,18 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.util.loading.state
+package org.jetbrains.projector.agent.ijInjector
 
-import org.jetbrains.projector.util.loading.UseProjectorLoader
+import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
+import org.jetbrains.projector.util.loading.state.IdeState
 
-@UseProjectorLoader
-public fun interface IdeaStateListener {
+internal abstract class IdeTransformerSetup<Params>() : TransformerSetupBase<Params>() {
 
-  /**
-   * Function to be invoked when state occurred.
-   *
-   * @return true to remove listener after function execution, false otherwise
-   */
-  public fun onStateOccurred(state: IdeaState): Boolean
+  internal open val loadingState: IdeState?
+    get() = IdeState.CONFIGURATION_STORE_INITIALIZED
 
 }
