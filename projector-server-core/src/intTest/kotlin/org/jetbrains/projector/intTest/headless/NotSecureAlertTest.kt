@@ -28,9 +28,6 @@ import com.codeborne.selenide.Selenide.confirm
 import com.codeborne.selenide.WebDriverRunner
 import org.jetbrains.projector.intTest.ConnectionUtil
 import org.openqa.selenium.JavascriptExecutor
-import org.openqa.selenium.TimeoutException
-import org.openqa.selenium.support.ui.ExpectedConditions
-import org.openqa.selenium.support.ui.WebDriverWait
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -44,16 +41,6 @@ class NotSecureAlertTest {
 
       // don't click because it will disable the initial pop up:
       //Selenide.element("body").click(5, 5)  // enable onbeforeunload listener, can't click without arguments because of an exception
-    }
-
-    private fun isAlertPresent(): Boolean {
-      try {
-        val wait = WebDriverWait(WebDriverRunner.getWebDriver(), 5)
-        return wait.until(ExpectedConditions.alertIsPresent()) != null
-      }
-      catch (e: TimeoutException) {
-        return false
-      }
     }
 
     private const val port = 8888

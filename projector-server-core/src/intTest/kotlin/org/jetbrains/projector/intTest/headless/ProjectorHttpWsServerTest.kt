@@ -33,7 +33,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
 import io.ktor.http.contentType
-import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.runBlocking
 import org.java_websocket.WebSocket
 import org.jetbrains.projector.common.protocol.toClient.MainWindow
@@ -79,7 +78,6 @@ class ProjectorHttpWsServerTest {
     }
   }
 
-  @OptIn(KtorExperimentalAPI::class)
   @Test
   fun testWebSocket() {
     val server = createServer().also { it.start() }
