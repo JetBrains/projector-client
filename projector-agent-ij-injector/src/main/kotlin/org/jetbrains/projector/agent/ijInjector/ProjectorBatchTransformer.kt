@@ -26,6 +26,7 @@ package org.jetbrains.projector.agent.ijInjector
 import kotlinx.coroutines.*
 import org.jetbrains.projector.agent.common.transformation.BatchTransformer
 import org.jetbrains.projector.util.loading.state.IdeState
+import org.jetbrains.projector.util.loading.state.IdeStateListener
 import org.jetbrains.projector.util.loading.state.registerStateListener
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.Instrumentation
@@ -59,7 +60,9 @@ internal class ProjectorBatchTransformer(transformerSetups: List<IdeTransformerS
     }
 
     runForState(null)
-    registerStateListener(null) { runForState(it) }
+
+    val requiredStates = groups.keys.filterNotNullTo(mutableSetOf())
+    registerStateListener("run transformations", IdeStateListener(requiredStates, ::runForState))
   }
 
   private fun logResults(state: IdeState?) {

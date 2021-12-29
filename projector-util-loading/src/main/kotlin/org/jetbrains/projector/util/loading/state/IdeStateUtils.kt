@@ -49,7 +49,7 @@ public fun IdeState.whenOccurred(
   purpose: String?,
   onStateOccurred: () -> Unit,
 ) {
-  val listener = IdeTargetStateListener(this, onStateOccurred)
+  val listener = IdeStateListener(this) { onStateOccurred() }
   registerStateListener(purpose, listener)
 }
 /**
@@ -66,6 +66,8 @@ public fun registerStateListener(purpose: String?, listener: IdeStateListener) {
     }
     return
   }
+
+  val listenerWithPurpose = IdeStateListenerWithPurpose(purpose, listener)
 
   lock.withLock {
     if (listeners.contains(listener)) return
@@ -87,20 +89,19 @@ public fun registerStateListener(purpose: String?, listener: IdeStateListener) {
       }
 
       for (state in stateRange) {
-        if (listener.onStateOccurred(state)) {
-          logJobDone(purpose)
-          return
-        }
+        if (state !in listenerWithPurpose.requiredStates) continue
+        listenerWithPurpose.onStateAndRemove(state)
+        listenerWithPurpose.runIfFinished { return }
       }
     }
-    listeners.add(IdeStateListenerWithPurpose(purpose, listener))
+    listeners[listener] = listenerWithPurpose
     condition.signal()
   }
 }
 
 private val lock = ReentrantLock()
 private val condition = lock.newCondition()
-private val listeners = mutableSetOf<IdeStateListenerWithPurpose>()
+private val listeners = mutableMapOf<IdeStateListener, IdeStateListenerWithPurpose>()
 
 private var startingState: IdeState? = IdeState.values().first()
 private var listenerThreadStarted = false
@@ -113,10 +114,15 @@ private fun runListenerThread() {
         lock.withLock {
           iterationLoop@ for (state in beginWith..IdeState.values().last()) {
             if (state.isOccurred) {
-              listeners.removeIf {
-                withCondition(it.onStateOccurred(state)) {
-                  logJobDone(it.purpose)
-                }
+
+              val listenersIterator = listeners.iterator()
+              while (listenersIterator.hasNext()) {
+                val listenerWithPurpose = listenersIterator.next().value
+
+                if (state !in listenerWithPurpose.requiredStates) continue
+                listenerWithPurpose.onStateAndRemove(state)
+
+                listenerWithPurpose.runIfFinished { listenersIterator.remove() }
               }
 
               startingState = if (state.ordinal != IdeState.values().size - 1) { // not last
@@ -150,29 +156,31 @@ private fun logJobDone(purpose: String?) {
   }
 }
 
-private inline fun withCondition(condition: Boolean, action: () -> Unit): Boolean {
-  if (condition) { action() }
-  return condition
-}
-
-@UseProjectorLoader
-private class IdeTargetStateListener(
-  private val targetState: IdeState,
-  private val onStateOccurred: () -> Unit,
-) : IdeStateListener {
-
-  override fun onStateOccurred(state: IdeState): Boolean {
-    if (state == targetState) {
-      onStateOccurred()
-      return true
-    }
-
-    return false
-  }
-}
-
 @UseProjectorLoader
 private class IdeStateListenerWithPurpose(
   val purpose: String?,
   private val listener: IdeStateListener,
-) : IdeStateListener by listener
+) : IdeStateListener {
+
+  private val mutableRequiredStates = listener.requiredStates.toMutableSet()
+
+  val finished: Boolean get() = mutableRequiredStates.isEmpty()
+
+  override val requiredStates: Set<IdeState> get() = mutableRequiredStates
+
+  override fun onStateOccurred(state: IdeState) {
+    throw IllegalStateException("Call ${::onStateAndRemove.name} instead")
+  }
+
+  fun onStateAndRemove(state: IdeState) {
+    mutableRequiredStates.remove(state)
+    listener.onStateOccurred(state)
+  }
+}
+
+private inline fun IdeStateListenerWithPurpose.runIfFinished(runnable: () -> Unit) {
+  if (finished) {
+    logJobDone(purpose)
+    runnable()
+  }
+}

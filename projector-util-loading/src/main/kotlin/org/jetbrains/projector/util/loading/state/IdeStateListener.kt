@@ -21,18 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+@file:UseProjectorLoader
+
 package org.jetbrains.projector.util.loading.state
 
 import org.jetbrains.projector.util.loading.UseProjectorLoader
 
 @UseProjectorLoader
-public fun interface IdeStateListener {
+public interface IdeStateListener {
+
+  /**
+   * States occurrence of which should be listened.
+   */
+  public val requiredStates: Set<IdeState>
 
   /**
    * Function to be invoked when state occurred.
    *
-   * @return true to remove listener after function execution, false otherwise
+   * @param state state that occurred
    */
-  public fun onStateOccurred(state: IdeState): Boolean
+  public fun onStateOccurred(state: IdeState)
 
+}
+
+@Suppress("FunctionName")
+public fun IdeStateListener(vararg ideState: IdeState, callback: (IdeState) -> Unit): IdeStateListener =
+  IdeStateListener(setOf(*ideState), callback)
+
+@Suppress("FunctionName")
+public fun IdeStateListener(ideState: Set<IdeState>, callback: (IdeState) -> Unit): IdeStateListener = object : IdeStateListener {
+
+  override val requiredStates: Set<IdeState> = ideState
+
+  override fun onStateOccurred(state: IdeState) {
+    callback(state)
+  }
 }
