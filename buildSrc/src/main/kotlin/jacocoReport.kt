@@ -52,6 +52,10 @@ private fun JacocoReport.setup(project: Project, isKotlinMpModule: Boolean) {
 
   val moduleName = project.name.split("-").joinToString("") { it.capitalize() }
 
+  // fix jacoco error "Can't add different class with same name" due to
+  // projector-server-core/build/resources/main/projector-agent/projector-agent-ij-injector.jar
+  classDirectories.setFrom(classDirectories.files.filter { !it.endsWith("projector-server-core/build/resources/main") })
+
   reports {
     xml.required.set(true)
     xml.outputLocation.set(project.rootProject.file("JacocoReports/jacocoReport$moduleName.xml"))
