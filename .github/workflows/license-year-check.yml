@@ -19,4 +19,9 @@ jobs:
             ./LICENSE.txt
             ./**/*.kt
             ./**/*.kts
+            ./**/*.js
+            ./**/*.css
+            ./**/*.html
+            ./**/*.properties
+            ./*.properties
             ./*.kts
