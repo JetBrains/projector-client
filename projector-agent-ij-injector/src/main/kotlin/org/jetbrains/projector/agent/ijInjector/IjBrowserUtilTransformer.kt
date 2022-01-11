@@ -47,6 +47,10 @@ internal object IjBrowserUtilTransformer : IdeTransformerSetup<IjInjector.AgentP
         // language=java prefix="class BrowserUtil { public static void browse(@NotNull String $1)" suffix="}"
         """
           {
+            if ($1.contains("account.jetbrains.com") && $1.contains("redirect_uri")) {
+              // fallback to token copy-pasting
+              throw new IllegalArgumentException("Automatic IDE licensing after login in JB account is disabled. This is an intended exception.");
+            }
             java.net.URI uri = com.intellij.openapi.vfs.VfsUtil.toUri($1);
             java.awt.Desktop.getDesktop().browse(uri);
           }
