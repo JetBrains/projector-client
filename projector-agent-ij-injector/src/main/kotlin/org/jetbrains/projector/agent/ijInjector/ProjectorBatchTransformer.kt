@@ -36,9 +36,6 @@ internal class ProjectorBatchTransformer(transformerSetups: List<IdeTransformerS
 
   override val logger: Logger = Logger<ProjectorBatchTransformer>()
 
-  @OptIn(DelicateCoroutinesApi::class)
-  private val scope = CoroutineScope(newSingleThreadContext("transformer"))
-
   override fun runTransformations(
     instrumentation: Instrumentation,
     parameters: IjInjector.AgentParameters,
@@ -49,12 +46,8 @@ internal class ProjectorBatchTransformer(transformerSetups: List<IdeTransformerS
 
     fun runForState(state: IdeState?): Boolean {
       val transformers = groups[state] ?: return groups.isEmpty()
-
-      scope.launch { // run on another thread to prevent hanging
-        transformers.forEach { it.runTransformations(instrumentation, parameters, canRetransform) }
-        logResults(state)
-      }
-
+      transformers.forEach { it.runTransformations(instrumentation, parameters, canRetransform) }
+      logResults(state)
       groups.remove(state)
       return groups.isEmpty()
     }
