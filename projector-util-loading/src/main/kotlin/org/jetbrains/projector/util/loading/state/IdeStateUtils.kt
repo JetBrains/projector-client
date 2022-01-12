@@ -28,7 +28,6 @@ package org.jetbrains.projector.util.loading.state
 import kotlinx.coroutines.*
 import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.logging.Logger
-import java.util.*
 
 private val logger = Logger("IdeState")
 
@@ -49,6 +48,7 @@ public fun IdeState.whenOccurred(
   val listener = IdeStateListener(this) { onStateOccurred() }
   registerStateListener(purpose, listener)
 }
+
 /**
  * Registers listener to be invoked on state change.
  * Listener function will be invoked immediately on the **current thread** for already occurred states.
@@ -64,35 +64,35 @@ public fun registerStateListener(purpose: String?, listener: IdeStateListener) {
     return
   }
 
-  val listenerWithPurpose = IdeStateListenerWithPurpose(purpose, listener)
-  scope.launch { runLoopForListener(listenerWithPurpose) }
+  scope.launch { runLoopForListener(purpose, listener) }
 }
 
-@OptIn(DelicateCoroutinesApi::class)
-private val scope = CoroutineScope(newSingleThreadContext("stateListenerThread"))
+private suspend fun runLoopForListener(purpose: String?, listener: IdeStateListener) {
 
-private suspend fun runLoopForListener(listenerWithPurpose: IdeStateListenerWithPurpose) {
-
-  listenerWithPurpose.purpose?.also {
-    logger.debug { "Starting attempts to $it" }
+  if (purpose != null) {
+    logger.debug { "Starting attempts to $purpose" }
   }
 
-  threadLoop@ while (true) {
-    val stateIterator = listenerWithPurpose.requiredStates.iterator()
+  val sortedStates = listener.requiredStates.toSortedSet()
+
+  listenerLoop@ while (true) {
+    val stateIterator = sortedStates.iterator()
     iterationLoop@ while (stateIterator.hasNext()) {
       val state = stateIterator.next()
       if (state.isOccurred) {
         try {
-          listenerWithPurpose.onStateOccurred(state)
+          listener.onStateOccurred(state)
         } catch (t: Throwable) {
           logger.error(t) { "Error in IDE state listener" }
         }
 
         stateIterator.remove()
 
-        if (listenerWithPurpose.requiredStates.isEmpty()) {
-          logJobDone(listenerWithPurpose.purpose)
-          break@threadLoop
+        if (sortedStates.isEmpty()) {
+          if (purpose != null) {
+            logger.debug { "\"$purpose\" is done" }
+          }
+          break@listenerLoop
         }
 
       } else { // if state is not occurred yet, then all next didn't occur as well
@@ -104,17 +104,5 @@ private suspend fun runLoopForListener(listenerWithPurpose: IdeStateListenerWith
   }
 }
 
-private fun logJobDone(purpose: String?) {
-  if (purpose != null) {
-    logger.debug { "\"$purpose\" is done" }
-  }
-}
-
-@UseProjectorLoader
-private class IdeStateListenerWithPurpose(
-  val purpose: String?,
-  private val listener: IdeStateListener,
-) : IdeStateListener by listener {
-
-  override val requiredStates: SortedSet<IdeState> = listener.requiredStates.toSortedSet()
-}
+@OptIn(DelicateCoroutinesApi::class)
+private val scope = CoroutineScope(newSingleThreadContext("stateListenerThread"))
