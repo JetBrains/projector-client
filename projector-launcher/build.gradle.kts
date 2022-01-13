@@ -226,3 +226,14 @@ tasks.create<Exec>("electronProductionRun") {
     "--",
     ".")
 }
+
+tasks.create<Exec>("electronRun") {
+  workingDir(project.file(distDir))
+  commandLine(npmCommand + listOf("run", "electron", "--", "."))
+}
+
+tasks.create<Exec>("electronBuildAndRun") {
+  dependsOn(":projector-launcher:build")
+  workingDir(project.file(distDir))
+  commandLine(npmCommand + listOf("run", "electron", "--", "."))
+}

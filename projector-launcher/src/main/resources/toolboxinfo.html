@@ -1,0 +1,102 @@
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright (c) 2019-2022 JetBrains s.r.o.
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <base href="./">
+  <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+  <link href="favicon.ico" rel="icon" type="image/x-icon">
+  <link href="main.css" rel="stylesheet"> <!-- <- webpack output -->
+  <link crossorigin="anonymous" href="assets/css/styles.css" rel="stylesheet">
+  <title>Projector</title>
+</head>
+<body class="text-center">
+<div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+
+  <header class="stdhead mb-auto">
+    <div class="inner">
+      <h3 class="stdhead-brand"><a class="navbar-left" href="#"><img class="stdhead-brand-img" src="assets/img/pj512px.png"></a>Projector
+      </h3>
+      <nav class="nav nav-stdhead justify-content-center">
+        <a class="nav-link" href="https://github.com/JetBrains/projector-server">GitHub</a>
+        <a class="nav-link"
+           href="https://github.com/JetBrains/projector-server/blob/master/README-JETBRAINS.md">Readme</a>
+        <a class="nav-link" href="https://jetbrains.com">JetBrains</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="inner cover" role="main">
+    <div class="container cont-md">
+      <div class="row">
+        <div class="col-md-12 " style="padding-bottom: 20px;">
+
+          <div class="card w-75 bg-dark text-white text-start" style="margin: 0 auto; float: none; margin-bottom: 10px;">
+            <div class="card-body">
+              <h5 class="card-title text-center">Warning</h5>
+              <p class="card-text">
+              <p>
+                We will remove the Projector desktop app from the Toolbox in two weeks.
+              </p>
+              <p>
+                New versions of the app will be available on <a href="https://github.com/JetBrains/projector-client/releases">GitHub Releases</a>.
+              </p>
+              <p>
+                The primary <a href="https://www.jetbrains.com/remote-development/">Remote Development</a> tool for JetBrains IDEs is <a href="https://www.jetbrains.com/remote-development/gateway/">Gateway</a>. Gateway gives you the ability to work with minimal network latency, and setting up and administering the infrastructure is simpler than it is with Projector.<br>
+              </p>
+              <p>
+                Projector is a special solution for those who can't use Gateway. Projector has much higher network latency and is more difficult to configure, but it is the recommended solution if you want to access your IDEs from web browsers (including mobile browsers).
+              </p>
+              <p>
+                If you're not sure which solution you should choose, please consider using <a href="https://www.jetbrains.com/remote-development/gateway/">Gateway</a>.
+              </p>
+            </div>
+            <div class="card-text mb-3 mx-auto justify-content-center">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="" id="dont-show-checkbox">
+                <label class="form-check-label" for="dont-show-checkbox">
+                  Don't show again
+                </label>
+              </div>
+              <button class="btn btn-primary" id="ok-button" >OK, I understand</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="stdfoot mt-auto">
+    <div class="inner">
+      <p></p>
+    </div>
+  </footer>
+
+</div>
+
+<script crossorigin="anonymous" type="module" src="assets/js/toolboxinfo.js"></script>
+</body>
+</html>
