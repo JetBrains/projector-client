@@ -22,7 +22,9 @@
  * SOFTWARE.
  */
 import com.google.gson.GsonBuilder
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.apache.tools.ant.taskdefs.condition.Os.isFamily
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsSetupTask
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackCssMode.EXTRACT
 import org.paleozogt.gradle.zip.SymZip
 
@@ -65,9 +67,30 @@ dependencies {
 
 version = "1.0.2"  // todo: npm doesn't support versions like "1.0-SNAPSHOT"
 
-val npmCommand = when (DefaultNativePlatform.getCurrentOperatingSystem().isWindows) {
-  true -> listOf("cmd.exe", "/C", "npm.cmd")
-  false -> listOf("npm")
+val kotlinNodeJsSetupTask = rootProject.tasks.getByPath("kotlinNodeJsSetup") as NodeJsSetupTask
+
+val node = if (isFamily(Os.FAMILY_WINDOWS)) {
+  kotlinNodeJsSetupTask.destination
+    .resolve("node.exe")
+} else {
+  kotlinNodeJsSetupTask.destination
+    .resolve("bin")
+    .resolve("node")
+}
+
+val npm = if (isFamily(Os.FAMILY_WINDOWS)) {
+  kotlinNodeJsSetupTask.destination
+    .resolve("node_modules")
+    .resolve("npm")
+    .resolve("bin")
+    .resolve("npm-cli.js")
+} else {
+  kotlinNodeJsSetupTask.destination
+    .resolve("lib")
+    .resolve("node_modules")
+    .resolve("npm")
+    .resolve("bin")
+    .resolve("npm-cli.js")
 }
 
 val distDir = "build/distributions"
@@ -112,14 +135,19 @@ val generateDistPackageJson by tasks.creating(Task::class) {
 val initDistEnvironment by tasks.creating(Exec::class) {
   group = "dist"
   dependsOn(generateDistPackageJson)
+  dependsOn(rootProject.tasks.getByPath("kotlinNodeJsSetup"))
   workingDir(project.file(distDir))
-  commandLine(npmCommand + listOf("install"))
+  commandLine(
+    node,
+    npm,
+    "install"
+  )
 }
 
 val electronOutDir = "build/electronOut"
 val appName = "projector"
 
-val packagerCommand = npmCommand + listOf(
+val packagerCommand = listOf(
   "run",
   "electron-packager",
   "--",
@@ -142,7 +170,20 @@ fun Task.createPackageTask(platform: String, arch: String, configuration: Exec.(
     group = checkNotNull(this@createPackageTask.group) { "Grouping task of $packageTaskName group name is not defined" }
     dependsOn(initDistEnvironment)
     workingDir(project.file(distDir))
-    commandLine(packagerCommand + listOf("--platform=$platform", "--arch=$arch"))
+    commandLine(
+      node,
+      npm,
+      "run",
+      "electron-packager",
+      "--",
+      "--executable-name=projector",
+      "--out=${project.file(electronOutDir).absolutePath}",
+      "--overwrite",
+      "--icon=${project.file("src/main/resources/assets/img/electron-icon.ico").absolutePath}",
+      ".",
+      appName,
+      "--platform=$platform",
+      "--arch=$arch")
     configuration()
     this@createPackageTask.dependsOn(this)
   }
@@ -186,5 +227,11 @@ tasks.create("distZip") {
 tasks.create<Exec>("electronProductionRun") {
   dependsOn(initDistEnvironment)
   workingDir(project.file(distDir))
-  commandLine(npmCommand + listOf("run", "electron", "--", "."))
+  commandLine(
+    node,
+    npm,
+    "run",
+    "electron",
+    "--",
+    ".")
 }
