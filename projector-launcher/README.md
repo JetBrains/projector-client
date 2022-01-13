@@ -36,3 +36,11 @@ After that, executables will be generated in the `build/electronOut` dir.
 ```shell script
 ./gradlew :projector-launcher:electronProductionRun
 ```
+
+### Development
+
+If you're a UI developer, and you want to speed up iterations when you constantly change HTML files, here are two new tasks introduced in 1.1.0: `electronRun` and `electronBuildAndRun`.
+
+The problem is, preparing the full dist environment with `electronProductionRun` takes unbelievably long time, therefore you can build only HTML and Kotlin (with `electronBuildAndRun`) or build nothing at all (`electronRun`).
+
+Please note, that the *fastest* way to get to do quick and dirty experiments with HTML and preload JS is to build the project only once (with `electronProductionRun`), then open the command line, change the directory to `build/distributions` and then run command `npx electron .`. You want to do this only if you work on quick fixing HTML. For building Kotlin, dependencies, and everything else `electronBuildAndRun` is still required.
