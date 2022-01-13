@@ -23,6 +23,7 @@
  */
 import com.google.gson.GsonBuilder
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsSetupTask
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackCssMode.EXTRACT
 import org.paleozogt.gradle.zip.SymZip
 
@@ -65,10 +66,25 @@ dependencies {
 
 version = "1.1.0"  // npm doesn't support versions like "1.0-SNAPSHOT"
 
-val npmCommand = when (DefaultNativePlatform.getCurrentOperatingSystem().isWindows) {
-  true -> listOf("cmd.exe", "/C", "npm.cmd")
-  false -> listOf("npm")
+val kotlinNodeJsSetup: NodeJsSetupTask by rootProject.tasks
+val nodeDir get() = kotlinNodeJsSetup.destination
+val isWindows get() = DefaultNativePlatform.getCurrentOperatingSystem().isWindows
+
+val nodeCommand = when (isWindows) {
+  true -> nodeDir.resolve("node.exe")
+  false -> nodeDir.resolve("bin/node")
 }
+
+val npmScriptPath = when (isWindows) {
+  true -> nodeDir.resolve("node_modules/nmp/bin/npm-cli.js")
+  false -> nodeDir.resolve("lib/node_modules/npm/bin/npm-cli.js")
+}
+
+val npmCommand = listOf(
+  "$nodeCommand",
+  "$npmScriptPath",
+  "--scripts-prepend-node-path=true",
+)
 
 val distDir = "build/distributions"
 
@@ -112,6 +128,7 @@ val generateDistPackageJson by tasks.creating(Task::class) {
 val initDistEnvironment by tasks.creating(Exec::class) {
   group = "dist"
   dependsOn(generateDistPackageJson)
+  dependsOn(kotlinNodeJsSetup)
   workingDir(project.file(distDir))
   commandLine(npmCommand + listOf("install"))
 }
