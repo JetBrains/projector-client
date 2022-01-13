@@ -2,11 +2,14 @@
 
 Notable changes to this project are documented in this file.
 
-# Unreleased
+## Added
+
+# 1.1.0
 
 ## Added
 
-- Open DevTools by passing `--dev` flag
+- DevTools now can be opened by passing `--dev` flag on the command line
+- New warning dialog window: deprecation in Toolbox
 
 # 1.0.2
 
