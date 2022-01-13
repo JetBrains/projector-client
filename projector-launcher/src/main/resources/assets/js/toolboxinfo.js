@@ -21,33 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-external fun require(module: String): dynamic
-external val process: dynamic
-external val __dirname: dynamic
+window.onload = function () {
+  document.getElementById("ok-button").focus();
+};
 
-fun main() {
-  // Full Bootstrap CSS package
-  require("bootstrap/dist/css/bootstrap.min.css")
-  require("bootstrap/dist/css/bootstrap-grid.min.css")
-  require("bootstrap/dist/css/bootstrap-reboot.min.css")
-  require("bootstrap/dist/css/bootstrap-utilities.min.css")
+document.querySelector('#ok-button').addEventListener('click', function () {
+  connect()
+});
 
-  val argv = commandLineArguments()
-  var url = argv.last()
-
-  if (url.endsWith("projector.exe")) {
-    url = ""
-  }
-
-  if (argv.contains("--dev")) {
-    GlobalSettings.DEVELOPER_TOOLS_ENABLED = true
-  }
-
-  console.log("URL: $url")
-  val eapp = ElectronApp(url)
-  eapp.start()
-}
-
-fun commandLineArguments(): Array<String> {
-  return process.argv
+function connect() {
+  let checkboxValue = document.getElementById("dont-show-checkbox").checked;
+  const {ipcRenderer} = require('electron')
+  ipcRenderer.send("toolboxinfo-ok", checkboxValue);
 }

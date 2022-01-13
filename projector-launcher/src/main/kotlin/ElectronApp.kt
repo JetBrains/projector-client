@@ -24,6 +24,7 @@
 @file:Suppress("JSCODE_ARGUMENT_SHOULD_BE_CONSTANT")
 
 import Electron.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
@@ -31,9 +32,11 @@ import org.w3c.dom.url.URL
 
 external fun encodeURI(data: String): String
 
+@OptIn(DelicateCoroutinesApi::class)
 class ElectronApp(val url: String) {
   var that = this
   var configData = js("{}")
+  var toolboxInfoWasActivated: Boolean = false
 
   var path = require("path")
   var node_url = require("url")
@@ -46,6 +49,7 @@ class ElectronApp(val url: String) {
   lateinit var mainWindowNextUrl: String
   var initialized = false
 
+
   fun navigateMainWindow(url: String) {
     GlobalScope.launch(block = {
       that.mainWindowNextUrl = url
@@ -55,7 +59,30 @@ class ElectronApp(val url: String) {
         that.mainWindowUrl = url
       }
       catch (e: dynamic) {
+        Logger.debug(e)
+      }
+    })
+  }
 
+  fun navigateMainWindowFromFile(url: String, saveToHistory: Boolean) {
+    GlobalScope.launch(block = {
+      if (saveToHistory) {
+        that.mainWindowNextUrl = url
+        try {
+          that.mainWindow.loadFile(url).await()
+          that.mainWindowPrevUrl = that.mainWindowUrl
+          that.mainWindowUrl = url
+        }
+        catch (e: dynamic) {
+          Logger.debug(e)
+        }
+      } else {
+        try {
+          that.mainWindow.loadFile(url).await()
+        }
+        catch (e: dynamic) {
+          Logger.debug(e)
+        }
       }
     })
   }
@@ -115,7 +142,14 @@ class ElectronApp(val url: String) {
 
                                          console.log("Can't load the URL: $validatedURL")
                                          console.log("errorDescription: $errorDescription, errorCode: $errorCode")
-                                         that.mainWindow.loadFile("openurl.html").await()
+
+                                         val dontShowToolboxInfo = (that.configData.dontShowToolboxInfo ?: false) as Boolean
+                                         if (!that.toolboxInfoWasActivated && !dontShowToolboxInfo) {
+                                           that.toolboxInfoWasActivated = true
+                                           that.mainWindow.loadFile("toolboxinfo.html").await()
+                                         } else {
+                                           that.mainWindow.loadFile("openurl.html").await()
+                                         }
                                        }
                                        else {
                                          Logger.direct(
@@ -182,6 +216,10 @@ class ElectronApp(val url: String) {
       this.connect(arg)
     }
 
+    ipcMain.on("toolboxinfo-ok") { _, arg: dynamic ->
+      this.toolboxInfoOK((arg ?: false) as Boolean)
+    }
+
     ipcMain.on("projector-dom-ready") { event, _ ->
       ElectronUtil.disableAllStandardShortcuts()
 
@@ -244,9 +282,17 @@ class ElectronApp(val url: String) {
     }
   }
 
+  fun toolboxInfoOK(dontShowAgain: Boolean) {
+    that.configData.dontShowToolboxInfo = dontShowAgain
+    savedb()
+    Logger.debug("Will navigate to the default page")
+    this.navigateMainWindowFromFile("openurl.html", false)
+  }
+
   fun connect(newUrl: String, password: String? = null) {
     if (!this.testUrl(newUrl)) {
       messageInvalidURL(newUrl)
+      return
     }
     val urlToAddOptions = URL(newUrl)
     urlToAddOptions.searchParams.append("blockClosing", "false")
