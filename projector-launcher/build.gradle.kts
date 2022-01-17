@@ -63,7 +63,7 @@ dependencies {
   implementation("org.jetbrains.kotlin-wrappers:kotlin-extensions:$kotlinExtensionsVersion")
 }
 
-version = "1.0.2"  // todo: npm doesn't support versions like "1.0-SNAPSHOT"
+version = "1.1.0"  // npm doesn't support versions like "1.0-SNAPSHOT"
 
 val npmCommand = when (DefaultNativePlatform.getCurrentOperatingSystem().isWindows) {
   true -> listOf("cmd.exe", "/C", "npm.cmd")
