@@ -30,8 +30,6 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import org.w3c.dom.url.URL
 
-external fun encodeURI(data: String): String
-
 @OptIn(DelicateCoroutinesApi::class)
 class ElectronApp(val url: String) {
   var that = this
@@ -39,7 +37,7 @@ class ElectronApp(val url: String) {
   var toolboxInfoWasActivated: Boolean = false
 
   var path = require("path")
-  var node_url = require("url")
+  //var node_url = require("url") //uncomment to enable "url" module
   var node_fs = require("fs")
 
   var app: App = Electron.app
@@ -135,7 +133,7 @@ class ElectronApp(val url: String) {
                                    didFailLoadListener = { _: Event, errorCode: Number, errorDescription: String, validatedURL: String, _: Boolean, _: Number, _: Number ->
                                      GlobalScope.launch(block = {
                                        if (!that.initialized) {
-                                         if (!validatedURL.isNullOrBlank()) {
+                                         if (!validatedURL.isBlank()) {
                                            messageInvalidURL(validatedURL)
                                          }
 
@@ -182,16 +180,8 @@ class ElectronApp(val url: String) {
     })
   }
 
-  fun loadMessage(message: String) {
-    GlobalScope.launch(block = {
-      that.mainWindow.loadURL("about:blank").await()
-      var html = "<body><h1>Invalid URL</h1><p>$message</p></body>"
-      that.mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURI(html)).await()
-    })
-  }
-
   fun testUrl(url: String): Boolean {
-    var result: Boolean = true
+    var result = true
     try {
       URL(url)
     }
@@ -222,7 +212,7 @@ class ElectronApp(val url: String) {
     ipcMain.on("projector-dom-ready") { event, _ ->
       ElectronUtil.disableAllStandardShortcuts()
 
-      var defaultUrl = this.configData.defaultUrl
+      val defaultUrl = this.configData.defaultUrl
       if (null != defaultUrl) {
         event.sender.send("projector-set-url", defaultUrl)
       }
@@ -314,7 +304,7 @@ class ElectronApp(val url: String) {
   }
 
   fun savedb() {
-    var data = JSON.stringify(this.configData)
+    val data = JSON.stringify(this.configData)
 
     if (!node_fs.existsSync(GlobalSettings.USER_CONFIG_DIR)) {
       node_fs.mkdirSync(GlobalSettings.USER_CONFIG_DIR)
@@ -324,7 +314,7 @@ class ElectronApp(val url: String) {
 
   fun loaddb() {
     if (node_fs.existsSync(GlobalSettings.USER_CONFIG_FILE)) {
-      var buffer = node_fs.readFileSync(GlobalSettings.USER_CONFIG_FILE)
+      val buffer = node_fs.readFileSync(GlobalSettings.USER_CONFIG_FILE)
       this.configData = JSON.parse(buffer.toString())
     }
   }
