@@ -184,17 +184,20 @@ tasks.create("distZip") {
 }
 
 tasks.create<Exec>("electronProductionRun") {
+  group = "development"
   dependsOn(initDistEnvironment)
   workingDir(project.file(distDir))
   commandLine(npmCommand + listOf("run", "electron", "--", "."))
 }
 
 tasks.create<Exec>("electronRun") {
+  group = "development"
   workingDir(project.file(distDir))
   commandLine(npmCommand + listOf("run", "electron", "--", "."))
 }
 
 tasks.create<Exec>("electronBuildAndRun") {
+  group = "development"
   dependsOn(":projector-launcher:build")
   workingDir(project.file(distDir))
   commandLine(npmCommand + listOf("run", "electron", "--", "."))
