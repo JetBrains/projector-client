@@ -49,7 +49,6 @@ class ElectronApp(val url: String) {
   lateinit var mainWindowNextUrl: String
   var initialized = false
 
-
   fun navigateMainWindow(url: String) {
     GlobalScope.launch(block = {
       that.mainWindowNextUrl = url
