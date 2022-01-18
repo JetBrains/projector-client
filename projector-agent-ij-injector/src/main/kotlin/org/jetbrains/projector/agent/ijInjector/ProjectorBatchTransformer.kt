@@ -23,7 +23,6 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
-import kotlinx.coroutines.*
 import org.jetbrains.projector.agent.common.transformation.BatchTransformer
 import org.jetbrains.projector.util.loading.state.IdeState
 import org.jetbrains.projector.util.loading.state.IdeStateListener
@@ -31,6 +30,9 @@ import org.jetbrains.projector.util.loading.state.registerStateListener
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.Instrumentation
 
+/**
+ * BatchTransformer setup that simplifies running transformations and logging results of IdeTransformerSetup' batch
+ */
 internal class ProjectorBatchTransformer(transformerSetups: List<IdeTransformerSetup<IjInjector.AgentParameters>>) :
   BatchTransformer<IjInjector.AgentParameters, IdeTransformerSetup<IjInjector.AgentParameters>>(transformerSetups) {
 
