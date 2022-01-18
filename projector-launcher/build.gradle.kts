@@ -72,7 +72,8 @@ val kotlinNodeJsSetupTask = rootProject.tasks.getByPath("kotlinNodeJsSetup") as 
 val node = if (isFamily(Os.FAMILY_WINDOWS)) {
   kotlinNodeJsSetupTask.destination
     .resolve("node.exe")
-} else {
+}
+else {
   kotlinNodeJsSetupTask.destination
     .resolve("bin")
     .resolve("node")
@@ -84,7 +85,8 @@ val npm = if (isFamily(Os.FAMILY_WINDOWS)) {
     .resolve("npm")
     .resolve("bin")
     .resolve("npm-cli.js")
-} else {
+}
+else {
   kotlinNodeJsSetupTask.destination
     .resolve("lib")
     .resolve("node_modules")
@@ -200,8 +202,8 @@ fun Task.createPackageZipTask(platform: String, arch: String): Task {
 val platformArchPairs = listOf(
   "darwin" to "x64",
   "darwin" to "arm64",
-  "linux"  to "x64",
-  "win32"  to "x64",
+  "linux" to "x64",
+  "win32" to "x64",
 )
 
 tasks.create("dist") {
@@ -231,12 +233,26 @@ tasks.create<Exec>("electronProductionRun") {
 tasks.create<Exec>("electronRun") {
   group = "development"
   workingDir(project.file(distDir))
-  commandLine(npmCommand + listOf("run", "electron", "--", "."))
+  commandLine(
+    node,
+    npm,
+    "--scripts-prepend-node-path=true",
+    "run",
+    "electron",
+    "--",
+    ".")
 }
 
 tasks.create<Exec>("electronBuildAndRun") {
   group = "development"
   dependsOn(":projector-launcher:build")
   workingDir(project.file(distDir))
-  commandLine(npmCommand + listOf("run", "electron", "--", "."))
+  commandLine(
+    node,
+    npm,
+    "--scripts-prepend-node-path=true",
+    "run",
+    "electron",
+    "--",
+    ".")
 }
