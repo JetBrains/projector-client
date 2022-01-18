@@ -140,24 +140,13 @@ val initDistEnvironment by tasks.creating(Exec::class) {
   commandLine(
     node,
     npm,
+    "--scripts-prepend-node-path=true",
     "install"
   )
 }
 
 val electronOutDir = "build/electronOut"
 val appName = "projector"
-
-val packagerCommand = listOf(
-  "run",
-  "electron-packager",
-  "--",
-  "--executable-name=projector",
-  "--out=${project.file(electronOutDir).absolutePath}",
-  "--overwrite",
-  "--icon=${project.file("src/main/resources/assets/img/electron-icon.ico").absolutePath}",
-  ".",
-  appName
-)
 
 fun getPackageTaskName(platform: String, arch: String) = "package${platform.capitalize()}${arch.capitalize()}"
 fun getPackageZipTaskName(platform: String, arch: String) = "packageZip${platform.capitalize()}${arch.capitalize()}"
@@ -173,6 +162,7 @@ fun Task.createPackageTask(platform: String, arch: String, configuration: Exec.(
     commandLine(
       node,
       npm,
+      "--scripts-prepend-node-path=true",
       "run",
       "electron-packager",
       "--",
@@ -230,6 +220,7 @@ tasks.create<Exec>("electronProductionRun") {
   commandLine(
     node,
     npm,
+    "--scripts-prepend-node-path=true",
     "run",
     "electron",
     "--",
