@@ -53,7 +53,5 @@ public fun IdeStateListener(ideState: Set<IdeState>, callback: (IdeState) -> Uni
 
   override val requiredStates: Set<IdeState> = ideState
 
-  override fun onStateOccurred(state: IdeState) {
-    callback(state)
-  }
+  override fun onStateOccurred(state: IdeState) = callback(state)
 }

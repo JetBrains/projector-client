@@ -26,8 +26,14 @@ package org.jetbrains.projector.agent.ijInjector
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
 import org.jetbrains.projector.util.loading.state.IdeState
 
+/**
+ * Transformer setup that provides access to Intellij Platform specific settings
+ */
 internal abstract class IdeTransformerSetup<Params>() : TransformerSetupBase<Params>() {
 
+  /**
+   * Run transformations at least at the specified IDE state
+   */
   internal open val loadingState: IdeState?
     get() = IdeState.IDE_CLASSLOADER_FETCHED
 

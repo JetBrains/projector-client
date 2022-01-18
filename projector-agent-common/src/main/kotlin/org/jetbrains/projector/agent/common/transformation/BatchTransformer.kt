@@ -26,6 +26,9 @@ package org.jetbrains.projector.agent.common.transformation
 import org.jetbrains.projector.util.logging.Logger
 import java.lang.instrument.Instrumentation
 
+/**
+ * Transformer setup that simplifies running transformations and logging results of transformers' batch
+ */
 public open class BatchTransformer<Params, Transformer: TransformerSetup<Params>>(protected val transformerSetups: List<Transformer>) : TransformerSetup<Params> {
 
   protected val results: MutableList<TransformationResult> = mutableListOf()
