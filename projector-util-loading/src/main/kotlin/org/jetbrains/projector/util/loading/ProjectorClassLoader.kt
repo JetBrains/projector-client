@@ -29,6 +29,7 @@ import java.io.InputStream
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.net.URL
+import java.util.*
 import java.util.jar.JarFile
 
 @Suppress("unused", "MemberVisibilityCanBePrivate", "RedundantVisibilityModifier") // public to be accessible for additional setup
@@ -186,6 +187,10 @@ public class ProjectorClassLoader constructor(parent: ClassLoader? = null) : Cla
 
   override fun getResource(name: String?): URL? {
     return findInClassloaders { it.getResource(name) } ?: super.getResource(name)
+  }
+
+  override fun getResources(name: String?): Enumeration<URL> {
+    return findInClassloaders { it.getResources(name) } ?: super.getResources(name)
   }
 
   public fun addJarSource(jarPath: String) {
