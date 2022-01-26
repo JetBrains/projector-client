@@ -1,4 +1,4 @@
-name: Qodana code scanning
+name: Qodana master code scanning
 on:
   workflow_dispatch:
   push:
