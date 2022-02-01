@@ -31,6 +31,7 @@ plugins {
 setupJacoco(isKotlinMpModule = true)
 
 val kotlinVersion: String by project
+val kotestVersion: String by project
 
 kotlin {
   js {
@@ -57,7 +58,8 @@ kotlin {
 
     val commonTest by getting {
       dependencies {
-        api(kotlin("test", kotlinVersion))
+        implementation(kotlin("test-junit"))
+        implementation("io.kotest:kotest-assertions-core:$kotestVersion")
       }
     }
 

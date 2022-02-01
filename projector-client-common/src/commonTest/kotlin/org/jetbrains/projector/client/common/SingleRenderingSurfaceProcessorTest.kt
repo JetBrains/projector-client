@@ -23,13 +23,13 @@
  */
 package org.jetbrains.projector.client.common
 
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.common.protocol.data.AlphaCompositeRule
 import org.jetbrains.projector.common.protocol.data.CommonAlphaComposite
 import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.*
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class SingleRenderingSurfaceProcessorTest {
 
@@ -50,7 +50,8 @@ class SingleRenderingSurfaceProcessorTest {
         paintEvent = ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
       ),
     )
-    assertEquals(expected, actual)
+
+    actual shouldBe expected
   }
 
   @Test
@@ -80,6 +81,6 @@ class SingleRenderingSurfaceProcessorTest {
         paintEvent = ServerDrawLineEvent(0, 1, 2, 3),
       ),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 }

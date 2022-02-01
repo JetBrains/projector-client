@@ -23,10 +23,10 @@
  */
 package org.jetbrains.projector.client.common.misc
 
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.common.protocol.data.ImageData
 import org.jetbrains.projector.common.protocol.data.ImageId
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class ImageCacherTest {
 
@@ -45,6 +45,6 @@ class ImageCacherTest {
 
     imageCacher.getImageData(imageId)
 
-    assertEquals(0, imageCacher.extractImagesToRequest().size)
+    imageCacher.extractImagesToRequest().size shouldBe 0
   }
 }
