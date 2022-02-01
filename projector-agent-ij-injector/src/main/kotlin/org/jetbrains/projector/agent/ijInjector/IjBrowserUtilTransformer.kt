@@ -28,6 +28,7 @@ import com.intellij.openapi.project.Project
 import javassist.CtClass
 import org.jetbrains.projector.agent.common.getDeclaredMethod
 import org.jetbrains.projector.agent.common.transformation.TransformerSetupBase
+import java.net.URI
 
 internal object IjBrowserUtilTransformer : TransformerSetupBase<IjInjector.AgentParameters>() {
 
@@ -59,6 +60,17 @@ internal object IjBrowserUtilTransformer : TransformerSetupBase<IjInjector.Agent
         """
           {
             java.awt.Desktop.getDesktop().browse(new java.net.URI($1));
+          }
+        """.trimIndent()
+      )
+
+    clazz
+      .getDeclaredMethod("browse", URI::class.java)
+      .setBody(
+        // language=java prefix="class BrowserUtil { public static void browse(@NotNull java.net.URI $1)" suffix="}"
+        """
+          {
+            java.awt.Desktop.getDesktop().browse($1);
           }
         """.trimIndent()
       )
