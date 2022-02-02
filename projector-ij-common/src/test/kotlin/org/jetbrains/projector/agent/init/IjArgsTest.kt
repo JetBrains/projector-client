@@ -23,45 +23,40 @@
  */
 package org.jetbrains.projector.agent.init
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class IjArgsTest {
+class IjArgsTest : FunSpec({
+                             val argString = "key1=stringValue;key2=2;key3=3.14;key4=false;key5=customObject"
 
-  @Test
-  fun mapToStringTest() {
+                             test("Map to string") {
+                               val obj = object : Any() {
+                                 override fun toString(): String {
+                                   return "customObject"
+                                 }
+                               }
 
-    val obj = object : Any() {
-      override fun toString(): String {
-        return "customObject"
-      }
-    }
+                               val map = mapOf(
+                                 "key1" to "stringValue",
+                                 "key2" to 2,
+                                 "key3" to 3.14,
+                                 "key4" to false,
+                                 "key5" to obj,
+                               )
 
-    val map = mapOf(
-      "key1" to "stringValue",
-      "key2" to 2,
-      "key3" to 3.14,
-      "key4" to false,
-      "key5" to obj,
-    )
+                               val testArgString = map.toIjArgs()
 
-    val argString = map.toIjArgs()
+                               testArgString shouldBe argString
+                             }
 
-    assertEquals("key1=stringValue;key2=2;key3=3.14;key4=false;key5=customObject", argString)
-  }
+                             test("String to map") {
+                               val map = argString.toArgsMap()
 
-  @Test
-  fun stringToMapTest() {
-
-    val argString = "key1=stringValue;key2=2;key3=3.14;key4=false;key5=customObject"
-
-    val map = argString.toArgsMap()
-
-    assertEquals(5, map.size)
-    assertEquals("stringValue", map["key1"])
-    assertEquals("2", map["key2"])
-    assertEquals("3.14", map["key3"])
-    assertEquals("false", map["key4"])
-    assertEquals("customObject", map["key5"])
-  }
-}
+                               map.size shouldBe 5
+                               map["key1"] shouldBe "stringValue"
+                               map["key2"] shouldBe "2"
+                               map["key3"] shouldBe "3.14"
+                               map["key4"] shouldBe "false"
+                               map["key5"] shouldBe "customObject"
+                             }
+                           })
