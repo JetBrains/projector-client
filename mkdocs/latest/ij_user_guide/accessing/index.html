@@ -953,8 +953,10 @@
 <p>Recent versions of servers have bundled client files. So for example if you start a server on port 9999, you can access it via a browser locally opening <a href="http://localhost:9999/">http://localhost:9999/</a> (or <a href="https://...">https://...</a> if your server is secure).</p>
 <p>If your server is located remotely, just use the corresponding host address instead of <code>localhost</code>.</p>
 <h3 id="latest-client">Latest client<a class="headerlink" href="#latest-client" title="Permanent link">&para;</a></h3>
-<p>The latest client is always available at our site: <a href="https://projector.jetbrains.com/client/?host=HOST&amp;port=PORT">https://projector.jetbrains.com/client/?host=HOST&amp;port=PORT</a>. So this variant is useful if you want to check out the recent update in the client.</p>
-<p>You should set <code>HOST</code> and <code>PORT</code> matching your server. For the previous example, it will be <a href="https://projector.jetbrains.com/client/?host=localhost&amp;port=9999">https://projector.jetbrains.com/client/?host=localhost&amp;port=9999</a>.</p>
+<p>The latest client is always available at our site: <a href="https://projector.jetbrains.com/client/latest/?host=HOST&amp;port=PORT">https://projector.jetbrains.com/client/latest/?host=HOST&amp;port=PORT</a>. So this variant is useful if you want to check out the recent update in the client.</p>
+<p>Also, you can select the stable version of the client by replacing the field <code>latest</code> with the number of the stable version, starting from <code>v1.4.0</code>.</p>
+<p>For example, <em>projector.jetbrains.com/client/<strong>v1.4.0</strong>/?host=HOST&amp;port=PORT</em>.</p>
+<p>You should set <code>HOST</code> and <code>PORT</code> matching your server. For the previous example, it will be <a href="https://projector.jetbrains.com/client/latest/?host=localhost&amp;port=9999">https://projector.jetbrains.com/client/latest/?host=localhost&amp;port=9999</a>.</p>
 <div class="admonition info">
 <p class="admonition-title">Secure connection is required for the latest client</p>
 <p>Your server must be secure when using the latest client because our domain is secure itself. Before connection, make sure that your browser trusts the certificate you use on your server (in this case, connection via the bundled client should succeed). For more info, read <a href="#its-not-possible-to-connect-to-insecure-websocket-from-a-secure-web-page">below</a>.</p>
