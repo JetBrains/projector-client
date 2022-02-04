@@ -79,6 +79,6 @@ public abstract class WsTransportBuilder {
   }
 
   private companion object {
-    private val logger = Logger<HttpWsServerBuilder>()
+    private val logger = Logger<WsTransportBuilder>()
   }
 }
