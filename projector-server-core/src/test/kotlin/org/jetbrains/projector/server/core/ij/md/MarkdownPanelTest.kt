@@ -23,15 +23,14 @@
  */
 package org.jetbrains.projector.server.core.ij.md
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.server.core.ij.IjInjectorAgentInitializer
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
-class MarkdownPanelTest {
 
-  @Test
-  fun testPanelName() {
-    assertEquals(IjInjectorAgentInitializer.MD_PANEL_CLASS_NAME, ProjectorMarkdownPanel::class.java.name)
-  }
-
-}
+class MarkdownPanelTest
+  : FunSpec({
+              test("panel name should be correct") {
+                ProjectorMarkdownPanel::class.java.name shouldBe IjInjectorAgentInitializer.MD_PANEL_CLASS_NAME
+              }
+            })
