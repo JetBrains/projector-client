@@ -23,157 +23,131 @@
  */
 package org.jetbrains.projector.server.core.util
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.common.protocol.toClient.Flush
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawStringEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerSetFontEvent
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class DistinctUpdatedOnscreenSurfacesTest {
+class DistinctUpdatedOnscreenSurfacesTest
+  : FunSpec({
+              test("simple -> same simple") {
+                val initial = listOf(
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(1),
+                    listOf(
+                      ServerSetFontEvent(10, 12),
+                      ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+                    ),
+                  ),
+                )
+                initial.distinctUpdatedOnscreenSurfaces() shouldBe listOf(
+                  ServerDrawCommandsEvent.Target.Onscreen(1),
+                )
+              }
 
-  @Test
-  fun testSimple() {
-    // simple -> same simple
+              test("with two commands -> same two") {
+                val initial = listOf(
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(1),
+                    listOf(
+                      ServerSetFontEvent(10, 12),
+                      ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+                    ),
+                  ),
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(3),
+                    listOf(
+                      ServerSetFontEvent(10, 12),
+                      ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+                    ),
+                  ),
+                )
+                initial.distinctUpdatedOnscreenSurfaces() shouldBe listOf(
+                  ServerDrawCommandsEvent.Target.Onscreen(1),
+                  ServerDrawCommandsEvent.Target.Onscreen(3),
+                )
+              }
+              test("repeating targets -> merged into single target") {
+                val initial = listOf(
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(1),
+                    listOf(
+                      ServerSetFontEvent(10, 12),
+                      ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+                    ),
+                  ),
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(1),
+                    listOf(
+                      ServerSetFontEvent(10, 12),
+                      ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+                    ),
+                  ),
+                )
+                initial.distinctUpdatedOnscreenSurfaces() shouldBe listOf(
+                  ServerDrawCommandsEvent.Target.Onscreen(1),
+                )
+              }
 
-    val initial = listOf(
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(1),
-        listOf(
-          ServerSetFontEvent(10, 12),
-          ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
-        ),
-      ),
-    )
-    val actual = initial.distinctUpdatedOnscreenSurfaces()
-    val expected = listOf(
-      ServerDrawCommandsEvent.Target.Onscreen(1),
-    )
-    assertEquals(expected, actual)
-  }
+              test("redundant state changers -> they are skipped") {
+                val initial = listOf(
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(1),
+                    listOf(
+                      ServerSetFontEvent(10, 120),
+                    ),
+                  ),
+                )
+                initial.distinctUpdatedOnscreenSurfaces() shouldBe emptyList()
+              }
 
-  @Test
-  fun testTwo() {
-    // with two commands -> same two
-
-    val initial = listOf(
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(1),
-        listOf(
-          ServerSetFontEvent(10, 12),
-          ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
-        ),
-      ),
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(3),
-        listOf(
-          ServerSetFontEvent(10, 12),
-          ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
-        ),
-      ),
-    )
-    val actual = initial.distinctUpdatedOnscreenSurfaces()
-    val expected = listOf(
-      ServerDrawCommandsEvent.Target.Onscreen(1),
-      ServerDrawCommandsEvent.Target.Onscreen(3),
-    )
-    assertEquals(expected, actual)
-  }
-
-  @Test
-  fun testRepeatingSameTargets() {
-    // repeating targets -> merged into single target
-
-    val initial = listOf(
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(1),
-        listOf(
-          ServerSetFontEvent(10, 12),
-          ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
-        ),
-      ),
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(1),
-        listOf(
-          ServerSetFontEvent(10, 12),
-          ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
-        ),
-      ),
-    )
-    val actual = initial.distinctUpdatedOnscreenSurfaces()
-    val expected = listOf(
-      ServerDrawCommandsEvent.Target.Onscreen(1),
-    )
-    assertEquals(expected, actual)
-  }
-
-  @Test
-  fun redundantStateEvents() {
-    // redundant state changers -> they are skipped
-
-    val initial = listOf(
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(1),
-        listOf(
-          ServerSetFontEvent(10, 120),
-        ),
-      ),
-    )
-    val actual = initial.distinctUpdatedOnscreenSurfaces()
-    val expected = emptyList<ServerDrawCommandsEvent.Target.Onscreen>()
-    assertEquals(expected, actual)
-  }
-
-  @Test
-  fun testFlush() {
-    // flush should be skipped
-
-    val initial = listOf(
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(1),
-        listOf(
-          ServerSetFontEvent(10, 12),
-          ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
-          Flush,
-        ),
-      ),
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(2),
-        listOf(
-          Flush,
-        ),
-      ),
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(3),
-        listOf(
-          ServerSetFontEvent(10, 12),
-          ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
-        ),
-      ),
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(1),
-        listOf(
-          Flush,
-        ),
-      ),
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(2),
-        listOf(
-          Flush,
-        ),
-      ),
-      ServerDrawCommandsEvent(
-        ServerDrawCommandsEvent.Target.Onscreen(3),
-        listOf(
-          Flush,
-        ),
-      ),
-    )
-    val actual = initial.distinctUpdatedOnscreenSurfaces()
-    val expected = listOf(
-      ServerDrawCommandsEvent.Target.Onscreen(1),
-      ServerDrawCommandsEvent.Target.Onscreen(3),
-    )
-    assertEquals(expected, actual)
-  }
-}
+              test("flush should be skipped") {
+                val initial = listOf(
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(1),
+                    listOf(
+                      ServerSetFontEvent(10, 12),
+                      ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+                      Flush,
+                    ),
+                  ),
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(2),
+                    listOf(
+                      Flush,
+                    ),
+                  ),
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(3),
+                    listOf(
+                      ServerSetFontEvent(10, 12),
+                      ServerDrawStringEvent("abc", 1.0, 2.0, 32.0),
+                    ),
+                  ),
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(1),
+                    listOf(
+                      Flush,
+                    ),
+                  ),
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(2),
+                    listOf(
+                      Flush,
+                    ),
+                  ),
+                  ServerDrawCommandsEvent(
+                    ServerDrawCommandsEvent.Target.Onscreen(3),
+                    listOf(
+                      Flush,
+                    ),
+                  ),
+                )
+                initial.distinctUpdatedOnscreenSurfaces() shouldBe listOf(
+                  ServerDrawCommandsEvent.Target.Onscreen(1),
+                  ServerDrawCommandsEvent.Target.Onscreen(3),
+                )
+              }
+            })
