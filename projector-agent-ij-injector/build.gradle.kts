@@ -38,6 +38,7 @@ val javassistVersion: String by project
 val intellijPlatformVersion: String by project
 val intellijMarkdownPluginVersion: String by project
 val intellijJcefVersion: String by project
+val kotestVersion: String by project
 
 dependencies {
   implementation(project(":projector-agent-common"))
@@ -52,7 +53,8 @@ dependencies {
   compileOnly("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion")
   compileOnly("org.jetbrains.intellij.deps.jcef:jcef:$intellijJcefVersion")
 
-  testImplementation(kotlin("test"))
+  testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+  testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
 }
 
 val agentClass = "org.jetbrains.projector.agent.ijInjector.IjInjectorAgent"
