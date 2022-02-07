@@ -23,12 +23,6 @@
  */
 package org.jetbrains.projector.agent.common
 
-import kotlin.test.Test
-import kotlin.test.assertTrue
+import io.kotest.core.spec.style.StringSpec
 
-class MiscTest {
-  @Test
-  fun `empty test for coverage building`() {
-    assertTrue(true)
-  }
-}
+class DummyTest : StringSpec({ "empty test for coverage building" {} })
