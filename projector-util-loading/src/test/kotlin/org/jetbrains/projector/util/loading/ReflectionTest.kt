@@ -23,13 +23,13 @@
  */
 package org.jetbrains.projector.util.loading
 
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import java.lang.reflect.Modifier
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
-class ReflectionTest {
+class ReflectionTest : AnnotationSpec() {
 
   private class TestClass {
     @Suppress("unused")
@@ -39,12 +39,12 @@ class ReflectionTest {
   }
 
   @Test
-  fun testFieldUnprotectFinal() {
+  fun `final field can be unprotected`() {
     runFieldUnprotectTest("unprotectMe", true)
   }
 
   @Test
-  fun testFieldUnprotectNonFinal() {
+  fun `field can be unprotected`() {
     runFieldUnprotectTest("unprotectMeToo", false)
   }
 
@@ -52,12 +52,12 @@ class ReflectionTest {
     val field = TestClass::class.java.getDeclaredField(fieldName)
     val classInstance = TestClass()
 
-    assertFalse(field.canAccess(classInstance))
-    assertEquals(isFinalByDefault, Modifier.isFinal(field.modifiers))
+    field.canAccess(classInstance).shouldBeFalse()
+    Modifier.isFinal(field.modifiers) shouldBe isFinalByDefault
 
     field.unprotect()
 
-    assertTrue(field.canAccess(classInstance))
-    assertFalse(Modifier.isFinal(field.modifiers))
+    field.canAccess(classInstance).shouldBeTrue()
+    Modifier.isFinal(field.modifiers).shouldBeFalse()
   }
 }

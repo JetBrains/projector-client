@@ -36,6 +36,7 @@ kotlin {
 publishToSpace("java")
 
 val coroutinesVersion: String by project
+val kotestVersion: String by project
 val intellijPlatformVersion: String by project
 
 dependencies {
@@ -47,5 +48,6 @@ dependencies {
   compileOnly("com.jetbrains.intellij.platform:bootstrap:$intellijPlatformVersion")
   compileOnly("com.jetbrains.intellij.platform:util-base:$intellijPlatformVersion")
 
-  testImplementation(kotlin("test"))
+  testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+  testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
 }
