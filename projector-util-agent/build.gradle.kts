@@ -35,8 +35,11 @@ kotlin {
 
 publishToSpace("java")
 
+val kotestVersion: String by project
+
 dependencies {
   implementation(project(":projector-util-logging"))
 
-  testImplementation(kotlin("test"))
+  testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+  testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
 }
