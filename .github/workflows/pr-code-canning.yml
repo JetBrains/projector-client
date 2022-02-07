@@ -14,8 +14,4 @@ jobs:
         uses: JetBrains/qodana-action@v4.2.2
         with:
           linter: jetbrains/qodana-jvm
-          use-annotations: false
           baseline-path: qodana.sarif.json
-      - uses: github/codeql-action/upload-sarif@v1
-        with:
-          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
