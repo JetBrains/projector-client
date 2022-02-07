@@ -23,13 +23,15 @@
  */
 package org.jetbrains.projector.agent.init
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.maps.shouldContain
+import io.kotest.matchers.maps.shouldHaveSize
+import io.kotest.matchers.shouldBe
 
-class IjArgsTest {
+class IjArgsTest : AnnotationSpec() {
 
   @Test
-  fun mapToStringTest() {
+  fun `map to string should be equal`() {
 
     val obj = object : Any() {
       override fun toString(): String {
@@ -47,21 +49,21 @@ class IjArgsTest {
 
     val argString = map.toIjArgs()
 
-    assertEquals("key1=stringValue;key2=2;key3=3.14;key4=false;key5=customObject", argString)
+    argString shouldBe "key1=stringValue;key2=2;key3=3.14;key4=false;key5=customObject"
   }
 
   @Test
-  fun stringToMapTest() {
+  fun `string to map should be equal`() {
 
     val argString = "key1=stringValue;key2=2;key3=3.14;key4=false;key5=customObject"
 
     val map = argString.toArgsMap()
 
-    assertEquals(5, map.size)
-    assertEquals("stringValue", map["key1"])
-    assertEquals("2", map["key2"])
-    assertEquals("3.14", map["key3"])
-    assertEquals("false", map["key4"])
-    assertEquals("customObject", map["key5"])
+    map.shouldHaveSize(5)
+    map.shouldContain("key1", "stringValue")
+    map.shouldContain("key2", "2")
+    map.shouldContain("key3", "3.14")
+    map.shouldContain("key4", "false")
+    map.shouldContain("key5", "customObject")
   }
 }

@@ -36,6 +36,7 @@ publishToSpace("java")
 setupJacoco()
 
 val intellijPlatformVersion: String by project
+val kotestVersion: String by project
 val kotlinVersion: String by project
 
 dependencies {
@@ -43,5 +44,6 @@ dependencies {
 
   compileOnly("com.jetbrains.intellij.platform:core-impl:$intellijPlatformVersion")
 
-  testImplementation(kotlin("test", kotlinVersion))
+  testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+  testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
 }
