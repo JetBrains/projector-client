@@ -26,10 +26,12 @@ plugins {
   `maven-publish`
   jacoco
   java
+  id("io.kotest.multiplatform")
 }
 
 setupJacoco(isKotlinMpModule = true)
 
+val kotestVersion: String by project
 val kotlinVersion: String by project
 
 kotlin {
@@ -58,6 +60,8 @@ kotlin {
     val commonTest by getting {
       dependencies {
         api(kotlin("test", kotlinVersion))
+        implementation("io.kotest:kotest-framework-engine:$kotestVersion")
+        implementation("io.kotest:kotest-assertions-core:$kotestVersion")
       }
     }
 

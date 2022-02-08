@@ -23,12 +23,12 @@
  */
 package org.jetbrains.projector.client.common.misc
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import org.jetbrains.projector.common.protocol.data.ImageData
 import org.jetbrains.projector.common.protocol.data.ImageId
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class ImageCacherTest {
+class ImageCacherTest : FunSpec() {
 
   private val imageId = ImageId.BufferedImageId(15, 1076959906)
   private val imageData = ImageData.PngBase64("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA10lEQVR4XmNgGBQgKytLIjc31" +
@@ -37,14 +37,15 @@ class ImageCacherTest {
                                               "zyhz2N7AgGzIR2QCg5gAg/RyHAWAMDJs5cAOghhQDNf1CMugXDgMwXQADQEPUgXgbCOfk5GiAxNA0Y4YBIQ" +
                                               "DViDsWCAF86QAAK0j+ypzY0swAAAAASUVORK5CYII=")
 
-  @Test
-  fun getImageDataShouldNotAddImageToRequestIfImageDataIsAlreadyConvertedFromBase64() {
-    val imageCacher = ImageCacher(DummyCanvasFactory)
+  init {
+    test("get image data should not add image to request if image data is already converted from base64") {
+      val imageCacher = ImageCacher(DummyCanvasFactory)
 
-    imageCacher.putImageData(imageId, imageData)
+      imageCacher.putImageData(imageId, imageData)
 
-    imageCacher.getImageData(imageId)
+      imageCacher.getImageData(imageId)
 
-    assertEquals(0, imageCacher.extractImagesToRequest().size)
+      imageCacher.extractImagesToRequest().shouldBeEmpty()
+    }
   }
 }

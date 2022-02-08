@@ -23,6 +23,7 @@
  */
 pluginManagement {
   val gradleMkdocsPluginVersion: String by settings
+  val kotestVersion: String by settings
   val kotlinVersion: String by settings
   val symZipVersion: String by settings
 
@@ -42,6 +43,7 @@ pluginManagement {
     kotlin("plugin.serialization") version kotlinVersion apply false
     id("org.paleozogt.symzip") version symZipVersion apply false
     id("ru.vyarus.mkdocs") version gradleMkdocsPluginVersion apply false
+    id("io.kotest.multiplatform") version kotestVersion apply false
   }
 }
 

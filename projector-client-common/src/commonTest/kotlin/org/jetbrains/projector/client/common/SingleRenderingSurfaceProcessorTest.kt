@@ -23,63 +23,62 @@
  */
 package org.jetbrains.projector.client.common
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor.Companion.shrinkByPaintEvents
 import org.jetbrains.projector.common.protocol.data.AlphaCompositeRule
 import org.jetbrains.projector.common.protocol.data.CommonAlphaComposite
 import org.jetbrains.projector.common.protocol.data.PaintValue
 import org.jetbrains.projector.common.protocol.toClient.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class SingleRenderingSurfaceProcessorTest {
-
-  @Test
-  fun testShrink0() {
-    val initial = listOf(
-      ServerDrawLineEvent(0, 1, 2, 3),
-      ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
-    )
-    val actual = initial.shrinkByPaintEvents()
-    val expected = listOf(
-      StateAndPaint(
-        prerequisites = emptyList(),
-        paintEvent = ServerDrawLineEvent(0, 1, 2, 3),
-      ),
-      StateAndPaint(
-        prerequisites = emptyList(),
-        paintEvent = ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
-      ),
-    )
-    assertEquals(expected, actual)
-  }
-
-  @Test
-  fun testShrink1() {
-    val initial = listOf(
-      ServerSetPaintEvent(PaintValue.Color(0x1234_5678)),
-      ServerSetFontEvent(2, 12),
-      ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
-      ServerSetPaintEvent(PaintValue.Color(0x5678_1234)),
-      ServerSetCompositeEvent(CommonAlphaComposite(AlphaCompositeRule.SRC, 1f)),
-      ServerDrawLineEvent(0, 1, 2, 3),
-    )
-    val actual = initial.shrinkByPaintEvents()
-    val expected = listOf(
-      StateAndPaint(
-        prerequisites = listOf(
-          ServerSetPaintEvent(PaintValue.Color(0x1234_5678)),
-          ServerSetFontEvent(2, 12),
+class SingleRenderingSurfaceProcessorTest : FunSpec() {
+  init {
+    test("shrink function should work with events") {
+      val initial = listOf(
+        ServerDrawLineEvent(0, 1, 2, 3),
+        ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
+      )
+      val actual = initial.shrinkByPaintEvents()
+      val expected = listOf(
+        StateAndPaint(
+          prerequisites = emptyList(),
+          paintEvent = ServerDrawLineEvent(0, 1, 2, 3),
         ),
-        paintEvent = ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
-      ),
-      StateAndPaint(
-        prerequisites = listOf(
-          ServerSetPaintEvent(PaintValue.Color(0x5678_1234)),
-          ServerSetCompositeEvent(CommonAlphaComposite(AlphaCompositeRule.SRC, 1f)),
+        StateAndPaint(
+          prerequisites = emptyList(),
+          paintEvent = ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
         ),
-        paintEvent = ServerDrawLineEvent(0, 1, 2, 3),
-      ),
-    )
-    assertEquals(expected, actual)
+      )
+      actual shouldBe expected
+    }
+
+    test("shrink function should work with events with prerequisites") {
+      val initial = listOf(
+        ServerSetPaintEvent(PaintValue.Color(0x1234_5678)),
+        ServerSetFontEvent(2, 12),
+        ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
+        ServerSetPaintEvent(PaintValue.Color(0x5678_1234)),
+        ServerSetCompositeEvent(CommonAlphaComposite(AlphaCompositeRule.SRC, 1f)),
+        ServerDrawLineEvent(0, 1, 2, 3),
+      )
+      val actual = initial.shrinkByPaintEvents()
+      val expected = listOf(
+        StateAndPaint(
+          prerequisites = listOf(
+            ServerSetPaintEvent(PaintValue.Color(0x1234_5678)),
+            ServerSetFontEvent(2, 12),
+          ),
+          paintEvent = ServerDrawStringEvent("abc", 1.0, 2.0, 20.0),
+        ),
+        StateAndPaint(
+          prerequisites = listOf(
+            ServerSetPaintEvent(PaintValue.Color(0x5678_1234)),
+            ServerSetCompositeEvent(CommonAlphaComposite(AlphaCompositeRule.SRC, 1f)),
+          ),
+          paintEvent = ServerDrawLineEvent(0, 1, 2, 3),
+        ),
+      )
+      actual shouldBe expected
+    }
   }
 }
