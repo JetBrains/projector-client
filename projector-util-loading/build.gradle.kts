@@ -40,7 +40,6 @@ val kotestVersion: String by project
 val intellijPlatformVersion: String by project
 
 dependencies {
-  compileOnly(project(":projector-common"))
   api(project(":projector-util-logging"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")

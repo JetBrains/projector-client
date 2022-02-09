@@ -31,6 +31,7 @@ plugins {
 
 setupJacoco(isKotlinMpModule = true)
 
+val intellijPlatformVersion: String by project
 val kotlinVersion: String by project
 val serializationVersion: String by project
 
@@ -69,6 +70,10 @@ kotlin {
     }
 
     val jvmMain by getting {
+      dependencies {
+        implementation(project(":projector-util-loading"))
+        compileOnly("com.jetbrains.intellij.platform:core-impl:$intellijPlatformVersion")
+      }
     }
 
     val jvmTest by getting {
