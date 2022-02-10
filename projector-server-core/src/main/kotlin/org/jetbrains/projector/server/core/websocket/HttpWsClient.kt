@@ -91,7 +91,7 @@ public abstract class HttpWsClient(
     override fun onClose(code: Int, reason: String?, remote: Boolean) {
       if (wasInitialized == null) {
         logger.info { "Closing control connection code: $code, reason: $reason" }
-        logger.info { "Please check relay status."}
+        logger.info { "Please check relay status." }
         lock.withLock {
           wasInitialized = false
           condition.signal()
