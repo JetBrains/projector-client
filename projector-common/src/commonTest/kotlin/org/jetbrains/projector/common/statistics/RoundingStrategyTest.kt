@@ -23,49 +23,53 @@
  */
 package org.jetbrains.projector.common.statistics
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class RoundingStrategyTest {
+class RoundingStrategyTest : FunSpec() {
+  init {
+    test("fraction digits should be rounded") {
+      val tests = listOf(
+        Triple(11.2345, 0, "11"),
+        Triple(11.2345, 1, "11.2"),
+        Triple(11.2345, 2, "11.23"),
+        Triple(11.2345, 3, "11.235"),
+        Triple(11.2345, 4, "11.2345"),
+        Triple(11.2345, 5, "11.23450")
+      )
 
-  @Test
-  fun testFractionDigits() {
-    val tests = listOf(
-      Triple(11.2345, 0, "11"),
-      Triple(11.2345, 1, "11.2"),
-      Triple(11.2345, 2, "11.23"),
-      Triple(11.2345, 3, "11.235"),
-      Triple(11.2345, 4, "11.2345"),
-      Triple(11.2345, 5, "11.23450")
-    )
+      tests.forEach { (number, fractionDigitsToLeave, expected) ->
+        val strategy = RoundingStrategy.FractionDigits(fractionDigitsToLeave)
 
-    tests.forEach { (number, fractionDigitsToLeave, expected) ->
-      val strategy = RoundingStrategy.FractionDigits(fractionDigitsToLeave)
-
-      assertEquals(expected, strategy.round(number), "FractionDigits($fractionDigitsToLeave).round($number) must be $expected")
+        withClue("FractionDigits($fractionDigitsToLeave).round($number) must be $expected") {
+          strategy.round(number) shouldBe expected
+        }
+      }
     }
-  }
 
-  @Test
-  fun testMultiplier() {
-    val tests = listOf(
-      Pair(0.1, "0"),
-      Pair(1.1, "1"),
-      Pair(11.1, "11"),
-      Pair(111.1, "111"),
-      Pair(1_111.1, "1K"),
-      Pair(11_111.1, "11K"),
-      Pair(111_111.1, "111K"),
-      Pair(1_111_111.1, "1M"),
-      Pair(11_111_111.1, "11M"),
-      Pair(12_345_678.1, "12M"),
-      Pair(978.1, "978")
-    )
+    test("multiplier should be rounded") {
+      val tests = listOf(
+        Pair(0.1, "0"),
+        Pair(1.1, "1"),
+        Pair(11.1, "11"),
+        Pair(111.1, "111"),
+        Pair(1_111.1, "1K"),
+        Pair(11_111.1, "11K"),
+        Pair(111_111.1, "111K"),
+        Pair(1_111_111.1, "1M"),
+        Pair(11_111_111.1, "11M"),
+        Pair(12_345_678.1, "12M"),
+        Pair(978.1, "978")
+      )
 
-    tests.forEach { (number, expected) ->
-      val strategy = RoundingStrategy.Multiplier
+      tests.forEach { (number, expected) ->
+        val strategy = RoundingStrategy.Multiplier
 
-      assertEquals(expected, strategy.round(number), "Multiplier.round($number) must be $expected")
+        withClue("Multiplier.round($number) must be $expected") {
+          strategy.round(number) shouldBe expected
+        }
+      }
     }
   }
 }

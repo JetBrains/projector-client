@@ -23,20 +23,17 @@
  */
 package org.jetbrains.projector.common.protocol
 
+import io.kotest.assertions.asClue
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldContain
 import org.jetbrains.projector.common.protocol.handshake.COMMON_VERSION
 import org.jetbrains.projector.common.protocol.handshake.HANDSHAKE_VERSION
 import org.jetbrains.projector.common.protocol.handshake.commonVersionList
 import org.jetbrains.projector.common.protocol.handshake.handshakeVersionList
-import kotlin.test.Test
-import kotlin.test.assertTrue
 
-class CommonVersionPresenceTest {
-
-  @Test
-  fun handshakeVersionListShouldContainCurrentHandshakeVersion() {
-    assertTrue(
-      HANDSHAKE_VERSION in handshakeVersionList,
-      """
+class CommonVersionPresenceTest : FunSpec() {
+  init {
+    val handshakeClue = """
         |Current handshake version of protocol should be in `handshakeVersionList`.
         |It seems that protocol has been updated.
         |Please append the current HANDSHAKE_VERSION to the `handshakeVersionList` as the last element.
@@ -44,14 +41,8 @@ class CommonVersionPresenceTest {
         |HANDSHAKE_VERSION = $HANDSHAKE_VERSION
         |handshakeVersionList = $handshakeVersionList
       """.trimMargin()
-    )
-  }
 
-  @Test
-  fun commonVersionListShouldContainCurrentCommonVersion() {
-    assertTrue(
-      COMMON_VERSION in commonVersionList,
-      """
+    val commonVersionClue = """
         |Current common version of protocol should be in `commonVersionList`.
         |It seems that protocol has been updated.
         |Please append the current COMMON_VERSION to the `commonVersionList` as the last element.
@@ -59,6 +50,17 @@ class CommonVersionPresenceTest {
         |COMMON_VERSION = $COMMON_VERSION
         |commonVersionList = $commonVersionList
       """.trimMargin()
-    )
+
+    test("handshake version list should contain current handshake version") {
+      handshakeClue.asClue {
+        handshakeVersionList.shouldContain(HANDSHAKE_VERSION)
+      }
+    }
+
+    test("common version list should contain current common version") {
+      commonVersionClue.asClue {
+        commonVersionList.shouldContain(COMMON_VERSION)
+      }
+    }
   }
 }

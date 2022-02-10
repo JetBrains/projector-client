@@ -23,54 +23,68 @@
  */
 package org.jetbrains.projector.common.statistics
 
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlin.math.absoluteValue
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
-class AverageTest {
+class AverageTest : FunSpec() {
 
-  @Test
-  fun testEmpty() {
-    val stats = Average.createForDouble(DEFAULT_NAME, DEFAULT_ROUNDING_STRATEGY)
+  init {
+    lateinit var stats: Average<Double>
 
-    val actual = stats.reset().data
+    beforeTest {
+      stats = Average.createForDouble(DEFAULT_NAME, DEFAULT_ROUNDING_STRATEGY)
+    }
 
-    assertTrue(actual is Average.Data.Empty, "at the beginning there must be empty data")
-  }
+    test("reset stats should be empty") {
+      val actual = stats.reset().data
 
-  @Test
-  fun testByIterationsList() {
-    val stats = Average.createForDouble(DEFAULT_NAME, DEFAULT_ROUNDING_STRATEGY)
+      withClue("at the beginning there must be empty data") {
+        actual.shouldBeInstanceOf<Average.Data.Empty>()
+      }
+    }
 
-    val data = listOf(0.0, 0.1, 0.1, 0.2, 1000.0)
+    test("iterations list should be successful after data addition") {
+      val data = listOf(0.0, 0.1, 0.1, 0.2, 1000.0)
 
-    data.forEach(stats::add)
+      data.forEach(stats::add)
 
-    val expectedAverage = data.sum() / data.size
+      val expectedAverage = data.sum() / data.size
 
-    val resetResult = stats.reset()
+      val resetResult = stats.reset()
 
-    val resetData = resetResult.data
-    assertTrue(resetData is Average.Data.Success, "extracted data after addition must be successful")
+      val resetData = resetResult.data
 
-    val (average, iterations) = resetData
-    assertEquals(data.size.toLong(), iterations, "iterations must be calculated properly")
-    assertTrue((expectedAverage - average).absoluteValue < 1e-6, "average must be calculated properly")
-  }
+      withClue("extracted data after addition must be successful") {
+        resetData.shouldBeInstanceOf<Average.Data.Success>()
 
-  @Test
-  fun testByIterationsListReset() {
-    val stats = Average.createForDouble(DEFAULT_NAME, DEFAULT_ROUNDING_STRATEGY)
+        val (average, iterations) = resetData
 
-    val data = listOf(0.0, 0.1, 0.1, 0.2, 1000.0)
+        withClue("iterations must be calculated properly") {
+          iterations shouldBe data.size.toLong()
+        }
 
-    data.forEach(stats::add)
+        withClue("average must be calculated properly") {
+          ((expectedAverage - average).absoluteValue < 1e-6).shouldBeTrue()
+        }
+      }
+    }
 
-    stats.reset()
-    val actual = stats.reset().data
+    test("iterations list reset should be empty") {
+      val data = listOf(0.0, 0.1, 0.1, 0.2, 1000.0)
 
-    assertTrue(actual is Average.Data.Empty, "second reset in a row must give empty data")
+      data.forEach(stats::add)
+
+      stats.reset()
+      val actual = stats.reset().data
+
+      withClue("second reset in a row must give empty data") {
+        actual.shouldBeInstanceOf<Average.Data.Empty>()
+      }
+    }
   }
 
   companion object {

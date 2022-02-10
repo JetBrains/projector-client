@@ -23,15 +23,16 @@
  */
 package org.jetbrains.projector.common.misc
 
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 
-class CompatibilityHashTest {
+class CompatibilityHashTest : FunSpec() {
 
   @Serializable
   @SerialName(TEST_ENUM_SERIAL_NAME)
@@ -131,98 +132,101 @@ class CompatibilityHashTest {
 
   private data class TestData(val serializer1: KSerializer<*>, val serializer2: KSerializer<*>, val testMessage: String, val equal: Boolean)
 
-  @Test
-  fun test() {
-    listOf(
-      TestData(
-        serializer1 = SimpleClass1.serializer(),
-        serializer2 = SimpleClass1.serializer(),
-        testMessage = "descriptor must be compatible to itself",
-        equal = true
-      ),
-      TestData(
-        serializer1 = SimpleClass1.serializer(),
-        serializer2 = SimpleClass2.serializer(),
-        testMessage = "descriptors of classes with identical signature must be compatible",
-        equal = true
-      ),
-      TestData(
-        serializer1 = SimpleClass1.serializer(),
-        serializer2 = SimpleClass3.serializer(),
-        testMessage = "descriptors of classes with different names must be incompatible",
-        equal = false
-      ),
-      TestData(
-        serializer1 = SimpleClass1.serializer(),
-        serializer2 = SimpleClass4.serializer(),
-        testMessage = "descriptors of enums with different amount of elements must be incompatible",
-        equal = false
-      ),
-      TestData(
-        serializer1 = SimpleClass1.serializer(),
-        serializer2 = SimpleClass5.serializer(),
-        testMessage = "descriptors of enums with different elements must be incompatible",
-        equal = false
-      ),
-      TestData(
-        serializer1 = SimpleClass1.serializer(),
-        serializer2 = SimpleClass6.serializer(),
-        testMessage = "descriptors of fields with different nullability must be incompatible",
-        equal = false
-      ),
-      TestData(
-        serializer1 = SimpleClass1.serializer(),
-        serializer2 = SimpleClass7.serializer(),
-        testMessage = "descriptors of fields with different names must be incompatible",
-        equal = false
-      ),
-      TestData(
-        serializer1 = SealedClass1.serializer(),
-        serializer2 = SealedClass2.serializer(),
-        testMessage = "descriptors of sealed classes with children with different elements must be incompatible",
-        equal = false
-      ),
-      TestData(
-        serializer1 = SealedClass1.serializer(),
-        serializer2 = SealedClass3.serializer(),
-        testMessage = "descriptors of sealed classes with different children must be incompatible",
-        equal = false
-      )
-    )
-      .flatMap { (serializer1, serializer2, testMessage, equal) ->
-        listOf(
-          TestData(
-            serializer1 = serializer1,
-            serializer2 = serializer2,
-            testMessage = testMessage,
-            equal = equal
-          ),
-          TestData(
-            serializer1 = ListSerializer(serializer1),
-            serializer2 = ListSerializer(serializer2),
-            testMessage = "[list] $testMessage",
-            equal = equal
-          ),
-          TestData(
-            serializer1 = ListSerializer(ListSerializer(serializer1)),
-            serializer2 = ListSerializer(ListSerializer(serializer2)),
-            testMessage = "[list x 2] $testMessage",
-            equal = equal
-          )
+  init {
+    test("compatibility hash tests") {
+      listOf(
+        TestData(
+          serializer1 = SimpleClass1.serializer(),
+          serializer2 = SimpleClass1.serializer(),
+          testMessage = "descriptor must be compatible to itself",
+          equal = true
+        ),
+        TestData(
+          serializer1 = SimpleClass1.serializer(),
+          serializer2 = SimpleClass2.serializer(),
+          testMessage = "descriptors of classes with identical signature must be compatible",
+          equal = true
+        ),
+        TestData(
+          serializer1 = SimpleClass1.serializer(),
+          serializer2 = SimpleClass3.serializer(),
+          testMessage = "descriptors of classes with different names must be incompatible",
+          equal = false
+        ),
+        TestData(
+          serializer1 = SimpleClass1.serializer(),
+          serializer2 = SimpleClass4.serializer(),
+          testMessage = "descriptors of enums with different amount of elements must be incompatible",
+          equal = false
+        ),
+        TestData(
+          serializer1 = SimpleClass1.serializer(),
+          serializer2 = SimpleClass5.serializer(),
+          testMessage = "descriptors of enums with different elements must be incompatible",
+          equal = false
+        ),
+        TestData(
+          serializer1 = SimpleClass1.serializer(),
+          serializer2 = SimpleClass6.serializer(),
+          testMessage = "descriptors of fields with different nullability must be incompatible",
+          equal = false
+        ),
+        TestData(
+          serializer1 = SimpleClass1.serializer(),
+          serializer2 = SimpleClass7.serializer(),
+          testMessage = "descriptors of fields with different names must be incompatible",
+          equal = false
+        ),
+        TestData(
+          serializer1 = SealedClass1.serializer(),
+          serializer2 = SealedClass2.serializer(),
+          testMessage = "descriptors of sealed classes with children with different elements must be incompatible",
+          equal = false
+        ),
+        TestData(
+          serializer1 = SealedClass1.serializer(),
+          serializer2 = SealedClass3.serializer(),
+          testMessage = "descriptors of sealed classes with different children must be incompatible",
+          equal = false
         )
-      }
-      .forEach { (serializer1, serializer2, testMessage, equal) ->
-        val hash1 = serializer1.descriptor.compatibilityHash
-        val hash2 = serializer2.descriptor.compatibilityHash
-
-        when (equal) {
-          true -> assertEquals(hash1, hash2, testMessage)
-
-          false -> assertNotEquals(hash1, hash2, testMessage)
+      )
+        .flatMap { (serializer1, serializer2, testMessage, equal) ->
+          listOf(
+            TestData(
+              serializer1 = serializer1,
+              serializer2 = serializer2,
+              testMessage = testMessage,
+              equal = equal
+            ),
+            TestData(
+              serializer1 = ListSerializer(serializer1),
+              serializer2 = ListSerializer(serializer2),
+              testMessage = "[list] $testMessage",
+              equal = equal
+            ),
+            TestData(
+              serializer1 = ListSerializer(ListSerializer(serializer1)),
+              serializer2 = ListSerializer(ListSerializer(serializer2)),
+              testMessage = "[list x 2] $testMessage",
+              equal = equal
+            )
+          )
         }
+        .forEach { (serializer1, serializer2, testMessage, equal) ->
+          val hash1 = serializer1.descriptor.compatibilityHash
+          val hash2 = serializer2.descriptor.compatibilityHash
 
-        println("Passed test: $testMessage")
-      }
+          withClue(testMessage) {
+            when (equal) {
+              true -> hash2 shouldBe hash1
+
+              false -> hash2 shouldNotBe hash1
+            }
+          }
+
+          println("Passed test: $testMessage")
+        }
+    }
   }
 
   companion object {

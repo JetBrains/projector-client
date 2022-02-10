@@ -23,16 +23,27 @@
  */
 package org.jetbrains.projector.common.protocol
 
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldBeSameSizeAs
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.*
 import org.jetbrains.projector.common.protocol.toClient.ServerEvent
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 @OptIn(ExperimentalSerializationApi::class)
-class SerialNamesTest {
+class SerialNamesTest : FunSpec() {
+  init {
+    test("element names should be different and contain only one symbol") {
+      listOf(
+        ServerEvent.serializer()
+      )
+        .map(KSerializer<*>::descriptor)
+        .forEach { checkProjectorDescriptor(it) }
+    }
+  }
 
   private fun checkProjectorDescriptor(descriptor: SerialDescriptor) {
     if (descriptor.kind is PrimitiveKind) {
@@ -43,39 +54,31 @@ class SerialNamesTest {
       val elementNames = descriptor.elementNames.toList()
       val elementNamesSet = elementNames.toSet()
 
-      assertEquals(elementNames.size, elementNamesSet.size, "Similar element names $descriptor: $elementNames")
+      withClue("Similar element names $descriptor: $elementNames") {
+        elementNamesSet.shouldBeSameSizeAs(elementNames)
+      }
 
       val singleSymbolElementNames = mutableSetOf<Char>()
 
       elementNames.forEach { name ->
         val singleSymbol = name.singleOrNull()
 
-        assertNotNull(singleSymbol, "Not single-symbol element name in $descriptor: $name")
-
-        singleSymbolElementNames.add(singleSymbol)
+        withClue("Not single-symbol element name in $descriptor: $name") {
+          singleSymbol.shouldNotBeNull()
+          singleSymbolElementNames.add(singleSymbol)
+        }
       }
 
       val expectedNames = generateSequence('a') { it + 1 }.take(singleSymbolElementNames.size).toSet()
 
-      assertEquals(
-        expectedNames.sorted(),
-        singleSymbolElementNames.sorted(),
-        "Not alphabetical single-symbol element names in $descriptor"
-      )
+      withClue("Not alphabetical single-symbol element names in $descriptor") {
+        singleSymbolElementNames.sorted() shouldBe expectedNames.sorted()
+      }
     }
 
     if (descriptor.kind !is SerialKind.ENUM) {
       descriptor.elementDescriptors.forEach(::checkProjectorDescriptor)
     }
-  }
-
-  @Test
-  fun elementNamesShouldBeDifferentAndContainOnlyOneSymbol() {
-    listOf(
-      ServerEvent.serializer()
-    )
-      .map(KSerializer<*>::descriptor)
-      .forEach(this::checkProjectorDescriptor)
   }
 
   companion object {
