@@ -76,7 +76,7 @@ val nodeCommand = when (isWindows) {
 }
 
 val npmScriptPath = when (isWindows) {
-  true -> nodeDir.resolve("node_modules/nmp/bin/npm-cli.js")
+  true -> nodeDir.resolve("node_modules/npm/bin/npm-cli.js")
   false -> nodeDir.resolve("lib/node_modules/npm/bin/npm-cli.js")
 }
 
