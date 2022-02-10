@@ -29,13 +29,13 @@ import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.projector.client.common.RenderingQueue
 import org.jetbrains.projector.client.common.canvas.DomCanvasFactory
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.misc.ParamsProvider
 import org.jetbrains.projector.client.common.misc.TimeStamp
 import org.jetbrains.projector.client.common.protocol.KotlinxJsonToClientHandshakeDecoder
 import org.jetbrains.projector.client.common.protocol.KotlinxJsonToServerHandshakeEncoder
-import org.jetbrains.projector.client.common.RenderingQueue
 import org.jetbrains.projector.client.web.ServerEventsProcessor
 import org.jetbrains.projector.client.web.WindowSizeController
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
@@ -48,8 +48,8 @@ import org.jetbrains.projector.client.web.protocol.SupportedTypesProvider
 import org.jetbrains.projector.client.web.speculative.Typing
 import org.jetbrains.projector.client.web.ui.ReconnectionMessage
 import org.jetbrains.projector.client.web.window.OnScreenMessenger
-import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.client.web.window.WebWindowManager
+import org.jetbrains.projector.client.web.window.WindowDataEventsProcessor
 import org.jetbrains.projector.common.misc.Do
 import org.jetbrains.projector.common.protocol.MessageDecoder
 import org.jetbrains.projector.common.protocol.MessageEncoder
@@ -449,8 +449,7 @@ sealed class ClientState {
 
         val drawEventCount = commands
           .filterIsInstance<ServerDrawCommandsEvent>()
-          .map { it.drawEvents.size }
-          .sum()
+          .sumOf { it.drawEvents.size }
 
         val decompressingTimeMs = decompressTimeStamp - receiveTimeStamp
         val decodingTimeMs = decodeTimestamp - decompressTimeStamp

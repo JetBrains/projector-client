@@ -133,7 +133,7 @@ class ElectronApp(val url: String) {
                                    didFailLoadListener = { _: Event, errorCode: Number, errorDescription: String, validatedURL: String, _: Boolean, _: Number, _: Number ->
                                      GlobalScope.launch(block = {
                                        if (!that.initialized) {
-                                         if (!validatedURL.isBlank()) {
+                                         if (validatedURL.isNotBlank()) {
                                            messageInvalidURL(validatedURL)
                                          }
 

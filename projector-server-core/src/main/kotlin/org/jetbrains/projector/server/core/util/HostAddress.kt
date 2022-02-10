@@ -26,4 +26,4 @@ package org.jetbrains.projector.server.core.util
 import java.net.InetAddress
 import java.net.InetSocketAddress
 
-public fun getWildcardHostAddress(): InetAddress = InetSocketAddress(0).getAddress()
+public fun getWildcardHostAddress(): InetAddress = InetSocketAddress(0).address

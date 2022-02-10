@@ -24,7 +24,7 @@
 class Logger {
   companion object {
     fun debug(message: dynamic) {
-      if (GlobalSettings.LOG_LEVEL.equals("debug")) {
+      if (GlobalSettings.LOG_LEVEL == "debug") {
         console.log(message)
       }
     }

@@ -39,11 +39,10 @@ public object HandshakeTypesSelector {
   public fun selectToClientCompressor(supportedToClientCompressions: List<CompressionType>): MessageCompressor<ToClientTransferableType>? {
     fun CompressionType.toToClientCompressor(): MessageCompressor<ToClientTransferableType>? = when (this) {
       CompressionType.GZIP -> GZipMessageCompressor
-
       CompressionType.NONE -> NotCompressor()
     }
 
-    return supportedToClientCompressions.mapNotNull(CompressionType::toToClientCompressor).firstOrNull()
+    return supportedToClientCompressions.firstNotNullOfOrNull(CompressionType::toToClientCompressor)
   }
 
   public fun selectToClientEncoder(supportedToClientProtocols: List<ProtocolType>): ToClientMessageEncoder? {
@@ -52,17 +51,16 @@ public object HandshakeTypesSelector {
       ProtocolType.KOTLINX_PROTOBUF -> KotlinxProtoBufToClientMessageEncoder
     }
 
-    return supportedToClientProtocols.mapNotNull(ProtocolType::toToClientEncoder).firstOrNull()
+    return supportedToClientProtocols.firstNotNullOfOrNull(ProtocolType::toToClientEncoder)
   }
 
   public fun selectToServerDecompressor(supportedToServerCompressions: List<CompressionType>): MessageDecompressor<ToServerTransferableType>? {
     fun CompressionType.toToServerDecompressor(): MessageDecompressor<ToServerTransferableType>? = when (this) {
       CompressionType.NONE -> NotDecompressor()
-
       else -> null
     }
 
-    return supportedToServerCompressions.mapNotNull(CompressionType::toToServerDecompressor).firstOrNull()
+    return supportedToServerCompressions.firstNotNullOfOrNull(CompressionType::toToServerDecompressor)
   }
 
   public fun selectToServerDecoder(supportedToServerProtocols: List<ProtocolType>): ToServerMessageDecoder? {
@@ -71,6 +69,6 @@ public object HandshakeTypesSelector {
       ProtocolType.KOTLINX_PROTOBUF -> KotlinxJsonToServerMessageDecoder
     }
 
-    return supportedToServerProtocols.mapNotNull(ProtocolType::toToServerDecoder).firstOrNull()
+    return supportedToServerProtocols.firstNotNullOfOrNull(ProtocolType::toToServerDecoder)
   }
 }
