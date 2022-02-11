@@ -25,11 +25,13 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDistributionDsl
 
 plugins {
   kotlin("js")
+  id("io.kotest.multiplatform")
 }
 
 val coroutinesVersion: String by project
 val istanbulInstrumenterLoaderVersion: String by project
 val karmaCoverageIstanbulReporter: String by project
+val kotestVersion: String by project
 val kotlinReactVersion: String by project
 val kotlinStyledComponentsVersion: String by project
 val kotlinVersion: String by project
@@ -57,6 +59,7 @@ dependencies {
   implementation(npm("karma-coverage-istanbul-reporter", karmaCoverageIstanbulReporter))
 
   testImplementation(kotlin("test", kotlinVersion))
+  implementation("io.kotest:kotest-framework-engine:$kotestVersion")
 }
 
 kotlin {
