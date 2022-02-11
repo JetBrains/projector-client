@@ -23,6 +23,11 @@
  */
 package org.jetbrains.projector.client.web.input.key.util
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldBeSameSizeAs
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.common.protocol.data.VK
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent
@@ -32,12 +37,12 @@ import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocati
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyEvent.KeyLocation.STANDARD
 import org.jetbrains.projector.common.protocol.toServer.ClientKeyPressEvent
 import org.jetbrains.projector.common.protocol.toServer.KeyModifier
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
+// todo: rewrite to custom matcher (https://kotest.io/docs/assertions/assertions.html#custom-matchers)
 fun assertEqualsWithoutTimeStamp(expected: List<ClientEvent>, actual: List<ClientEvent>) {
-  assertEquals(expected.size, actual.size, "actual list: $actual")
+  withClue("actual list: $actual") {
+    actual.shouldBeSameSizeAs(expected)
+  }
   expected.forEachIndexed { i, exp ->
     val act = actual[i]
     when {
@@ -50,123 +55,117 @@ fun assertEqualsWithoutTimeStamp(expected: List<ClientEvent>, actual: List<Clien
 }
 
 fun assertEqualsWithoutTimeStamp(expected: ClientKeyPressEvent, actual: ClientKeyPressEvent, message: String? = null) {
-  assertEquals(expected.char, actual.char, message)
-  assertEquals(expected.modifiers, actual.modifiers, message)
+  withClue(message) {
+    actual.char shouldBe expected.char
+    actual.modifiers shouldBe expected.modifiers
+  }
 }
 
 fun assertEqualsWithoutTimeStamp(expected: ClientKeyEvent, actual: ClientKeyEvent, message: String? = null) {
-  assertEquals(expected.char, actual.char, message)
-  assertEquals(expected.code, actual.code, message)
-  assertEquals(expected.location, actual.location, message)
-  assertEquals(expected.modifiers, actual.modifiers, message)
-  assertEquals(expected.keyEventType, actual.keyEventType, message)
+  withClue(message) {
+    actual.char shouldBe expected.char
+    actual.code shouldBe expected.code
+    actual.location shouldBe expected.location
+    actual.modifiers shouldBe expected.modifiers
+    actual.keyEventType shouldBe expected.keyEventType
+  }
 }
 
-class AssertEqualsWithoutTimeStampTest {
-
-  @Test
-  fun differentSize() {
-    assertFailsWith<AssertionError> {
-      assertEqualsWithoutTimeStamp(
-        listOf(ClientKeyPressEvent(42, 'a', emptySet())),
-        emptyList(),
-      )
+class AssertEqualsWithoutTimeStampTest : FunSpec() {
+  init {
+    test("different sizes should consider not equal") {
+      shouldThrow<AssertionError> {
+        assertEqualsWithoutTimeStamp(
+          listOf(ClientKeyPressEvent(42, 'a', emptySet())),
+          emptyList(),
+        )
+      }
     }
-  }
 
-  @Test
-  fun differentTypes() {
-    assertFailsWith<AssertionError> {
-      assertEqualsWithoutTimeStamp(
-        listOf(ClientKeyPressEvent(42, 'a', emptySet())),
-        listOf(ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN)),
-      )
+    test("different types should consider not equal") {
+      shouldThrow<AssertionError> {
+        assertEqualsWithoutTimeStamp(
+          listOf(ClientKeyPressEvent(42, 'a', emptySet())),
+          listOf(ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN)),
+        )
+      }
     }
-  }
 
-  @Test
-  fun differentTimeStampForKeyPress() {
-    assertEqualsWithoutTimeStamp(
-      ClientKeyPressEvent(42, 'a', emptySet()),
-      ClientKeyPressEvent(11, 'a', emptySet()),
-    )
-  }
-
-  @Test
-  fun differentCharForKeyPress() {
-    assertFailsWith<AssertionError> {
+    test("different TimeStamp for key press should consider not equal") {
       assertEqualsWithoutTimeStamp(
         ClientKeyPressEvent(42, 'a', emptySet()),
-        ClientKeyPressEvent(42, 'b', emptySet()),
+        ClientKeyPressEvent(11, 'a', emptySet()),
       )
     }
-  }
 
-  @Test
-  fun differentModifiersForKeyPress() {
-    assertFailsWith<AssertionError> {
-      assertEqualsWithoutTimeStamp(
-        ClientKeyPressEvent(42, 'a', emptySet()),
-        ClientKeyPressEvent(42, 'a', setOf(KeyModifier.ALT_KEY)),
-      )
+    test("different char for key press should consider not equal") {
+      shouldThrow<AssertionError> {
+        assertEqualsWithoutTimeStamp(
+          ClientKeyPressEvent(42, 'a', emptySet()),
+          ClientKeyPressEvent(42, 'b', emptySet()),
+        )
+      }
     }
-  }
 
-  @Test
-  fun differentTimeStampForKey() {
-    assertEqualsWithoutTimeStamp(
-      ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
-      ClientKeyEvent(11, 'a', VK.A, STANDARD, emptySet(), DOWN),
-    )
-  }
+    test("different modifiers for key press should consider not equal") {
+      shouldThrow<AssertionError> {
+        assertEqualsWithoutTimeStamp(
+          ClientKeyPressEvent(42, 'a', emptySet()),
+          ClientKeyPressEvent(42, 'a', setOf(KeyModifier.ALT_KEY)),
+        )
+      }
+    }
 
-  @Test
-  fun differentCharForKey() {
-    assertFailsWith<AssertionError> {
+    test("different TimeStamp for key should consider not equal") {
       assertEqualsWithoutTimeStamp(
         ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
-        ClientKeyEvent(42, 'b', VK.A, STANDARD, emptySet(), DOWN),
+        ClientKeyEvent(11, 'a', VK.A, STANDARD, emptySet(), DOWN),
       )
     }
-  }
 
-  @Test
-  fun differentCodeForKey() {
-    assertFailsWith<AssertionError> {
-      assertEqualsWithoutTimeStamp(
-        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
-        ClientKeyEvent(42, 'a', VK.B, STANDARD, emptySet(), DOWN),
-      )
+    test("different char for key should consider not equal") {
+      shouldThrow<AssertionError> {
+        assertEqualsWithoutTimeStamp(
+          ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+          ClientKeyEvent(42, 'b', VK.A, STANDARD, emptySet(), DOWN),
+        )
+      }
     }
-  }
 
-  @Test
-  fun differentLocationForKey() {
-    assertFailsWith<AssertionError> {
-      assertEqualsWithoutTimeStamp(
-        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
-        ClientKeyEvent(42, 'a', VK.A, LEFT, emptySet(), DOWN),
-      )
+    test("different code for key should consider not equal") {
+      shouldThrow<AssertionError> {
+        assertEqualsWithoutTimeStamp(
+          ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+          ClientKeyEvent(42, 'a', VK.B, STANDARD, emptySet(), DOWN),
+        )
+      }
     }
-  }
 
-  @Test
-  fun differentModifiersForKey() {
-    assertFailsWith<AssertionError> {
-      assertEqualsWithoutTimeStamp(
-        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
-        ClientKeyEvent(42, 'a', VK.A, STANDARD, setOf(KeyModifier.ALT_KEY), DOWN),
-      )
+    test("different location for key should consider not equal") {
+      shouldThrow<AssertionError> {
+        assertEqualsWithoutTimeStamp(
+          ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+          ClientKeyEvent(42, 'a', VK.A, LEFT, emptySet(), DOWN),
+        )
+      }
     }
-  }
 
-  @Test
-  fun differentTypeForKey() {
-    assertFailsWith<AssertionError> {
-      assertEqualsWithoutTimeStamp(
-        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
-        ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), UP),
-      )
+    test("different modifiers for key should consider not equal") {
+      shouldThrow<AssertionError> {
+        assertEqualsWithoutTimeStamp(
+          ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+          ClientKeyEvent(42, 'a', VK.A, STANDARD, setOf(KeyModifier.ALT_KEY), DOWN),
+        )
+      }
+    }
+
+    test("different type for key should consider not equal") {
+      shouldThrow<AssertionError> {
+        assertEqualsWithoutTimeStamp(
+          ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), DOWN),
+          ClientKeyEvent(42, 'a', VK.A, STANDARD, emptySet(), UP),
+        )
+      }
     }
   }
 }

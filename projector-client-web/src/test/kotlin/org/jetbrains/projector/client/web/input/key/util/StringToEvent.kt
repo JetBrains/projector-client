@@ -23,9 +23,9 @@
  */
 package org.jetbrains.projector.client.web.input.key.util
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import org.w3c.dom.events.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 // Format:
 // "${event.type}: ${event.timeStamp} ${event.key} ${event.code} ${event.defaultPrevented} ${event.keyCode} ${event.data}"
@@ -53,33 +53,31 @@ fun String.toEvent(): Event {
   }
 }
 
-class StringToEventTest {
+class StringToEventTest : FunSpec() {
+  init {
+    test("composition") {
+      val initial = "compositionupdate: 7060.000000000001 undefined undefined false undefined z"
+      val actual = initial.toEvent() as CompositionEvent
 
-  @Test
-  fun composition() {
-    val initial = "compositionupdate: 7060.000000000001 undefined undefined false undefined z"
-    val actual = initial.toEvent() as CompositionEvent
+      actual.type shouldBe "compositionupdate"
+      actual.data shouldBe "z"
+    }
 
-    assertEquals("compositionupdate", actual.type)
-    assertEquals("z", actual.data)
-  }
+    test("input") {
+      val initial = "input: 7061 undefined undefined false undefined z"
+      val actual = initial.toEvent() as InputEvent
 
-  @Test
-  fun input() {
-    val initial = "input: 7061 undefined undefined false undefined z"
-    val actual = initial.toEvent() as InputEvent
+      actual.type shouldBe "input"
+      actual.data shouldBe "z"
+    }
 
-    assertEquals("input", actual.type)
-    assertEquals("z", actual.data)
-  }
+    test("key") {
+      val initial = "keyup: 7132.000000000001 z KeyZ false 90 undefined"
+      val actual = initial.toEvent() as KeyboardEvent
 
-  @Test
-  fun key() {
-    val initial = "keyup: 7132.000000000001 z KeyZ false 90 undefined"
-    val actual = initial.toEvent() as KeyboardEvent
-
-    assertEquals("z", actual.key)
-    assertEquals("KeyZ", actual.code)
-    assertEquals(90, actual.keyCode)
+      actual.key shouldBe "z"
+      actual.code shouldBe "KeyZ"
+      actual.keyCode shouldBe 90
+    }
   }
 }

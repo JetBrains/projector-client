@@ -58,7 +58,7 @@ dependencies {
   implementation(npm("istanbul-instrumenter-loader", istanbulInstrumenterLoaderVersion))
   implementation(npm("karma-coverage-istanbul-reporter", karmaCoverageIstanbulReporter))
 
-  testImplementation(kotlin("test", kotlinVersion))
+  implementation("io.kotest:kotest-assertions-core:$kotestVersion")
   implementation("io.kotest:kotest-framework-engine:$kotestVersion")
 }
 
