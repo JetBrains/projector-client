@@ -142,6 +142,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       this["n"] as Boolean,
       this["o"] as Boolean,
       this["p"] as Int?,
+      this["q"] as Float,
     )
   }
 
