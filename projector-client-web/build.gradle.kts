@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDistributionDsl
 
 plugins {
   kotlin("js")
+  id("org.jetbrains.compose")
 }
 
 val coroutinesVersion: String by project
@@ -56,6 +57,9 @@ dependencies {
   implementation(npm("istanbul-instrumenter-loader", istanbulInstrumenterLoaderVersion))
   implementation(npm("karma-coverage-istanbul-reporter", karmaCoverageIstanbulReporter))
 
+  implementation(compose.web.core)
+  implementation(compose.runtime)
+
   testImplementation(kotlin("test", kotlinVersion))
 }
 
@@ -69,4 +73,9 @@ kotlin {
     }
     binaries.executable()
   }
+}
+
+// workaround to support Compose for plain K/JS plugin:
+compose.web {
+  targets(kotlin.js())
 }

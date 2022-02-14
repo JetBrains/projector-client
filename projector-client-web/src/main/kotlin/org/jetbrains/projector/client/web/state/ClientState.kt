@@ -85,9 +85,9 @@ sealed class ClientState {
       document.body!!.apply {
         style.apply {
           backgroundColor = ParamsProvider.BACKGROUND_COLOR
-          asDynamic().overscrollBehaviorX = "none"
-          asDynamic().overscrollBehaviorY = "none"
-          asDynamic().touchAction = "none"
+          setPropertyValue("overscroll-behavior-x", "none")
+          setPropertyValue("overscroll-behavior-y", "none")
+          setPropertyValue("touch-action", "none")
         }
 
         oncontextmenu = { false }

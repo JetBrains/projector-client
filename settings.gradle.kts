@@ -42,6 +42,7 @@ pluginManagement {
     kotlin("plugin.serialization") version kotlinVersion apply false
     id("ru.vyarus.mkdocs") version gradleMkdocsPluginVersion apply false
     id("org.paleozogt.symzip") version symZipVersion apply false
+    id("org.jetbrains.compose") version "1.1.0-alpha04" apply false
   }
 }
 
