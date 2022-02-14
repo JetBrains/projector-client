@@ -23,6 +23,9 @@
  */
 package org.jetbrains.projector.intTest.headless
 
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.WebSockets
 import io.ktor.client.features.websocket.ws
@@ -40,10 +43,8 @@ import org.jetbrains.projector.common.protocol.toClient.toMainWindowList
 import org.jetbrains.projector.server.core.websocket.HttpWsServer
 import java.io.File
 import java.nio.ByteBuffer
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class ProjectorHttpWsServerTest {
+class ProjectorHttpWsServerTest : AnnotationSpec() {
 
   private companion object {
 
@@ -78,75 +79,69 @@ class ProjectorHttpWsServerTest {
     }
   }
 
+  lateinit var server: HttpWsServer
+  lateinit var client: HttpClient
+
+  @BeforeEach
+  fun beforeTest() {
+    server = createServer().also { it.start() }
+  }
+
+  @AfterEach
+  fun afterTest() {
+    client.close()
+    server.stop()
+  }
+
   @Test
-  fun testWebSocket() {
-    val server = createServer().also { it.start() }
-    val client = HttpClient {
+  fun `webSocket should return success message`() {
+    client = HttpClient {
       install(WebSockets)
     }
-
     runBlocking {
       client.ws(host = "localhost", port = PORT) {
         val actual = (incoming.receive() as Frame.Text).readText()
 
-        assertEquals(WS_SUCCESS, actual)
+        actual shouldBe WS_SUCCESS
       }
     }
-
-    client.close()
-    server.stop()
   }
 
   @Test
-  fun test404() {
-    val server = createServer().also { it.start() }
-    val client = HttpClient {
+  fun `incorrect request should return 404`() {
+    client = HttpClient {
       expectSuccess = false
     }
-
     val response = runBlocking { client.get<HttpResponse>(prj("/abc")) }
-
-    assertEquals(404, response.status.value)
-
-    client.close()
-    server.stop()
+    response.status.value shouldBe 404
   }
 
   @Test
-  fun testRoot() {
-    val server = createServer().also { it.start() }
-    val client = HttpClient()
+  fun `correct request should return correct HTML`() {
+    client = HttpClient()
 
     val response = runBlocking { client.get<HttpResponse>(prj("/")) }
     val responseBytes = runBlocking { response.readBytes() }.toList()
     val expected = File("$clientRoot/index.html").readBytes().toList()
 
-    assertEquals(expected, responseBytes)
-    assertEquals(ContentType.Text.Html, response.contentType())
-
-    client.close()
-    server.stop()
+    responseBytes shouldBe expected
+    response.contentType() shouldBe ContentType.Text.Html
   }
 
   @Test
-  fun testMainWindows() {
-    val server = createServer().also { it.start() }
-    val client = HttpClient()
+  fun `main windows should have correct title and icon`() {
+    client = HttpClient()
 
     val response = runBlocking { client.get<String>(prj("/mainWindows")) }.toMainWindowList()
 
-    assertEquals(1, response.size)
-    assertEquals("abc", response[0].title)
-    assertEquals("png base 64", response[0].pngBase64Icon)
-
-    client.close()
-    server.stop()
+    response.size shouldBe 1
+    response[0].title shouldBe "abc"
+    response[0].pngBase64Icon shouldBe "png base 64"
   }
 
   @Test
-  fun testFiles() {
-    val server = createServer().also { it.start() }
-    val client = HttpClient()
+  fun `files should be returned by the response`() {
+    client = HttpClient()
 
     File(clientRoot).listFiles()!!.forEach {
       val filename = it.name
@@ -160,12 +155,11 @@ class ProjectorHttpWsServerTest {
         val path = "$prefix$filename"
         val response = runBlocking { client.get<ByteArray>(prj(path)) }.toList()
 
-        assertEquals(expected, response, "mismatching responce for path: $path")
+        withClue("mismatching response for path: $path") {
+          response shouldBe expected
+        }
         println("$path OK")
       }
     }
-
-    client.close()
-    server.stop()
   }
 }

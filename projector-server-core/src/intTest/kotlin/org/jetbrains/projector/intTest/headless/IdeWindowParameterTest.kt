@@ -26,6 +26,8 @@ package org.jetbrains.projector.intTest.headless
 import com.codeborne.selenide.CollectionCondition.size
 import com.codeborne.selenide.Selenide.elements
 import com.codeborne.selenide.Selenide.open
+import io.kotest.core.spec.style.AnnotationSpec
+import io.ktor.server.engine.ApplicationEngine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
@@ -34,9 +36,8 @@ import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
-import kotlin.test.Test
 
-class IdeWindowParameterTest {
+class IdeWindowParameterTest : AnnotationSpec() {
 
   private companion object {
 
@@ -64,11 +65,14 @@ class IdeWindowParameterTest {
     )
   }
 
-  @Test
-  fun shouldShowAllWindowsWhenParameterIsNotPresented() {
-    val clientLoadNotifier = Channel<Unit>()
 
-    val server = startServerAndDoHandshake { (sender, _) ->
+  lateinit var server: ApplicationEngine
+  lateinit var clientLoadNotifier: Channel<Unit>
+
+  @BeforeEach
+  fun beforeTest() {
+    clientLoadNotifier = Channel()
+    server = startServerAndDoHandshake { (sender, _) ->
       sender(listOf(ServerWindowSetChangedEvent(windows)))
 
       clientLoadNotifier.send(Unit)
@@ -78,89 +82,50 @@ class IdeWindowParameterTest {
       }
     }
     server.start()
+  }
 
+  @AfterEach
+  fun afterTest() {
+    server.stop(500, 1000)
+  }
+
+  @Test
+  fun `should show all windows when parameter is not presented`() {
     open(clientUrl)
 
     runBlocking {
       clientLoadNotifier.receive()
     }
     elements("canvas.window").shouldHave(size(2))
-
-    server.stop(500, 1000)
   }
 
   @Test
-  fun shouldShowSelectedWindow0WhenParameterIsPresented() {
-    val clientLoadNotifier = Channel<Unit>()
-
-    val server = startServerAndDoHandshake { (sender, _) ->
-      sender(listOf(ServerWindowSetChangedEvent(windows)))
-
-      clientLoadNotifier.send(Unit)
-
-      for (frame in incoming) {
-        // maintaining connection
-      }
-    }
-    server.start()
-
+  fun `should show selected window 0 when parameter is presented`() {
     open("$clientUrl&ideWindow=0")
 
     runBlocking {
       clientLoadNotifier.receive()
     }
     elements("canvas.window").shouldHave(size(1))
-
-    server.stop(500, 1000)
   }
 
   @Test
-  fun shouldShowSelectedWindow1WhenParameterIsPresented() {
-    val clientLoadNotifier = Channel<Unit>()
-
-    val server = startServerAndDoHandshake { (sender, _) ->
-      sender(listOf(ServerWindowSetChangedEvent(windows)))
-
-      clientLoadNotifier.send(Unit)
-
-      for (frame in incoming) {
-        // maintaining connection
-      }
-    }
-    server.start()
-
+  fun `show selected window 1 when parameter is presented`() {
     open("$clientUrl&ideWindow=1")
 
     runBlocking {
       clientLoadNotifier.receive()
     }
     elements("canvas.window").shouldHave(size(1))
-
-    server.stop(500, 1000)
   }
 
   @Test
-  fun shouldNotShowNotExistingWindow2WhenParameterIsPresented() {
-    val clientLoadNotifier = Channel<Unit>()
-
-    val server = startServerAndDoHandshake { (sender, _) ->
-      sender(listOf(ServerWindowSetChangedEvent(windows)))
-
-      clientLoadNotifier.send(Unit)
-
-      for (frame in incoming) {
-        // maintaining connection
-      }
-    }
-    server.start()
-
+  fun `should not show not existing window 2 when parameter is presented`() {
     open("$clientUrl&ideWindow=2")
 
     runBlocking {
       clientLoadNotifier.receive()
     }
     elements("canvas.window").shouldHave(size(0))
-
-    server.stop(500, 1000)
   }
 }

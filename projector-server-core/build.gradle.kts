@@ -154,7 +154,6 @@ dependencies {
     setupMarkdownDependency()
   }
 
-  testImplementation(kotlin("test", kotlinVersion))
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
   testImplementation("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion") {
@@ -169,6 +168,8 @@ dependencies {
   intTestImplementation("io.ktor:ktor-client-cio:$ktorVersion")
   intTestImplementation(kotlin("test", kotlinVersion))
   intTestImplementation(kotlin("test-junit5", kotlinVersion))
+  intTestImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+  intTestImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
 }
 
 val copyProjectorClientWebDistributionToResources = task<Copy>("copyProjectorClientWebDistributionToResources") {

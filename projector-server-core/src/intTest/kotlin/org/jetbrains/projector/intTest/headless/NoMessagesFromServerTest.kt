@@ -27,6 +27,7 @@ import com.codeborne.selenide.Condition.*
 import com.codeborne.selenide.Configuration
 import com.codeborne.selenide.Selenide.element
 import com.codeborne.selenide.Selenide.open
+import io.kotest.core.spec.style.AnnotationSpec
 import io.ktor.server.engine.ApplicationEngine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -37,11 +38,8 @@ import org.jetbrains.projector.common.protocol.toServer.ClientRequestPingEvent
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
 import kotlin.properties.Delegates
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
 
-class NoMessagesFromServerTest {
+class NoMessagesFromServerTest : AnnotationSpec() {
 
   private companion object {
 
@@ -53,25 +51,25 @@ class NoMessagesFromServerTest {
     }
   }
 
-  private var oldTimeout by Delegates.notNull<Long>()
-  private lateinit var clientLoadNotifier: Channel<Unit>
-  private lateinit var server: ApplicationEngine
+  var oldTimeout by Delegates.notNull<Long>()
+  lateinit var clientLoadNotifier: Channel<Unit>
+  lateinit var server: ApplicationEngine
 
-  @BeforeTest
-  fun before() {
+  @BeforeEach
+  fun beforeTest() {
     oldTimeout = Configuration.timeout
     Configuration.timeout = TIMEOUT
     clientLoadNotifier = Channel()
   }
 
-  @AfterTest
-  fun after() {
+  @AfterEach
+  fun afterTest() {
     server.stop(500, 1000)
     Configuration.timeout = oldTimeout
   }
 
   @Test
-  fun shouldShowWarningAndReconnectWhenNoMessagesFromServer() {
+  fun `should show warning and reconnect when no messages from server`() {
     var canDoHandshake = true
 
     server = startServerAndDoHandshake(
@@ -107,7 +105,7 @@ class NoMessagesFromServerTest {
   }
 
   @Test
-  fun shouldNotShowWarningWhenMessagesFromServer() {
+  fun `should not show warning when messages from server`() {
     server = startServerAndDoHandshake { (_, receiver) ->
       clientLoadNotifier.send(Unit)
 
@@ -131,7 +129,7 @@ class NoMessagesFromServerTest {
   }
 
   @Test
-  fun shouldHideWarningWhenReconnectedToReplyingServer() {
+  fun `should hide warning when reconnected to replying server`() {
     var canDoHandshake = true
     var canAnswerPing = false
 

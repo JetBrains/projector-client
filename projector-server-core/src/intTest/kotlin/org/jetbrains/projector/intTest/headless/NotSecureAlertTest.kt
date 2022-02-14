@@ -26,13 +26,14 @@ package org.jetbrains.projector.intTest.headless
 import com.codeborne.selenide.Selenide
 import com.codeborne.selenide.Selenide.confirm
 import com.codeborne.selenide.WebDriverRunner
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 import org.jetbrains.projector.intTest.ConnectionUtil
 import org.openqa.selenium.JavascriptExecutor
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
-class NotSecureAlertTest {
+class NotSecureAlertTest : AnnotationSpec() {
 
   private companion object {
 
@@ -48,29 +49,27 @@ class NotSecureAlertTest {
   }
 
   @Test
-  fun shouldWarnOnNotSecureConnection() {
+  fun `should warn on not secure connection`() {
     val server = ConnectionUtil.hostFiles(port, host)
     server.start()
     openClientAndActivatePage("http://$host:$port/index.html")
 
-    assertTrue(isAlertPresent())
+    isAlertPresent().shouldBeTrue()
     confirm()
-    assertFalse(
-      (WebDriverRunner.getWebDriver() as JavascriptExecutor).executeScript("return window.isSecureContext;") as Boolean,
-      "The context should be insecure in this test",
-    )
+    withClue("The context should be insecure in this test") {
+      ((WebDriverRunner.getWebDriver() as JavascriptExecutor).executeScript("return window.isSecureContext;") as Boolean).shouldBeFalse()
+    }
     server.stop(500, 1000)
   }
 
   @Test
-  fun shouldNotWarnOnSecureConnection() {
+  fun `should not warn on secure connection`() {
     openClientAndActivatePage(
       ConnectionUtil.clientUrl)  // local files are meant as secure: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts#When_is_a_context_considered_secure
 
-    assertFalse(isAlertPresent())
-    assertTrue(
-      (WebDriverRunner.getWebDriver() as JavascriptExecutor).executeScript("return window.isSecureContext;") as Boolean,
-      "The context should be secure in this test",
-    )
+    isAlertPresent().shouldBeFalse()
+    withClue("The context should be secure in this test") {
+      ((WebDriverRunner.getWebDriver() as JavascriptExecutor).executeScript("return window.isSecureContext;") as Boolean).shouldBeTrue()
+    }
   }
 }
