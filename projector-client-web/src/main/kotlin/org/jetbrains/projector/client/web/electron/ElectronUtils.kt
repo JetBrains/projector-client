@@ -33,9 +33,14 @@ internal fun isElectron(): Boolean {
     return true
   }
 
-  // Main process
-  if (isDefined(process) && jsTypeOf(process.versions) == "object" && jsBoolean(process.versions.electron)) {
-    return true
+  try {
+    // Main process
+    if (isDefined(process) && jsTypeOf(process.versions) == "object" && jsBoolean(process.versions.electron)) {
+      return true
+    }
+  }
+  catch (_: Throwable) {
+    // Began to throw 'ReferenceError: process is not defined' after we switched to JS IR
   }
 
   // Detect the user agent when the `nodeIntegration` option is set to true
