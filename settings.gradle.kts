@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 pluginManagement {
+  val composeVersion: String by settings
   val gradleMkdocsPluginVersion: String by settings
   val kotlinVersion: String by settings
   val symZipVersion: String by settings
@@ -40,6 +41,7 @@ pluginManagement {
     kotlin("js") version kotlinVersion apply false
     kotlin("jvm") version kotlinVersion apply false
     kotlin("plugin.serialization") version kotlinVersion apply false
+    id("org.jetbrains.compose") version composeVersion apply false
     id("org.paleozogt.symzip") version symZipVersion apply false
     id("ru.vyarus.mkdocs") version gradleMkdocsPluginVersion apply false
   }

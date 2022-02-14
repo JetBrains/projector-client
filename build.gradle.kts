@@ -41,6 +41,7 @@ subprojects {
     mavenCentral()
     maven("https://www.jetbrains.com/intellij-repository/releases")
     maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 
   tasks.withType<JavaCompile> {

@@ -25,19 +25,14 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDistributionDsl
 
 plugins {
   kotlin("js")
+  id("org.jetbrains.compose")
 }
 
 val coroutinesVersion: String by project
 val istanbulInstrumenterLoaderVersion: String by project
 val karmaCoverageIstanbulReporter: String by project
-val kotlinReactVersion: String by project
-val kotlinStyledComponentsVersion: String by project
 val kotlinVersion: String by project
-val radiumVersion: String by project
-val reactVersion: String by project
-val reactLoadingIndicatorVersion: String by project
 val serializationVersion: String by project
-val styledComponentsVersion: String by project
 
 dependencies {
   implementation(project(":projector-common"))
@@ -48,13 +43,11 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
 
-  implementation("org.jetbrains.kotlin-wrappers:kotlin-react:$kotlinReactVersion")
-  implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:$kotlinReactVersion")
-  implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$kotlinStyledComponentsVersion")
-  implementation(npm("radium", radiumVersion))
-  implementation(npm("react-loading-indicator", reactLoadingIndicatorVersion))
   implementation(npm("istanbul-instrumenter-loader", istanbulInstrumenterLoaderVersion))
   implementation(npm("karma-coverage-istanbul-reporter", karmaCoverageIstanbulReporter))
+
+  implementation(compose.web.core)
+  implementation(compose.runtime)
 
   testImplementation(kotlin("test", kotlinVersion))
 }

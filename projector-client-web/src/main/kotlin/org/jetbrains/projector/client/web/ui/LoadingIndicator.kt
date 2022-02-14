@@ -21,32 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-@file:JsModule("react-loading-indicator")
-@file:JsNonModule
+package org.jetbrains.projector.client.web.ui
 
-package org.jetbrains.projector.client.web.externalDeclarartion
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.dom.Div
 
-import react.ComponentClass
-import react.Props
-
-@JsName("default")
-external val loadingIndicator: ComponentClass<LoadingIndicatorProps>
-
-external interface LoadingIndicatorProps : Props {
-
-  var color: Color
-  var segments: Int
-  var segmentWidth: Double
-  var segmentLength: Double
-  var spacing: Double
-  var fadeTo: Double
-  var fadeSteps: Double
-}
-
-external interface Color {
-
-  var red: Int
-  var green: Int
-  var blue: Int
-  var alpha: Double
+@Composable
+fun LoadingIndicator() {
+  Div({ classes("lds-spinner") }) {
+    repeat(12) {
+      Div()
+    }
+  }
 }
