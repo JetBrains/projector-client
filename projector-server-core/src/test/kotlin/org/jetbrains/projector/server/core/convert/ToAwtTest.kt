@@ -23,16 +23,18 @@
  */
 package org.jetbrains.projector.server.core.convert
 
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.common.protocol.data.VK
 import org.jetbrains.projector.server.core.convert.toAwt.codesMap
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class ToAwtTest {
-
+class ToAwtTest : AnnotationSpec() {
   @Test
-  fun testCodesMapKeys() {
+  fun `codes map keys shouldn't have missing keys`() {
     val difference = VK.values().toSet() - codesMap.keys
-    assertEquals(0, difference.size, "codesMap has missing keys: $difference")
+    withClue("codesMap has missing keys: $difference") {
+      difference.size shouldBe 0
+    }
   }
 }

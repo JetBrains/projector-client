@@ -23,15 +23,15 @@
  */
 package org.jetbrains.projector.server.core.convert
 
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.common.protocol.toClient.Flush
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawStringEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerSetFontEvent
 import org.jetbrains.projector.server.core.convert.toClient.shrinkEvents
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class ToClientTransformShrinkEvents {
+class ToClientTransformShrinkEvents : AnnotationSpec() {
 
   @Test
   fun testSimple() {
@@ -53,7 +53,7 @@ class ToClientTransformShrinkEvents {
         ),
       ),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 
   @Test
@@ -89,7 +89,7 @@ class ToClientTransformShrinkEvents {
         ),
       ),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 
   @Test
@@ -116,7 +116,7 @@ class ToClientTransformShrinkEvents {
         ),
       ),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 
   @Test
@@ -140,7 +140,7 @@ class ToClientTransformShrinkEvents {
         ),
       ),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 
   @Test
@@ -216,6 +216,6 @@ class ToClientTransformShrinkEvents {
         ),
       ),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 }

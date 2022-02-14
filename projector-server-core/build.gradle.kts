@@ -50,6 +50,7 @@ val intellijMarkdownPluginVersion: String by project
 val javassistVersion: String by project
 val javaWebSocketVersion: String by project
 val jsoupVersion: String by project
+val kotestVersion: String by project
 val kotlinVersion: String by project
 val ktorVersion: String by project
 val selenideVersion: String by project
@@ -154,6 +155,8 @@ dependencies {
   }
 
   testImplementation(kotlin("test", kotlinVersion))
+  testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+  testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
   testImplementation("com.jetbrains.intellij.markdown:markdown:$intellijMarkdownPluginVersion") {
     setupMarkdownDependency()
   }

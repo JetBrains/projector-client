@@ -23,15 +23,14 @@
  */
 package org.jetbrains.projector.server.core.ij.md
 
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.types.shouldBeSameInstanceAs
 import org.jetbrains.projector.server.core.ij.IjInjectorAgentInitializer
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
-class MarkdownPanelTest {
-
+class MarkdownPanelTest : AnnotationSpec() {
   @Test
-  fun testPanelName() {
-    assertEquals(IjInjectorAgentInitializer.MD_PANEL_CLASS_NAME, ProjectorMarkdownPanel::class.java.name)
+  fun `panel name should be correct`() {
+    ProjectorMarkdownPanel::class.java.name.shouldBeSameInstanceAs(IjInjectorAgentInitializer.MD_PANEL_CLASS_NAME)
   }
-
 }
+

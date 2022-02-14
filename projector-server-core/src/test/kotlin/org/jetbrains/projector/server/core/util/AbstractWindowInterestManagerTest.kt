@@ -23,74 +23,76 @@
  */
 package org.jetbrains.projector.server.core.util
 
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.common.protocol.toClient.ServerClipboardEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerPingReplyEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerWindowSetChangedEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowInterestEvent
-import kotlin.test.*
 
-class AbstractWindowInterestManagerTest {
-  private class DummyRedrawImpl : AbstractWindowDrawInterestManager() {
+class AbstractWindowInterestManagerTest : AnnotationSpec() {
+  class DummyRedrawImpl : AbstractWindowDrawInterestManager() {
     var repaintCounter = 0
       private set
+
     override fun redrawWindow(id: Int) {
       repaintCounter++
     }
   }
 
+  private lateinit var interestManager: DummyRedrawImpl
 
-  @Test
-  fun `test interested by default`() {
-    val interestManager = DummyRedrawImpl()
-
-    assertTrue(interestManager.isInterestedInWindow(0))
+  @BeforeEach
+  fun beforeTest() {
+    interestManager = DummyRedrawImpl()
   }
 
   @Test
-  fun `test disinterest event handle`() {
-    val interestManager = DummyRedrawImpl()
+  fun `should interested by default`() {
+    interestManager.isInterestedInWindow(0).shouldBeTrue()
+  }
 
-    assertTrue(interestManager.isInterestedInWindow(0))
+  @Test
+  fun `disinterest event should handle`() {
+    interestManager.isInterestedInWindow(0).shouldBeTrue()
 
     interestManager.processClientEvent(ClientWindowInterestEvent(0, false))
-    assertFalse(interestManager.isInterestedInWindow(0))
+    interestManager.isInterestedInWindow(0).shouldBeFalse()
 
     interestManager.processClientEvent(ClientWindowInterestEvent(0, true))
-    assertTrue(interestManager.isInterestedInWindow(0))
+    interestManager.isInterestedInWindow(0).shouldBeTrue()
   }
 
   @Test
-  fun `test different windows not interfering`() {
-    val interestManager = DummyRedrawImpl()
-
+  fun `different windows should not interfering`() {
     interestManager.processClientEvent(ClientWindowInterestEvent(1, false))
-    assertTrue(interestManager.isInterestedInWindow(0))
+    interestManager.isInterestedInWindow(0).shouldBeTrue()
 
     interestManager.processClientEvent(ClientWindowInterestEvent(0, false))
-    assertFalse(interestManager.isInterestedInWindow(0))
+    interestManager.isInterestedInWindow(0).shouldBeFalse()
 
     interestManager.processClientEvent(ClientWindowInterestEvent(0, true))
-    assertTrue(interestManager.isInterestedInWindow(0))
-    assertFalse(interestManager.isInterestedInWindow(1))
+    interestManager.isInterestedInWindow(0).shouldBeTrue()
+    interestManager.isInterestedInWindow(1).shouldBeFalse()
   }
 
   @Test
-  fun `test repeated events are idempotent`() {
-    val interestManager = DummyRedrawImpl()
-
+  fun `repeated events should be idempotent`() {
     interestManager.processClientEvent(ClientWindowInterestEvent(0, false))
     interestManager.processClientEvent(ClientWindowInterestEvent(0, false))
-    assertFalse(interestManager.isInterestedInWindow(0))
+    interestManager.isInterestedInWindow(0).shouldBeFalse()
 
     interestManager.processClientEvent(ClientWindowInterestEvent(0, true))
     interestManager.processClientEvent(ClientWindowInterestEvent(0, true))
-    assertTrue(interestManager.isInterestedInWindow(0))
+    interestManager.isInterestedInWindow(0).shouldBeTrue()
   }
 
   @Test
-  fun `test event filtering on clean interest manager keeps sequence instance`() {
-    val interestManager = DummyRedrawImpl()
+  fun `event filtering on clean interest manager should keep sequence instance`() {
     val sampleEvents = listOf(
       ServerWindowSetChangedEvent(),
     )
@@ -99,12 +101,13 @@ class AbstractWindowInterestManagerTest {
 
     val filteredSequence = interestManager.filterEvents(sourceSequence)
 
-    assertEquals(sourceSequence, filteredSequence, "Clean interest manager should return the same sequence")
+    withClue("Clean interest manager should return the same sequence") {
+      filteredSequence shouldBe sourceSequence
+    }
   }
 
   @Test
-  fun `test event filtering on fully interested interest manager keeps sequence instance`() {
-    val interestManager = DummyRedrawImpl()
+  fun `event filtering on fully interested interest manager should keep sequence instance`() {
     val sampleEvents = listOf(
       ServerWindowSetChangedEvent(),
     )
@@ -116,12 +119,13 @@ class AbstractWindowInterestManagerTest {
 
     val filteredSequence = interestManager.filterEvents(sourceSequence)
 
-    assertEquals(sourceSequence, filteredSequence, "Clean interest manager should return the same sequence")
+    withClue("Clean interest manager should return the same sequence") {
+      filteredSequence shouldBe sourceSequence
+    }
   }
 
   @Test
-  fun `test event filtering keeps non-draw events`() {
-    val interestManager = DummyRedrawImpl()
+  fun `event filtering should keep non-draw events`() {
     val sampleEvents = listOf(
       ServerWindowSetChangedEvent(),
       ServerClipboardEvent("a"),
@@ -133,12 +137,13 @@ class AbstractWindowInterestManagerTest {
 
     val filteredEvents = interestManager.filterEvents(sampleEvents.asSequence()).toList()
 
-    assertContentEquals(sampleEvents, filteredEvents, "Non-draw events should not be filtered out")
+    withClue("Non-draw events should not be filtered out") {
+      filteredEvents shouldBe sampleEvents
+    }
   }
 
   @Test
-  fun `test event filtering keeps interested events`() {
-    val interestManager = DummyRedrawImpl()
+  fun `event filtering should keep interested events`() {
     val sampleEvents = listOf(
       ServerDrawCommandsEvent(ServerDrawCommandsEvent.Target.Onscreen(0)),
       ServerDrawCommandsEvent(ServerDrawCommandsEvent.Target.Onscreen(1)),
@@ -148,12 +153,15 @@ class AbstractWindowInterestManagerTest {
 
     val filteredEvents = interestManager.filterEvents(sampleEvents.asSequence()).toList()
 
-    assertTrue(filteredEvents.all { it is ServerDrawCommandsEvent && (it.target as ServerDrawCommandsEvent.Target.Onscreen).windowId == 1 }, "Interested events should not be filtered out")
+    withClue("Interested events should not be filtered out") {
+      filteredEvents.all {
+        it is ServerDrawCommandsEvent && (it.target as ServerDrawCommandsEvent.Target.Onscreen).windowId == 1
+      }.shouldBeTrue()
+    }
   }
 
   @Test
-  fun `test event filtering discards disinterested events 1`() {
-    val interestManager = DummyRedrawImpl()
+  fun `event filtering should discard disinterested events 1`() {
     val sampleEvents = listOf(
       ServerDrawCommandsEvent(ServerDrawCommandsEvent.Target.Onscreen(0)),
       ServerDrawCommandsEvent(ServerDrawCommandsEvent.Target.Onscreen(1)),
@@ -163,13 +171,13 @@ class AbstractWindowInterestManagerTest {
     interestManager.processClientEvent(ClientWindowInterestEvent(1, false))
 
     val filteredEvents = interestManager.filterEvents(sampleEvents.asSequence()).toList()
-
-    assertTrue(filteredEvents.isEmpty(), "Disinterested events should be filtered out")
+    withClue("Disinterested events should be filtered out") {
+      filteredEvents.isEmpty().shouldBeTrue()
+    }
   }
 
   @Test
-  fun `test event filtering discards disinterested events 2`() {
-    val interestManager = DummyRedrawImpl()
+  fun `event filtering should discard disinterested events 2`() {
     val sampleEvents = listOf(
       ServerDrawCommandsEvent(ServerDrawCommandsEvent.Target.Onscreen(0)),
       ServerDrawCommandsEvent(ServerDrawCommandsEvent.Target.Onscreen(1)),
@@ -179,29 +187,38 @@ class AbstractWindowInterestManagerTest {
 
     val filteredEvents = interestManager.filterEvents(sampleEvents.asSequence()).toList()
 
-    assertTrue(filteredEvents.all { it is ServerDrawCommandsEvent && (it.target as ServerDrawCommandsEvent.Target.Onscreen).windowId == 1 }, "Events should be filtered out precisely")
+    withClue("Events should be filtered out precisely") {
+      filteredEvents.all {
+        it is ServerDrawCommandsEvent && (it.target as ServerDrawCommandsEvent.Target.Onscreen).windowId == 1
+      }.shouldBeTrue()
+    }
   }
 
   @Test
-  fun `test gaining interest triggers abstract redraw`() {
-    val interestManager = DummyRedrawImpl()
-
+  fun `gaining interest should trigger abstract redraw`() {
     val windowId = 0
 
-    assertEquals(0, interestManager.repaintCounter)
+    interestManager.repaintCounter shouldBe 0
 
     interestManager.processClientEvent(ClientWindowInterestEvent(windowId, false))
-    assertEquals(0, interestManager.repaintCounter, "interest loss should not trigger repaint")
+    withClue("interest loss should not trigger repaint") {
+      interestManager.repaintCounter shouldBe 0
+    }
 
     interestManager.processClientEvent(ClientWindowInterestEvent(windowId, true))
-    assertEquals(1, interestManager.repaintCounter, "interest gain should trigger repaint")
+    withClue("interest gain should trigger repaint") {
+      interestManager.repaintCounter shouldBe 1
+    }
 
     interestManager.processClientEvent(ClientWindowInterestEvent(windowId, true))
-    assertEquals(1, interestManager.repaintCounter, "repeated interest gain should not trigger repaint")
+    withClue("repeated interest gain should not trigger repaint") {
+      interestManager.repaintCounter shouldBe 1
+    }
 
     interestManager.processClientEvent(ClientWindowInterestEvent(windowId, false))
     interestManager.processClientEvent(ClientWindowInterestEvent(windowId, true))
-    assertEquals(2, interestManager.repaintCounter, "interest gain should trigger repaint")
-
+    withClue("interest gain should trigger repaint") {
+      interestManager.repaintCounter shouldBe 2
+    }
   }
 }

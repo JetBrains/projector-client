@@ -23,14 +23,14 @@
  */
 package org.jetbrains.projector.server.core.util
 
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.shouldBe
 import org.jetbrains.projector.common.protocol.toClient.Flush
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawCommandsEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerDrawStringEvent
 import org.jetbrains.projector.common.protocol.toClient.ServerSetFontEvent
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class DistinctUpdatedOnscreenSurfacesTest {
+class DistinctUpdatedOnscreenSurfacesTest : AnnotationSpec() {
 
   @Test
   fun testSimple() {
@@ -49,7 +49,7 @@ class DistinctUpdatedOnscreenSurfacesTest {
     val expected = listOf(
       ServerDrawCommandsEvent.Target.Onscreen(1),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 
   @Test
@@ -77,7 +77,7 @@ class DistinctUpdatedOnscreenSurfacesTest {
       ServerDrawCommandsEvent.Target.Onscreen(1),
       ServerDrawCommandsEvent.Target.Onscreen(3),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 
   @Test
@@ -104,7 +104,7 @@ class DistinctUpdatedOnscreenSurfacesTest {
     val expected = listOf(
       ServerDrawCommandsEvent.Target.Onscreen(1),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 
   @Test
@@ -121,7 +121,7 @@ class DistinctUpdatedOnscreenSurfacesTest {
     )
     val actual = initial.distinctUpdatedOnscreenSurfaces()
     val expected = emptyList<ServerDrawCommandsEvent.Target.Onscreen>()
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 
   @Test
@@ -174,6 +174,6 @@ class DistinctUpdatedOnscreenSurfacesTest {
       ServerDrawCommandsEvent.Target.Onscreen(1),
       ServerDrawCommandsEvent.Target.Onscreen(3),
     )
-    assertEquals(expected, actual)
+    actual shouldBe expected
   }
 }
