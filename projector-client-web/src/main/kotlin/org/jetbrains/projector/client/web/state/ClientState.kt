@@ -38,6 +38,7 @@ import org.jetbrains.projector.client.common.protocol.KotlinxJsonToClientHandsha
 import org.jetbrains.projector.client.common.protocol.KotlinxJsonToServerHandshakeEncoder
 import org.jetbrains.projector.client.web.ServerEventsProcessor
 import org.jetbrains.projector.client.web.WindowSizeController
+import org.jetbrains.projector.client.web.component.EmbeddedBrowserManager
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.debug.DivSentReceivedBadgeShower
 import org.jetbrains.projector.client.web.debug.NoSentReceivedBadgeShower
@@ -411,6 +412,10 @@ sealed class ClientState {
       stateMachine.fire(ClientAction.AddEvent(ClientOpenLinkEvent(link)))
     }
 
+    private val embeddedBrowserManager = EmbeddedBrowserManager(windowManager::getWindowZIndex) { link ->
+      stateMachine.fire(ClientAction.AddEvent(ClientOpenLinkEvent(link)))
+    }
+
     private val closeBlocker = when (ParamsProvider.BLOCK_CLOSING) {
       true -> CloseBlockerImpl(window)
       false -> NopCloseBlocker
@@ -440,7 +445,7 @@ sealed class ClientState {
         val decompressTimeStamp = TimeStamp.current
         val commands = decoder.decode(decompressed)
         val decodeTimestamp = TimeStamp.current
-        serverEventsProcessor.process(commands, pingStatistics, typing, markdownPanelManager, inputController)
+        serverEventsProcessor.process(commands, pingStatistics, typing, markdownPanelManager, embeddedBrowserManager, inputController)
         val drawTimestamp = TimeStamp.current
 
         imageCacher.collectGarbage()
@@ -558,6 +563,7 @@ sealed class ClientState {
             windowSizeController.removeListener()
             typing.dispose()
             markdownPanelManager.disposeAll()
+            embeddedBrowserManager.disposeAll()
             closeBlocker.removeListener()
             selectionBlocker.unblockSelection()
             connectionWatcher.removeWatcher()
@@ -592,6 +598,7 @@ sealed class ClientState {
       return WaitingOpening(stateMachine, newConnection, windowSizeController, layers) {
         windowDataEventsProcessor.onClose()
         markdownPanelManager.disposeAll()
+        embeddedBrowserManager.disposeAll()
         closeBlocker.removeListener()
         selectionBlocker.unblockSelection()
         layers.reconnectionMessageUpdater(null)

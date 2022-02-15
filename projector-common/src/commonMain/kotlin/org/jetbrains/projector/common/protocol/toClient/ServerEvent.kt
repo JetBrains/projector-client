@@ -242,3 +242,78 @@ data class ServerWindowColorsEvent(
     val windowHeaderInactiveText: PaintValue.Color,
   )
 }
+
+@Serializable
+sealed class ServerBrowserEvent : ServerEvent() {
+
+  @Serializable
+  @SerialName("q")
+  data class ExecuteJsEvent(
+    @SerialName("a")
+    val browserId: Int,
+    @SerialName("b")
+    val code: String,
+    @SerialName("c")
+    val url: String?,
+    @SerialName("d")
+    val line: Int,
+  ) : ServerBrowserEvent()
+
+  @Serializable
+  @SerialName("r")
+  data class SetHtmlEvent(
+    @SerialName("a")
+    val browserId: Int,
+    @SerialName("b")
+    val html: String,
+  ) : ServerBrowserEvent()
+
+  @Serializable
+  @SerialName("s")
+  data class LoadUrlEvent(
+    @SerialName("a")
+    val browserId: Int,
+    @SerialName("b")
+    val url: String,
+    @SerialName("c")
+    val show: Boolean,
+  ) : ServerBrowserEvent()
+
+  @Serializable
+  @SerialName("t")
+  data class ShowEvent(
+    @SerialName("a")
+    val browserId: Int,
+    @SerialName("b")
+    val show: Boolean,
+    @SerialName("c")
+    val windowId: Int?,
+  ) : ServerBrowserEvent()
+
+  @Serializable
+  @SerialName("u")
+  data class MoveEvent(
+    @SerialName("a")
+    val browserId: Int,
+    @SerialName("b")
+    val position: Point,
+  ) : ServerBrowserEvent()
+
+  @Serializable
+  @SerialName("v")
+  data class ResizeEvent(
+    @SerialName("a")
+    val browserId: Int,
+    @SerialName("b")
+    val size: CommonIntSize,
+  ) : ServerBrowserEvent()
+
+  @Serializable
+  @SerialName("w")
+  data class SetOpenLinksInExternalBrowserEvent(
+    @SerialName("a")
+    val browserId: Int,
+    @SerialName("b")
+    val openLinksInExternalBrowser: Boolean,
+  ) : ServerBrowserEvent()
+}

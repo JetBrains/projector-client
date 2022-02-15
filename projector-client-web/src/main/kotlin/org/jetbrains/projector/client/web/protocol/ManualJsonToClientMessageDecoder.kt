@@ -67,6 +67,13 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "n" -> ServerMarkdownEvent.ServerMarkdownScrollEvent(content["a"] as Int, content["b"] as Int)
       "o" -> ServerBrowseUriEvent(content["a"] as String)
       "p" -> ServerWindowColorsEvent(content["a"].unsafeCast<Json>().toColorsStorage())
+      "q" -> ServerBrowserEvent.ExecuteJsEvent(content["a"] as Int, content["b"] as String, content["c"] as String?, content["d"] as Int)
+      "r" -> ServerBrowserEvent.SetHtmlEvent(content["a"] as Int, content["b"] as String)
+      "s" -> ServerBrowserEvent.LoadUrlEvent(content["a"] as Int, content["b"] as String, content["c"] as Boolean)
+      "t" -> ServerBrowserEvent.ShowEvent(content["a"] as Int, content["b"] as Boolean, content["c"] as? Int)
+      "u" -> ServerBrowserEvent.MoveEvent(content["a"] as Int, content["b"].unsafeCast<Json>().toPoint())
+      "v" -> ServerBrowserEvent.ResizeEvent(content["a"] as Int, content["b"].unsafeCast<Json>().toCommonIntSize())
+      "w" -> ServerBrowserEvent.SetOpenLinksInExternalBrowserEvent(content["a"] as Int, content["b"] as Boolean)
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }
   }

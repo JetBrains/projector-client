@@ -21,18 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.common.protocol.data
+package org.jetbrains.projector.ij.jcef
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+internal data class BrowserState(
+  val html: String,
+  val executedJs: List<JsCode>,
+  val openInExternalBrowser: Boolean,
+  val externalUrl: String,
+)
 
-@Serializable
-data class Point(
-  @SerialName("a")
-  val x: Double,
-  @SerialName("b")
-  val y: Double,
-) {
-
-  constructor(x: Int, y: Int): this(x.toDouble(), y.toDouble())
-}
+internal data class JsCode(
+  val code: String,
+  val url: String? = null,
+  val line: Int = 0,
+)

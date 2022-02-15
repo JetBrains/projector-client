@@ -21,18 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.common.protocol.data
+package org.jetbrains.projector.common.event
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import java.awt.Component
 
-@Serializable
-data class Point(
-  @SerialName("a")
-  val x: Double,
-  @SerialName("b")
-  val y: Double,
-) {
+sealed class ServerEventPart
 
-  constructor(x: Int, y: Int): this(x.toDouble(), y.toDouble())
-}
+data class BrowserShowEventPart(
+  val browserId: Int,
+  val show: Boolean,
+  val component: Component?,
+) : ServerEventPart()

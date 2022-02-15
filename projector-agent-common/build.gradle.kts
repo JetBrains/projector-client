@@ -37,9 +37,12 @@ publishToSpace("java")
 
 val javassistVersion: String by project
 val kotestVersion: String by project
+val kotlinVersion: String by project
 
 dependencies {
   implementation(project(":projector-util-loading"))
+
+  implementation(kotlin("reflect", kotlinVersion))
   implementation("org.javassist:javassist:$javassistVersion")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")

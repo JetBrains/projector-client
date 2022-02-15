@@ -32,7 +32,9 @@ import org.jetbrains.projector.util.logging.Logger
 import kotlin.js.json
 import kotlin.random.Random
 
-class Application {
+@OptIn(ExperimentalJsExport::class)
+@JsExport
+object Application {
 
   private val stateMachine = ClientStateMachine()
   private val windowSizeController = WindowSizeController(stateMachine)
@@ -70,6 +72,11 @@ class Application {
     stateMachine.runMainLoop()
   }
 
+  @Suppress("unused") // used from js code of jcef client side component
+  fun fireAction(action: ClientAction) {
+    stateMachine.fire(action)
+  }
+
   private fun setClipboardPermissions() {
     val permissions = window.navigator.permissions
 
@@ -85,16 +92,13 @@ class Application {
       }
   }
 
-  companion object {
+  private val logger = Logger<Application>()
 
-    private val logger = Logger<Application>()
+  private val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
-    private val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-
-    private fun generateKey(): String =
-      (1 .. 20)
-        .map { Random.nextInt(0, charPool.size) }
-        .map(charPool::get)
-        .joinToString("")
-  }
+  private fun generateKey(): String =
+    (1 .. 20)
+      .map { Random.nextInt(0, charPool.size) }
+      .map(charPool::get)
+      .joinToString("")
 }

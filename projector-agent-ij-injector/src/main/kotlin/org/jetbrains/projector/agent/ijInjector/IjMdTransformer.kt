@@ -23,13 +23,19 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
-import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.openapi.extensions.PluginId
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.BuildNumber
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.jcef.JBCefApp
 import javassist.CtClass
+import javassist.expr.*
+import org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel
+import org.jetbrains.projector.agent.common.assign
+import org.jetbrains.projector.agent.common.getDeclaredConstructor
 import org.jetbrains.projector.agent.common.transformation.TransformationResult
 import org.jetbrains.projector.agent.common.transformation.classForNameOrNull
+import org.jetbrains.projector.common.intellij.buildAtLeast
+import org.jetbrains.projector.common.intellij.buildInRange
 import org.jetbrains.projector.ij.md.markdownPlugin
 import org.jetbrains.projector.util.loading.ProjectorClassLoader
 import org.jetbrains.projector.util.loading.state.IdeState
@@ -45,6 +51,9 @@ internal object IjMdTransformer : IdeTransformerSetup<IjInjector.AgentParameters
   // language=java prefix="import " suffix=";"
   private const val previewFileEditorClass = "org.intellij.plugins.markdown.ui.preview.MarkdownPreviewFileEditor"
 
+  // No language injection because it leads to 'Usage of Kotlin internal declaration from different module'
+  private const val pipeImplClass = "org.intellij.plugins.markdown.ui.preview.jcef.impl.JcefBrowserPipeImpl"
+
   override val loadingState: IdeState
     get() = IdeState.CONFIGURATION_STORE_INITIALIZED
 
@@ -58,22 +67,29 @@ internal object IjMdTransformer : IdeTransformerSetup<IjInjector.AgentParameters
 
     val transformations = mutableMapOf<Class<*>, (CtClass) -> ByteArray?>()
 
-    transformations += listOf(
-      javaFxClass to MdPreviewType.JAVAFX,
-      jcefClass to MdPreviewType.JCEF,
-    ).mapNotNull { (className, previewType) ->
-      val clazz = classForNameOrNull(className, classLoader) ?: run {
-        transformationResultConsumer(TransformationResult.Skip(this, className, "Class not found"))
-        return@mapNotNull null
+    if (!parameters.jcefTransformerInUse) {
+      transformations += listOf(
+        javaFxClass to MdPreviewType.JAVAFX,
+        jcefClass to MdPreviewType.JCEF,
+      ).mapNotNull { (className, previewType) ->
+        val clazz = classForNameOrNull(className, classLoader) ?: run {
+          transformationResultConsumer(TransformationResult.Skip(this, className, "Class not found"))
+          return@mapNotNull null
+        }
+        clazz to previewType
+      }.associate { (clazz, previewType) ->
+        val foo = { ctClass: CtClass -> transformMdHtmlPanelProvider(previewType, ctClass, parameters.markdownPanelClassName, parameters.isAgent) }
+        clazz to foo
       }
-      clazz to previewType
-    }.associate { (clazz, previewType) ->
-      clazz to { ctClass -> transformMdHtmlPanelProvider(previewType, ctClass, parameters.markdownPanelClassName, parameters.isAgent) }
     }
 
-    if (!parameters.isAgent && isPreviewCheckIsBrokenInHeadless()) {
+    if (isPreviewCheckBroken()) {
       val previewFileEditor = Class.forName(previewFileEditorClass, false, classLoader)
       transformations[previewFileEditor] = ::fixMarkdownPreviewNPE
+    }
+
+    if (areResourcesProtected()) {
+      transformations += MarkdownJCEFHtmlPanel::class.java to ::transformMarkdownJCEFHtmlPanel
     }
 
     return transformations
@@ -94,13 +110,26 @@ internal object IjMdTransformer : IdeTransformerSetup<IjInjector.AgentParameters
     return markdownPlugin!!.pluginClassLoader!!
   }
 
-  private fun isPreviewCheckIsBrokenInHeadless(): Boolean {
-    val buildNumberMin = BuildNumber.fromString("201.0")!!
-    val buildNumberFixed = BuildNumber.fromString("212.0")!!
-    val markdownVersionString = PluginManagerCore.getPlugin(PluginId.getId("org.intellij.plugins.markdown"))!!.version
-    val markdownBuildNumber = BuildNumber.fromString(markdownVersionString)!!
-    return markdownBuildNumber >= buildNumberMin && markdownBuildNumber < buildNumberFixed
+  private fun transformMarkdownJCEFHtmlPanel(clazz: CtClass): ByteArray {
+
+    clazz
+      .getDeclaredConstructor(Project::class.java, VirtualFile::class.java)
+      .instrument(object : ExprEditor() {
+        override fun edit(e: NewExpr) {
+          if (e.className == pipeImplClass) {
+            // Disable whitelisting of allowed resources (because we inline them)
+            e.replace("$assign new $pipeImplClass(this, null);")
+          }
+        }
+      })
+
+
+    return clazz.toBytecode()
   }
+
+  private fun areResourcesProtected() = BuildNumber.fromString(markdownPlugin!!.version)!!.buildAtLeast("221")
+
+  private fun isPreviewCheckBroken() = BuildNumber.fromString(markdownPlugin!!.version)!!.buildInRange("201", "212")
 
   private fun fixMarkdownPreviewNPE(previewFileEditorClazz: CtClass): ByteArray {
 

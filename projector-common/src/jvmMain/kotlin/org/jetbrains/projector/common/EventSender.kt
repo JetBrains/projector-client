@@ -23,6 +23,7 @@
  */
 package org.jetbrains.projector.common
 
+import org.jetbrains.projector.common.event.ServerEventPart
 import org.jetbrains.projector.common.protocol.toClient.ServerEvent
 import org.jetbrains.projector.util.loading.ProjectorClassLoader
 import java.util.*
@@ -30,6 +31,8 @@ import java.util.*
 interface EventSender {
 
   fun sendEvent(event: ServerEvent)
+
+  fun sendEventPart(part: ServerEventPart)
 
   companion object {
 

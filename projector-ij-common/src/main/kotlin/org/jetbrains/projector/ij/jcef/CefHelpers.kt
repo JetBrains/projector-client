@@ -21,18 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.common.protocol.data
+@file:UseProjectorLoader
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+package org.jetbrains.projector.ij.jcef
 
-@Serializable
-data class Point(
-  @SerialName("a")
-  val x: Double,
-  @SerialName("b")
-  val y: Double,
-) {
+import org.cef.browser.CefMessageRouter
+import org.cef.callback.CefQueryCallback
+import org.cef.handler.CefClientHandler
+import org.cef.handler.CefMessageRouterHandler
+import org.jetbrains.projector.util.loading.UseProjectorLoader
 
-  constructor(x: Int, y: Int): this(x.toDouble(), y.toDouble())
+public fun CefClientHandler.getMessageRouters(): List<CefMessageRouter> {
+  return CefHandlers.getMessageRouters(this)
+}
+
+public fun CefMessageRouter.getHandlers(): List<CefMessageRouterHandler> {
+  return CefHandlers.getRouterHandlers(this)
+}
+
+public fun CefMessageRouterHandler.onProjectorQuery(projectorCefBrowser: ProjectorCefBrowser, query: String) {
+  println("Got query: $query")
+  onQuery(projectorCefBrowser, DEFAULT_FRAME, 0, query, false, DEFAULT_CALLBACK)
+}
+
+internal val DEFAULT_FRAME = ProjectorCefFrame()
+
+private val DEFAULT_CALLBACK = object : CefQueryCallback {
+  override fun success(response: String?) {
+    // TODO
+  }
+
+  override fun failure(error_code: Int, error_message: String?) {
+    // TODO
+  }
 }
