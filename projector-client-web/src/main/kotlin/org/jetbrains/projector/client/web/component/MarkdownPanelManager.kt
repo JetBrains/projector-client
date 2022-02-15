@@ -23,151 +23,25 @@
  */
 package org.jetbrains.projector.client.web.component
 
-import kotlinx.browser.document
 import kotlinx.dom.clear
-import org.jetbrains.projector.common.misc.Do
-import org.jetbrains.projector.common.protocol.data.CommonIntSize
-import org.jetbrains.projector.common.protocol.data.Point
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.Node
 import org.w3c.dom.get
 import org.w3c.dom.parsing.DOMParser
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.math.absoluteValue
 
-class MarkdownPanelManager(private val zIndexByWindowIdGetter: (Int) -> Int?, private val openInExternalBrowser: (String) -> Unit) {
+class MarkdownPanelManager(
+  zIndexByWindowIdGetter: (Int) -> Int?,
+  private val openInExternalBrowser: (String) -> Unit,
+) : ClientComponentManager<MarkdownPanelManager.MarkdownPanel>(zIndexByWindowIdGetter) {
 
-  private class MarkdownPanel(openInExternalBrowser: (String) -> Unit) {
+  class MarkdownPanel(id: Int, openInExternalBrowser: (String) -> Unit): ClientComponent(id) {
 
-    val iFrame: HTMLIFrameElement = createIFrame(openInExternalBrowser)
-
-    var windowId: Int? = null
-
-    fun dispose() {
-      iFrame.remove()
+    init {
+      setLinkProcessor(openInExternalBrowser)
     }
-
-    companion object {
-
-      private fun createIFrame(openInExternalBrowser: (String) -> Unit) = (document.createElement("iframe") as HTMLIFrameElement).apply {
-        style.apply {
-          position = "fixed"
-          backgroundColor = "#FFF"
-          overflowX = "scroll"
-          overflowY = "scroll"
-          display = "none"
-        }
-
-        frameBorder = "0"
-
-        document.body!!.appendChild(this)
-
-        // cancel auto-started load of about:blank in Firefox
-        // https://stackoverflow.com/questions/7828502/cannot-set-document-body-innerhtml-of-iframe-in-firefox
-        contentDocument!!.apply {
-          open()
-          close()
-        }
-
-        contentDocument!!.oncontextmenu = { false }
-
-        // adopted from processLinks.js
-        contentDocument!!.onclick = { e ->
-          var target = e.target.asDynamic()
-          while (target != null && target.tagName != "A") {
-            target = target.parentNode
-          }
-
-          if (target == null) {
-            true
-          }
-          else if (target.tagName == "A" && target.hasAttribute("href").unsafeCast<Boolean>()) {
-            e.stopPropagation()
-
-            val href = target.getAttribute("href").unsafeCast<String>()
-            if (href[0] == '#') {
-              val elementId = href.substring(1)
-              contentDocument!!.getElementById(elementId)?.scrollIntoView()
-            }
-            else {
-              openInExternalBrowser(href)
-            }
-
-            false
-          }
-          else {
-            null
-          }
-        }
-      }
-    }
-  }
-
-  private val idToPanel = mutableMapOf<Int, MarkdownPanel>()
-
-  private fun getOrCreate(markdownPanelId: Int): MarkdownPanel {
-    return idToPanel.getOrPut(markdownPanelId) { MarkdownPanel(openInExternalBrowser) }
-  }
-
-  fun placeToWindow(markdownPanelId: Int, windowId: Int) {
-    val panel = getOrCreate(markdownPanelId)
-
-    panel.windowId = windowId
-
-    val zIndex = zIndexByWindowIdGetter(windowId) ?: return
-
-    panel.iFrame.style.zIndex = (zIndex + 1).toString()
-  }
-
-  fun updatePlacements() {
-    idToPanel.forEach { (markdownPanelId, panel) ->
-      panel.windowId?.let { placeToWindow(markdownPanelId, it) }
-    }
-  }
-
-  fun show(markdownPanelId: Int, show: Boolean) {
-    val panel = getOrCreate(markdownPanelId)
-
-    Do exhaustive when (show) {
-      true -> panel.iFrame.style.display = "block"
-
-      false -> panel.iFrame.style.display = "none"
-    }
-  }
-
-  fun move(markdownPanelId: Int, point: Point) {
-    val panel = getOrCreate(markdownPanelId)
-
-    panel.iFrame.style.apply {
-      left = "${point.x}px"
-      top = "${point.y}px"
-    }
-  }
-
-  fun resize(markdownPanelId: Int, size: CommonIntSize) {
-    val panel = getOrCreate(markdownPanelId)
-
-    panel.iFrame.style.apply {
-      width = "${size.width}px"
-      height = "${size.height}px"
-    }
-  }
-
-  fun dispose(markdownPanelId: Int) {
-    val panel = getOrCreate(markdownPanelId)
-
-    panel.dispose()
-
-    idToPanel.remove(markdownPanelId)
-  }
-
-  fun disposeAll() {
-    idToPanel.values.forEach { it.dispose() }
-
-    idToPanel.clear()
   }
 
   fun setHtml(markdownPanelId: Int, html: String) {
@@ -216,6 +90,8 @@ class MarkdownPanelManager(private val zIndexByWindowIdGetter: (Int) -> Int?, pr
       logger.error(t) { "Can't scroll" }
     }
   }
+
+  override fun createComponent(componentId: Int) = MarkdownPanel(componentId, openInExternalBrowser)
 
   companion object {
 

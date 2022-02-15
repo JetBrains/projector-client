@@ -25,36 +25,37 @@ package org.jetbrains.projector.client.web.component
 
 import kotlinx.browser.document
 import org.jetbrains.projector.client.web.UriHandler
-import org.jetbrains.projector.common.misc.Do
-import org.jetbrains.projector.common.protocol.data.CommonIntSize
-import org.jetbrains.projector.common.protocol.data.Point
 import org.w3c.dom.*
 import org.w3c.dom.events.MouseEvent
 
-class EmbeddedBrowserManager(private val zIndexByWindowIdGetter: (Int) -> Int?, private val openInExternalBrowser: (String) -> Unit) {
+class EmbeddedBrowserManager(
+  zIndexByWindowIdGetter: (Int) -> Int?,
+  private val openInExternalBrowser: (String) -> Unit,
+) : ClientComponentManager<EmbeddedBrowserManager.EmbeddedBrowserPanel>(zIndexByWindowIdGetter){
 
-  private class EmbeddedBrowserPanel(private val id: Int, private val openInExternalBrowser: (String) -> Unit) {
-
-    init {
-      console.log("createPanel id: $id")
-    }
-
-    var openLinksInExternalBrowser: Boolean = false
-      private set
-
-    val iFrame: HTMLIFrameElement = createIFrame(id)
-
-    var windowId: Int? = null
-
-    private var previousClickHandler: ((MouseEvent) -> dynamic)? = null
-
-    fun dispose() {
-      iFrame.remove()
-    }
+  class EmbeddedBrowserPanel(id: Int, private val openInExternalBrowser: (String) -> Unit): ClientComponent(id) {
 
     var wasLoaded = false
 
+    private var openLinksInExternalBrowser: Boolean = false
+
+    private var previousClickHandler: ((MouseEvent) -> dynamic)? = null
+
     private val jsQueue = ArrayDeque<String>()
+
+    init {
+      iFrame.apply {
+        onload = {
+          setOpenLinksInExternalBrowser(openLinksInExternalBrowser, true)
+
+          wasLoaded = true
+          while (jsQueue.isNotEmpty()) {
+            val code = jsQueue.removeFirst()
+            executeJsImpl(code)
+          }
+        }
+      }
+    }
 
     fun setHtml(html: String) {
       iFrame.srcdoc = html
@@ -94,147 +95,15 @@ class EmbeddedBrowserManager(private val zIndexByWindowIdGetter: (Int) -> Int?, 
         previousClickHandler = iFrame.contentDocument?.onclick
       }
 
-      iFrame.contentDocument?.onclick = { e ->
-        var target = e.target.asDynamic()
-        while (target != null && target.tagName != "A") {
-          target = target.parentNode
-        }
-
-        if (target == null) {
-          true
-        }
-        else if (target.tagName == "A" && target.hasAttribute("href").unsafeCast<Boolean>()) {
-          e.stopPropagation()
-
-          val href = target.getAttribute("href").unsafeCast<String>()
-          if (href[0] == '#') {
-            val elementId = href.substring(1)
-            iFrame.contentDocument?.getElementById(elementId)?.scrollIntoView()
-          }
-          else {
-            openInExternalBrowser(href)
-          }
-
-          false
-        }
-        else {
-          null
-        }
-      }
+      setLinkProcessor(openInExternalBrowser)
     }
 
     fun setOpenLinksInExternalBrowser(openLinksInExternalBrowser: Boolean) = setOpenLinksInExternalBrowser(openLinksInExternalBrowser, false)
-
-    private fun createIFrame(browserId: Int) = (document.createElement("iframe") as HTMLIFrameElement).apply {
-      id = getIFrameId(browserId)
-      style.apply {
-        position = "fixed"
-        backgroundColor = "#FFF"
-        overflowX = "scroll"
-        overflowY = "scroll"
-        display = "none"
-      }
-
-      frameBorder = "0"
-
-      document.body!!.appendChild(this)
-
-      // cancel auto-started load of about:blank in Firefox
-      // https://stackoverflow.com/questions/7828502/cannot-set-document-body-innerhtml-of-iframe-in-firefox
-      contentDocument!!.apply {
-        open()
-        close()
-      }
-
-      contentDocument!!.oncontextmenu = { false }
-
-      onload = {
-        setOpenLinksInExternalBrowser(openLinksInExternalBrowser, true)
-
-        wasLoaded = true
-        while (jsQueue.isNotEmpty()) {
-          val code = jsQueue.removeFirst()
-          executeJsImpl(code)
-        }
-      }
-    }
-
-    companion object {
-
-      internal fun getIFrameId(browserId: Int) = "${EmbeddedBrowserPanel::class.simpleName}$browserId"
-    }
-  }
-
-  private val idToPanel = mutableMapOf<Int, EmbeddedBrowserPanel>()
-
-  private fun getOrCreate(browserId: Int): EmbeddedBrowserPanel {
-    return idToPanel.getOrPut(browserId) { EmbeddedBrowserPanel(browserId, openInExternalBrowser) }
-  }
-
-  private fun placeToWindow(browserId: Int, windowId: Int) {
-    val panel = getOrCreate(browserId)
-
-    panel.windowId = windowId
-
-    val zIndex = zIndexByWindowIdGetter(windowId) ?: return
-
-    panel.iFrame.style.zIndex = (zIndex + 1).toString()
-  }
-
-  fun updatePlacements() {
-    idToPanel.forEach { (browserId, panel) ->
-      panel.windowId?.let { placeToWindow(browserId, it) }
-    }
-  }
-
-  fun show(browserId: Int, show: Boolean, windowId: Int?) {
-    val panel = getOrCreate(browserId)
-
-    Do exhaustive when (show) {
-      true -> {
-        windowId?.also { placeToWindow(browserId, it) }
-        panel.iFrame.style.display = "block"
-      }
-
-      false -> panel.iFrame.style.display = "none"
-    }
-  }
-
-  fun move(browserId: Int, point: Point) {
-    val panel = getOrCreate(browserId)
-
-    panel.iFrame.style.apply {
-      left = "${point.x}px"
-      top = "${point.y}px"
-    }
-  }
-
-  fun resize(browserId: Int, size: CommonIntSize) {
-    val panel = getOrCreate(browserId)
-
-    panel.iFrame.style.apply {
-      width = "${size.width}px"
-      height = "${size.height}px"
-    }
   }
 
   fun setOpenLinksInExternalBrowser(browserId: Int, openLinksInExternalBrowser: Boolean) {
     val panel = getOrCreate(browserId)
     panel.setOpenLinksInExternalBrowser(openLinksInExternalBrowser)
-  }
-
-  fun dispose(browserId: Int) {
-    val panel = getOrCreate(browserId)
-
-    panel.dispose()
-
-    idToPanel.remove(browserId)
-  }
-
-  fun disposeAll() {
-    idToPanel.values.forEach { it.dispose() }
-
-    idToPanel.clear()
   }
 
   fun setHtml(browserId: Int, html: String) {
@@ -273,5 +142,7 @@ class EmbeddedBrowserManager(private val zIndexByWindowIdGetter: (Int) -> Int?, 
 
     panel.executeJs(code)
   }
+
+  override fun createComponent(componentId: Int) = EmbeddedBrowserPanel(componentId, openInExternalBrowser)
 
 }
