@@ -27,6 +27,11 @@ import com.codeborne.selenide.Condition.appear
 import com.codeborne.selenide.Configuration
 import com.codeborne.selenide.Selenide.element
 import com.codeborne.selenide.Selenide.open
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.collections.shouldBeSameSizeAs
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.ktor.server.engine.ApplicationEngine
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
@@ -44,7 +49,6 @@ import org.jetbrains.projector.common.protocol.toServer.ClientRawKeyEvent
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
 import org.jetbrains.projector.server.core.convert.toAwt.toAwtKeyEvent
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
 import java.awt.Robot
@@ -55,13 +59,9 @@ import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JTextArea
-import kotlin.test.Ignore
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 
 // todo: test not only IME
-class LowLevelKeyboardTest {
+class LowLevelKeyboardTest : AnnotationSpec() {
 
   private companion object {
 
@@ -169,7 +169,9 @@ class LowLevelKeyboardTest {
       }
 
       val keyEvents = allEvents.filterIsInstance<KeyEvent>()
-      assertEquals(allEvents.size, keyEvents.size, "Different sizes: keys $keyEvents, all $allEvents")
+      withClue("Different sizes: keys $keyEvents, all $allEvents") {
+        keyEvents.shouldBeSameSizeAs(allEvents)
+      }
 
       val expectedEvents = mutableListOf<KeyEvent>()
 
@@ -219,18 +221,25 @@ class LowLevelKeyboardTest {
           waitABit()
         }
 
-        assertNotEquals(0, expectedEvents.size, "No expected events received (actual key events size: ${keyEvents.size})...")
-        assertEquals(expectedInputText, textArea.text, "Wrong text is input")
-        assertEquals(expectedEvents.size, keyEvents.size,
-                     "Different sizes: actual ${keyEvents.toPrettyString()}, expected ${expectedEvents.toPrettyString()}")
+        withClue("No expected events received (actual key events size: ${keyEvents.size})...") {
+          expectedEvents.size shouldNotBe 0
+        }
+        withClue("Wrong text is input") {
+          textArea.text shouldBe expectedInputText
+        }
+        withClue("Different sizes: actual ${keyEvents.toPrettyString()}, expected ${expectedEvents.toPrettyString()}") {
+          keyEvents.size shouldBe expectedEvents.size
+        }
 
         expectedEvents.zip(keyEvents).forEachIndexed { i, (expected, actual) ->
           try {
-            assertEquals(expected.id, actual.id)
-            assertEquals(expected.modifiersEx, actual.modifiersEx)
-            assertEquals(expected.keyCode, actual.keyCode)
-            assertEquals(expected.keyChar, actual.keyChar, "expected int: ${expected.keyChar.code} but was int: ${actual.keyChar.code}")
-            assertEquals(expected.keyLocation, actual.keyLocation)
+            actual.id shouldBe expected.id
+            actual.modifiersEx shouldBe expected.modifiersEx
+            actual.keyCode shouldBe expected.keyCode
+            withClue("expected int: ${expected.keyChar.code} but was int: ${actual.keyChar.code}") {
+              actual.keyChar shouldBe expected.keyChar
+            }
+            actual.keyLocation shouldBe expected.keyLocation
           }
           catch (e: AssertionError) {
             throw AssertionError(
@@ -249,13 +258,13 @@ class LowLevelKeyboardTest {
   }
 
   @Test
-  fun testSimpleSymbol() = test("h") {
+  fun `'h' should be pressed and released`() = test("h") {
     keyPress(KeyEvent.VK_H)
     keyRelease(KeyEvent.VK_H)
   }
 
   @Test
-  fun testShiftedSimpleSymbol() = test("H") {
+  fun `'H' should be pressed and released`() = test("H") {
     keyPress(KeyEvent.VK_SHIFT)
     keyPress(KeyEvent.VK_H)
     keyRelease(KeyEvent.VK_H)
@@ -263,43 +272,43 @@ class LowLevelKeyboardTest {
   }
 
   @Test
-  fun testTab() = test("\t") {
+  fun `Tab should be pressed and released`() = test("\t") {
     keyPress(KeyEvent.VK_TAB)
     keyRelease(KeyEvent.VK_TAB)
   }
 
   @Test
-  fun testEnter() = test("\n") {
+  fun `Enter should be pressed and released`() = test("\n") {
     keyPress(KeyEvent.VK_ENTER)
     keyRelease(KeyEvent.VK_ENTER)
   }
 
   @Test
-  fun testBackspace() = test("") {
+  fun `Backspace should be pressed and released`() = test("") {
     keyPress(KeyEvent.VK_BACK_SPACE)
     keyRelease(KeyEvent.VK_BACK_SPACE)
   }
 
   @Test
-  fun testSpace() = test(" ") {
+  fun `Spase should be pressed and released`() = test(" ") {
     keyPress(KeyEvent.VK_SPACE)
     keyRelease(KeyEvent.VK_SPACE)
   }
 
   @Test
-  fun testEscape() = test("") {
+  fun `Escape should be pressed and released`() = test("") {
     keyPress(KeyEvent.VK_ESCAPE)
     keyRelease(KeyEvent.VK_ESCAPE)
   }
 
   @Test
-  fun testDelete() = test("") {
+  fun `Delete should be pressed and released`() = test("") {
     keyPress(KeyEvent.VK_DELETE)
     keyRelease(KeyEvent.VK_DELETE)
   }
 
   @Test
-  fun testCtrlLetter() = test("") {
+  fun `Letter should be pressed and released with Ctrl modifier`() = test("") {
     keyPress(KeyEvent.VK_CONTROL)
     keyPress(KeyEvent.VK_Z)
     keyRelease(KeyEvent.VK_Z)
@@ -307,13 +316,13 @@ class LowLevelKeyboardTest {
   }
 
   @Test
-  fun testFunctionalKey() = test("") {
+  fun `functional key should be pressed and released`() = test("") {
     keyPress(KeyEvent.VK_F6)
     keyRelease(KeyEvent.VK_F6)
   }
 
   @Test
-  fun testShiftedFunctionalKey() = test("") {
+  fun `functional key should be pressed and released with Shift modifier`() = test("") {
     keyPress(KeyEvent.VK_SHIFT)
     keyPress(KeyEvent.VK_F6)
     keyRelease(KeyEvent.VK_F6)
@@ -321,7 +330,7 @@ class LowLevelKeyboardTest {
   }
 
   @Test
-  fun testCtrlShiftedLetter() = test("") {
+  fun `letter should be pressed and released with Shift and Ctrl modifier`() = test("") {
     keyPress(KeyEvent.VK_CONTROL)
     keyPress(KeyEvent.VK_SHIFT)
     keyPress(KeyEvent.VK_K)
@@ -331,20 +340,20 @@ class LowLevelKeyboardTest {
   }
 
   @Test
-  fun testArrow() = test("") {
+  fun `arrow should be pressed and released`() = test("") {
     keyPress(KeyEvent.VK_RIGHT)
     keyRelease(KeyEvent.VK_RIGHT)
   }
 
   @Test
   @EnabledOnOs(OS.LINUX)
-  fun testNumpadEnterLinux() = test("\n") {
+  fun `numpad Enter should be pressed and released on Linux`() = test("\n") {
     Runtime.getRuntime().exec("xdotool key KP_Enter").waitFor()
   }
 
   @Test
   @EnabledOnOs(OS.LINUX)
-  fun testNumpadWithNumLockLinux() = test("5") {
+  fun `numpad should be pressed and released with num lock on Linux`() = test("5") {
     Runtime.getRuntime().exec("numlockx on").waitFor()
     keyPress(KeyEvent.VK_NUMPAD5)
     keyRelease(KeyEvent.VK_NUMPAD5)
@@ -353,7 +362,7 @@ class LowLevelKeyboardTest {
   @Test
   @EnabledOnOs(OS.LINUX)
   @Ignore  // todo: https://youtrack.jetbrains.com/issue/PRJ-301
-  fun testNumpadWithoutNumLockLinux() = test("") {
+  fun `numpad should be pressed and released without numlock on Linux`() = test("") {
     Runtime.getRuntime().exec("numlockx off").waitFor()
     keyPress(KeyEvent.VK_NUMPAD7)
     keyRelease(KeyEvent.VK_NUMPAD7)
@@ -362,7 +371,7 @@ class LowLevelKeyboardTest {
   @Test
   @EnabledOnOs(OS.LINUX)
   @Ignore  // todo: https://youtrack.jetbrains.com/issue/PRJ-194
-  fun testLinuxAltCode() = test("–") {
+  fun `Linux alt code should be typed`() = test("–") {
     keyPress(KeyEvent.VK_CONTROL)
     keyPress(KeyEvent.VK_SHIFT)
     keyPress(KeyEvent.VK_U)
@@ -381,7 +390,7 @@ class LowLevelKeyboardTest {
 
   @Test
   @EnabledOnOs(OS.MAC)
-  fun testMacAltCode() = test("–") {
+  fun `Mac alt code should be typed`() = test("–") {
     keyPress(KeyEvent.VK_ALT)
     keyPress(KeyEvent.VK_MINUS)
     keyRelease(KeyEvent.VK_MINUS)

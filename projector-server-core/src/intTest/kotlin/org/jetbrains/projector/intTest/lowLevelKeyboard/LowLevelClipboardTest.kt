@@ -26,6 +26,10 @@ package org.jetbrains.projector.intTest.lowLevelKeyboard
 import com.codeborne.selenide.Condition.appear
 import com.codeborne.selenide.Selenide.element
 import com.codeborne.selenide.Selenide.open
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.collections.shouldBeSameSizeAs
+import io.kotest.matchers.shouldBe
 import io.ktor.server.engine.ApplicationEngine
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
@@ -45,11 +49,9 @@ import org.openqa.selenium.Keys
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 // todo: test not only IME
-class LowLevelClipboardTest {
+class LowLevelClipboardTest : AnnotationSpec() {
 
   private companion object {
 
@@ -93,7 +95,7 @@ class LowLevelClipboardTest {
   }
 
   @Test
-  fun testPaste() {
+  fun `paste should work`() {
     val toPaste = "projector-paste"
     Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(toPaste), null)
 
@@ -139,7 +141,9 @@ class LowLevelClipboardTest {
         "${ClientKeyEvent::class.simpleName}(keyEventType=${ClientKeyEvent.KeyEventType.UP})",
       )
 
-      assertEquals(expectedEvents.size, allEvents.size, "Different sizes: expected $expectedEvents, all $allEvents")
+      withClue("Different sizes: expected $expectedEvents, all $allEvents") {
+        allEvents.shouldBeSameSizeAs(expectedEvents)
+      }
 
       val comparableEvents = allEvents.map {
         when (it) {
@@ -149,7 +153,7 @@ class LowLevelClipboardTest {
         }
       }
 
-      assertEquals(expectedEvents, comparableEvents)
+      comparableEvents shouldBe expectedEvents
     }
     finally {
       server.stop(500, 1000)
@@ -157,7 +161,7 @@ class LowLevelClipboardTest {
   }
 
   @Test
-  fun testCopy() {
+  fun `copy should work`() {
     val initialClipboard = "projector-paste"
     Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(initialClipboard), null)
 
@@ -192,7 +196,7 @@ class LowLevelClipboardTest {
 
       val clipboard = Toolkit.getDefaultToolkit().systemClipboard.getContents(null).getTransferData(DataFlavor.stringFlavor).toString()
 
-      assertEquals(toCopy, clipboard)
+      clipboard shouldBe toCopy
     }
     finally {
       server.stop(500, 1000)
