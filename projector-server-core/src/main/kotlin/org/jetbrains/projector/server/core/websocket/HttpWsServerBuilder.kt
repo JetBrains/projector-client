@@ -33,10 +33,12 @@ import java.nio.ByteBuffer
 public class HttpWsServerBuilder(private val host: InetAddress, private val port: Int): WsTransportBuilder() {
 
   public lateinit var getMainWindows: () -> List<MainWindow>
+  public lateinit var getLastUserActionTimeStampMs: () -> Long
 
   override fun build(): HttpWsServer {
     val wsServer =  object : HttpWsServer(host, port) {
       override fun getMainWindows(): List<MainWindow> = this@HttpWsServerBuilder.getMainWindows()
+      override fun getLastUserActionTimeStampMs() = this@HttpWsServerBuilder.getLastUserActionTimeStampMs()
       override fun onError(connection: WebSocket?, e: Exception) = this@HttpWsServerBuilder.onError(connection, e)
       override fun onWsOpen(connection: WebSocket) = this@HttpWsServerBuilder.onWsOpen(connection)
       override fun onWsClose(connection: WebSocket) = this@HttpWsServerBuilder.onWsClose(connection)

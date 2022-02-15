@@ -37,6 +37,7 @@ import kotlinx.coroutines.runBlocking
 import org.java_websocket.WebSocket
 import org.jetbrains.projector.common.protocol.toClient.MainWindow
 import org.jetbrains.projector.common.protocol.toClient.toMainWindowList
+import org.jetbrains.projector.common.protocol.toClient.toStatus
 import org.jetbrains.projector.server.core.websocket.HttpWsServer
 import java.io.File
 import java.nio.ByteBuffer
@@ -75,6 +76,8 @@ class ProjectorHttpWsServerTest {
           pngBase64Icon = "png base 64",
         )
       )
+
+      override fun getLastUserActionTimeStampMs(): Long = 123
     }
   }
 
@@ -138,6 +141,20 @@ class ProjectorHttpWsServerTest {
     assertEquals(1, response.size)
     assertEquals("abc", response[0].title)
     assertEquals("png base 64", response[0].pngBase64Icon)
+
+    client.close()
+    server.stop()
+  }
+
+  @Test
+  fun testStatus() {
+    val server = createServer().also { it.start() }
+    val client = HttpClient()
+
+    val response = runBlocking { client.get<String>(prj("/status")) }.toStatus()
+
+    assertEquals(1, response.mainWindowsCount)
+    assertEquals(123, response.lastUserActionTimeStampMs)
 
     client.close()
     server.stop()

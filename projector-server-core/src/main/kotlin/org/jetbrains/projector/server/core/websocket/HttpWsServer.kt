@@ -35,6 +35,7 @@ import org.java_websocket.handshake.*
 import org.java_websocket.server.WebSocketServer
 import org.java_websocket.util.Charsetfunctions
 import org.jetbrains.projector.common.protocol.toClient.MainWindow
+import org.jetbrains.projector.common.protocol.toClient.Status
 import org.jetbrains.projector.common.protocol.toClient.toJson
 import org.jetbrains.projector.server.core.ClientWrapper
 import org.jetbrains.projector.server.core.util.getWildcardHostAddress
@@ -60,6 +61,7 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) : HttpWsTranspo
   public constructor(port: Int) : this(getWildcardHostAddress(), port)
 
   public abstract fun getMainWindows(): List<MainWindow>
+  public abstract fun getLastUserActionTimeStampMs(): Long
 
   public fun onGetRequest(path: String): GetRequestResult {
     val pathWithoutParams = path.substringBefore('?').substringBefore('#')
@@ -67,6 +69,22 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) : HttpWsTranspo
     if (pathWithoutParams == "/mainWindows") {
       val mainWindows = getMainWindows()
       val json = mainWindows.toJson().toByteArray()
+      return GetRequestResult(
+        statusCode = 200,
+        statusText = "OK",
+        contentType = "text/json",
+        content = json,
+      )
+    }
+
+    if (pathWithoutParams == "/status") {
+      val mainWindows = getMainWindows()
+      val lastUserActionTimeStampMs = getLastUserActionTimeStampMs()
+      val status = Status(
+        mainWindowsCount = mainWindows.size,
+        lastUserActionTimeStampMs = lastUserActionTimeStampMs,
+      )
+      val json = status.toJson().toByteArray()
       return GetRequestResult(
         statusCode = 200,
         statusText = "OK",
