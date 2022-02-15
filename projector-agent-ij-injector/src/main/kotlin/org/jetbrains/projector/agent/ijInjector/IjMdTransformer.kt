@@ -28,7 +28,8 @@ import com.intellij.openapi.util.BuildNumber
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.jcef.JBCefApp
 import javassist.CtClass
-import javassist.expr.*
+import javassist.expr.ExprEditor
+import javassist.expr.NewExpr
 import org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel
 import org.jetbrains.projector.agent.common.assign
 import org.jetbrains.projector.agent.common.getDeclaredConstructor
@@ -78,7 +79,9 @@ internal object IjMdTransformer : IdeTransformerSetup<IjInjector.AgentParameters
         }
         clazz to previewType
       }.associate { (clazz, previewType) ->
-        val foo = { ctClass: CtClass -> transformMdHtmlPanelProvider(previewType, ctClass, parameters.markdownPanelClassName, parameters.isAgent) }
+        val foo = { ctClass: CtClass ->
+          transformMdHtmlPanelProvider(previewType, ctClass, parameters.markdownPanelClassName, parameters.isAgent)
+        }
         clazz to foo
       }
     }
@@ -229,7 +232,8 @@ internal object IjMdTransformer : IdeTransformerSetup<IjInjector.AgentParameters
         try {
           Class.forName("javafx.scene.web.WebView", false, javaClass.classLoader)
           return true
-        } catch (ignored: ClassNotFoundException) {
+        }
+        catch (ignored: ClassNotFoundException) {
         }
 
         return false
@@ -240,10 +244,12 @@ internal object IjMdTransformer : IdeTransformerSetup<IjInjector.AgentParameters
         try {
           JBCefApp.getInstance()
           true
-        } catch (e: IllegalStateException) {
+        }
+        catch (e: IllegalStateException) {
           false
         }
-      } else false
+      }
+      else false
     };
 
     abstract fun isAvailable(): Boolean

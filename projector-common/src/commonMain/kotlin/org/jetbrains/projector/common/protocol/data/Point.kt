@@ -34,5 +34,5 @@ data class Point(
   val y: Double,
 ) {
 
-  constructor(x: Int, y: Int): this(x.toDouble(), y.toDouble())
+  constructor(x: Int, y: Int) : this(x.toDouble(), y.toDouble())
 }

@@ -73,9 +73,6 @@ public fun Constructor<*>.toGetDeclaredMethodFormat(): String {
   return "new Class[] { $parameterClasses }"
 }
 
-// language=java prefix="class DummyClass { void dummyMethod() {" suffix="}}"
-public inline fun <reified T> loadClassWithProjectorLoader(): String = loadClassWithProjectorLoader(T::class.java)
-
 public fun loadClassWithProjectorLoader(clazz: Class<*>): String = loadClassWithProjectorLoader(clazz.name, true)
 
 private fun loadClassWithProjectorLoader(className: String, trim: Boolean): String = """
@@ -85,7 +82,7 @@ private fun loadClassWithProjectorLoader(className: String, trim: Boolean): Stri
 
 private val unitType by lazy { Unit::class.createType() }
 
-public  fun <T : KFunction<*>> T.getJavaCallString(
+public fun <T : KFunction<*>> T.getJavaCallString(
   vararg params: String,
   finishedExpression: Boolean = this.returnType == unitType,
   autoCast: Boolean = true,
@@ -112,7 +109,9 @@ private fun getJavaCallString(asJavaMethod: Method, cast: Boolean = true, vararg
   val instance = if (isStatic) "null" else params.first()
   val otherParams = if (isStatic) params.toList() else params.drop(1)
 
-  require(otherParams.size == asJavaMethod.parameterCount) { "Cannot create Java method call string: expected ${asJavaMethod.parameterCount} parameters, got ${otherParams.size}" }
+  require(otherParams.size == asJavaMethod.parameterCount) {
+    "Cannot create Java method call string: expected ${asJavaMethod.parameterCount} parameters, got ${otherParams.size}"
+  }
 
   val castString = if (!cast || asJavaMethod.returnType == Void.TYPE) "" else "(${asJavaMethod.returnType.objectType.name})"
 
@@ -124,7 +123,9 @@ private fun getJavaCallString(asJavaMethod: Method, cast: Boolean = true, vararg
 }
 
 private fun getJavaCallString(asJavaCtor: Constructor<*>, cast: Boolean = true, vararg params: String): String {
-  require(params.size == asJavaCtor.parameterCount) { "Cannot create Java method call string: expected ${asJavaCtor.parameterCount} parameters, got ${params.size}" }
+  require(params.size == asJavaCtor.parameterCount) {
+    "Cannot create Java method call string: expected ${asJavaCtor.parameterCount} parameters, got ${params.size}"
+  }
 
   val castString = if (!cast) "" else "(${asJavaCtor.declaringClass.name})"
 

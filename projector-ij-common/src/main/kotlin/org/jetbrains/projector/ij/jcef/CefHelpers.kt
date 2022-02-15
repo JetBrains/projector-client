@@ -35,12 +35,13 @@ public fun CefClientHandler.getMessageRouters(): List<CefMessageRouter> {
   return CefHandlers.getMessageRouters(this)
 }
 
+@Suppress("unused") // used in server
 public fun CefMessageRouter.getHandlers(): List<CefMessageRouterHandler> {
   return CefHandlers.getRouterHandlers(this)
 }
 
+@Suppress("unused") // used in server
 public fun CefMessageRouterHandler.onProjectorQuery(projectorCefBrowser: ProjectorCefBrowser, query: String) {
-  println("Got query: $query")
   onQuery(projectorCefBrowser, DEFAULT_FRAME, 0, query, false, DEFAULT_CALLBACK)
 }
 

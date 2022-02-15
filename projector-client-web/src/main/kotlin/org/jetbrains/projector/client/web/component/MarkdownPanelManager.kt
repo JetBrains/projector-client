@@ -37,7 +37,7 @@ class MarkdownPanelManager(
   private val openInExternalBrowser: (String) -> Unit,
 ) : ClientComponentManager<MarkdownPanelManager.MarkdownPanel>(zIndexByWindowIdGetter) {
 
-  class MarkdownPanel(id: Int, openInExternalBrowser: (String) -> Unit): ClientComponent(id) {
+  class MarkdownPanel(id: Int, openInExternalBrowser: (String) -> Unit) : ClientComponent(id) {
 
     init {
       setLinkProcessor(openInExternalBrowser)

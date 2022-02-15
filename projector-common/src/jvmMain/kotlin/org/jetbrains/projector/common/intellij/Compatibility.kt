@@ -31,8 +31,10 @@ import org.jetbrains.projector.util.loading.UseProjectorLoader
 
 fun buildAtLeast(version: String) = ApplicationInfo.getInstance().build.buildAtLeast(version)
 
+@Suppress("unused")
 fun buildLowerThan(version: String) = ApplicationInfo.getInstance().build.buildLowerThan(version)
 
+@Suppress("unused")
 fun buildInRange(start: String, endExclusive: String) = ApplicationInfo.getInstance().build.buildInRange(start, endExclusive)
 
 fun BuildNumber.buildAtLeast(version: String): Boolean {

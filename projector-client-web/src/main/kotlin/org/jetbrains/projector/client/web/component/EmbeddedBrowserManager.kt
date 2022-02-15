@@ -25,15 +25,15 @@ package org.jetbrains.projector.client.web.component
 
 import kotlinx.browser.document
 import org.jetbrains.projector.client.web.UriHandler
-import org.w3c.dom.*
+import org.w3c.dom.HTMLScriptElement
 import org.w3c.dom.events.MouseEvent
 
 class EmbeddedBrowserManager(
   zIndexByWindowIdGetter: (Int) -> Int?,
   private val openInExternalBrowser: (String) -> Unit,
-) : ClientComponentManager<EmbeddedBrowserManager.EmbeddedBrowserPanel>(zIndexByWindowIdGetter){
+) : ClientComponentManager<EmbeddedBrowserManager.EmbeddedBrowserPanel>(zIndexByWindowIdGetter) {
 
-  class EmbeddedBrowserPanel(id: Int, private val openInExternalBrowser: (String) -> Unit): ClientComponent(id) {
+  class EmbeddedBrowserPanel(id: Int, private val openInExternalBrowser: (String) -> Unit) : ClientComponent(id) {
 
     var wasLoaded = false
 
@@ -64,7 +64,8 @@ class EmbeddedBrowserManager(
     fun executeJs(code: String) {
       if (wasLoaded) {
         executeJsImpl(code)
-      } else {
+      }
+      else {
         jsQueue.addLast(code)
       }
     }
@@ -98,7 +99,8 @@ class EmbeddedBrowserManager(
       setLinkProcessor(openInExternalBrowser)
     }
 
-    fun setOpenLinksInExternalBrowser(openLinksInExternalBrowser: Boolean) = setOpenLinksInExternalBrowser(openLinksInExternalBrowser, false)
+    fun setOpenLinksInExternalBrowser(openLinksInExternalBrowser: Boolean) = setOpenLinksInExternalBrowser(openLinksInExternalBrowser,
+                                                                                                           false)
   }
 
   fun setOpenLinksInExternalBrowser(browserId: Int, openLinksInExternalBrowser: Boolean) {

@@ -107,7 +107,8 @@ class ServerEventsProcessor(
           is ServerBrowserEvent.ShowEvent -> embeddedBrowserManager.show(command.browserId, command.show, command.windowId)
           is ServerBrowserEvent.MoveEvent -> embeddedBrowserManager.move(command.browserId, command.position)
           is ServerBrowserEvent.ResizeEvent -> embeddedBrowserManager.resize(command.browserId, command.size)
-          is ServerBrowserEvent.SetOpenLinksInExternalBrowserEvent -> embeddedBrowserManager.setOpenLinksInExternalBrowser(command.browserId, command.openLinksInExternalBrowser)
+          is ServerBrowserEvent.SetOpenLinksInExternalBrowserEvent ->
+            embeddedBrowserManager.setOpenLinksInExternalBrowser(command.browserId, command.openLinksInExternalBrowser)
         }
       }
     }

@@ -320,7 +320,8 @@ public class ProjectorCefBrowser @JvmOverloads constructor(
 
   private fun <F, T> F.tryOrNull(callable: (F) -> T) = try {
     callable(this)
-  } catch (_: Throwable) {
+  }
+  catch (_: Throwable) {
     null
   }
 
@@ -391,7 +392,7 @@ public class ProjectorCefBrowser @JvmOverloads constructor(
         "<head>",
         """
           <head>
-              ${ getRequiredJs().joinToString("\n") { "<script type=\"text/javascript\">$it</script>" } }
+              ${getRequiredJs().joinToString("\n") { "<script type=\"text/javascript\">$it</script>" }}
         """.trimIndent()
       )
   }
@@ -546,11 +547,11 @@ public class ProjectorCefBrowser @JvmOverloads constructor(
       state.executedJs.forEach { (code, url, line) ->
         sendJs(code, url, line)
       }
-    } else if (state.externalUrl.isNotEmpty()) {
-      sendEvent(ServerBrowserEvent.LoadUrlEvent(id, state.externalUrl, false))
-    } else {
-      return
     }
+    else if (state.externalUrl.isNotEmpty()) {
+      sendEvent(ServerBrowserEvent.LoadUrlEvent(id, state.externalUrl, false))
+    }
+    else return
 
     sendMoveResizeEvent()
     sendShowEvent(null)
@@ -588,16 +589,19 @@ public class ProjectorCefBrowser @JvmOverloads constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun getHtmlMap(browser: CefBrowser): Map<String, String>? = (htmlMapField.get() as Map<CefBrowser, Map<String, String>>)[browser]
+    private fun getHtmlMap(browser: CefBrowser): Map<String, String>? =
+      (htmlMapField.get() as Map<CefBrowser, Map<String, String>>)[browser]
 
     private fun sendEvent(event: ServerBrowserEvent) = eventSender.sendEvent(event)
 
     private val instances = Collections.synchronizedMap(mutableMapOf<Int, ProjectorCefBrowser>())
 
+    @Suppress("unused") // used in server
     public fun getInstance(id: Int): ProjectorCefBrowser? = instances[id]
 
     public fun getClientInstances(client: CefClient): List<ProjectorCefBrowser> = instances.values.filter { it.cefClient === client }
 
+    @Suppress("unused") // used in server
     public fun updateAll() {
       instances.values.forEach {
         it.resendState()

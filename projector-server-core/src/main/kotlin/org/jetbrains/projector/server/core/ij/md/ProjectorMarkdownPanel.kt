@@ -98,17 +98,17 @@ public class ProjectorMarkdownPanel(private val isAgent: Boolean, agentDelegateC
     }
   }
 
-  public override fun setHtml(html: String, initialScrollOffset: Int, documentPath: Path?) {
+  override fun setHtml(html: String, initialScrollOffset: Int, documentPath: Path?) {
     setHtml(html, initialScrollOffset) // TODO support documentPath
   }
 
-  public override fun reloadWithOffset(offset: Int) {
+  override fun reloadWithOffset(offset: Int) {
     reloadExtensions()
     agentDelegate?.reloadWithOffset(offset)
     // TODO implement for PanelDelegate
   }
 
-  public override fun scrollToMarkdownSrcOffset(offset: Int, smooth: Boolean) {
+  override fun scrollToMarkdownSrcOffset(offset: Int, smooth: Boolean) {
     agentDelegate?.scrollToMarkdownSrcOffset(offset, smooth)
     clientDelegate.scrollToMarkdownSrcOffset(offset) // TODO implement smooth scroll for PanelDelegate
   }

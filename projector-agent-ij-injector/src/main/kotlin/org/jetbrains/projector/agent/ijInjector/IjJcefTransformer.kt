@@ -45,7 +45,7 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
 
   override fun getTransformations(
     parameters: IjInjector.AgentParameters,
-    classLoader: ClassLoader
+    classLoader: ClassLoader,
   ): Map<Class<*>, (CtClass) -> ByteArray?> {
 
     isAgent = parameters.isAgent
@@ -193,7 +193,7 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
 
     clazz
       .getDeclaredMethod("startup")
-      // language=java prefix="class CefApp { public static final boolean startup(String[] $1)" suffix="}"
+      // language=java prefix="class CefApp { public static boolean startup(String[] $1)" suffix="}"
       .setBodyIfHeadless(
         """
           {
@@ -235,14 +235,15 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
               }
             """.trimIndent()
           )
-        } else {
+        }
+        else {
           setBody(
             // language=java prefix="class CefMessageRouter_N { public boolean addHandler(CefMessageRouterHandler $1, boolean $2)" suffix="}"
             """
-          {
-            return $addHandlerCode.booleanValue(); // javassist can't automatically unbox primitive wrapper..
-          }
-        """.trimIndent()
+              {
+                return $addHandlerCode.booleanValue(); // javassist can't automatically unbox primitive wrapper..
+              }
+            """.trimIndent()
           )
         }
       }
@@ -259,7 +260,8 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
               }
             """.trimIndent()
           )
-        } else {
+        }
+        else {
           setBody(
             // language=java prefix="class CefMessageRouter_N { public boolean removeHandler(CefMessageRouterHandler $1)" suffix="}"
             """
@@ -274,7 +276,7 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
     clazz
       .getDeclaredMethod("createNative")
       .setBodyIfHeadless(
-        // language=java prefix="class CefMessageRouter_N { public static final org.cef.browser.CefMessageRouter createNative(org.cef.browser.CefMessageRouterConfig $1)" suffix="}"
+        // language=java prefix="class CefMessageRouter_N { public static org.cef.browser.CefMessageRouter createNative(org.cef.browser.CefMessageRouterConfig $1)" suffix="}"
         """
           {
             org.cef.browser.CefMessageRouter instance = new org.cef.browser.CefMessageRouter_N();
@@ -376,7 +378,7 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
   /**
    * Replace instantiation of CEF browser in JBCefBrowserBase with ProjectorCefBrowser
    */
-  private class JBCefBrowserBaseProjectorInserter() : ExprEditor() {
+  private class JBCefBrowserBaseProjectorInserter : ExprEditor() {
 
     private val methodDeclaringClass = projectorClassPool[METHOD_DECLARING_CLASS]
 
@@ -389,7 +391,7 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
 
         @Suppress("rawtypes", "unchecked")
         //language=java prefix="class JBCefBrowserBase { private @NotNull CefBrowserOsrWithHandler createOsrBrowser(...)" suffix="}"
-        val code =  """
+        val code = """
             {
               $assign $newBrowserInstanceCode;
             }
