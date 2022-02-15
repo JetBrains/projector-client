@@ -36,29 +36,13 @@ public class HttpWsServerBuilder(private val host: InetAddress, private val port
 
   override fun build(): HttpWsServer {
     val wsServer =  object : HttpWsServer(host, port) {
-      override fun getMainWindows(): List<MainWindow> {
-        return this@HttpWsServerBuilder.getMainWindows()
-      }
-
-      override fun onError(connection: WebSocket?, e: Exception) {
-        this@HttpWsServerBuilder.onError(connection, e)
-      }
-
-      override fun onWsOpen(connection: WebSocket) {
-        this@HttpWsServerBuilder.onWsOpen(connection)
-      }
-
-      override fun onWsClose(connection: WebSocket) {
-        this@HttpWsServerBuilder.onWsClose(connection)
-      }
-
-      override fun onWsMessage(connection: WebSocket, message: String) {
-        this@HttpWsServerBuilder.onWsMessageString(connection, message)
-      }
-
-      override fun onWsMessage(connection: WebSocket, message: ByteBuffer) {
-        this@HttpWsServerBuilder.onWsMessageByteBuffer(connection, message)
-      }
+      override fun getMainWindows(): List<MainWindow> = this@HttpWsServerBuilder.getMainWindows()
+      override fun onError(connection: WebSocket?, e: Exception) = this@HttpWsServerBuilder.onError(connection, e)
+      override fun onWsOpen(connection: WebSocket) = this@HttpWsServerBuilder.onWsOpen(connection)
+      override fun onWsClose(connection: WebSocket) = this@HttpWsServerBuilder.onWsClose(connection)
+      override fun onWsMessage(connection: WebSocket, message: String) = this@HttpWsServerBuilder.onWsMessageString(connection, message)
+      override fun onWsMessage(connection: WebSocket, message: ByteBuffer) = this@HttpWsServerBuilder.onWsMessageByteBuffer(connection,
+                                                                                                                            message)
     }
 
     val message = when (val hint = setSsl(wsServer::setWebSocketFactory)) {
