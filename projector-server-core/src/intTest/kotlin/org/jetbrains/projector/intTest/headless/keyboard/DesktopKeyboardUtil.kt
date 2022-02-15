@@ -24,9 +24,9 @@
 package org.jetbrains.projector.intTest.headless.keyboard
 
 import com.codeborne.selenide.Selenide.element
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import org.openqa.selenium.Keys
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 fun inputOnDesktop(vararg keysToSend: CharSequence, ctrl: Boolean, shift: Boolean, f: Keys?, esc: Boolean) {
   val keys = toSeleniumKeys(*keysToSend, ctrl = ctrl, shift = shift, f = f, esc = esc)
@@ -56,101 +56,70 @@ private fun toSeleniumKeys(
   return keys
 }
 
-class ToSeleniumKeysTest {
+class ToSeleniumKeysTest : FunSpec() {
+  init {
+    test("simple symbol should be typed") {
+      toSeleniumKeys("h").toList() shouldBe "h".toList()
+    }
 
-  @Test
-  fun testSimpleSymbol() = assertEquals(
-    expected = "h".toList(),
-    actual = toSeleniumKeys("h").toList(),
-  )
+    test("simple symbol should be typed with Shift modifier") {
+      toSeleniumKeys("h", shift = true).toList() shouldBe Keys.chord(Keys.SHIFT, "h").toList()
+    }
 
-  @Test
-  fun testShiftedSimpleSymbol() = assertEquals(
-    expected = Keys.chord(Keys.SHIFT, "h").toList(),
-    actual = toSeleniumKeys("h", shift = true).toList(),
-  )
+    test("already Shifted simple symbol should be typed") {
+      toSeleniumKeys("H").toList() shouldBe "H".toList()
+    }
 
-  @Test
-  fun testAlreadyShiftedSimpleSymbol() = assertEquals(
-    expected = "H".toList(),
-    actual = toSeleniumKeys("H").toList(),
-  )
+    test("Tab should be typed") {
+      toSeleniumKeys(Keys.TAB).toList() shouldBe Keys.TAB.toList()
+    }
 
-  @Test
-  fun testTab() = assertEquals(
-    expected = Keys.TAB.toList(),
-    actual = toSeleniumKeys(Keys.TAB).toList(),
-  )
+    test("Enter should be typed") {
+      toSeleniumKeys(Keys.ENTER).toList() shouldBe Keys.ENTER.toList()
+    }
 
-  @Test
-  fun testEnter() = assertEquals(
-    expected = Keys.ENTER.toList(),
-    actual = toSeleniumKeys(Keys.ENTER).toList(),
-  )
+    test("Backspace should be typed") {
+      toSeleniumKeys(Keys.BACK_SPACE).toList() shouldBe Keys.BACK_SPACE.toList()
+    }
 
-  @Test
-  fun testBackspace() = assertEquals(
-    expected = Keys.BACK_SPACE.toList(),
-    actual = toSeleniumKeys(Keys.BACK_SPACE).toList(),
-  )
+    test("Space should be typed") {
+      toSeleniumKeys(Keys.SPACE).toList() shouldBe Keys.SPACE.toList()
+    }
 
-  @Test
-  fun testSpace() = assertEquals(
-    expected = Keys.SPACE.toList(),
-    actual = toSeleniumKeys(Keys.SPACE).toList(),
-  )
+    test("Escape should be typed") {
+      toSeleniumKeys(esc = true).toList() shouldBe Keys.ESCAPE.toList()
+    }
 
-  @Test
-  fun testEscape() = assertEquals(
-    expected = Keys.ESCAPE.toList(),
-    actual = toSeleniumKeys(esc = true).toList(),
-  )
+    test("Delete should be typed") {
+      toSeleniumKeys(Keys.DELETE).toList() shouldBe Keys.DELETE.toList()
+    }
 
-  @Test
-  fun testDelete() = assertEquals(
-    expected = Keys.DELETE.toList(),
-    actual = toSeleniumKeys(Keys.DELETE).toList(),
-  )
+    test("letter should be typed with Ctrl modifier") {
+      toSeleniumKeys("z", ctrl = true).toList() shouldBe Keys.chord(Keys.CONTROL, "z").toList()
+    }
 
-  @Test
-  fun testCtrlLetter() = assertEquals(
-    expected = Keys.chord(Keys.CONTROL, "z").toList(),
-    actual = toSeleniumKeys("z", ctrl = true).toList(),
-  )
+    test("functional key should be typed") {
+      toSeleniumKeys(f = Keys.F6).toList() shouldBe Keys.F6.toList()
+    }
 
-  @Test
-  fun testFunctionalKey() = assertEquals(
-    expected = Keys.F6.toList(),
-    actual = toSeleniumKeys(f = Keys.F6).toList(),
-  )
+    test("functional key with Shift modifier should be typed") {
+      toSeleniumKeys(f = Keys.F6, shift = true).toList() shouldBe Keys.chord(Keys.SHIFT, Keys.F6).toList()
+    }
 
-  @Test
-  fun testShiftedFunctionalKey() = assertEquals(
-    expected = Keys.chord(Keys.SHIFT, Keys.F6).toList(),
-    actual = toSeleniumKeys(f = Keys.F6, shift = true).toList(),
-  )
+    test("functional key with Shift and Ctrl modifier should be typed") {
+      toSeleniumKeys("k", ctrl = true, shift = true).toList() shouldBe Keys.chord(Keys.CONTROL, Keys.SHIFT, "k").toList()
+    }
 
-  @Test
-  fun testCtrlShiftedLetter() = assertEquals(
-    expected = Keys.chord(Keys.CONTROL, Keys.SHIFT, "k").toList(),
-    actual = toSeleniumKeys("k", ctrl = true, shift = true).toList(),
-  )
+    test("arrow should be typed") {
+      toSeleniumKeys(Keys.ARROW_RIGHT).toList() shouldBe Keys.ARROW_RIGHT.toList()
+    }
 
-  @Test
-  fun testArrow() = assertEquals(
-    expected = Keys.ARROW_RIGHT.toList(),
-    actual = toSeleniumKeys(Keys.ARROW_RIGHT).toList(),
-  )
+    test("numpad key should be typed with numlock") {
+      toSeleniumKeys(Keys.NUMPAD5).toList() shouldBe Keys.NUMPAD5.toList()
+    }
 
-  @Test
-  fun testNumpadWithNumLock() = assertEquals(
-    expected = Keys.NUMPAD5.toList(),
-    actual = toSeleniumKeys(Keys.NUMPAD5).toList(),
-  )
-
-  @Test
-  fun testNumpadWithoutNumLock() = assertEquals(
-    expected = "\uE057".toList(),
-    actual = toSeleniumKeys("\uE057").toList(),
-  )
+    test("numpad key should be typed without numlock") {
+      toSeleniumKeys("\uE057").toList() shouldBe "\uE057".toList()
+    }
+  }
 }
