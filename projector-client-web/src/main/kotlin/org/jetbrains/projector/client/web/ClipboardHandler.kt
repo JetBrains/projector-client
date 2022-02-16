@@ -33,6 +33,11 @@ import org.jetbrains.projector.common.protocol.toServer.ClientNotificationType
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLTextAreaElement
 
+/**
+ * First try to copy via `window.navigator.clipboard`. If this method fails or is not available,
+ * then try to copy via `document.execCommand` (deprecated, but still supported by firefox).
+ * If this also fails, then fallback to asking user to copy manually.
+ */
 class ClipboardHandler(private val onCopyFailed: (ClientNotificationEvent) -> Unit) {
 
   private val logger = Logger<ClipboardHandler>()
