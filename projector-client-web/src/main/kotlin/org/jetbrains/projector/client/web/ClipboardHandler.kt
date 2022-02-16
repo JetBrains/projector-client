@@ -49,7 +49,8 @@ class ClipboardHandler(private val onCopyFailed: (ClientNotificationEvent) -> Un
           logger.error(it) { "Error writing clipboard: $it" }
           fallbackCopy(text, it.message ?: "Unknown error")
         }
-    } else {
+    }
+    else {
       fallbackCopy(text, "Clipboard API is not available")
     }
   }
@@ -70,7 +71,9 @@ class ClipboardHandler(private val onCopyFailed: (ClientNotificationEvent) -> Un
 
     when {
       !isDefined(js("document.execCommand")) -> return "Document.execCommand is not available"
-      !isGecko() -> return "Copying using Document.execCommand works only in Firefox" // Chrome only allows Document.execCommand from event callbacks
+
+      // Chrome only allows Document.execCommand from event callbacks
+      !isGecko() -> return "Copying using Document.execCommand works only in Firefox"
     }
 
     val textArea = document.createElement("textarea") as HTMLTextAreaElement
@@ -86,9 +89,11 @@ class ClipboardHandler(private val onCopyFailed: (ClientNotificationEvent) -> Un
     var isCopied = false
     try {
       isCopied = document.execCommand("copy")
-    } catch (t: Throwable) { // May throw SecurityError https://dvcs.w3.org/hg/editing/raw-file/tip/editing.html#the-copy-command
+    }
+    catch (t: Throwable) { // May throw SecurityError https://dvcs.w3.org/hg/editing/raw-file/tip/editing.html#the-copy-command
       logger.error(t) { "Error while running 'document.execCommand(\"copy\")'" }
-    } finally {
+    }
+    finally {
       textArea.remove()
     }
 
@@ -104,7 +109,8 @@ class ClipboardHandler(private val onCopyFailed: (ClientNotificationEvent) -> Un
       val notificationMessage = "Copying is not currently supported in insecure context in Projector launcher"
       val type = ClientNotificationType.ERROR
       onCopyFailed(ClientNotificationEvent(title, notificationMessage, type))
-    } else {
+    }
+    else {
       window.prompt(message, textToCopy)
     }
   }

@@ -53,7 +53,10 @@ internal fun isElectron(): Boolean {
   }
 
   // Detect the user agent when the `nodeIntegration` option is set to true
-  if (jsTypeOf(window.navigator) == "object" && jsTypeOf(window.navigator.userAgent) == "string" && window.navigator.userAgent.contains("Electron")) {
+  if (jsTypeOf(window.navigator) == "object"
+      && jsTypeOf(window.navigator.userAgent) == "string"
+      && window.navigator.userAgent.contains("Electron")
+  ) {
     return true
   }
 
