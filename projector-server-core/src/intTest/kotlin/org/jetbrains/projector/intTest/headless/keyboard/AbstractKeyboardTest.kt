@@ -27,6 +27,8 @@ import com.codeborne.selenide.Condition.appear
 import com.codeborne.selenide.Selenide.element
 import com.codeborne.selenide.Selenide.open
 import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.ktor.server.engine.ApplicationEngine
@@ -49,11 +51,8 @@ import org.jetbrains.projector.util.logging.loggerFactory
 import org.openqa.selenium.Keys
 import java.awt.event.KeyEvent
 import javax.swing.JLabel
-import kotlin.test.Ignore
-import kotlin.test.Test
 
-@Ignore
-abstract class AbstractKeyboardTest(private val inputMethod: String) {
+abstract class AbstractKeyboardTest(private val inputMethod: String) : AnnotationSpec(){
 
   private companion object {
 
@@ -179,7 +178,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar='h',keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=72,keyText=H,keyChar='h',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 3
+    it.shouldHaveSize(3)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 72, 'h', KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_TYPED, 0, 'h', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
     checkEvent(it[2], KeyEvent.KEY_RELEASED, 72, 'h', KeyEvent.KEY_LOCATION_STANDARD, 0)
@@ -194,7 +193,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 5
+    it.shouldHaveSize(5)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT,
                -64)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
     checkEvent(it[1], KeyEvent.KEY_PRESSED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
@@ -212,7 +211,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=72,keyText=H,keyChar='H',modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 5
+    it.shouldHaveSize(5)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT,
                -64)  // todo: the modifier is wrong in WebDriver so skip the check for now by making it negative
     checkEvent(it[1], KeyEvent.KEY_PRESSED, 72, 'H', KeyEvent.KEY_LOCATION_STANDARD, 64)
@@ -228,7 +227,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Tab,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=9,keyText=Tab,keyChar=Tab,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 3
+    it.shouldHaveSize(3)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 9, '\t', KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\t', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
     checkEvent(it[2], KeyEvent.KEY_RELEASED, 9, '\t', KeyEvent.KEY_LOCATION_STANDARD, 0)
@@ -241,7 +240,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Enter,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=10,keyText=Enter,keyChar=Enter,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 3
+    it.shouldHaveSize(3)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 10, '\n', KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\n', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
     checkEvent(it[2], KeyEvent.KEY_RELEASED, 10, '\n', KeyEvent.KEY_LOCATION_STANDARD, 0)
@@ -254,7 +253,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Backspace,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=8,keyText=Backspace,keyChar=Backspace,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 3
+    it.shouldHaveSize(3)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 8, '\b', KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\b', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
     checkEvent(it[2], KeyEvent.KEY_RELEASED, 8, '\b', KeyEvent.KEY_LOCATION_STANDARD, 0)
@@ -267,7 +266,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=' ',keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=32,keyText=Space,keyChar=' ',keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 3
+    it.shouldHaveSize(3)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 32, ' ', KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_TYPED, 0, ' ', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
     checkEvent(it[2], KeyEvent.KEY_RELEASED, 32, ' ', KeyEvent.KEY_LOCATION_STANDARD, 0)
@@ -280,7 +279,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Escape,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=27,keyText=Escape,keyChar=Escape,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
 
-    it.size shouldBe 3
+    it.shouldHaveSize(3)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 27, '\u001b', KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\u001b', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
     checkEvent(it[2], KeyEvent.KEY_RELEASED, 27, '\u001b', KeyEvent.KEY_LOCATION_STANDARD, 0)
@@ -293,6 +292,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_TYPED,keyCode=0,keyText=Unknown keyCode: 0x0,keyChar=Delete,keyLocation=KEY_LOCATION_UNKNOWN,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=127,keyText=Delete,keyChar=Delete,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0
 
+    it.shouldHaveSize(3)
     it.size shouldBe 3
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 127, '\u007f', KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '\u007f', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
@@ -308,7 +308,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     //java.awt.event.KeyEvent[KEY_RELEASED,keyCode=90,keyText=Z,keyChar='',modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 128
     //java.awt.event.KeyEvent[KEY_RELEASED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 5
+    it.shouldHaveSize(5)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 128)
     checkEvent(it[1], KeyEvent.KEY_PRESSED, 90, '', KeyEvent.KEY_LOCATION_STANDARD, 128)
     checkEvent(it[2], KeyEvent.KEY_TYPED, 0, '', KeyEvent.KEY_LOCATION_UNKNOWN, 128)
@@ -322,7 +322,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 2
+    it.shouldHaveSize(2)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_RELEASED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
   }
@@ -335,7 +335,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=117,keyText=F6,keyChar=Undefined keyChar,modifiers=Shift,extModifiers=Shift,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 64
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 4
+    it.shouldHaveSize(4)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 64)
     checkEvent(it[1], KeyEvent.KEY_PRESSED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 64)
     checkEvent(it[2], KeyEvent.KEY_RELEASED, 117, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 64)
@@ -353,7 +353,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=16,keyText=Shift,keyChar=Undefined keyChar,modifiers=Ctrl,extModifiers=Ctrl,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on dialog0 128
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=17,keyText=Ctrl,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_LEFT,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on dialog0 0
 
-    it.size shouldBe 7
+    it.shouldHaveSize(7)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 17, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 128)
     checkEvent(it[1], KeyEvent.KEY_PRESSED, 16, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_LEFT, 192)
     checkEvent(it[2], KeyEvent.KEY_PRESSED, 75, '', KeyEvent.KEY_LOCATION_STANDARD, 192)
@@ -370,7 +370,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // java.awt.event.KeyEvent[KEY_PRESSED,keyCode=39,keyText=Right,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
     // java.awt.event.KeyEvent[KEY_RELEASED,keyCode=39,keyText=Right,keyChar=Undefined keyChar,keyLocation=KEY_LOCATION_STANDARD,rawCode=0,primaryLevelUnicode=0,scancode=0,extendedKeyCode=0x0] on frame0 0
 
-    it.size shouldBe 2
+    it.shouldHaveSize(2)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 39, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
     checkEvent(it[1], KeyEvent.KEY_RELEASED, 39, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD, 0)
   }
@@ -385,7 +385,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // todo: change key location from null to KeyEvent.KEY_LOCATION_NUMPAD when there is a chance to run this test on a pc with numpad.
     //       On a laptop without numpad, the browser sends standard location. If it sends the same even with numpad, we need to fix it
     //       on the client-side.
-    it.size shouldBe 3
+    it.shouldHaveSize(3)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 101, '5', null, 0)
     checkEvent(it[1], KeyEvent.KEY_TYPED, 0, '5', KeyEvent.KEY_LOCATION_UNKNOWN, 0)
     checkEvent(it[2], KeyEvent.KEY_RELEASED, 101, '5', null, 0)
@@ -400,7 +400,7 @@ abstract class AbstractKeyboardTest(private val inputMethod: String) {
     // todo: change key location from null to KeyEvent.KEY_LOCATION_NUMPAD when there is a chance to run this test on a pc with numpad.
     //       On a laptop without numpad, the browser sends standard location. If it sends the same even with numpad, we need to fix it
     //       on the client-side.
-    it.size shouldBe 2
+    it.shouldHaveSize(2)
     checkEvent(it[0], KeyEvent.KEY_PRESSED, 36, KeyEvent.CHAR_UNDEFINED, null, 0)
     checkEvent(it[1], KeyEvent.KEY_RELEASED, 36, KeyEvent.CHAR_UNDEFINED, null, 0)
   }

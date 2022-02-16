@@ -166,8 +166,6 @@ dependencies {
   intTestImplementation("io.ktor:ktor-server-netty:$ktorVersion")
   intTestImplementation("io.ktor:ktor-websockets:$ktorVersion")
   intTestImplementation("io.ktor:ktor-client-cio:$ktorVersion")
-  intTestImplementation(kotlin("test", kotlinVersion))
-  intTestImplementation(kotlin("test-junit5", kotlinVersion))
   intTestImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   intTestImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
 }

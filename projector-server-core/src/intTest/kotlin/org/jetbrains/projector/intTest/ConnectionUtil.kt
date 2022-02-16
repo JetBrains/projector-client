@@ -23,6 +23,9 @@
  */
 package org.jetbrains.projector.intTest
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import io.ktor.application.install
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
@@ -49,8 +52,6 @@ import org.jetbrains.projector.server.core.protocol.KotlinxJsonToClientHandshake
 import org.jetbrains.projector.server.core.protocol.KotlinxJsonToServerHandshakeDecoder
 import java.io.File
 import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 object ConnectionUtil {
 
@@ -75,44 +76,48 @@ object ConnectionUtil {
   @OptIn(ExperimentalCoroutinesApi::class)
   private suspend fun DefaultWebSocketServerSession.doHandshake(handlePing: Boolean): SenderReceiver {
     val (handshakeVersion, handshakeVersionId) = (incoming.receive() as Frame.Text).readText().split(";")
-    assertEquals("$HANDSHAKE_VERSION", handshakeVersion,
-                 "Incompatible handshake versions: server - $HANDSHAKE_VERSION (#${handshakeVersionList.indexOf(HANDSHAKE_VERSION)}), " +
-                 "client - $handshakeVersion (#$handshakeVersionId)"
-    )
+    withClue("Incompatible handshake versions: server - $HANDSHAKE_VERSION (#${
+      handshakeVersionList.indexOf(HANDSHAKE_VERSION)
+    }), client - $handshakeVersion (#$handshakeVersionId)") {
+      handshakeVersion shouldBe "$HANDSHAKE_VERSION"
+    }
 
     val handshakeText = (incoming.receive() as Frame.Text).readText()
     val toServerHandshakeEvent = KotlinxJsonToServerHandshakeDecoder.decode(handshakeText)
 
-    assertEquals(COMMON_VERSION, toServerHandshakeEvent.commonVersion,
-                 "Incompatible common protocol versions: server - $COMMON_VERSION (#${commonVersionList.indexOf(COMMON_VERSION)}), " +
-                 "client - ${toServerHandshakeEvent.commonVersion} (#${toServerHandshakeEvent.commonVersionId})"
-    )
+    withClue("Incompatible common protocol versions: server - $COMMON_VERSION (#${
+      commonVersionList.indexOf(COMMON_VERSION)
+    }), client - ${toServerHandshakeEvent.commonVersion} (#${toServerHandshakeEvent.commonVersionId})") {
+      toServerHandshakeEvent.commonVersion shouldBe COMMON_VERSION
+    }
 
     val toClientCompressor = HandshakeTypesSelector.selectToClientCompressor(toServerHandshakeEvent.supportedToClientCompressions)
-    assertNotNull(toClientCompressor,
-                  "Server doesn't support any of the following to-client compressions: ${toServerHandshakeEvent.supportedToClientCompressions}"
-    )
+    withClue(
+      "Server doesn't support any of the following to-client compressions: ${toServerHandshakeEvent.supportedToClientCompressions}") {
+      toClientCompressor.shouldNotBeNull()
+    }
 
     val toClientEncoder = HandshakeTypesSelector.selectToClientEncoder(toServerHandshakeEvent.supportedToClientProtocols)
-    assertNotNull(toClientEncoder) {
-      "Server doesn't support any of the following to-client protocols: ${toServerHandshakeEvent.supportedToClientProtocols}"
+    withClue("Server doesn't support any of the following to-client protocols: ${toServerHandshakeEvent.supportedToClientProtocols}") {
+      toClientEncoder.shouldNotBeNull()
     }
 
     val toServerDecompressor = HandshakeTypesSelector.selectToServerDecompressor(toServerHandshakeEvent.supportedToServerCompressions)
-    assertNotNull(toServerDecompressor) {
-      "Server doesn't support any of the following to-server compressions: ${toServerHandshakeEvent.supportedToServerCompressions}"
+    withClue(
+      "Server doesn't support any of the following to-server compressions: ${toServerHandshakeEvent.supportedToServerCompressions}") {
+      toServerDecompressor.shouldNotBeNull()
     }
 
     val toServerDecoder = HandshakeTypesSelector.selectToServerDecoder(toServerHandshakeEvent.supportedToServerProtocols)
-    assertNotNull(toServerDecoder) {
-      "Server doesn't support any of the following to-server protocols: ${toServerHandshakeEvent.supportedToServerProtocols}"
+    withClue("Server doesn't support any of the following to-server protocols: ${toServerHandshakeEvent.supportedToServerProtocols}") {
+      toServerDecoder.shouldNotBeNull()
     }
 
     val successEvent = ToClientHandshakeSuccessEvent(
-      toClientCompression = toClientCompressor.compressionType,
-      toClientProtocol = toClientEncoder.protocolType,
-      toServerCompression = toServerDecompressor.compressionType,
-      toServerProtocol = toServerDecoder.protocolType,
+      toClientCompression = toClientCompressor!!.compressionType,
+      toClientProtocol = toClientEncoder!!.protocolType,
+      toServerCompression = toServerDecompressor!!.compressionType,
+      toServerProtocol = toServerDecoder!!.protocolType,
       fontDataHolders = listOf(getFontHolderData()),
       colors = null
     )

@@ -24,8 +24,6 @@
 package org.jetbrains.projector.intTest.headless.keyboard
 
 import org.openqa.selenium.Keys
-import kotlin.test.Ignore
-import kotlin.test.Test
 
 class MobileKeyboardTest : AbstractKeyboardTest("mobile") {
 
@@ -35,7 +33,7 @@ class MobileKeyboardTest : AbstractKeyboardTest("mobile") {
   }
 
   @Test
-  @Ignore("need to somehow determine on the client that exactly numpad5 is sent, not plain5")
+  @Ignore   //TODO: need to somehow determine on the client that exactly numpad5 is sent, not plain5
   override fun testNumpadWithNumLock() {
     // todo
   }
