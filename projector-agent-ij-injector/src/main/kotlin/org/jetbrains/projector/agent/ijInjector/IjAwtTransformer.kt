@@ -40,6 +40,8 @@ internal object IjAwtTransformer : IdeTransformerSetup<IjInjector.AgentParameter
     GraphicsEnvironment::class.java to ::transformGraphicsEnvironment,
   )
 
+  override fun isTransformerAvailable(parameters: IjInjector.AgentParameters): Boolean = !parameters.isAgent
+
   private fun transformGraphicsEnvironment(ctClass: CtClass): ByteArray {
 
     @Suppress("rawtypes", "unchecked", "RedundantArrayCreation") // for body injection
