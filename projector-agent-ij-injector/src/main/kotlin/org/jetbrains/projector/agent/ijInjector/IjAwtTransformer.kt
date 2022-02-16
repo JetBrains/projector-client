@@ -25,13 +25,11 @@
 package org.jetbrains.projector.agent.ijInjector
 
 import javassist.CtClass
+import org.jetbrains.projector.util.loading.ProjectorClassLoader
 import org.jetbrains.projector.util.loading.state.IdeState
 import java.awt.GraphicsEnvironment
 
 internal object IjAwtTransformer : IdeTransformerSetup<IjInjector.AgentParameters>() {
-
-  // language=java prefix="import " suffix=;
-  private const val PROJECTOR_CLASS_LOADER_NAME = "org.jetbrains.projector.util.loading.ProjectorClassLoader"
 
   // language=java prefix="import " suffix=;
   private const val PROJECTOR_GRAPHICS_ENVIRONMENT_NAME = "org.jetbrains.projector.awt.image.PGraphicsEnvironment"
@@ -51,8 +49,10 @@ internal object IjAwtTransformer : IdeTransformerSetup<IjInjector.AgentParameter
         // language=java prefix="class GraphicsEnvironment { private static GraphicsEnvironment createGE()" suffix="}"
         """
           {
-            Class prjClassLoaderClazz = ClassLoader.getSystemClassLoader().loadClass("$PROJECTOR_CLASS_LOADER_NAME");
-            ClassLoader loader = (ClassLoader) prjClassLoaderClazz.getDeclaredMethod("getInstance", new Class[0]).invoke(null, new Object[0]);
+            Class prjClassLoaderClazz = ClassLoader.getSystemClassLoader().loadClass("${ProjectorClassLoader::class.java.name}");
+            ClassLoader loader = (ClassLoader) prjClassLoaderClazz
+              .getDeclaredMethod("getInstance", new Class[0])
+              .invoke(null, new Object[0]);
             Class envClass = loader.loadClass("$PROJECTOR_GRAPHICS_ENVIRONMENT_NAME");
             Object envInstance = envClass.getDeclaredMethod("getInstance", new Class[0]).invoke(null, new Object[0]);
             return (java.awt.GraphicsEnvironment) envInstance;
