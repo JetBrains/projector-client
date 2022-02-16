@@ -51,3 +51,7 @@ dependencies {
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
 }
+
+val test by tasks.getting(Test::class) {
+  jvmArgs("--add-opens=java.base/java.lang.reflect=ALL-UNNAMED")
+}
