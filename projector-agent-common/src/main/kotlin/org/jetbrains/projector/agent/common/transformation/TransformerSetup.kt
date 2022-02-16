@@ -82,7 +82,8 @@ public interface TransformerSetup<Params> {
    * @param unavailableReasonConsumer pass a reason why you return false. Only last passed value is used
    * @return true if transformations of thus transformer are applicable for given parameters, false otherwise
    */
-  public fun isTransformerAvailable(parameters: Params, unavailableReasonConsumer: (String) -> Unit): Boolean = isTransformerAvailable(parameters)
+  public fun isTransformerAvailable(parameters: Params, unavailableReasonConsumer: (String) -> Unit): Boolean =
+    isTransformerAvailable(parameters)
 
   /**
    * Runs transformation (returned from [getTransformations]) of this transformer.
