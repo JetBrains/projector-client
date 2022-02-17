@@ -25,6 +25,7 @@ package org.jetbrains.projector.client.web.debug
 
 import kotlinx.browser.document
 import org.jetbrains.projector.client.common.misc.ParamsProvider
+import org.jetbrains.projector.client.web.externalDeclarartion.pointerEvents
 import org.w3c.dom.HTMLDivElement
 import kotlin.math.roundToInt
 
@@ -61,7 +62,7 @@ class DivPingShower : PingShower {
       style.left = "5%"
       style.padding = "5px"
       style.zIndex = "1"
-      style.asDynamic().pointerEvents = "none"
+      style.pointerEvents = "none"
 
       document.body!!.appendChild(this)
     }

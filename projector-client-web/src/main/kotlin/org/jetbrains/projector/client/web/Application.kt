@@ -25,21 +25,12 @@ package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ParamsProvider
+import org.jetbrains.projector.client.web.externalDeclarartion.permissions
 import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.util.logging.Logger
-import kotlin.js.Json
-import kotlin.js.Promise
 import kotlin.js.json
 import kotlin.random.Random
-
-// todo: remove after https://youtrack.jetbrains.com/issue/KT-36037 is resolved
-external class Permissions {
-
-  fun query(permissionDescriptor: Json): Promise<PermissionStatus>
-}
-
-external class PermissionStatus
 
 class Application {
 
@@ -80,7 +71,7 @@ class Application {
   }
 
   private fun setClipboardPermissions() {
-    val permissions = window.navigator.asDynamic().permissions as Permissions
+    val permissions = window.navigator.permissions
 
     listOf(
       "clipboard-read",

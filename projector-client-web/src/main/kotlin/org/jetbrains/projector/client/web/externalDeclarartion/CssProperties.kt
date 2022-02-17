@@ -31,3 +31,31 @@ inline var CSSStyleDeclaration.textDecorationThickness: String?
   set(value) {
     asDynamic().textDecorationThickness = value
   }
+
+// todo: https://youtrack.jetbrains.com/issue/KT-51370
+inline var CSSStyleDeclaration.overscrollBehaviorX: String?
+  get() = asDynamic().overscrollBehaviorX.unsafeCast<String?>()
+  set(value) {
+    asDynamic().overscrollBehaviorX = value
+  }
+
+// todo: https://youtrack.jetbrains.com/issue/KT-51370
+inline var CSSStyleDeclaration.overscrollBehaviorY: String?
+  get() = asDynamic().overscrollBehaviorY.unsafeCast<String?>()
+  set(value) {
+    asDynamic().overscrollBehaviorY = value
+  }
+
+// todo: https://youtrack.jetbrains.com/issue/KT-51370
+inline var CSSStyleDeclaration.touchAction: String?
+  get() = asDynamic().touchAction.unsafeCast<String?>()
+  set(value) {
+    asDynamic().touchAction = value
+  }
+
+// todo: https://youtrack.jetbrains.com/issue/KT-51370
+inline var CSSStyleDeclaration.pointerEvents: String?
+  get() = asDynamic().pointerEvents.unsafeCast<String?>()
+  set(value) {
+    asDynamic().pointerEvents = value
+  }

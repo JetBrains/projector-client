@@ -42,6 +42,9 @@ import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.debug.DivSentReceivedBadgeShower
 import org.jetbrains.projector.client.web.debug.NoSentReceivedBadgeShower
 import org.jetbrains.projector.client.web.debug.SentReceivedBadgeShower
+import org.jetbrains.projector.client.web.externalDeclarartion.overscrollBehaviorX
+import org.jetbrains.projector.client.web.externalDeclarartion.overscrollBehaviorY
+import org.jetbrains.projector.client.web.externalDeclarartion.touchAction
 import org.jetbrains.projector.client.web.input.InputController
 import org.jetbrains.projector.client.web.misc.*
 import org.jetbrains.projector.client.web.protocol.SupportedTypesProvider
@@ -85,9 +88,9 @@ sealed class ClientState {
       document.body!!.apply {
         style.apply {
           backgroundColor = ParamsProvider.BACKGROUND_COLOR
-          asDynamic().overscrollBehaviorX = "none"
-          asDynamic().overscrollBehaviorY = "none"
-          asDynamic().touchAction = "none"
+          overscrollBehaviorX = "none"
+          overscrollBehaviorY = "none"
+          touchAction = "none"
         }
 
         oncontextmenu = { false }
