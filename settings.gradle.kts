@@ -40,8 +40,8 @@ pluginManagement {
     kotlin("js") version kotlinVersion apply false
     kotlin("jvm") version kotlinVersion apply false
     kotlin("plugin.serialization") version kotlinVersion apply false
-    id("ru.vyarus.mkdocs") version gradleMkdocsPluginVersion apply false
     id("org.paleozogt.symzip") version symZipVersion apply false
+    id("ru.vyarus.mkdocs") version gradleMkdocsPluginVersion apply false
   }
 }
 
