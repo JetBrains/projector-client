@@ -57,6 +57,12 @@ enum class KeyModifier {
 sealed class ClientEvent
 
 @Serializable
+sealed class ClientUserEvent : ClientEvent()
+
+@Serializable
+sealed class ClientNonUserEvent : ClientEvent()
+
+@Serializable
 data class ClientMouseEvent(
   /** From connection opening. */
   val timeStamp: Int,
@@ -67,7 +73,7 @@ data class ClientMouseEvent(
   val clickCount: Int,
   val modifiers: Set<MouseModifier>,
   val mouseEventType: MouseEventType,
-) : ClientEvent() {
+) : ClientUserEvent() {
 
   enum class MouseEventType {
     MOVE,
@@ -91,7 +97,7 @@ data class ClientWheelEvent(
   val y: Int,
   val deltaX: Double,
   val deltaY: Double,
-) : ClientEvent() {
+) : ClientUserEvent() {
 
   enum class ScrollingMode {
     PIXEL,
@@ -109,7 +115,7 @@ data class ClientKeyEvent(
   val location: KeyLocation,
   val modifiers: Set<KeyModifier>,
   val keyEventType: KeyEventType,
-) : ClientEvent() {
+) : ClientUserEvent() {
 
   enum class KeyEventType {
     DOWN,
@@ -130,7 +136,7 @@ data class ClientKeyPressEvent(
   val timeStamp: Int,
   val char: Char,
   val modifiers: Set<KeyModifier>,
-) : ClientEvent()
+) : ClientUserEvent()
 
 @Serializable
 data class ClientRawKeyEvent(
@@ -141,7 +147,7 @@ data class ClientRawKeyEvent(
   val modifiers: Int,
   val location: Int,
   val keyEventType: RawKeyEventType,
-) : ClientEvent() {
+) : ClientUserEvent() {
 
   enum class RawKeyEventType {
     DOWN,
@@ -151,38 +157,38 @@ data class ClientRawKeyEvent(
 }
 
 @Serializable
-data class ClientResizeEvent(val size: CommonIntSize) : ClientEvent()
+data class ClientResizeEvent(val size: CommonIntSize) : ClientUserEvent()
 
 @Serializable
-data class ClientRequestImageDataEvent(val imageId: ImageId) : ClientEvent()
+data class ClientRequestImageDataEvent(val imageId: ImageId) : ClientNonUserEvent()
 
 @Serializable
 data class ClientClipboardEvent(
   val stringContent: String,  // TODO: support more types
-) : ClientEvent()
+) : ClientNonUserEvent()
 
 @Serializable
 data class ClientRequestPingEvent(
   /** From connection opening. */
   val clientTimeStamp: Int,
-) : ClientEvent()
+) : ClientNonUserEvent()
 
 @Serializable
 data class ClientSetKeymapEvent(
   val keymap: UserKeymap,
-) : ClientEvent()
+) : ClientUserEvent()
 
 @Serializable
 data class ClientOpenLinkEvent(
   val link: String,
-) : ClientEvent()
+) : ClientUserEvent()
 
 @Serializable
 data class ClientWindowMoveEvent(
   val windowId: Int,
   val deltaX: Int,
   val deltaY: Int,
-) : ClientEvent()
+) : ClientUserEvent()
 
 // If delta is negative, we resizing to the left top
 @Serializable
@@ -191,38 +197,38 @@ data class ClientWindowResizeEvent(
   val deltaX: Int,
   val deltaY: Int,
   val direction: ResizeDirection,
-) : ClientEvent()
+) : ClientUserEvent()
 
 @Serializable
 data class ClientWindowSetBoundsEvent(
   val windowId: Int,
-  val bounds: CommonIntRectangle
-) : ClientEvent()
+  val bounds: CommonIntRectangle,
+) : ClientUserEvent()
 
 @Serializable
 data class ClientDisplaySetChangeEvent(
-  val newDisplays: List<DisplayDescription>
-) : ClientEvent()
+  val newDisplays: List<DisplayDescription>,
+) : ClientUserEvent()
 
 @Serializable
 data class ClientWindowCloseEvent(
   val windowId: Int,
-) : ClientEvent()
+) : ClientUserEvent()
 
 @Serializable
 data class ClientWindowInterestEvent(
   val windowId: Int,
-  val isInterested: Boolean
-): ClientEvent()
+  val isInterested: Boolean,
+) : ClientNonUserEvent()
 
 @Suppress("unused") //used in client-web/org.jetbrains.projector.client.web.window.WindowManager and at server side
 @Serializable
 data class ClientWindowsActivationEvent(
   val windowIds: List<Int>,
-) : ClientEvent()
+) : ClientUserEvent()
 
 @Suppress("unused") //used in client-web/org.jetbrains.projector.client.web.window.WindowManager and at server side
 @Serializable
 data class ClientWindowsDeactivationEvent(
   val windowIds: List<Int>,
-) : ClientEvent()
+) : ClientUserEvent()

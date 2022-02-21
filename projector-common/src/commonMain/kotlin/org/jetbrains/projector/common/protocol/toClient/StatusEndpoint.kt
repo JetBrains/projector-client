@@ -21,45 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.common.protocol.handshake
 
-import kotlinx.serialization.builtins.ListSerializer
-import org.jetbrains.projector.common.misc.compatibilityHash
-import org.jetbrains.projector.common.protocol.toClient.ServerEvent
-import org.jetbrains.projector.common.protocol.toServer.ClientEvent
+package org.jetbrains.projector.common.protocol.toClient
 
-val HANDSHAKE_VERSION = listOf(ToClientHandshakeEvent.serializer(), ToServerHandshakeEvent.serializer())
-  .map { ListSerializer(it).descriptor.compatibilityHash }
-  .reduce(Int::xor)
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
-// Don't change order here: it's used to obtain readable "human id"
-val handshakeVersionList = listOf(
-  456250626,
+@Serializable
+data class Status(
+  val mainWindowsCount: Int,
+  val lastUserActionTimeStampMs: Long,
 )
 
-val COMMON_VERSION = listOf(ServerEvent.serializer(), ClientEvent.serializer())
-  .map { ListSerializer(it).descriptor.compatibilityHash }
-  .reduce(Int::xor)
+private val json = Json.Default
+private val serializer = Status.serializer()
 
-// Don't change order here: it's used to obtain readable "human id"
-val commonVersionList = listOf(
-  -1663032476,
-  615706807,
-  891030124,
-  -1205505588,
-  581264379,
-  -625612891,
-  -560999684,
-  471600343,
-  -215338327,
-  1580903519,
-  36358479,
-  1670488062,
-  -733798733,
-  -1255984693,
-  -1671626343,
-  1980644253,
-  1328208692,
-  -1867356666,
-  -1218764012,
-)
+fun Status.toJson(): String = json.encodeToString(serializer, this)
+
+fun String.toStatus(): Status = json.decodeFromString(serializer, this)
