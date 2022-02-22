@@ -108,5 +108,5 @@ data class WindowData(
    * This is intended to help the client size rendering canvas, as `bounds` operates on "user pixels" (as opposed to hardware pixels)
    */
   @SerialName("q")
-  val renderingScale: Float = 1f
+  val renderingScale: Float = 1f,
 )
