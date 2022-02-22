@@ -29,6 +29,10 @@ import kotlinx.coroutines.*
 import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.logging.Logger
 
+// This must be before logger declaration, as loggers will try to call other methods in this file
+@OptIn(DelicateCoroutinesApi::class)
+private val scope = CoroutineScope(newSingleThreadContext("stateListenerThread"))
+
 private val logger = Logger("IdeState")
 
 /**
@@ -103,6 +107,3 @@ private suspend fun runLoopForListener(purpose: String?, listener: IdeStateListe
     delay(5)
   }
 }
-
-@OptIn(DelicateCoroutinesApi::class)
-private val scope = CoroutineScope(newSingleThreadContext("stateListenerThread"))
