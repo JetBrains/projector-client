@@ -1,5 +1,4 @@
 version: "1.0"
-failThreshold: 0
 linter: jetbrains/qodana-jvm:latest
 profile:
   name: qodana.recommended
@@ -11,7 +10,6 @@ include:
   - name: DuplicatedCode
   - name: InconsistentLineSeparators
   - name: JavaLangImport
-  - name: LongLine
   - name: OnDemandImport
   - name: ProblematicWhitespace
   - name: QodanaServiceMessage
@@ -22,17 +20,3 @@ include:
   - name: StaticImport
   - name: SyntaxError
   - name: UNUSED_IMPORT
-exclude:
-  - name: LongLine
-    paths:
-      - README.md
-      - projector-client-web/README.md
-      - projector-launcher/README.md
-      - projector-launcher/src/main/resources/
-      - docs/
-      - docSrc/
-      - .github/
-      - projector-client-web/src/main/resources/
-      - projector-server-core/src/main/resources/
-      - gradlew
-      - gradlew.bat
