@@ -21,37 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-  kotlin("multiplatform")
-  `maven-publish`
-  id("io.kotest.multiplatform")
-}
 
-val kotlinVersion: String by project
-val kotestVersion: String by project
+package org.jetbrains.projector.util.logging
 
-kotlin {
-  explicitApi()
+import io.kotest.core.spec.style.StringSpec
 
-  js(IR) {
-    browser()
-  }
-  jvm()
-
-  sourceSets {
-    val commonMain by getting {
-      dependencies {
-        implementation("io.kotest:kotest-framework-engine:$kotestVersion")
-        implementation("io.kotest:kotest-assertions-core:$kotestVersion")
-      }
-    }
-
-    val jsMain by getting {
-    }
-
-    val jvmMain by getting {
-    }
-  }
-}
-
-publishToSpace("kotlin")
+class DummyTest : StringSpec({ "empty test for coverage building" {} })
