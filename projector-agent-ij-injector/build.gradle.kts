@@ -70,6 +70,8 @@ tasks.withType<Jar> {
     )
   }
 
+  duplicatesStrategy = DuplicatesStrategy.WARN
+
   exclude("META-INF/versions/9/module-info.class")
 
   from(inline(configurations.runtimeClasspath))
