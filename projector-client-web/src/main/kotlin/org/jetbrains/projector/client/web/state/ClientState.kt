@@ -512,8 +512,10 @@ sealed class ClientState {
           typing.addEventChar(event)
         }
 
-        eventsToSend.add(event)
-        messagingPolicy.onAddEvent()
+        if (!isCopyOrPasteEvent(event)) {
+          eventsToSend.add(event)
+          messagingPolicy.onAddEvent()
+        }
 
         this
       }
@@ -561,6 +563,17 @@ sealed class ClientState {
         reloadConnection("No messages from server for ${action.elapsedTimeMs} ms, retrying the connection...")
 
       else -> super.consume(action)
+    }
+
+    private fun isCopyOrPasteEvent(event: ClientEvent): Boolean {
+      return (event is ClientKeyPressEvent
+              && (KeyModifier.CTRL_KEY in event.modifiers
+                  || KeyModifier.META_KEY in event.modifiers
+                  || event.char.category == CharCategory.CONTROL)
+              && (event.char.toString() == "v"
+                  || event.char.toString() == "V"
+                  || event.char.toString() == "C"
+                  || event.char.toString() == "c"))
     }
 
     private fun reloadConnection(messageText: String): ClientState {
