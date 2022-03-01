@@ -21,7 +21,7 @@ jobs:
       - uses: gradle/wrapper-validation-action@v1
       - uses: actions/setup-java@v1
         with:
-          java-version: '17'
+          java-version: '11'
       - run: ./gradlew clean
       - run: ./gradlew build -x check
 
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
         with:
-          java-version: '17'
+          java-version: '11'
       - run: sudo apt update && sudo apt install wine-stable -y
       - name: check projector-launcher building linux
         run: ./gradlew :projector-launcher:distZip
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
         with:
-          java-version: '17'
+          java-version: '11'
       - run: brew install --cask wine-stable
       - name: check projector-launcher building macOS
         run: ./gradlew :projector-launcher:packageZipDarwinX64
@@ -59,7 +59,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
         with:
-          java-version: '17'
+          java-version: '11'
       - name: check projector-launcher building windows
         run: |
           npm cache clean --force
