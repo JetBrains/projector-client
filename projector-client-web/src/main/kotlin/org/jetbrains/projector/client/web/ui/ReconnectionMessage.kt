@@ -42,10 +42,10 @@ fun ReconnectionMessage(text: String?) {
           left(0.px)
           property("pointer-events", "none")
 
-          background("rgba(127, 127, 127, 0.5)")
+          backgroundColor(rgba(127, 127, 127, 0.5))
           display(DisplayStyle.Block)
 
-          textAlign("center")
+          textAlign(AlignContent.Center.value)
         }
 
         classes("connection-watcher-warning")

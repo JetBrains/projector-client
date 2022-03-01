@@ -24,12 +24,17 @@
 package org.jetbrains.projector.client.web.ui
 
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.selectors.Nth.Companion.Functional
 import org.jetbrains.compose.web.dom.Div
 
-private const val CHILDREN_COUNT = 12
+/* The following loading indicator is inspired from https://loading.io/css/ (CC0 license). */
 
+private const val CHILDREN_COUNT = 12
+private val ANIMATION_DELAY = 0.1.s
+
+@OptIn(ExperimentalComposeWebApi::class)
 private object LoadingIndicatorStyleSheet : StyleSheet() {
 
   private val ldsSpinnerFrames by keyframes {
@@ -52,14 +57,14 @@ private object LoadingIndicatorStyleSheet : StyleSheet() {
     type("div") style {
       property("transform-origin", "40px 40px")
       animation(ldsSpinnerFrames) {
-        duration(1.2.s)
+        duration(CHILDREN_COUNT * ANIMATION_DELAY)
         timingFunction(AnimationTimingFunction.Linear)
         iterationCount(null)  // null is infinite
       }
     }
 
     type("div") + after style {
-      property("content", """" """")
+      property("content", """" """")  // like `content: " ";` in css – to make divs have some volume
       display(DisplayStyle.Block)
       position(Position.Absolute)
       top(3.px)
@@ -67,13 +72,14 @@ private object LoadingIndicatorStyleSheet : StyleSheet() {
       width(6.px)
       height(18.px)
       borderRadius(20.percent)
-      background("#fff")
+      backgroundColor(Color("#fff"))
     }
 
-    (1..CHILDREN_COUNT).forEach { n ->
-      type("div") + nthChild(Functional(b = n)) style {
-        property("transform", "rotate(${(n - 1) * 30}deg)")
-        property("animation-delay", "${(-1.2 + n * 0.1)}s")
+    repeat(CHILDREN_COUNT) { i ->
+      type("div") + nthChild(Functional(b = i + 1)) style {  // todo: what is functional? can we do without it?
+        transform { rotate(i * (360.deg / CHILDREN_COUNT)) }
+        property("animation-delay",
+                 (i + 1 - CHILDREN_COUNT) * ANIMATION_DELAY)  // todo: can we add CHILDREN_COUNT to the multiplier to make it clearer?
       }
     }
   }
