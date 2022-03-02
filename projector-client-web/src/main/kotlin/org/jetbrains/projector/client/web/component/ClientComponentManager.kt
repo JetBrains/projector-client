@@ -64,7 +64,7 @@ abstract class ClientComponentManager<Component : ClientComponent>(
         component.iFrame.style.display = "block"
       }
 
-      false -> component.dispose()
+      false -> component.iFrame.style.display = "none"
     }
   }
 
