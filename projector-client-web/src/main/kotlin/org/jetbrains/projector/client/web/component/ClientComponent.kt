@@ -25,16 +25,20 @@ package org.jetbrains.projector.client.web.component
 
 import kotlinx.browser.document
 import org.w3c.dom.HTMLIFrameElement
+import org.w3c.dom.events.EventListener
 
 abstract class ClientComponent(
   protected val id: Int,
 ) {
+
+  private val documentListeners = mutableMapOf<String, EventListener>()
 
   val iFrame: HTMLIFrameElement = createIFrame(id)
 
   var windowId: Int? = null
 
   fun dispose() {
+    documentListeners.forEach { document.removeEventListener(it.key, it.value) }
     iFrame.remove()
   }
 
@@ -60,6 +64,15 @@ abstract class ClientComponent(
     }
 
     contentDocument!!.oncontextmenu = { false }
+
+    documentListeners["mousedown"] = EventListener {
+      style.asDynamic().pointerEvents = "none"
+    }
+    documentListeners["mouseup"] = EventListener {
+      style.asDynamic().pointerEvents = "auto"
+    }
+
+    documentListeners.forEach { document.addEventListener(it.key, it.value) }
   }
 
   protected fun setLinkProcessor(linkProcessor: (String) -> Unit) {
