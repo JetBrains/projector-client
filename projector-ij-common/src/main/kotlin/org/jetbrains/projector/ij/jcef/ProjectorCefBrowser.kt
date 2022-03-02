@@ -157,8 +157,6 @@ public class ProjectorCefBrowser @JvmOverloads constructor(
       }
 
       override fun ancestorRemoved(event: AncestorEvent?) {
-        instances.remove(id)
-
         sendShowEvent(false)
       }
 
@@ -166,8 +164,6 @@ public class ProjectorCefBrowser @JvmOverloads constructor(
         sendMoveEvent()
       }
     })
-
-    logger.debug { "createdPrjBrowser: ${cefClient.hashCode()}: ${instances.size} : $originalBrowser" }
 
     loadURL(url)
   }
