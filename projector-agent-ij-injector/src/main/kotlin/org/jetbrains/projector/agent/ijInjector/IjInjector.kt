@@ -24,7 +24,7 @@
 package org.jetbrains.projector.agent.ijInjector
 
 import org.jetbrains.projector.agent.init.IjArgs
-import org.jetbrains.projector.common.intellij.buildAtLeast
+import org.jetbrains.projector.ij.jcef.isCefAvailable
 import org.jetbrains.projector.util.loading.UseProjectorLoader
 import java.lang.instrument.Instrumentation
 
@@ -36,7 +36,7 @@ internal object IjInjector {
     val isAgent: Boolean,
     val markdownPanelClassName: String,
   ) {
-    val jcefTransformerInUse by lazy { buildAtLeast("202") }
+    val jcefTransformerInUse by lazy { isCefAvailable() }
   }
 
   private fun parametersFromArgs(args: Map<String, String>): AgentParameters {

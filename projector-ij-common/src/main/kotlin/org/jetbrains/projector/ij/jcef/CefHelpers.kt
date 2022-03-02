@@ -29,7 +29,9 @@ import org.cef.browser.CefMessageRouter
 import org.cef.callback.CefQueryCallback
 import org.cef.handler.CefClientHandler
 import org.cef.handler.CefMessageRouterHandler
+import org.jetbrains.projector.common.intellij.buildAtLeast
 import org.jetbrains.projector.util.loading.UseProjectorLoader
+import org.jetbrains.projector.util.loading.state.IdeState
 
 public fun CefClientHandler.getMessageRouters(): List<CefMessageRouter> {
   return CefHandlers.getMessageRouters(this)
@@ -45,14 +47,24 @@ public fun CefMessageRouterHandler.onProjectorQuery(projectorCefBrowser: Project
   onQuery(projectorCefBrowser, DEFAULT_FRAME, 0, query, false, DEFAULT_CALLBACK)
 }
 
-internal val DEFAULT_FRAME = ProjectorCefFrame()
+internal val DEFAULT_FRAME by lazy {  ProjectorCefFrame() }
 
-private val DEFAULT_CALLBACK = object : CefQueryCallback {
-  override fun success(response: String?) {
-    // TODO
-  }
+private val DEFAULT_CALLBACK by lazy {
+  object : CefQueryCallback {
+    override fun success(response: String?) {
+      // TODO
+    }
 
-  override fun failure(error_code: Int, error_message: String?) {
-    // TODO
+    override fun failure(error_code: Int, error_message: String?) {
+      // TODO
+    }
   }
+}
+
+public fun isCefAvailable(): Boolean = IdeState.isIdeAttached && buildAtLeast("202")
+
+@Suppress("unused") // used in server
+public fun updateCefBrowsersSafely() {
+  if (!isCefAvailable()) return
+  ProjectorCefBrowser.updateAll()
 }

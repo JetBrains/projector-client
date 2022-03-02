@@ -601,8 +601,7 @@ public class ProjectorCefBrowser @JvmOverloads constructor(
 
     public fun getClientInstances(client: CefClient): List<ProjectorCefBrowser> = instances.values.filter { it.cefClient === client }
 
-    @Suppress("unused") // used in server
-    public fun updateAll() {
+    internal fun updateAll() {
       instances.values.forEach {
         it.resendState()
       }
