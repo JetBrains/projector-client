@@ -148,19 +148,26 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
     }
   }
 
+  private fun CtBehavior.removeNativeCallsIfHeadless() {
+    if (isAgent) return
+    instrument(object : ExprEditor() {
+      override fun edit(m: MethodCall) {
+        if (Modifier.isNative(m.method.modifiers)) {
+          m.replace("")
+        }
+      }
+    })
+  }
+
   private fun transformCefClientHandler(clazz: CtClass): ByteArray {
 
-    @Suppress("rawtypes")
     clazz
       .getDeclaredConstructor()
-      .setBodyIfHeadless(
-        // language=java prefix="class CefClientHandler { public CefClientHandler()" suffix="}"
-        """
-          {
-            // Remove call to native method
-          }
-        """.trimIndent()
-      )
+      .removeNativeCallsIfHeadless()
+
+    clazz
+      .getDeclaredMethod("dispose")
+      .removeNativeCallsIfHeadless()
 
     clazz
       .getDeclaredMethod("addMessageRouter")
@@ -171,6 +178,27 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
       .getDeclaredMethod("removeMessageRouter")
       // language=java prefix="class CefClientHandler { protected synchronized void removeMessageRouter(org.cef.browser.CefMessageRouter $1) {" suffix="}}"
       .setBodyOrInsertBefore(CefHandlers::onMessageRouterRemoved.getJavaCallString("$0", "$1"))
+
+    listOf(
+      "removeContextMenuHandler",
+      "removeDialogHandler",
+      "removeDisplayHandler",
+      "removeDownloadHandler",
+      "removeDragHandler",
+      "removeFocusHandler",
+      "removeJSDialogHandler",
+      "removeKeyboardHandler",
+      "removeLifeSpanHandler",
+      "removeLoadHandler",
+      "removeRenderHandler",
+      "removeRequestHandler",
+      "removeWindowHandler",
+    ).forEach { methodName ->
+
+      clazz
+        .getDeclaredMethod(methodName)
+        .removeNativeCallsIfHeadless()
+    }
 
     return clazz.toBytecode()
   }
