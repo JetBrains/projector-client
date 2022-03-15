@@ -63,6 +63,9 @@ class ImageCacher(private val canvasFactory: CanvasFactory) {
   }
 
   fun putImageData(imageId: ImageId, imageData: ImageData) {
+    if (currentSize > ParamsProvider.IMAGE_CACHE_SIZE_CHARS) {
+      collectGarbage()
+    }
     requestedImages[imageId] = LivingEntity(TimeStamp.current, 0, null) // Added new image to requested
 
     putImageAsync(imageId, imageData)
