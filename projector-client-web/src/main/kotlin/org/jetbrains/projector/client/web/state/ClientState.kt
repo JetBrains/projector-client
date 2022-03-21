@@ -73,9 +73,16 @@ import kotlin.math.roundToInt
 
 sealed class ClientState {
 
-  open fun consume(action: ClientAction): ClientState {
-    logger.error { "${this::class.simpleName}: can't consume ${action::class.simpleName}" }
-    return this
+  open fun consume(action: ClientAction): ClientState = when (action) {
+    is ClientAction.WindowResize -> {
+      OnScreenMessenger.updatePosition()
+      this
+    }
+
+    else -> {
+      logger.error { "${this::class.simpleName}: can't consume ${action::class.simpleName}" }
+      this
+    }
   }
 
   private class AppLayers(
@@ -164,6 +171,10 @@ sealed class ClientState {
     private val layers: AppLayers,
     private val onHandshakeFinish: () -> Unit = {},
   ) : ClientState() {
+
+    init {
+      windowSizeController.addListenerIfNeeded()
+    }
 
     override fun consume(action: ClientAction) = when (action) {
       is ClientAction.WebSocket.Open -> {
@@ -426,10 +437,6 @@ sealed class ClientState {
       setWatcher()
     }
 
-    init {
-      windowSizeController.addListener()
-    }
-
     @OptIn(ExperimentalStdlibApi::class)
     override fun consume(action: ClientAction) = when (action) {
       is ClientAction.WebSocket.Message -> {
@@ -555,7 +562,6 @@ sealed class ClientState {
             pingStatistics.onClose()
             windowDataEventsProcessor.onClose()
             inputController.removeListeners()
-            windowSizeController.removeListener()
             typing.dispose()
             markdownPanelManager.disposeAll()
             closeBlocker.removeListener()
@@ -582,7 +588,6 @@ sealed class ClientState {
       drawPendingEvents.cancel()
       pingStatistics.onClose()
       inputController.removeListeners()
-      windowSizeController.removeListener()
       typing.dispose()
       connectionWatcher.removeWatcher()
 
