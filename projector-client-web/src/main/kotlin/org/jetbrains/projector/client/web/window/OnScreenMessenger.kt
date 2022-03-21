@@ -83,6 +83,13 @@ object OnScreenMessenger : LafListener {
       document.body!!.appendChild(div)
     }
 
+    updatePosition()
+    header.visible = true
+    header.zIndex = div.style.zIndex.toInt()
+    header.draw()
+  }
+
+  fun updatePosition() {
     val userScalingRatio = ParamsProvider.USER_SCALING_RATIO
     val mainDivBounds = div.getBoundingClientRect()
     header.bounds = CommonRectangle(
@@ -91,9 +98,6 @@ object OnScreenMessenger : LafListener {
       div.clientWidth * userScalingRatio,
       ProjectorUI.headerHeight * userScalingRatio
     )
-    header.visible = true
-    header.zIndex = div.style.zIndex.toInt()
-    header.draw()
   }
 
   fun hide() {

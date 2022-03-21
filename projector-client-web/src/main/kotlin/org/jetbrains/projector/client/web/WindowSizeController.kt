@@ -50,12 +50,13 @@ class WindowSizeController(private val stateMachine: ClientStateMachine) {
     stateMachine.fire(ClientAction.WindowResize)
   }
 
-  fun addListener() {
-    window.addEventListener(RESIZE_EVENT_TYPE, ::handleResizeEvent)
-  }
+  private var listening = false
 
-  fun removeListener() {
-    window.removeEventListener(RESIZE_EVENT_TYPE, ::handleResizeEvent)
+  fun addListenerIfNeeded() {
+    if (!listening) {
+      window.addEventListener(RESIZE_EVENT_TYPE, ::handleResizeEvent)
+      listening = true
+    }
   }
 
   companion object {
