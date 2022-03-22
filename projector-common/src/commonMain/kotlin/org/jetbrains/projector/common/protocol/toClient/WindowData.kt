@@ -38,7 +38,10 @@ enum class WindowType {
   POPUP,
 
   @SerialName("c")
-  IDEA_WINDOW
+  IDEA_WINDOW,
+
+  @SerialName("d")
+  FAKE_WINDOW,
 }
 
 // unlike WindowType, this is intended to always be the lowest inheritor of Window that's useful for clientside purposes

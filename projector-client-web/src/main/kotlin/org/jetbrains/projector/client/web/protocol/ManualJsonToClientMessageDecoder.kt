@@ -158,6 +158,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "a" -> WindowType.WINDOW
       "b" -> WindowType.POPUP
       "c" -> WindowType.IDEA_WINDOW
+      "d" -> WindowType.FAKE_WINDOW
       else -> throw IllegalArgumentException("Unsupported window type: $this")
     }
   }

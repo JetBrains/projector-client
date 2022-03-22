@@ -48,6 +48,7 @@ dependencies {
   implementation("org.jsoup:jsoup:$jsoupVersion")
 
   compileOnly("com.jetbrains.intellij.platform:core-impl:$intellijPlatformVersion")
+  compileOnly("com.jetbrains.intellij.platform:ide-impl:$intellijPlatformVersion")
   compileOnly("com.jetbrains.intellij.platform:util-ui:$intellijPlatformVersion")
   compileOnly("org.jetbrains.intellij.deps.jcef:jcef:$intellijJcefVersion")
 
