@@ -49,7 +49,11 @@ class DoubleBufferedRenderingSurface(bufferCanvasFactory: CanvasFactory, private
     // optimization: flush only if the buffer is changed
     if (buffer.changed) {
       buffer.resetChanged()
-      target.context2d.drawImage(buffer.imageSource, 0.0, 0.0)
+      target.context2d.apply {
+        // clear canvas so that semi-transparent parts won't stack on top of each other
+        clearRect(0.0, 0.0, buffer.width.toDouble(), buffer.height.toDouble())
+        drawImage(buffer.imageSource, 0.0, 0.0)
+      }
     }
   }
 
