@@ -408,11 +408,11 @@ sealed class ClientState {
       true -> Typing.SpeculativeTyping(windowManager::getWindowCanvas)
     }
 
-    private val markdownPanelManager = MarkdownPanelManager(windowManager::getWindowZIndex) { link ->
+    private val markdownPanelManager = MarkdownPanelManager(windowManager::getWindowZIndex, inputController::handleMouseMoveEvent) { link ->
       stateMachine.fire(ClientAction.AddEvent(ClientOpenLinkEvent(link)))
     }
 
-    private val embeddedBrowserManager = EmbeddedBrowserManager(windowManager::getWindowZIndex) { link ->
+    private val embeddedBrowserManager = EmbeddedBrowserManager(windowManager::getWindowZIndex, inputController::handleMouseMoveEvent) { link ->
       stateMachine.fire(ClientAction.AddEvent(ClientOpenLinkEvent(link)))
     }
 

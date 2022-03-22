@@ -25,19 +25,18 @@ package org.jetbrains.projector.client.web.component
 
 import kotlinx.dom.clear
 import org.jetbrains.projector.util.logging.Logger
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLIFrameElement
-import org.w3c.dom.Node
-import org.w3c.dom.get
+import org.w3c.dom.*
+import org.w3c.dom.events.Event
 import org.w3c.dom.parsing.DOMParser
 import kotlin.math.absoluteValue
 
 class MarkdownPanelManager(
   zIndexByWindowIdGetter: (Int) -> Int?,
+  private val onMouseMove: (Event) -> Unit,
   private val openInExternalBrowser: (String) -> Unit,
 ) : ClientComponentManager<MarkdownPanelManager.MarkdownPanel>(zIndexByWindowIdGetter) {
 
-  class MarkdownPanel(id: Int, openInExternalBrowser: (String) -> Unit) : ClientComponent(id) {
+  inner class MarkdownPanel(id: Int, openInExternalBrowser: (String) -> Unit) : ClientComponent(id, onMouseMove) {
 
     init {
       setLinkProcessor(openInExternalBrowser)

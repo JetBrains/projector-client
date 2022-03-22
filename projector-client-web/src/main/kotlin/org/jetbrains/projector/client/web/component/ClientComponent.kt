@@ -25,16 +25,24 @@ package org.jetbrains.projector.client.web.component
 
 import kotlinx.browser.document
 import org.w3c.dom.HTMLIFrameElement
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.events.MouseEventInit
 
 abstract class ClientComponent(
   protected val id: Int,
+  private val onMouseMove: (Event) -> Unit,
 ) {
+
+  private val contentDocumentListeners = mutableMapOf<String, EventListener>()
 
   val iFrame: HTMLIFrameElement = createIFrame(id)
 
   var windowId: Int? = null
 
   fun dispose() {
+    contentDocumentListeners.forEach { iFrame.contentDocument?.removeEventListener(it.key, it.value) }
     iFrame.remove()
   }
 
@@ -60,6 +68,10 @@ abstract class ClientComponent(
     }
 
     contentDocument!!.oncontextmenu = { false }
+
+    addEventListener("load", EventListener {
+      onContentChanged()
+    })
   }
 
   protected fun setLinkProcessor(linkProcessor: (String) -> Unit) {
@@ -92,6 +104,49 @@ abstract class ClientComponent(
     }
   }
 
+  private fun onContentChanged() {
+    contentDocumentListeners.forEach { iFrame.contentDocument!!.addEventListener(it.key, it.value) }
+  }
+
   private fun getIFrameId(browserId: Int) = "${this::class.simpleName}$browserId"
 
+  init {
+    contentDocumentListeners["mousemove"] = EventListener {
+
+      val mouseEventInit = with(it as MouseEvent) {
+        MouseEventInit(
+          screenX = screenX,
+          screenY = screenY,
+          clientX = clientX + iFrame.offsetLeft,
+          clientY = clientY + iFrame.offsetTop,
+          button = button,
+          buttons = buttons,
+          relatedTarget = relatedTarget,
+          region = region,
+          ctrlKey = ctrlKey,
+          shiftKey = shiftKey,
+          altKey = altKey,
+          metaKey = metaKey,
+          modifierAltGraph = getModifierState("AltGraph"),
+          modifierCapsLock = getModifierState("CapsLock"),
+          modifierFn = getModifierState("Fn"),
+          modifierFnLock = getModifierState("FnLock"),
+          modifierHyper = getModifierState("Hyper"),
+          modifierNumLock = getModifierState("NumLock"),
+          modifierScrollLock = getModifierState("ScrollLock"),
+          modifierSuper = getModifierState("Super"),
+          modifierSymbol = getModifierState("Symbol"),
+          modifierSymbolLock = getModifierState("SymbolLock"),
+          view = view,
+          detail = detail,
+          bubbles = bubbles,
+          cancelable = cancelable,
+          composed = composed,
+        )
+      }
+      onMouseMove(MouseEvent(it.type, mouseEventInit))
+
+    }
+    onContentChanged()
+  }
 }
