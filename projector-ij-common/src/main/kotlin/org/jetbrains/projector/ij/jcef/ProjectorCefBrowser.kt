@@ -285,7 +285,7 @@ public class ProjectorCefBrowser @JvmOverloads constructor(
   override fun loadURL(url: String?) {
     originalBrowser?.loadURL(url)
 
-    if (url == null || url == "about:blank") return
+    if (url.isNullOrEmpty() || url == "about:blank") return
 
     val parsedUrl = URL(url)
 
@@ -563,6 +563,7 @@ public class ProjectorCefBrowser @JvmOverloads constructor(
   public fun onLifeSpanHandlerAdded(lifeSpanHandler: CefLifeSpanHandler) {
     lifeSpanHandlers += lifeSpanHandler
     lifeSpanHandler.onAfterCreated(this) // html loading starts only after browser creation
+    client.onAfterCreated(this)
   }
 
   // Called only in headless
