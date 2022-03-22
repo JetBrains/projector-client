@@ -172,10 +172,6 @@ sealed class ClientState {
     private val onHandshakeFinish: () -> Unit = {},
   ) : ClientState() {
 
-    init {
-      windowSizeController.addListenerIfNeeded()
-    }
-
     override fun consume(action: ClientAction) = when (action) {
       is ClientAction.WebSocket.Open -> {
         OnScreenMessenger.showText("Connection is opened", "Sending handshake...", canReload = false)
