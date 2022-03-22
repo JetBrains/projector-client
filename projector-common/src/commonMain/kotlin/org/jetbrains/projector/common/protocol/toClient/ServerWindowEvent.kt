@@ -251,3 +251,16 @@ data class ServerSetUnknownStrokeEvent(
 @Serializable
 @SerialName("u")
 object Flush : ServerWindowEvent()
+
+@Serializable
+@SerialName("v")
+data class ServerClearRectEvent(
+  @SerialName("a")
+  val x: Double,
+  @SerialName("b")
+  val y: Double,
+  @SerialName("c")
+  val width: Double,
+  @SerialName("d")
+  val height: Double,
+) : ServerWindowPaintEvent()

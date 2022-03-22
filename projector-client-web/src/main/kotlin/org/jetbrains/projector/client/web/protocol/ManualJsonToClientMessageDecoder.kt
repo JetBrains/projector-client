@@ -287,6 +287,13 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
 
       "u" -> Flush
 
+      "v" -> ServerClearRectEvent(
+        content["a"] as Double,
+        content["b"] as Double,
+        content["c"] as Double,
+        content["d"] as Double,
+      )
+
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }
   }
