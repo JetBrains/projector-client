@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.server.core.util
+package org.jetbrains.projector.util.loading
 
 public fun getOption(propName: String): String? {
   return System.getProperty(propName) ?: System.getenv(propName)

@@ -25,6 +25,7 @@ package org.jetbrains.projector.server.core.util
 
 import org.java_websocket.WebSocketServerFactory
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory
+import org.jetbrains.projector.util.loading.getOption
 import org.jetbrains.projector.util.logging.Logger
 import java.io.FileInputStream
 import java.security.KeyStore
