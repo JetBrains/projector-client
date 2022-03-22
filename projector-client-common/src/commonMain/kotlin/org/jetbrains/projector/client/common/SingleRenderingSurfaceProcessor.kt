@@ -129,6 +129,13 @@ class SingleRenderingSurfaceProcessor(private val renderingSurface: RenderingSur
             r2 = arcHeight.toDouble()
           )
 
+          is ServerClearRectEvent -> renderer.clearRect(
+            x = x,
+            y = y,
+            width = width,
+            height = height,
+          )
+
           is ServerDrawImageEvent -> {
             val image = imageCacher.getImageData(imageId)
 

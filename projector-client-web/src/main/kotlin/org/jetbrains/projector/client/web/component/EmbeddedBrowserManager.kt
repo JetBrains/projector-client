@@ -26,14 +26,17 @@ package org.jetbrains.projector.client.web.component
 import kotlinx.browser.document
 import org.jetbrains.projector.client.web.UriHandler
 import org.w3c.dom.HTMLScriptElement
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.MouseEvent
 
 class EmbeddedBrowserManager(
   zIndexByWindowIdGetter: (Int) -> Int?,
+  private val onMouseMove: (Event) -> Unit,
   private val openInExternalBrowser: (String) -> Unit,
 ) : ClientComponentManager<EmbeddedBrowserManager.EmbeddedBrowserPanel>(zIndexByWindowIdGetter) {
 
-  class EmbeddedBrowserPanel(id: Int, private val openInExternalBrowser: (String) -> Unit) : ClientComponent(id) {
+  inner class EmbeddedBrowserPanel(id: Int, private val openInExternalBrowser: (String) -> Unit) : ClientComponent(id, onMouseMove) {
 
     var wasLoaded = false
 
@@ -44,17 +47,15 @@ class EmbeddedBrowserManager(
     private val jsQueue = ArrayDeque<String>()
 
     init {
-      iFrame.apply {
-        onload = {
-          setOpenLinksInExternalBrowser(openLinksInExternalBrowser, true)
+      iFrame.addEventListener("load", EventListener {
+        setOpenLinksInExternalBrowser(openLinksInExternalBrowser, true)
 
-          wasLoaded = true
-          while (jsQueue.isNotEmpty()) {
-            val code = jsQueue.removeFirst()
-            executeJsImpl(code)
-          }
+        wasLoaded = true
+        while (jsQueue.isNotEmpty()) {
+          val code = jsQueue.removeFirst()
+          executeJsImpl(code)
         }
-      }
+      })
     }
 
     fun setHtml(html: String) {

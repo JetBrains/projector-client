@@ -75,7 +75,7 @@ class InputController(
   private var lastTouchX = 1
   private var lastTouchY = 1
 
-  private fun handleMouseMoveEvent(event: Event) {
+  fun handleMouseMoveEvent(event: Event) {
     require(event is MouseEvent)
 
     val topWindow = windowManager.getTopWindow(event.clientX, event.clientY)

@@ -388,6 +388,14 @@ class Renderer(private val renderingSurface: RenderingSurface) {
     }
   }
 
+  fun clearRect(x: Double, y: Double, width: Double, height: Double) {
+    ensureClip()
+    ensureTransform()
+    ensureComposite()
+
+    ctx.clearRect(x, y, width, height)
+  }
+
   fun paintPolygon(paintType: PaintType, points: List<Point>) {
     ensureClip()
     ensureTransform()

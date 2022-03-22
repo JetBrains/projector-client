@@ -75,6 +75,8 @@ public fun Constructor<*>.toGetDeclaredMethodFormat(): String {
 
 public fun loadClassWithProjectorLoader(clazz: Class<*>): String = loadClassWithProjectorLoader(clazz.name, true)
 
+public fun loadClassWithProjectorLoader(className: String): String = loadClassWithProjectorLoader(className, true)
+
 private fun loadClassWithProjectorLoader(className: String, trim: Boolean): String = """
         $commonClassLoadCode
           .loadClass("$className")

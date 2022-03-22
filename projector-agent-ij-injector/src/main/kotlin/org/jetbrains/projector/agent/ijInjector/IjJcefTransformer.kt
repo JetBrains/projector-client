@@ -23,6 +23,8 @@
  */
 package org.jetbrains.projector.agent.ijInjector
 
+import com.intellij.openapi.actionSystem.ActionGroup
+import com.intellij.openapi.fileEditor.LayoutActionsFloatingToolbar
 import com.intellij.ui.jcef.*
 import javassist.*
 import javassist.expr.*
@@ -38,6 +40,7 @@ import org.jetbrains.projector.common.intellij.buildAtLeast
 import org.jetbrains.projector.ij.jcef.CefHandlers
 import org.jetbrains.projector.ij.jcef.ProjectorCefBrowser
 import org.jetbrains.projector.util.loading.state.IdeState
+import javax.swing.JComponent
 
 internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParameters>() {
 
@@ -64,6 +67,13 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
       transformations += JBCefBrowserBase::class.java to ::transformJBCefBrowserBase
     }
 
+    @Suppress("UnstableApiUsage")
+    transformations += HwFacadeHelper::class.java to ::transformHwFacadeHelper
+
+    if (buildAtLeast("213")) {
+      transformations += LayoutActionsFloatingToolbar::class.java to ::transformLayoutActionsFloatingToolbar
+    }
+
     return transformations
   }
 
@@ -73,6 +83,95 @@ internal object IjJcefTransformer : IdeTransformerSetup<IjInjector.AgentParamete
 
   override val loadingState: IdeState
     get() = IdeState.CONFIGURATION_STORE_INITIALIZED
+
+  private fun createPWindow(component: String) = """
+    {
+      Class pWindowClass = ${loadClassWithProjectorLoader("org.jetbrains.projector.awt.PWindow")};
+      Object pWindow = pWindowClass
+        .getDeclaredConstructor(new Class[]{java.awt.Component.class, boolean.class})
+        .newInstance(new Object[] { $component, Boolean.valueOf($isAgent) });
+    }
+  """.trimIndent()
+
+  private fun disposePWindow(component: String) = """
+    {
+      Class pWindowClass = ${loadClassWithProjectorLoader("org.jetbrains.projector.awt.PWindow")};
+      pWindowClass
+        .getDeclaredMethod("disposeWindow", new Class[]{java.awt.Component.class})
+        .invoke(null, new Object[] { $component });
+    }
+  """.trimIndent()
+
+  private fun useGraphics(component: String, useGraphics: (String) -> String) = """
+    {
+      Class pWindowClass = ${loadClassWithProjectorLoader("org.jetbrains.projector.awt.PWindow")};
+      Object pWindow = pWindowClass
+        .getDeclaredMethod("getWindow", new Class[]{java.awt.Component.class})
+        .invoke(null, new Object[]{$component});
+      if (pWindow != null) {
+        java.awt.Graphics2D windowGraphics = (java.awt.Graphics2D) pWindowClass
+          .getDeclaredMethod("getGraphics", new Class[]{})
+          .invoke(pWindow, new Object[]{});
+        ${useGraphics("windowGraphics")}  
+      }
+    }
+  """.trimIndent()
+
+  private fun transformLayoutActionsFloatingToolbar(ctClass: CtClass): ByteArray {
+
+    ctClass
+      .getDeclaredConstructor(JComponent::class.java, ActionGroup::class.java)
+      .insertAfter(createPWindow("this"))
+
+    ctClass
+      .getDeclaredMethod("dispose")
+      .insertBefore(disposePWindow("this"))
+
+    listOf(
+      "paintComponent",
+      "paintChildren",
+    ).forEach { methodName ->
+      ctClass
+        .getDeclaredMethod(methodName)
+        .apply {
+          if (isAgent) {
+            insertAfter(useGraphics("this") { g ->
+              """
+                if ($g != $1) {
+                  $methodName($g);
+                }
+              """.trimIndent()
+            })
+          } else {
+            insertBefore(useGraphics("this") { g -> "$1 = $g;" })
+          }
+        }
+    }
+
+    return ctClass.toBytecode()
+  }
+
+  private fun transformHwFacadeHelper(clazz: CtClass): ByteArray {
+
+    clazz
+      .getDeclaredMethod("paint")
+      .setBodyOrInsertAfter(useGraphics("myTarget") { g ->
+        """
+          $g.clearRect(0, 0, myTarget.getWidth(), myTarget.getHeight());
+          $2.accept($g);
+        """.trimIndent()
+      })
+
+    clazz
+      .getDeclaredMethod("addNotify")
+      .setBody(createPWindow("myTarget"))
+
+    clazz
+      .getDeclaredMethod("removeNotify")
+      .setBody(disposePWindow("myTarget"))
+
+    return clazz.toBytecode()
+  }
 
   private fun transformJBSchemeHandlerFactory(clazz: CtClass): ByteArray {
 

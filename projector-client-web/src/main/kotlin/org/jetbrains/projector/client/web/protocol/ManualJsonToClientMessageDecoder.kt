@@ -158,6 +158,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "a" -> WindowType.WINDOW
       "b" -> WindowType.POPUP
       "c" -> WindowType.IDEA_WINDOW
+      "d" -> WindowType.FAKE_WINDOW
       else -> throw IllegalArgumentException("Unsupported window type: $this")
     }
   }
@@ -285,6 +286,13 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "t" -> ServerSetUnknownStrokeEvent(content["a"] as String)
 
       "u" -> Flush
+
+      "v" -> ServerClearRectEvent(
+        content["a"] as Double,
+        content["b"] as Double,
+        content["c"] as Double,
+        content["d"] as Double,
+      )
 
       else -> throw IllegalArgumentException("Unsupported event type: ${JSON.stringify(this)}")
     }

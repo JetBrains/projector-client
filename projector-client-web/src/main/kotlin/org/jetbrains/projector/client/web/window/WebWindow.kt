@@ -71,7 +71,7 @@ class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMac
   var isShowing: Boolean = false
     set(value) {
       header?.visible = value
-      border.visible = value
+      border?.visible = value
 
       if (field == value) {
         return
@@ -81,13 +81,13 @@ class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMac
     }
 
   //public only for speculative typing.
-  val canvas = createCanvas()
+  val canvas = createCanvas(windowData.id)
   private val renderingSurface = createRenderingSurface(canvas)
 
   private var header: WindowHeader? = null
   private var headerVerticalPosition: Double = 0.0
   private var headerHeight: Double = 0.0
-  private val border = WindowBorder(windowData.resizable)
+  private val border = if (windowData.windowType == WindowType.FAKE_WINDOW) null else WindowBorder(windowData.resizable)
 
   override val commandProcessor = SingleRenderingSurfaceProcessor(renderingSurface, imageCacher)
 
@@ -106,7 +106,7 @@ class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMac
         field = value
         canvas.style.zIndex = "$zIndex"
         header?.zIndex = zIndex
-        border.zIndex = zIndex - 1
+        border?.zIndex = zIndex - 1
       }
     }
 
@@ -121,46 +121,46 @@ class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMac
   init {
     applyBounds()
 
-    if (windowData.windowType == WindowType.IDEA_WINDOW || windowData.windowType == WindowType.POPUP) {
-      canvas.style.border = "none"
-    }
-    else if (windowData.windowType == WindowType.WINDOW) {
-      if (windowData.undecorated) {
-        canvas.style.border = ProjectorUI.borderStyle
-      }
-      else {
-        // If the window has a header on the host, its sizes are included in the window bounds.
-        // The client header is drawn above the window, outside its bounds. At the same time,
-        // the coordinates of the contents of the window come taking into account the size
-        // of the header. As a result, on client an empty space is obtained between header
-        // and the contents of the window. To get rid of this, we transfer the height of the system
-        // window header and if it > 0, we draw the heading not over the window but inside
-        // the window's bounds, filling in the empty space.
-
-        header = WindowHeader(windowData.title)
-        header!!.undecorated = windowData.undecorated
-        header!!.onMove = ::onMove
-        header!!.onClose = ::onClose
-
-        headerVerticalPosition = when (windowData.headerHeight) {
-          0, null -> ProjectorUI.headerHeight
-          else -> 0.0
+    when (windowData.windowType) {
+      WindowType.IDEA_WINDOW, WindowType.POPUP, WindowType.FAKE_WINDOW -> canvas.style.border = "none"
+      WindowType.WINDOW -> {
+        if (windowData.undecorated) {
+          canvas.style.border = ProjectorUI.borderStyle
         }
+        else {
+          // If the window has a header on the host, its sizes are included in the window bounds.
+          // The client header is drawn above the window, outside its bounds. At the same time,
+          // the coordinates of the contents of the window come taking into account the size
+          // of the header. As a result, on client an empty space is obtained between header
+          // and the contents of the window. To get rid of this, we transfer the height of the system
+          // window header and if it > 0, we draw the heading not over the window but inside
+          // the window's bounds, filling in the empty space.
 
-        headerHeight = when (windowData.headerHeight) {
-          0, null -> ProjectorUI.headerHeight
-          else -> windowData.headerHeight!!.toDouble()
+          header = WindowHeader(windowData.title)
+          header!!.undecorated = windowData.undecorated
+          header!!.onMove = ::onMove
+          header!!.onClose = ::onClose
+
+          headerVerticalPosition = when (windowData.headerHeight) {
+            0, null -> ProjectorUI.headerHeight
+            else -> 0.0
+          }
+
+          headerHeight = when (windowData.headerHeight) {
+            0, null -> ProjectorUI.headerHeight
+            else -> windowData.headerHeight!!.toDouble()
+          }
+
+          canvas.style.borderBottom = ProjectorUI.borderStyle
+          canvas.style.borderLeft = ProjectorUI.borderStyle
+          canvas.style.borderRight = ProjectorUI.borderStyle
+          canvas.style.borderRadius = "0 0 ${ProjectorUI.borderRadius}px ${ProjectorUI.borderRadius}px"
         }
-
-        canvas.style.borderBottom = ProjectorUI.borderStyle
-        canvas.style.borderLeft = ProjectorUI.borderStyle
-        canvas.style.borderRight = ProjectorUI.borderStyle
-        canvas.style.borderRadius = "0 0 ${ProjectorUI.borderRadius}px ${ProjectorUI.borderRadius}px"
       }
     }
 
     if (windowData.resizable) {
-      border.onResize = ::onResize
+      border?.onResize = ::onResize
     }
   }
 
@@ -176,19 +176,19 @@ class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMac
     }
 
     header?.lookAndFeelChanged()
-    border.lookAndFeelChanged()
+    border?.lookAndFeelChanged()
   }
 
   fun contains(x: Int, y: Int): Boolean {
-    return border.bounds.contains(x, y)
+    return border?.bounds?.contains(x, y) ?: bounds.contains(x, y)
   }
 
   fun onMouseDown(x: Int, y: Int): DragEventsInterceptor? {
-    return border.onMouseDown(x, y) ?: header?.onMouseDown(x, y)
+    return border?.onMouseDown(x, y) ?: header?.onMouseDown(x, y)
   }
 
   fun onMouseClick(x: Int, y: Int): DragEventsInterceptor? {
-    return border.onMouseClick(x, y) ?: header?.onMouseClick(x, y)
+    return border?.onMouseClick(x, y) ?: header?.onMouseClick(x, y)
   }
 
   private fun onResize(deltaX: Int, deltaY: Int, direction: ResizeDirection) {
@@ -203,7 +203,8 @@ class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMac
     stateMachine.fire(ClientAction.AddEvent(ClientWindowCloseEvent(id)))
   }
 
-  private fun createCanvas() = (document.createElement("canvas") as HTMLCanvasElement).apply {
+  private fun createCanvas(windowId: Int) = (document.createElement("canvas") as HTMLCanvasElement).apply {
+    id = "window${windowId}"
     style.position = "fixed"
     style.display = isShowing.toDisplayType()
 
@@ -233,7 +234,7 @@ class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMac
       header!!.draw()
     }
 
-    border.bounds = CommonRectangle(
+    border?.bounds = CommonRectangle(
       clientBounds.x,
       (bounds.y - headerVerticalPosition) * userScalingRatio,
       clientBounds.width,
@@ -256,7 +257,7 @@ class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMac
 
   fun dispose() {
     canvas.remove()
-    border.dispose()
+    border?.dispose()
     header?.dispose()
   }
 
