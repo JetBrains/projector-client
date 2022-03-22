@@ -25,18 +25,16 @@ package org.jetbrains.projector.server.core.convert.toClient
 
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.jetbrains.projector.common.protocol.data.Point
-import java.awt.Component
+import java.awt.Rectangle
 import java.awt.Point as AwtPoint
 
-public fun Component.shiftBounds(shift: AwtPoint): CommonRectangle {
-  return with(bounds) {
-    CommonRectangle(
-      (x - shift.x).toDouble(),
-      (y - shift.y).toDouble(),
-      width.toDouble(),
-      height.toDouble()
-    )
-  }
+public fun Rectangle.shift(shift: AwtPoint): CommonRectangle {
+  return CommonRectangle(
+    (x - shift.x).toDouble(),
+    (y - shift.y).toDouble(),
+    width.toDouble(),
+    height.toDouble()
+  )
 }
 
 public fun AwtPoint.shift(shift: AwtPoint): Point {
