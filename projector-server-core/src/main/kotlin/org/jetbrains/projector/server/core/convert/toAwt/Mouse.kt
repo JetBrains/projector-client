@@ -28,7 +28,7 @@ import org.jetbrains.projector.common.protocol.toServer.ClientWheelEvent
 import org.jetbrains.projector.common.protocol.toServer.MouseModifier
 import org.jetbrains.projector.server.core.ReadyClientSettings.TouchState
 import org.jetbrains.projector.server.core.convert.toClient.roundToInfinity
-import org.jetbrains.projector.server.core.util.getOption
+import org.jetbrains.projector.util.loading.getOption
 import java.awt.Component
 import java.awt.event.InputEvent
 import java.awt.event.MouseEvent
