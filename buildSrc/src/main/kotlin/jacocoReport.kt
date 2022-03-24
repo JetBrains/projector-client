@@ -58,7 +58,6 @@ private fun JacocoReport.setup(project: Project, isKotlinMpModule: Boolean) {
 
   reports {
     xml.required.set(true)
-    xml.outputLocation.set(project.rootProject.file("JacocoReports/jacocoReport$moduleName.xml"))
     csv.required.set(false)
     html.outputLocation.set(project.layout.buildDirectory.dir("jacocoHtml$moduleName"))
   }

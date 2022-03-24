@@ -25,6 +25,7 @@ pluginManagement {
   val gradleMkdocsPluginVersion: String by settings
   val kotlinVersion: String by settings
   val symZipVersion: String by settings
+  val sonarqubeVersion: String by settings
 
   buildscript {
     repositories {
@@ -42,6 +43,7 @@ pluginManagement {
     kotlin("plugin.serialization") version kotlinVersion apply false
     id("org.paleozogt.symzip") version symZipVersion apply false
     id("ru.vyarus.mkdocs") version gradleMkdocsPluginVersion apply false
+    id("org.sonarqube") version sonarqubeVersion apply false
   }
 }
 

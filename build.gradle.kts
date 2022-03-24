@@ -27,15 +27,33 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 plugins {
   kotlin("multiplatform") apply false
   `maven-publish`
+  id("org.sonarqube")
 }
 
 val kotlinVersion: String by project
 val targetJvm: String by project
 val publishingVersion: String by project
 
+sonarqube {
+  properties {
+    property("sonar.projectKey", "Jetbrains_projector-client")
+    property("sonar.organization", "jetbrains")
+    property("sonar.host.url", "https://sonarcloud.io")
+  }
+}
+
 subprojects {
   group = "org.jetbrains.projector"
   version = publishingVersion
+
+  sonarqube {
+    properties {
+      property("sonar.sources", getSubprojectDirs("sources"))
+      property("sonar.tests", getSubprojectDirs("test"))
+      property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+      property("sonar.host.url", "https://sonarcloud.io")
+    }
+  }
 
   repositories {
     mavenCentral()
