@@ -62,7 +62,7 @@ public fun IdeState.whenOccurred(
  */
 public fun registerStateListener(purpose: String?, listener: IdeStateListener) {
   if (!IdeState.isIdeAttached) {
-    if (purpose != null && IdeState.attachToIde != false) {
+    if (purpose != null && IdeState.attachToIde) {
       logger.info { "Can't $purpose. It's OK if you don't run an IntelliJ platform based app." }
     }
     return

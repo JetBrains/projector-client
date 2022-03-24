@@ -65,18 +65,22 @@ public enum class IdeState {
 
   public companion object {
     public val isIdeAttached: Boolean
-      get() = attachToIde ?: try {
-        WindowsCommandLineProcessor.ourMainRunnerClass
-        true
-      }
-      catch (t: Throwable) {
-        false
+      get() = when (attachToIde) {
+        false -> false
+
+        true -> try {
+          WindowsCommandLineProcessor.ourMainRunnerClass
+          true
+        }
+        catch (t: Throwable) {
+          false
+        }
       }
 
     private val isIdeClassLoaderInstantiated: Boolean
       get() = isIdeAttached && WindowsCommandLineProcessor.ourMainRunnerClass != null
 
-    public val attachToIde: Boolean? get() = getOption(ATTACH_TO_IDE_PROPERTY_NAME)?.toBooleanStrictOrNull()
+    public val attachToIde: Boolean get() = getOption(ATTACH_TO_IDE_PROPERTY_NAME, "true").toBooleanStrict()
 
     public const val ATTACH_TO_IDE_PROPERTY_NAME: String = "ORG_JETBRAINS_PROJECTOR_SERVER_ATTACH_TO_IDE"
   }
