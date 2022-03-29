@@ -36,7 +36,7 @@ internal class ProjectorClassTransformer(
 ) : ClassFileTransformer {
 
   override fun transform(
-    loader: ClassLoader,
+    loader: ClassLoader?,
     className: String,
     classBeingRedefined: Class<*>?,
     protectionDomain: ProtectionDomain?,
