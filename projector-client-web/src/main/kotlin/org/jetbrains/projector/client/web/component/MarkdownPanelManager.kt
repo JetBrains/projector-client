@@ -32,6 +32,7 @@ import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.Node
+import org.w3c.dom.events.EventListener
 import org.w3c.dom.get
 import org.w3c.dom.parsing.DOMParser
 import kotlin.collections.component1
@@ -42,65 +43,74 @@ class MarkdownPanelManager(private val zIndexByWindowIdGetter: (Int) -> Int?, pr
 
   private class MarkdownPanel(openInExternalBrowser: (String) -> Unit) {
 
+    private val documentListeners = mutableMapOf<String, EventListener>()
+
     val iFrame: HTMLIFrameElement = createIFrame(openInExternalBrowser)
 
     var windowId: Int? = null
 
     fun dispose() {
+      documentListeners.forEach { document.removeEventListener(it.key, it.value) }
       iFrame.remove()
     }
 
-    companion object {
+    private fun createIFrame(openInExternalBrowser: (String) -> Unit) = (document.createElement("iframe") as HTMLIFrameElement).apply {
+      style.apply {
+        position = "fixed"
+        backgroundColor = "#FFF"
+        overflowX = "scroll"
+        overflowY = "scroll"
+        display = "none"
+      }
 
-      private fun createIFrame(openInExternalBrowser: (String) -> Unit) = (document.createElement("iframe") as HTMLIFrameElement).apply {
-        style.apply {
-          position = "fixed"
-          backgroundColor = "#FFF"
-          overflowX = "scroll"
-          overflowY = "scroll"
-          display = "none"
+      frameBorder = "0"
+
+      document.body!!.appendChild(this)
+
+      // cancel auto-started load of about:blank in Firefox
+      // https://stackoverflow.com/questions/7828502/cannot-set-document-body-innerhtml-of-iframe-in-firefox
+      contentDocument!!.apply {
+        open()
+        close()
+      }
+
+      contentDocument!!.oncontextmenu = { false }
+
+      documentListeners["mousedown"] = EventListener {
+        style.asDynamic().pointerEvents = "none"
+      }
+      documentListeners["mouseup"] = EventListener {
+        style.asDynamic().pointerEvents = "auto"
+      }
+
+      documentListeners.forEach { document.addEventListener(it.key, it.value) }
+
+      // adopted from processLinks.js
+      contentDocument!!.onclick = { e ->
+        var target = e.target.asDynamic()
+        while (target != null && target.tagName != "A") {
+          target = target.parentNode
         }
 
-        frameBorder = "0"
-
-        document.body!!.appendChild(this)
-
-        // cancel auto-started load of about:blank in Firefox
-        // https://stackoverflow.com/questions/7828502/cannot-set-document-body-innerhtml-of-iframe-in-firefox
-        contentDocument!!.apply {
-          open()
-          close()
+        if (target == null) {
+          true
         }
+        else if (target.tagName == "A" && target.hasAttribute("href").unsafeCast<Boolean>()) {
+          e.stopPropagation()
 
-        contentDocument!!.oncontextmenu = { false }
-
-        // adopted from processLinks.js
-        contentDocument!!.onclick = { e ->
-          var target = e.target.asDynamic()
-          while (target != null && target.tagName != "A") {
-            target = target.parentNode
-          }
-
-          if (target == null) {
-            true
-          }
-          else if (target.tagName == "A" && target.hasAttribute("href").unsafeCast<Boolean>()) {
-            e.stopPropagation()
-
-            val href = target.getAttribute("href").unsafeCast<String>()
-            if (href[0] == '#') {
-              val elementId = href.substring(1)
-              contentDocument!!.getElementById(elementId)?.scrollIntoView()
-            }
-            else {
-              openInExternalBrowser(href)
-            }
-
-            false
+          val href = target.getAttribute("href").unsafeCast<String>()
+          if (href[0] == '#') {
+            val elementId = href.substring(1)
+            contentDocument!!.getElementById(elementId)?.scrollIntoView()
           }
           else {
-            null
+            openInExternalBrowser(href)
           }
+
+          false
+        }
+        else {
+          null
         }
       }
     }
