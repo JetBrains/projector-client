@@ -21,6 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import com.intellij.openapi.util.BuildNumber
+
 plugins {
   kotlin("jvm")
   `maven-publish`
@@ -39,14 +41,21 @@ val coroutinesVersion: String by project
 val kotestVersion: String by project
 val intellijPlatformVersion: String by project
 
+val intelliJVersionRemovedSuffix = intellijPlatformVersion.takeWhile { it.isDigit() || it == '.' } // in case of EAP
+val intellijPlatformBuildNumber = BuildNumber.fromString(intelliJVersionRemovedSuffix)!!
+
 dependencies {
-  compileOnly(project(":projector-common"))
   api(project(":projector-util-logging"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
   compileOnly("com.jetbrains.intellij.platform:bootstrap:$intellijPlatformVersion")
-  compileOnly("com.jetbrains.intellij.platform:util-base:$intellijPlatformVersion")
+
+  if (intellijPlatformBuildNumber >= BuildNumber.fromString("213.6461.77")!!) {
+    compileOnly("com.jetbrains.intellij.platform:util-base:$intellijPlatformVersion")
+  } else {
+    compileOnly("com.jetbrains.intellij.platform:util-diagnostic:$intellijPlatformVersion")
+  }
 
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")

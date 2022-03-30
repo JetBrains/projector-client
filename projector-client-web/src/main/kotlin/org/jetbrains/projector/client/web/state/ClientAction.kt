@@ -26,6 +26,7 @@ package org.jetbrains.projector.client.web.state
 import org.jetbrains.projector.client.web.WindowSizeController
 import org.jetbrains.projector.common.protocol.toServer.ClientEvent
 
+@JsExport
 sealed class ClientAction {
 
   class Start(

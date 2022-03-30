@@ -21,37 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.jetbrains.projector.ij.jcef
 
-import java.util.*
+internal data class BrowserState(
+  val html: String,
+  val executedJs: List<JsCode>,
+  val openInExternalBrowser: Boolean,
+  val externalUrl: String,
+)
 
-plugins {
-  `kotlin-dsl`
-}
-
-repositories {
-  mavenCentral()
-  maven("https://www.jetbrains.com/intellij-repository/releases")
-  maven("https://www.jetbrains.com/intellij-repository/snapshots")
-  maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
-}
-
-
-val gradleProperties = Properties()
-val gradlePropertiesFile = project.file("../gradle.properties")
-if (gradlePropertiesFile.canRead()) {
-  gradleProperties.load(gradlePropertiesFile.inputStream())
-}
-
-val intellijPlatformVersion: String by gradleProperties
-
-dependencies {
-  implementation("com.jetbrains.intellij.platform:core:$intellijPlatformVersion") {
-    exclude(group = "org.jetbrains.kotlin") // cannot find these dependencies
-  }
-}
-
-kotlin {
-  explicitApi()
-}
-
-sourceSets.main.get().java.srcDir("src/main/kotlin")
+internal data class JsCode(
+  val code: String,
+  val url: String? = null,
+  val line: Int = 0,
+)

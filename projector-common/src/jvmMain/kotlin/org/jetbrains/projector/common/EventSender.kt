@@ -21,37 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.jetbrains.projector.common
 
+import org.jetbrains.projector.common.event.ServerEventPart
+import org.jetbrains.projector.common.protocol.toClient.ServerEvent
+import org.jetbrains.projector.util.loading.ProjectorClassLoader
 import java.util.*
 
-plugins {
-  `kotlin-dsl`
-}
+interface EventSender {
 
-repositories {
-  mavenCentral()
-  maven("https://www.jetbrains.com/intellij-repository/releases")
-  maven("https://www.jetbrains.com/intellij-repository/snapshots")
-  maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
-}
+  fun sendEvent(event: ServerEvent)
 
+  fun sendEventPart(part: ServerEventPart)
 
-val gradleProperties = Properties()
-val gradlePropertiesFile = project.file("../gradle.properties")
-if (gradlePropertiesFile.canRead()) {
-  gradleProperties.load(gradlePropertiesFile.inputStream())
-}
+  companion object {
 
-val intellijPlatformVersion: String by gradleProperties
-
-dependencies {
-  implementation("com.jetbrains.intellij.platform:core:$intellijPlatformVersion") {
-    exclude(group = "org.jetbrains.kotlin") // cannot find these dependencies
+    val instance: EventSender by lazy {
+      // Use ProjectorClassLoader because ProjectorServer is instantiated by it and in CommonQueueEvenSender we access server
+      ServiceLoader.load(EventSender::class.java, ProjectorClassLoader.instance).findFirst().orElseThrow()
+    }
   }
 }
-
-kotlin {
-  explicitApi()
-}
-
-sourceSets.main.get().java.srcDir("src/main/kotlin")

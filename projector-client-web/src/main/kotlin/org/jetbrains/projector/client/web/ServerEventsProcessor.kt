@@ -24,6 +24,7 @@
 package org.jetbrains.projector.client.web
 
 import org.jetbrains.projector.client.common.RenderingQueue
+import org.jetbrains.projector.client.web.component.EmbeddedBrowserManager
 import org.jetbrains.projector.client.web.component.MarkdownPanelManager
 import org.jetbrains.projector.client.web.input.InputController
 import org.jetbrains.projector.client.web.misc.*
@@ -47,7 +48,11 @@ class ServerEventsProcessor(
   private val clipboardHandler = ClipboardHandler { stateMachine.fire(ClientAction.AddEvent(it)) }
 
   fun process(
-    commands: ToClientMessageType, pingStatistics: PingStatistics, typing: Typing, markdownPanelManager: MarkdownPanelManager,
+    commands: ToClientMessageType,
+    pingStatistics: PingStatistics,
+    typing: Typing,
+    markdownPanelManager: MarkdownPanelManager,
+    embeddedBrowserManager: EmbeddedBrowserManager,
     inputController: InputController,
   ) {
     val drawCommandsEvents = mutableListOf<ServerDrawCommandsEvent>()
@@ -57,6 +62,7 @@ class ServerEventsProcessor(
         is ServerWindowSetChangedEvent -> {
           windowDataEventsProcessor.process(command)
           markdownPanelManager.updatePlacements()
+          embeddedBrowserManager.updatePlacements()
         }
 
         is ServerDrawCommandsEvent -> drawCommandsEvents.add(command)
@@ -92,6 +98,17 @@ class ServerEventsProcessor(
           ProjectorUI.setColors(command.colors)
           // todo: should WindowManager.lookAndFeelChanged() be called here?
           OnScreenMessenger.lookAndFeelChanged()
+        }
+
+        is ServerBrowserEvent -> when (command) {
+          is ServerBrowserEvent.ExecuteJsEvent -> embeddedBrowserManager.executeJs(command.browserId, command.code)
+          is ServerBrowserEvent.SetHtmlEvent -> embeddedBrowserManager.setHtml(command.browserId, command.html)
+          is ServerBrowserEvent.LoadUrlEvent -> embeddedBrowserManager.loadUrl(command.browserId, command.url, command.show)
+          is ServerBrowserEvent.ShowEvent -> embeddedBrowserManager.show(command.browserId, command.show, command.windowId)
+          is ServerBrowserEvent.MoveEvent -> embeddedBrowserManager.move(command.browserId, command.position)
+          is ServerBrowserEvent.ResizeEvent -> embeddedBrowserManager.resize(command.browserId, command.size)
+          is ServerBrowserEvent.SetOpenLinksInExternalBrowserEvent ->
+            embeddedBrowserManager.setOpenLinksInExternalBrowser(command.browserId, command.openLinksInExternalBrowser)
         }
       }
     }

@@ -21,37 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.jetbrains.projector.common.event
 
-import java.util.*
+import java.awt.Component
 
-plugins {
-  `kotlin-dsl`
-}
+sealed class ServerEventPart
 
-repositories {
-  mavenCentral()
-  maven("https://www.jetbrains.com/intellij-repository/releases")
-  maven("https://www.jetbrains.com/intellij-repository/snapshots")
-  maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
-}
-
-
-val gradleProperties = Properties()
-val gradlePropertiesFile = project.file("../gradle.properties")
-if (gradlePropertiesFile.canRead()) {
-  gradleProperties.load(gradlePropertiesFile.inputStream())
-}
-
-val intellijPlatformVersion: String by gradleProperties
-
-dependencies {
-  implementation("com.jetbrains.intellij.platform:core:$intellijPlatformVersion") {
-    exclude(group = "org.jetbrains.kotlin") // cannot find these dependencies
-  }
-}
-
-kotlin {
-  explicitApi()
-}
-
-sourceSets.main.get().java.srcDir("src/main/kotlin")
+data class BrowserShowEventPart(
+  val browserId: Int,
+  val show: Boolean,
+  val component: Component?,
+) : ServerEventPart()
