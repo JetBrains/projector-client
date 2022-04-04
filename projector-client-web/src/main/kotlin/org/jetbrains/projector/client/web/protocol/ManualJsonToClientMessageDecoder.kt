@@ -332,7 +332,7 @@ object ManualJsonToClientMessageDecoder : ToClientMessageDecoder {
       "a" -> content.toColor()
       "b" -> PaintValue.Gradient(
         content["a"].unsafeCast<Json>().toPoint(), content["b"].unsafeCast<Json>().toPoint(),
-        content["c"] as Int, content["d"] as Int
+        content["c"].unsafeCast<Array<Double>>().toList(), content["d"].unsafeCast<Array<Int>>().toList(),
       )
       "c" -> PaintValue.Unknown(content["a"] as String)
       else -> throw IllegalArgumentException("Unsupported paint value type: ${JSON.stringify(this)}")

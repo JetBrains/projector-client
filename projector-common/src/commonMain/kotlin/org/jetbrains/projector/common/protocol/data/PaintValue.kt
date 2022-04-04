@@ -44,9 +44,9 @@ sealed class PaintValue {
     @SerialName("b")
     val p2: Point,
     @SerialName("c")
-    val argb1: Int,
+    val fractions: List<Double>,
     @SerialName("d")
-    val argb2: Int,
+    val argbs: List<Int>,
   ) : PaintValue()
 
   @Serializable

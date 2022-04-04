@@ -169,8 +169,15 @@ public fun Paint.toPaintValue(): PaintValue = when (this) {
   is GradientPaint -> PaintValue.Gradient(
     p1 = point1.toPoint(),
     p2 = point2.toPoint(),
-    argb1 = color1.rgb,
-    argb2 = color2.rgb
+    fractions = listOf(0.0, 1.0),
+    argbs = listOf(color1.rgb, color2.rgb),
+  )
+
+  is LinearGradientPaint -> PaintValue.Gradient(
+    p1 = startPoint.toPoint(),
+    p2 = endPoint.toPoint(),
+    fractions = fractions.map(Float::toDouble),
+    argbs = colors.map { it.rgb },
   )
 
   is MultipleGradientPaint -> PaintValue.Unknown("MultipleGradientPaint, maybe split to Linear and Radial")
