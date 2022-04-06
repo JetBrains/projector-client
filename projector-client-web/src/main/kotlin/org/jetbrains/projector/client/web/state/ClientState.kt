@@ -624,10 +624,10 @@ sealed class ClientState {
 
         false -> OnScreenMessenger.showText(
           "Connection problem",
-          "There is no connection to <strong>$url</strong>. " +
+          "There is no connection to $url. " +
           "The browser console can contain the error and a more detailed description. " +
-          "Everything we know is that <code>CloseEvent.code=${action.code}</code>, " +
-          "<code>CloseEvent.wasClean=${action.wasClean}</code>. $reason",
+          "Everything we know is that CloseEvent.code=${action.code}, " +
+          "CloseEvent.wasClean=${action.wasClean}. $reason",
           canReload = true
         )
       }
