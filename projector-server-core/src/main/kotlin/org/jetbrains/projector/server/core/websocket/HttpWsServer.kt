@@ -41,6 +41,7 @@ import org.jetbrains.projector.server.core.util.getWildcardHostAddress
 import org.jetbrains.projector.util.logging.Logger
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.URLEncoder
 import java.nio.ByteBuffer
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -91,7 +92,7 @@ public abstract class HttpWsServer(host: InetAddress, port: Int) : HttpWsTranspo
       statusCode = 404,
       statusText = "Not found",
       contentType = "text/html",
-      content = "<h1>404 Not found requested path: $path</h1>".toByteArray(),
+      content = "<h1>404 Not found requested path: ${URLEncoder.encode(path, "utf-8")} (URL-encoded)</h1>".toByteArray(),
     )
   }
 
