@@ -25,14 +25,24 @@ package org.jetbrains.projector.client.web
 
 import kotlinx.browser.window
 import org.jetbrains.projector.client.web.misc.isElectron
+import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.url.URL
 
 object UriHandler {
 
+  private val logger = Logger<UriHandler>()
+
   fun browse(link: String) {
     val url = URL(link)
 
-    if(url.hostname == "localhost" || url.hostname == "127.0.0.1" || url.host == "::1") {
+    // ensure only save URLs are opened, for example, avoid opening executable files
+    if (url.protocol !in setOf("http:", "https:")) {
+      // TODO: handle opening of "file:" links on the server-side, to ensure feature-parity with IDEA
+      logger.error { "Opening $link is avoided (opening non-http(s) links is unsupported)" }
+      return
+    }
+
+    if (url.hostname == "localhost" || url.hostname == "127.0.0.1" || url.host == "::1") {
       url.hostname = window.location.hostname
       url.protocol = window.location.protocol
     }
@@ -41,9 +51,6 @@ object UriHandler {
       window.open(url.href, "_blank")
       return
     }
-
-    // local file cannot be opened in browser
-    if (url.protocol == "file:") return // TODO: handle opening of a file. Easier to do this on the server side
 
     val popUpWindow = window.open(url.href, "_blank")
 
