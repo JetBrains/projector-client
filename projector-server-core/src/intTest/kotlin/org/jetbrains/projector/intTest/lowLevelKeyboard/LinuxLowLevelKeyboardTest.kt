@@ -31,7 +31,7 @@ import org.junit.jupiter.api.condition.OS
 import java.awt.event.KeyEvent
 import kotlin.reflect.KClass
 
-private class LinuxOnlyCondition : EnabledCondition {
+class LinuxOnlyCondition : EnabledCondition {
   override fun enabled(kclass: KClass<out Spec>): Boolean = when {
     kclass.simpleName?.contains("Linux") == true -> OS.LINUX.isCurrentOs
     else -> true // non Linux tests always run
