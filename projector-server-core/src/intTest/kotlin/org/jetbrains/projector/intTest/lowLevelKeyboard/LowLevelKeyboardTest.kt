@@ -49,7 +49,6 @@ import org.jetbrains.projector.common.protocol.toServer.ClientRawKeyEvent
 import org.jetbrains.projector.intTest.ConnectionUtil.clientUrl
 import org.jetbrains.projector.intTest.ConnectionUtil.startServerAndDoHandshake
 import org.jetbrains.projector.server.core.convert.toAwt.toAwtKeyEvent
-import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
 import java.awt.Robot
 import java.awt.event.KeyEvent
@@ -61,7 +60,7 @@ import javax.swing.JLabel
 import javax.swing.JTextArea
 
 // todo: test not only IME
-class LowLevelKeyboardTest : AnnotationSpec() {
+open class LowLevelKeyboardTest : AnnotationSpec() {
 
   private companion object {
 
@@ -128,13 +127,13 @@ class LowLevelKeyboardTest : AnnotationSpec() {
   }
 
   @BeforeEach
-  fun setupBrowser() {
+  open fun setupBrowser() {
     Configuration.browserPosition = "200x200"
     Configuration.browserSize = "200x200"
   }
 
   @OptIn(ExperimentalStdlibApi::class)
-  private fun test(expectedInputText: String, input: Robot.() -> Unit) {
+  fun test(expectedInputText: String, input: Robot.() -> Unit) {
     val robot = Robot().apply {
       autoDelay = 20
     }
@@ -343,57 +342,5 @@ class LowLevelKeyboardTest : AnnotationSpec() {
   fun `arrow should be pressed and released`() = test("") {
     keyPress(KeyEvent.VK_RIGHT)
     keyRelease(KeyEvent.VK_RIGHT)
-  }
-
-  @Test
-  @EnabledOnOs(OS.LINUX)
-  fun `numpad Enter should be pressed and released on Linux`() = test("\n") {
-    Runtime.getRuntime().exec("xdotool key KP_Enter").waitFor()
-  }
-
-  @Test
-  @EnabledOnOs(OS.LINUX)
-  fun `numpad should be pressed and released with num lock on Linux`() = test("5") {
-    Runtime.getRuntime().exec("numlockx on").waitFor()
-    keyPress(KeyEvent.VK_NUMPAD5)
-    keyRelease(KeyEvent.VK_NUMPAD5)
-  }
-
-  @Test
-  @EnabledOnOs(OS.LINUX)
-  @Ignore  // todo: https://youtrack.jetbrains.com/issue/PRJ-301
-  fun `numpad should be pressed and released without numlock on Linux`() = test("") {
-    Runtime.getRuntime().exec("numlockx off").waitFor()
-    keyPress(KeyEvent.VK_NUMPAD7)
-    keyRelease(KeyEvent.VK_NUMPAD7)
-  }
-
-  @Test
-  @EnabledOnOs(OS.LINUX)
-  @Ignore  // todo: https://youtrack.jetbrains.com/issue/PRJ-194
-  fun `Linux alt code should be typed`() = test("–") {
-    keyPress(KeyEvent.VK_CONTROL)
-    keyPress(KeyEvent.VK_SHIFT)
-    keyPress(KeyEvent.VK_U)
-    keyRelease(KeyEvent.VK_U)
-    keyPress(KeyEvent.VK_2)
-    keyRelease(KeyEvent.VK_2)
-    keyPress(KeyEvent.VK_0)
-    keyRelease(KeyEvent.VK_0)
-    keyPress(KeyEvent.VK_1)
-    keyRelease(KeyEvent.VK_1)
-    keyPress(KeyEvent.VK_3)
-    keyRelease(KeyEvent.VK_3)
-    keyRelease(KeyEvent.VK_SHIFT)
-    keyRelease(KeyEvent.VK_CONTROL)
-  }
-
-  @Test
-  @EnabledOnOs(OS.MAC)
-  fun `Mac alt code should be typed`() = test("–") {
-    keyPress(KeyEvent.VK_ALT)
-    keyPress(KeyEvent.VK_MINUS)
-    keyRelease(KeyEvent.VK_MINUS)
-    keyRelease(KeyEvent.VK_ALT)
   }
 }
