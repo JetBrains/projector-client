@@ -33,7 +33,7 @@ import kotlin.reflect.KClass
 
 class MacOnlyCondition : EnabledCondition {
   override fun enabled(kclass: KClass<out Spec>): Boolean = when {
-    kclass.simpleName?.contains("Linux") == true -> OS.MAC.isCurrentOs
+    kclass.simpleName?.contains("Mac") == true -> OS.MAC.isCurrentOs
     else -> true // non Mac tests always run
   }
 }
@@ -46,7 +46,6 @@ class MacLowLevelKeyboardTest : LowLevelKeyboardTest(){
     Configuration.browserPosition = "200x200"
     Configuration.browserSize = "200x200"
   }
-
 
   @Test
   fun `Mac alt code should be typed`() = test("–") {
