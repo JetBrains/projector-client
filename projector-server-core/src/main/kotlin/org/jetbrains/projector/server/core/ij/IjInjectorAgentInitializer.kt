@@ -34,10 +34,11 @@ public object IjInjectorAgentInitializer {
   internal const val MD_PANEL_CLASS_NAME = "org.jetbrains.projector.server.core.ij.md.ProjectorMarkdownPanel"
 
   @Suppress("unused") // Called from projector-server, don't trigger linter that doesn't know it
-  public fun init(isAgent: Boolean) {
+  public fun init(isAgent: Boolean, isIdeAttached: Boolean) {
     val args = mapOf(
       IjArgs.IS_AGENT to isAgent,
       IjArgs.MD_PANEL_CLASS to MD_PANEL_CLASS_NAME,
+      IjArgs.IS_IDE_ATTACHED to isIdeAttached,
     ).toIjArgs()
 
     copyAgentToTempJarAndAttach(

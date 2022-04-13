@@ -56,6 +56,10 @@ internal class ProjectorBatchTransformer(transformerSetups: List<IdeTransformerS
 
     runForState(null)
 
+    if (!parameters.isIdeAttached) {
+      return
+    }
+
     val requiredStates = groups.keys.filterNotNullTo(mutableSetOf())
     registerStateListener("run transformations", IdeStateListener(requiredStates, ::runForState))
   }

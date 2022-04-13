@@ -34,6 +34,7 @@ internal object IjInjector {
   class AgentParameters(
     val isAgent: Boolean,
     val markdownPanelClassName: String,
+    val isIdeAttached: Boolean,
   )
 
   private fun parametersFromArgs(args: Map<String, String>): AgentParameters {
@@ -41,6 +42,7 @@ internal object IjInjector {
     return AgentParameters(
       isAgent = args[IjArgs.IS_AGENT] == "true",
       markdownPanelClassName = args.getValue(IjArgs.MD_PANEL_CLASS),
+      isIdeAttached = args[IjArgs.IS_IDE_ATTACHED] == "true",
     )
   }
 
