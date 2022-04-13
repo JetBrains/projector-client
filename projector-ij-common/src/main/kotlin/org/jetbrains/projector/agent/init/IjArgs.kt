@@ -28,6 +28,7 @@ package org.jetbrains.projector.agent.init
 public object IjArgs {
   public const val IS_AGENT: String = "isAgent"
   public const val MD_PANEL_CLASS: String = "mdPanelClass"
+  public const val IS_IDE_ATTACHED: String = "isIdeAttached"
 }
 
 public fun Map<String, Any>.toIjArgs(): String {

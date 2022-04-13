@@ -37,7 +37,7 @@ internal object IjAwtTransformer : IdeTransformerSetup<IjInjector.AgentParameter
   override val loadingState: IdeState? = null
 
   override fun getTransformations(): Map<Class<*>, (CtClass) -> ByteArray?> = mapOf(
-    //GraphicsEnvironment::class.java to ::transformGraphicsEnvironment,
+    GraphicsEnvironment::class.java to ::transformGraphicsEnvironment,
   )
 
   override fun isTransformerAvailable(parameters: IjInjector.AgentParameters): Boolean = !parameters.isAgent
