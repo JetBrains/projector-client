@@ -453,43 +453,43 @@ sealed class ClientState {
         messagingPolicy.onToClientMessage()
         sentReceivedBadgeShower.onToClientMessage()
 
-        val drawEventCount = commands
-          .filterIsInstance<ServerDrawCommandsEvent>()
-          .sumOf { it.drawEvents.size }
-
-        val decompressingTimeMs = decompressTimeStamp - receiveTimeStamp
-        val decodingTimeMs = decodeTimestamp - decompressTimeStamp
-        val drawingTimeMs = drawTimestamp - decodeTimestamp
-
-        ClientStats.toClientMessageSizeAverage.add(action.message.size.toLong())
-        ClientStats.toClientMessageSizeRate.add(action.message.size.toLong())
-
-        ClientStats.toClientCompressionRatioAverage.add(action.message.size.toDouble() / decompressed.size)
-
-        ClientStats.drawEventCountAverage.add(drawEventCount.toLong())
-        ClientStats.drawEventCountRate.add(drawEventCount.toLong())
-
-        ClientStats.decompressingTimeMsAverage.add(decompressingTimeMs)
-        ClientStats.decompressingTimeMsRate.add(decompressingTimeMs)
-
-        ClientStats.decodingTimeMsAverage.add(decodingTimeMs)
-        ClientStats.decodingTimeMsRate.add(decodingTimeMs)
-
-        ClientStats.drawingTimeMsAverage.add(drawingTimeMs)
-        ClientStats.drawingTimeMsRate.add(drawingTimeMs)
-
-        val processTimestamp = TimeStamp.current
-
-        val otherProcessingTimeMs = processTimestamp - drawTimestamp
-        val totalTimeMs = processTimestamp - receiveTimeStamp
-
-        ClientStats.otherProcessingTimeMsAverage.add(otherProcessingTimeMs)
-        ClientStats.otherProcessingTimeMsRate.add(otherProcessingTimeMs)
-
-        ClientStats.totalTimeMsAverage.add(totalTimeMs)
-        ClientStats.totalTimeMsRate.add(totalTimeMs)
-
         if (ParamsProvider.SHOW_PROCESSING_TIME) {
+          val drawEventCount = commands
+            .filterIsInstance<ServerDrawCommandsEvent>()
+            .map { it.drawEvents.size }
+            .sum()
+
+          val decompressingTimeMs = decompressTimeStamp - receiveTimeStamp
+          val decodingTimeMs = decodeTimestamp - decompressTimeStamp
+          val drawingTimeMs = drawTimestamp - decodeTimestamp
+
+          ClientStats.toClientMessageSizeAverage.add(action.message.size.toLong())
+          ClientStats.toClientMessageSizeRate.add(action.message.size.toLong())
+
+          ClientStats.toClientCompressionRatioAverage.add(action.message.size.toDouble() / decompressed.size)
+
+          ClientStats.drawEventCountAverage.add(drawEventCount.toLong())
+          ClientStats.drawEventCountRate.add(drawEventCount.toLong())
+
+          ClientStats.decompressingTimeMsAverage.add(decompressingTimeMs)
+          ClientStats.decompressingTimeMsRate.add(decompressingTimeMs)
+
+          ClientStats.decodingTimeMsAverage.add(decodingTimeMs)
+          ClientStats.decodingTimeMsRate.add(decodingTimeMs)
+
+          ClientStats.drawingTimeMsAverage.add(drawingTimeMs)
+          ClientStats.drawingTimeMsRate.add(drawingTimeMs)
+
+          val processTimestamp = TimeStamp.current
+
+          val otherProcessingTimeMs = processTimestamp - drawTimestamp
+          val totalTimeMs = processTimestamp - receiveTimeStamp
+
+          ClientStats.otherProcessingTimeMsAverage.add(otherProcessingTimeMs)
+          ClientStats.otherProcessingTimeMsRate.add(otherProcessingTimeMs)
+
+          ClientStats.totalTimeMsAverage.add(totalTimeMs)
+          ClientStats.totalTimeMsRate.add(totalTimeMs)
           fun roundToTwoDecimals(number: Double) = number.asDynamic().toFixed(2)
 
           if (drawEventCount > 0) {
