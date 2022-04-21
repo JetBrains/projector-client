@@ -93,8 +93,8 @@ class ElectronApp(val url: String) {
                     width: width,
                     height: height,
                     webPreferences: {
-                        nodeIntegration: true,
-                        contextIsolation: false,
+                        nodeIntegration: false,
+                        contextIsolation: true,
                         enableRemoteModule: true,
                         webSecurity: false,
                         worldSafeExecuteJavaScript: true,

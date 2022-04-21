@@ -49,15 +49,15 @@ function connect() {
     return;
   }
 
-  const {ipcRenderer} = require('electron')
-  ipcRenderer.send("projector-connect", url);
+  const {api} = window;
+  api.send("projector-connect", url);
 
   cacheNewUrlValue(url);
 }
 
 //$( document ).ready(function() {
-const {ipcRenderer} = require('electron')
-ipcRenderer.on('projector-set-url', (event, arg) => {
+const {api} = window;
+api.receive('projector-set-url', (event, arg) => {
   console.log("New URL: " + arg);
   document.getElementById("url-text-field").value = arg
 })

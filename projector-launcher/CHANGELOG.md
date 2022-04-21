@@ -4,6 +4,10 @@ Notable changes to this project are documented in this file.
 
 # Unreleased
 
+## Fixed
+
+- PRJ-866: Insecure Electron BrowserWindow Configuration fix
+
 ## Changed
 
 - PRJ-771 `node` and `npm` will be installed during the project's build. Preinstalling is no longer needed.
