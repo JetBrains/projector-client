@@ -33,9 +33,12 @@
   <link href="styles.css" rel="stylesheet" type="text/css">
   <link href="manifest.webmanifest" rel="manifest">
   <link href="apple-touch-icon.png" rel="apple-touch-icon" sizes="192x192" >
-
-  <script src="https://cdn.jsdelivr.net/pako/1.0.3/pako.min.js"></script>
+  <script src="https://cdn.bootcss.com/pako/2.0.4/pako.min.js"></script>
   <script>
+    window.depress=(data)=> {
+      const decompressedData = pako.inflate(new Uint8Array(data.buffer))
+      return new Int8Array(decompressedData.buffer)
+    }
     // Disable caching for some scripts (described here: https://stackoverflow.com/questions/118884/how-to-force-the-browser-to-reload-cached-css-js-files):
     const timestamp = Math.floor(Date.now());
     const notCachableScripts = [
