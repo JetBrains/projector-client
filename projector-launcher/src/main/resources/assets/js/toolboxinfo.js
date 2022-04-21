@@ -31,6 +31,6 @@ document.querySelector('#ok-button').addEventListener('click', function () {
 
 function connect() {
   let checkboxValue = document.getElementById("dont-show-checkbox").checked;
-  const {ipcRenderer} = require('electron')
-  ipcRenderer.send("toolboxinfo-ok", checkboxValue);
+  const {api} = window
+  api.send("toolboxinfo-ok", checkboxValue);
 }

@@ -5472,8 +5472,6 @@ external var inAppPurchase: InAppPurchase
 
 external var ipcMain: IpcMain
 
-external var ipcRenderer: IpcRenderer
-
 external var nativeTheme: NativeTheme
 
 external var net: Net
