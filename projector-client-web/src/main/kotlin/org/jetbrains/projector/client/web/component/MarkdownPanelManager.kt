@@ -55,6 +55,8 @@ class MarkdownPanelManager(private val zIndexByWindowIdGetter: (Int) -> Int?, pr
     }
 
     private fun createIFrame(openInExternalBrowser: (String) -> Unit) = (document.createElement("iframe") as HTMLIFrameElement).apply {
+      sandbox.value = "allow-same-origin"
+
       style.apply {
         position = "fixed"
         backgroundColor = "#FFF"
