@@ -586,6 +586,8 @@ sealed class ClientState {
       inputController.removeListeners()
       typing.dispose()
       connectionWatcher.removeWatcher()
+      webSocket.onclose = null
+      webSocket.close()
 
       layers.reconnectionMessageUpdater(messageText)
 
