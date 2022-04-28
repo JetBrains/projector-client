@@ -8,6 +8,10 @@ jobs:
   publish:
     name: publish on space
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        modules: [ agent-common, agent-ij-injector, client-common, client-web, common, ij-common, server-core, util-agent, util-loading, util-logging ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -15,8 +19,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - name: Add properties and publish
+      - name: Add properties
         run: |
           echo -n publishingVersion= >> gradle.properties
           echo ${{ github.sha }}  | head -c 8 >> gradle.properties
-          ./gradlew clean publish -PmavenUsername=${{ secrets.SPACE_NAME }} -PmavenPassword=${{ secrets.SPACE_TOKEN }}
+      - name: Clean
+        run: ./gradle clean
+      - name: Publish to space
+        run: ./gradlew :projector-${{ matrix.modules }}:publish -PmavenUsername=${{ secrets.SPACE_NAME }} -PmavenPassword=${{ secrets.SPACE_TOKEN }}
