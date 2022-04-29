@@ -39,9 +39,7 @@ As for the client-side, just open the URL (something like [https://127.0.0.1:888
 
 ## Client-side
 
-Currently, you can use a web browser to connect to the IDE. The experience is very similar to using any interactive website. You can use a fullscreen mode in your browser to achieve an almost desktop-like experience.
-
-If there is a demand from users, in the next stages we may build separate native applications.
+Currently, you can connect to the IDE using either a web browser, or the Projector Client App (available for Mac, Windows, and Linux). The Projector Client is available to download [here](https://github.com/JetBrains/projector-client/releases).
 
 ## Server-side
 
