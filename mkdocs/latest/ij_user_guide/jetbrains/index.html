@@ -763,14 +763,16 @@
 <p>You should decide how you run a remote IDE and how you access it. This info is given comprehensively at <a href="../running/">servers</a> and <a href="../accessing/">clients</a> pages respectively.</p>
 <p>The easiest way to try the project is to use <a href="../running/#docker">Docker Images</a>.</p>
 <p>If you can't use Docker for some reasons (for example, due to any security limitations), try this <a href="../running/#installer">installation script</a>.</p>
-<p>If you can't even use this installation script, you need to dive deeper and understand how it works under the hood. You can check README here: <a href="https://github.com/JetBrains/projector-server">https://github.com/JetBrains/projector-server</a>.</p>
+<p>If you can't even use this installation script, you need to dive deeper and understand how it works under the hood. You can check <a href="https://github.com/JetBrains/projector-server">README</a>.</p>
 <p>As for the client-side, just open the URL (something like <a href="https://127.0.0.1:8887">https://127.0.0.1:8887</a>) in the browser, and that’s it.</p>
 <h2 id="client-side">Client-side<a class="headerlink" href="#client-side" title="Permanent link">&para;</a></h2>
 <p>Currently, you can use a web browser to connect to the IDE. The experience is very similar to using any interactive website. You can use a fullscreen mode in your browser to achieve an almost desktop-like experience.</p>
+<p>We also have an Electron-based app (<a href="https://github.com/JetBrains/projector-client/tree/master/projector-launcher">projector-launcher</a>) that wraps a web page and can run Projector Web Client.</p>
 <p>If there is a demand from users, in the next stages we may build separate native applications.</p>
 <h2 id="server-side">Server-side<a class="headerlink" href="#server-side" title="Permanent link">&para;</a></h2>
-<p>You can use the Projector as a set of Docker images, or as a standalone distribution. A standalone distribution is currently available for GNU/Linux hosts only.</p>
+<p>You can use the Projector as a set of Docker images (<a href="https://github.com/JetBrains/projector-docker">projector-docker</a>), or as a standalone distribution (<a href="https://github.com/JetBrains/projector-installer">projector-installer</a>). A standalone distribution is currently available for GNU/Linux hosts only.</p>
 <p>Dockerfiles are public and Open Source, so you can verify them with your security team.</p>
+<p>Also, we have the third way to run Projector: via Projector IDE Plugin (<a href="https://plugins.jetbrains.com/plugin/16015-projector">projector-plugin</a>).</p>
 <h2 id="vpn-and-ssh-tunnels">VPN and SSH tunnels<a class="headerlink" href="#vpn-and-ssh-tunnels" title="Permanent link">&para;</a></h2>
 <p>The Projector should run on popular VPN solutions like OpenVPN. It uses the HTTP and WebSocket protocols to connect to the browser. You shouldn't have any problems with that.</p>
 <p>Also, you can use the following SSH command to redirect these ports through a plain SSH tunnel :</p>
@@ -785,10 +787,10 @@
 <h2 id="is-it-open-source">Is it open-source?<a class="headerlink" href="#is-it-open-source" title="Permanent link">&para;</a></h2>
 <p>Now, everything is free and open-source software:</p>
 <ul>
-<li>Dockerfiles (Apache License 2.0): <a href="https://github.com/JetBrains/projector-docker">https://github.com/JetBrains/projector-docker</a>.</li>
-<li>Installer (Apache License 2.0): <a href="https://github.com/JetBrains/projector-installer">https://github.com/JetBrains/projector-installer</a>.</li>
-<li>Server (GNU GPL v2.0 + Classpath Exception): <a href="https://github.com/JetBrains/projector-server">https://github.com/JetBrains/projector-server</a>.</li>
-<li>Client (MIT License): <a href="https://github.com/JetBrains/projector-client">https://github.com/JetBrains/projector-client</a>.</li>
+<li><a href="https://github.com/JetBrains/projector-docker">Dockerfiles</a> (Apache License 2.0);</li>
+<li><a href="https://github.com/JetBrains/projector-installer">Installer</a> (Apache License 2.0);</li>
+<li><a href="https://github.com/JetBrains/projector-server">Server</a> (GNU GPL v2.0 + Classpath Exception);</li>
+<li><a href="https://github.com/JetBrains/projector-client">Client</a> (MIT License).</li>
 </ul>
 <h2 id="known-problems">Known problems<a class="headerlink" href="#known-problems" title="Permanent link">&para;</a></h2>
 <p>The server side is supported as a Docker Image and as a local distribution for Linux servers. Local installations of the server on Windows and Mac are not a subject for the current stage of the project. However, technically it is quite possible.</p>
