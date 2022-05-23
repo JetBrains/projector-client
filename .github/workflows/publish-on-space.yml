@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        modules: [ agent-common, agent-ij-injector, client-common, client-web, common, ij-common, server-core, util-agent, util-loading, util-logging ]
+        modules: [ agent-common, client-common, common, ij-common, server-core, util-agent, util-loading, util-logging ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
