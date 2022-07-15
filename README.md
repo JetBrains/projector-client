@@ -6,6 +6,8 @@
 
 Common and client-related code for running Swing applications remotely.
 
+[Documentation](https://jetbrains.github.io/projector-client/mkdocs/latest/) | [Issue tracker](https://youtrack.jetbrains.com/issues/PRJ)
+
 ## The state of Projector
 
 The development of JetBrains Projector as its own standalone product has been suspended. That said, Projector remains an important part of [JetBrains Gateway](https://www.jetbrains.com/remote-development/gateway/), which is the primary remote development tool for JetBrains IDEs. We will focus our efforts on improving and developing Projector in this limited scenario.
@@ -15,8 +17,6 @@ Our goal is to provide a rich, full-featured remote development experience with 
 As a result, we no longer recommend using the standalone version of JetBrains Projector or merely making tweaks to incorporate it into your existing IDE servers. We won’t provide user support or quick-fixes for issues that arise when these setups are used. If you have the option to switch from Projector to Gateway, we strongly recommend you do so.
 
 [Learn more about JetBrains Gateway](https://www.jetbrains.com/remote-development/gateway/)
-
-[Documentation](https://jetbrains.github.io/projector-client/mkdocs/latest/) | [Issue tracker](https://youtrack.jetbrains.com/issues/PRJ)
 
 ## Modules
 To learn more about modules, check out README files inside them:
