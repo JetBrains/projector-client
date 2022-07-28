@@ -23,12 +23,15 @@
  */
 package org.jetbrains.projector.client.web.state
 
-import kotlinext.js.jso
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.renderComposable
 import org.jetbrains.projector.client.common.RenderingQueue
 import org.jetbrains.projector.client.common.canvas.DomCanvasFactory
 import org.jetbrains.projector.client.common.misc.ImageCacher
@@ -66,9 +69,6 @@ import org.jetbrains.projector.util.logging.Logger
 import org.khronos.webgl.ArrayBuffer
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
-import react.createElement
-import react.dom.render
-import react.react
 import kotlin.math.roundToInt
 
 sealed class ClientState {
@@ -119,14 +119,15 @@ sealed class ClientState {
         document.body!!.appendChild(this)
       }
 
-      val reconnectionMessageUpdater = { newMessage: String? ->
-        val reconnectionMessage = createElement(ReconnectionMessage::class.react, jso {
-          this.message = newMessage
-        })
-        render(reconnectionMessage, reloadingMessageLayer)
+      var reconnectionMessageText: String? by mutableStateOf(null)
+
+      renderComposable(reloadingMessageLayer) {
+        ReconnectionMessage(reconnectionMessageText)
       }
 
-      reconnectionMessageUpdater(null)
+      val reconnectionMessageUpdater = { newMessage: String? ->
+        reconnectionMessageText = newMessage
+      }
 
       OnScreenMessenger.showText("Starting connection", "Waiting for response from $url...", canReload = false)
 

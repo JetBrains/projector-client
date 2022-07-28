@@ -23,58 +23,45 @@
  */
 package org.jetbrains.projector.client.web.ui
 
-import kotlinx.css.*
-import org.jetbrains.projector.client.web.externalDeclarartion.loadingIndicator
-import org.jetbrains.projector.client.web.externalDeclarartion.styleRoot
-import react.*
-import styled.css
-import styled.styledH1
-import styled.styledSpan
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.H1
+import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.Text
 
-external interface ReconnectionMessageProps : Props {
+@Composable
+fun ReconnectionMessage(text: String?) {
+  text?.let { message ->
+    Span(
+      attrs = {
+        style {
+          position(Position.Absolute)
+          width(100.percent)
+          height(100.percent)
+          top(0.px)
+          left(0.px)
+          property("pointer-events", "none")
 
-  var message: String?
-}
+          backgroundColor(rgba(127, 127, 127, 0.5))
+          display(DisplayStyle.Block)
 
-class ReconnectionMessage : RComponent<ReconnectionMessageProps, State>() {
-
-  override fun RBuilder.render() {
-    props.message?.let { message ->
-      styledSpan {
-        css {
-          position = Position.absolute
-          width = 100.pct
-          height = 100.pct
-          top = 0.px
-          left = 0.px
-          pointerEvents = PointerEvents.none
-
-          background = "rgba(127, 127, 127, 0.5)"
-          display = Display.block
-
-          textAlign = TextAlign.center
-
-          classes.add("connection-watcher-warning")
+          textAlign(AlignContent.Center.value)
         }
 
-        styledH1 {
-          css {
-            put("text-shadow", "-1px 0 #ccc, 0 1px #ccc, 1px 0 #ccc, 0 -1px #ccc")  // border
-          }
-
-          +message
-        }
-
-        styleRoot {
-          loadingIndicator {
-            attrs {
-              segmentLength = 50.0
-              segmentWidth = 10.0
-              spacing = 20.0
-            }
-          }
-        }
+        classes("connection-watcher-warning")
       }
+    ) {
+      H1(
+        attrs = {
+          style {
+            property("text-shadow", "-1px 0 #ccc, 0 1px #ccc, 1px 0 #ccc, 0 -1px #ccc")  // border
+          }
+        }
+      ) {
+        Text(message)
+      }
+
+      LoadingIndicator()
     }
   }
 }
