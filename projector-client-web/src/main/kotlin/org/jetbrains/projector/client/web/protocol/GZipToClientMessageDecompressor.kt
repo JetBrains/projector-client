@@ -29,10 +29,10 @@ import org.jetbrains.projector.common.protocol.handshake.CompressionType
 object GZipToClientMessageDecompressor : MessageDecompressor<ByteArray> {
 
   override fun decompress(data: ByteArray): ByteArray {
-    return pako.inflate(data) as ByteArray
+    return pako(data)
   }
 
   override val compressionType = CompressionType.GZIP
 
-  private val pako: dynamic = js("window.pako")
+  private val pako: dynamic = js("window.depress")
 }
