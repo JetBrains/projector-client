@@ -59,7 +59,16 @@ There are some limitations with clipboard.
 
 When your clipboard is changed on the client side, the server needs to apply the change on its side.
 
-We implement it on the client side via setting ["paste" listener](https://developer.mozilla.org/en-US/docs/Web/API/Element/paste_event). So clipboard is updated on the server only if you invoke that listener, for example, by hitting Ctrl+V or Ctrl+Shift+V. **If you have an application on the server side with a "paste" button, a click on it can paste outdated information unless the listener wasn't invoked**.
+We implement it on the client side by reading clipboard contents when the browser tab is activated, then sending to the server. 
+This allows a pretty seamless user experience.
+This approach is tested in Firefox (requires `dom.events.testing.asyncClipboard` flag enabled in`about:config`) and Chromium based browsers.
+Safari is not supported due to restrictions on clipboard access.
+Also site requires secure context support.
+
+Main limitation of that current solution is inability to detect clipboard change if Projector tab is active and clipboard was changed 
+by some other app in background.
+
+So we also make use of ["paste" listener](https://developer.mozilla.org/en-US/docs/Web/API/Element/paste_event). Clipboard is updated on the server if you invoke that listener, for example, by hitting Ctrl+V or Ctrl+Shift+V. **If you have an application on the server side with a "paste" button, a click on it can paste outdated information unless the listener wasn't invoked**.
 
 Unfortunately, we can't just continuously get clipboard data from [`window.navigator.clipboard`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard) and send it to the server because when it's invoked not from user's context, there will be alert from the browser like "the site wants to read clipboard info, do you grant?".
 

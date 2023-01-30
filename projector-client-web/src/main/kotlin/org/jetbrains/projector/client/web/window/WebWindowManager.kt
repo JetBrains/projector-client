@@ -26,10 +26,12 @@ package org.jetbrains.projector.client.web.window
 import kotlinx.browser.window
 import org.jetbrains.projector.client.common.misc.ImageCacher
 import org.jetbrains.projector.client.common.window.WindowManager
+import org.jetbrains.projector.client.web.ClipboardHandler
 import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.state.LafListener
 import org.jetbrains.projector.common.protocol.toClient.WindowData
+import org.jetbrains.projector.common.protocol.toServer.ClientClipboardEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowsActivationEvent
 import org.jetbrains.projector.common.protocol.toServer.ClientWindowsDeactivationEvent
 import org.w3c.dom.HTMLCanvasElement
@@ -52,6 +54,10 @@ class WebWindowManager(private val stateMachine: ClientStateMachine, override va
   private fun onActivated(@Suppress("UNUSED_PARAMETER") event: FocusEvent) {
     val windowIds = visibleWindows.map { it.id }
     stateMachine.fire(ClientAction.AddEvent(ClientWindowsActivationEvent(windowIds)))
+
+    ClipboardHandler.getNewClipboardString {
+      stateMachine.fire(ClientAction.AddEvent(ClientClipboardEvent(it)))
+    }
   }
 
   // todo: remove SUPPRESS after KT-8112 is implemented or KTIJ-15401 is solved in some other way

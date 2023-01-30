@@ -115,4 +115,28 @@ class ClipboardHandler(private val onCopyFailed: (ClientNotificationEvent) -> Un
     }
   }
 
+  companion object {
+
+    private var lastClipboardString: String? = null
+
+    /**
+     * Attempts to get clipboard contents, then passes it to the callback function if it's a new value.
+     * Restrictions:
+     * - Requires secure context
+     * - In firefox function `window.navigator.clipboard.readText` requires flag `dom.events.testing.asyncClipboard` in
+     * `about:config` to be enabled
+     * - Safari can only read clipboard from handlers of mouse press events and similar
+     */
+    fun getNewClipboardString(callback: (String) -> Unit) {
+      if (isDefined(window.navigator.clipboard) && isDefined(js("window.navigator.clipboard.readText"))) {
+        window.navigator.clipboard.readText().then {
+          if (it != lastClipboardString) {
+            lastClipboardString = it
+            callback(it)
+          }
+        }
+      }
+    }
+  }
+
 }
